@@ -1,0 +1,53 @@
+{
+	"Name": "Windowing",
+	"Type": "Runtime",
+	"ThirdParty": {
+	"Include": [
+		"Include/"
+	],
+	"LibraryPaths": {
+		"x64": {
+			"Windows": {
+				"MSVC": [
+					"Libraries/x64/Windows/MSVC/"
+				],
+				"MinGW": [
+					"Libraries/x64/Windows/MinGW/"
+				]
+			},
+			"Linux": {
+				"GCC": [
+					"Libraries/x64/Linux/GCC/"
+				]
+			}
+		}
+	}
+},
+	"Libraries": {
+		"x64": {
+			"Windows": {
+				"MSVC": [
+					"user32.lib",
+					"gdi32.lib",
+					"Shell32.lib",
+					"glfw3.lib"
+				],
+				"MinGW": [
+					"glfw3",
+					"user32",
+					"gdi32",
+					"shell32",
+					"stdc++fs"
+				]
+			},
+			"Linux": {
+				"GCC": [
+					"glfw3",
+					"pthread",
+					"dl"
+				]
+			}
+		}
+	},
+	"Modules": ["Core"]
+}

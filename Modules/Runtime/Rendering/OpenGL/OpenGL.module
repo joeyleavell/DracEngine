@@ -1,0 +1,51 @@
+{
+	"Name": "OpenGL",
+	"Type": "Runtime",
+	"Macros":[
+		"GLEW_STATIC",
+		"GLEW_NO_GLU"
+	],
+	"ThirdParty": {
+		"Include": [
+			"Include/GL/"
+		],
+		"LibraryPaths": {
+			"x64": {
+				"Windows": {
+					"MSVC": [
+						"Libraries/x64/Windows/MSVC/"
+					],
+					"MinGW": [
+						"Libraries/x64/Windows/MinGW/"
+					]
+				},
+				"Linux": {
+					"GCC": [
+						"Libraries/x64/Linux/GCC/"
+					]
+				}
+			}
+		}
+	},
+	"Libraries": {
+		"x64": {
+			"Windows": {
+				"MSVC": [
+					"OpenGL32.lib",
+					"glew32s.lib"
+				],
+				"MinGW": [
+					"glew32",
+					"opengl32"
+				]
+			},
+			"Linux": {
+				"GCC": [
+					"GL",
+					"GLEW"
+				]
+			}
+		}
+	},
+	"Modules": ["Core", "Math", "AssetCore", "RenderingCore"]
+}

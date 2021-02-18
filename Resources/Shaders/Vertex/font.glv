@@ -1,0 +1,19 @@
+#version 330 core
+
+uniform mat4 UCamera;
+
+in vec3 a_pos;
+in vec2 a_tex_coord;
+in vec4 a_color;
+
+out vec2 VTexCoord;
+out vec4 VColor;
+
+void main()
+{
+	VTexCoord = a_tex_coord;
+	VColor = a_color;
+	
+	// Transform the position by the model view projection matrix.
+	gl_Position = UCamera * vec4(a_pos, 1.0);
+}

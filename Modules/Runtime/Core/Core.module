@@ -1,0 +1,19 @@
+{
+	"Name": "Core",
+	"Type": "Runtime",
+	"Libraries": {
+		"x64": {
+			"Windows": {
+				"MinGW":[
+					"stdc++fs"
+				]
+			},
+			"Linux": {
+				"GCC":[
+					"stdc++fs"
+				]
+			}
+		}
+	},
+	"Modules": []
+}

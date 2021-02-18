@@ -1,0 +1,13 @@
+{
+	"Name": "Audio",
+	"Type": "Runtime",
+	"ThirdParty": {
+		"Include": [
+			"Include/"
+		],
+		"LibraryPaths": [
+			"Libraries/Win64/"
+		]
+	},
+	"Modules": ["Core", "AssetCore"]
+}

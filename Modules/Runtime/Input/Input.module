@@ -1,0 +1,5 @@
+{
+	"Name": "Input",
+	"Type": "Runtime",
+	"Modules": ["Core"]
+}

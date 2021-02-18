@@ -1,0 +1,11 @@
+{
+    "FrameLock": 60,
+    "Window": {
+        "Fullscreen": {
+            "Enabled": false,
+            "Monitor": 0
+        },
+        "Height": 600,
+        "Width": 800
+    }
+}

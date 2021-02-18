@@ -1,0 +1,10 @@
+{
+	"Name": "Math",
+	"Type": "Runtime",
+	"ThirdParty": {
+		"Include": [
+			"Include/"
+		]
+	},
+	"Modules": ["Core"]
+}

@@ -1,0 +1,5 @@
+{
+	"Name": "Automation",
+	"Type": "Runtime",
+	"Modules": ["Core"]
+}

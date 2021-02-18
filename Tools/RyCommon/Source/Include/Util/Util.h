@@ -1,0 +1,28 @@
+#pragma once
+
+#include <string>
+#include <vector>
+
+void IncorrectUsage(std::string Usage);
+bool HasOption(std::vector<std::string>& Args, std::string Option);
+std::string ParseOption(std::vector<std::string>& Args, std::string Option);
+std::string FindPathArg(std::vector<std::string>& Args);
+std::string FullPath(std::string Path);
+std::string ToUpper(std::string Word);
+void FormatString(char* OutBuffer, int OutBufferSize, const char* Format, ...);
+
+bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize = 0, char* StdOut = nullptr, int ErrorBuffSize = 0, char* StdErr = nullptr);
+
+std::string GetModulePath();
+std::string GetEngineRootDir();
+std::string GetEngineModulesDir();
+std::string GetEngineRuntimeModulesDir();
+std::string GetEngineEditorModulesDir();
+
+std::string GetEngineBinaryDir();
+std::string GetEngineIntermediateDir();
+std::string GetEngineObjectDir();
+std::string GetEngineLibraryDir();
+std::string GetEngineResourcesDir();
+
+std::string GetTimestamp(std::string Format);
