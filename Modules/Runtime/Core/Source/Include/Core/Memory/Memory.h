@@ -25,6 +25,6 @@ namespace Ry
 		return std::make_unique<T>(Arguments...);
 	}
 
-	CORE_MODULE void MemCpy(void* Dest, uint64 DstSize, void* Src, uint64 SrcSize);
+	CORE_MODULE void MemCpy(void* Dest, uint64 DstSize, const void* Src, uint64 SrcSize);
 	
 }

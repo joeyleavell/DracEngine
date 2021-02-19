@@ -3,8 +3,8 @@ echo off
 setlocal EnableDelayedExpansion
 
 rem Module root relative to binaries directory
-set SOLUTIONROOT="../../../"
-set BINARYDIR="../../Tools/RyBuild/Binary/"
+set SOLUTIONROOT="../../"
+set BINARYDIR="../../Tools/Binary/"
 
 rem Perform work in engine binary directory
 pushd %~dp0

@@ -14,9 +14,10 @@ namespace Ry
 		// Unload all assets
 		while (AssetKeyItr)
 		{
-			UnloadAsset(**AssetKeyItr);
-
-			delete LoadedAssets.get(**AssetKeyItr);
+			Ry::AssetRef* Ref = AssetKeyItr.Key();
+			
+			(*AssetKeyItr.Value())->UnloadAsset();
+			delete *LoadedAssets.get(*Ref);
 
 			++AssetKeyItr;
 		}
@@ -24,12 +25,12 @@ namespace Ry
 		// Unload all factories
 		while (FactoryKeyItr)
 		{
-			UnregisterFactory(**FactoryKeyItr);
-
-			delete Factories.get(**FactoryKeyItr);
-
+			delete *FactoryKeyItr.Value();			
 			++FactoryKeyItr;
 		}
+
+		LoadedAssets.Clear();
+		Factories.Clear();
 	}
 
 	void AssetManager::RegisterFactory(const Ry::String& AssetType, AssetFactory* Factory)

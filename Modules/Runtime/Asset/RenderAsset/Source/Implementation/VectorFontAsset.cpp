@@ -1,8 +1,7 @@
 #include "VectorFontAsset.h"
 #include "Font.h"
 #include <iostream>
-
-#include "stb_truetype.h"
+#include "Stb/stb_truetype.h"
 
 constexpr uint32 START_CODEPOINT = 32;
 constexpr uint32 END_CODEPOINT = 126;
@@ -60,7 +59,7 @@ namespace Ry
 	Ry::BitmapFont* VectorFontAsset::GenerateBitmapFont(int32 Size)
 	{
 		BitmapFont* Result = new BitmapFont();
-		
+
 		float Scale = (float) stbtt_ScaleForMappingEmToPixels(TTFData->FontInfo, static_cast<float>(Size));
 
 		int32 Ascent;

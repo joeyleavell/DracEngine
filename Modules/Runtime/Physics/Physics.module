@@ -1,62 +1,6 @@
 {
 	"Name": "Physics",
 	"Type": "Runtime",
-	"ThirdParty": {
-		"Include": [
-			"Include/Bullet/"
-		],
-		"LibraryPaths": {
-			"x64": {
-				"Windows": {
-					"MSVC": [
-						"Libraries/x64/Windows/MSVC/"
-					],
-					"MinGW": [
-						"Libraries/x64/Windows/MinGW/"
-					]
-				},
-				"Linux": {
-					"GCC": [
-						"Libraries/x64/Linux/GCC/"
-					]
-				}
-			}
-		}
-	},
-	"Libraries": {
-		"x64": {
-			"Windows": {
-				"MSVC": [
-					"Bullet3Dynamics.lib",
-					"Bullet3Collision.lib",
-					"Bullet3Geometry.lib",
-					"BulletDynamics.lib",
-					"BulletCollision.lib",
-					"Bullet3Common.lib",
-					"LinearMath.lib"
-				],
-				"MinGW": [
-					"Bullet3Dynamics",
-					"Bullet3Collision",
-					"Bullet3Geometry",
-					"BulletDynamics",
-					"BulletCollision",
-					"Bullet3Common",
-					"LinearMath"
-				]
-			},
-			"Linux": {
-				"GCC": [
-					"Bullet3Dynamics",
-					"Bullet3Collision",
-					"Bullet3Geometry",
-					"BulletDynamics",
-					"BulletCollision",
-					"Bullet3Common",
-					"LinearMath"
-				]
-			}
-		}
-	}, 
+	"Extern": ["Bullet3"],
 	"Modules": ["Core", "Math"]
 }

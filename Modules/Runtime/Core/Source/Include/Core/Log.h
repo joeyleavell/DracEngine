@@ -28,7 +28,22 @@ namespace Ry
 		//	FileOutput.open(Output);
 		}
 
-		void Log(Ry::String Format, ...)
+		void Log(Ry::String Format)
+		{
+			this->Log(Sev::Normal, Format, nullptr);
+		}
+
+		void LogWarn(Ry::String Format)
+		{
+			this->Log(Sev::Warning, Format, nullptr);
+		}
+
+		void LogError(Ry::String Format)
+		{
+			this->Log(Sev::Error, Format, nullptr);
+		}
+
+		void Logf(Ry::String Format...)
 		{
 			va_list List;
 			va_start(List, Format);
@@ -36,7 +51,7 @@ namespace Ry
 			va_end(List);
 		}
 
-		void LogWarn(Ry::String Format, ...)
+		void LogWarnf(Ry::String Format...)
 		{
 			va_list List;
 			va_start(List, Format);
@@ -44,28 +59,23 @@ namespace Ry
 			va_end(List);
 		}
 
-		void LogError(Ry::String Format, ...)
+		void LogErrorf(Ry::String Format...)
 		{
 			va_list List;
 			va_start(List, Format);
-			this->Log(Sev::Warning, Format, List);
+			this->Log(Sev::Error, Format, List);
 			va_end(List);
 		}
 
-		void Log(Ry::String Format, va_list Args)
-		{
-			this->Log(Sev::Normal, Format, Args);
-		}
-
-		void LogWarn(Ry::String Format, va_list Args)
-		{
-			this->Log(Sev::Warning, Format, Args);
-		}
-
-		void LogError(Ry::String Format, va_list Args)
-		{
-			this->Log(Sev::Warning, Format, Args);
-		}
+		// void LogWarn(Ry::String Format, va_list Args)
+		// {
+		// 	this->Log(Sev::Warning, Format, Args);
+		// }
+		//
+		// void LogError(Ry::String Format, va_list Args)
+		// {
+		// 	this->Log(Sev::Error, Format, Args);
+		// }
 
 		void Log(Sev Severity, Ry::String Format, va_list Args)
 		{

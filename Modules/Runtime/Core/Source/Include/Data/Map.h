@@ -3,7 +3,7 @@
 #include "Algorithm/Algorithm.h"
 #include <iostream>
 
-#define TABLE_SIZE 500
+#define TABLE_SIZE 1
 
 namespace Ry
 {
@@ -27,38 +27,50 @@ namespace Ry
 	{
 	public:
 
-		KeyIterator(const KeyIterator& Other)
+		KeyIterator(const KeyIterator& Other):
+		HashTable(Other.HashTable),
+		TableIndex(Other.TableIndex),
+		CurrentEntry(Other.CurrentEntry),
+		NextEntry(Other.NextEntry),
+		NextIndex(Other.NextIndex)
 		{
-			this->HashTable = Other.HashTable;
-			this->TableIndex = Other.TableIndex;
-			this->CurrentEntry = Other.CurrentEntry;
+		}
+		
+		KeyIterator(const KeyIterator&& Other) noexcept:
+		HashTable(Other.HashTable),
+		TableIndex(Other.TableIndex),
+		CurrentEntry(Other.CurrentEntry),
+		NextEntry(Other.NextEntry),
+		NextIndex(Other.NextIndex)
+		{
 		}
 
-		KeyIterator(MapChain<K, V>** HashTable)
+		KeyIterator(MapChain<K, V>** HashTable):
+		HashTable(HashTable),
+		TableIndex(-1),
+		CurrentEntry(nullptr),
+		NextEntry(nullptr),
+		NextIndex(-1)
 		{
-			this->HashTable = HashTable;
-			this->TableIndex = 0;
-			this->CurrentEntry = nullptr;
+			CurrentEntry = FindNext(TableIndex, -1);
 
-			// Scan for the first table entry
-			bool Found = false;
-			while (!Found && TableIndex < TABLE_SIZE)
+			if(TableIndex >= 0)
 			{
-				if (HashTable[TableIndex])
-				{
-					this->CurrentEntry = HashTable[TableIndex];
-					Found = true;
-				}
-
-				++TableIndex;
+				NextEntry = FindNext(NextIndex, TableIndex + 1);
 			}
+			else
+			{
+				NextEntry = nullptr;
+				NextIndex = -1;
+			}
+
 		}
 
 		virtual ~KeyIterator() = default;
 
 		explicit operator bool() const override
 		{
-			return TableIndex < TABLE_SIZE;
+			return CurrentEntry != nullptr;
 		}
 
 		K* operator*() const override
@@ -93,27 +105,102 @@ namespace Ry
 			}
 			else
 			{
-				// Scan for the next table entry
-				bool Found = false;
-				while (!Found && TableIndex < TABLE_SIZE)
+				CurrentEntry = NextEntry;
+				TableIndex = NextIndex;
+
+				if(TableIndex >= 0)
 				{
-					if (HashTable[TableIndex])
-					{
-						this->CurrentEntry = HashTable[TableIndex];
-						Found = true;
-					}
-					++TableIndex;
+					NextEntry = FindNext(NextIndex, TableIndex + 1);
+				}
+				else
+				{
+					NextEntry = nullptr;
+					NextIndex = -1;
 				}
 			}
 
 			return *this;
 		}
 
+		KeyIterator<K, V>& operator=(const KeyIterator<K, V>& Other)
+		{
+			if (this == &Other)
+				return *this;
+
+			this->HashTable = Other.HashTable;
+			this->TableIndex = Other.TableIndex;
+			this->CurrentEntry = Other.CurrentEntry;
+			this->NextEntry = Other.NextEntry;
+			this->NextIndex = Other.NextIndex;
+
+			return *this;
+		}
+
+		KeyIterator<K, V>& operator=(KeyIterator<K, V>&& Other) noexcept
+		{
+			this->HashTable = Other.HashTable;
+			this->TableIndex = Other.TableIndex;
+			this->CurrentEntry = Other.CurrentEntry;
+			this->NextEntry = Other.NextEntry;
+			this->NextIndex = Other.NextIndex;
+
+			return *this;
+		}
+
+
 	private:
+
+		/**
+		 * Finds the next available entry in a hash map.
+		 * 
+		 * @param StartPoint The entry to use as a starting point. This value can be null, in which case we'll just start searching the hash map.
+		 * @param StartPointIndex Where to start searching in the hash map.
+		 * @param OutIndex The spot to store the index of the next found entry. If the entry is the next link in the chain, the out index remains as the start point index.
+		 * @return The next entry in the hash map.
+		 */
+		MapChain<K, V>* FindNext(int32& OutIndex, int32 StartPointIndex)
+		{
+			int32 Index = StartPointIndex + 1;
+			
+			// Scan for the next table entry
+			bool Found = false;
+			while (!Found && Index < TABLE_SIZE)
+			{
+				if (HashTable[Index])
+				{
+					this->CurrentEntry = HashTable[Index];
+					Found = true;
+				}
+				else
+				{
+					++Index;
+				}
+
+			}
+
+			if(Found)
+			{
+				OutIndex = Index;
+				return HashTable[Index];
+			}
+			else
+			{
+				OutIndex = -1;
+				return nullptr;
+			}
+
+		}
+		
 		MapChain<K, V>** HashTable;
 
-		uint32 TableIndex;
+		// These values can be negative, indicating no next value.
+		// The next value is stored as a convenience to allow explicit checking
+		int32 TableIndex;
+		int32 NextIndex;
+		
 		MapChain<K, V>* CurrentEntry;
+		MapChain<K, V>* NextEntry;
+
 	};
 
 	template <class K, class V>
@@ -125,6 +212,14 @@ namespace Ry
 		{
 			for (uint32 i = 0; i < TABLE_SIZE; i++)
 				table[i] = nullptr;
+		}
+
+		Map(const Map<K, V>& Other)
+		{
+			for (uint32 i = 0; i < TABLE_SIZE; i++)
+				table[i] = nullptr;
+			
+			Copy(Other);
 		}
 
 		KeyIterator<K, V> CreateKeyIterator()
@@ -241,18 +336,73 @@ namespace Ry
 
 				while (chain != nullptr && !(chain->key == key))
 				{
+					prev_chain = chain;
 					chain = chain->next;
 				}
 
 				if (chain != nullptr)
 				{
-					prev_chain->next = nullptr;
+					prev_chain->next = chain->next;
 					delete chain;
 				}
 				else
 				{
 					std::cerr << "ERROR: tried to delete element that was not in hashmap" << std::endl;
 				}
+			}
+		}
+
+		Map<K, V>& operator=(const Map<K, V>& Other)
+		{
+			Copy(Other);
+			return *this;
+		}
+
+		void Copy(const Map<K, V>& Other)
+		{	
+			// Deep copy the map
+			for (uint32 i = 0; i < TABLE_SIZE; i++)
+			{
+
+				// I know we could call clear instead, but this requires one less pass
+				MapChain<K, V>* Current = table[i];
+				while(Current)
+				{
+					MapChain<K, V>* Next = Current->next;
+					delete Current;
+					Current = Next;
+				}
+				table[i] = nullptr;
+
+				MapChain<K, V>* Start = Other.table[i];
+				MapChain<K, V>* NewChainHead = nullptr;
+				MapChain<K, V>* NewChain = nullptr;
+				MapChain<K, V>* NewChainPrev = nullptr;
+
+				while (Start)
+				{
+					NewChain = new MapChain<K, V>;
+					NewChain->key = Start->key;
+					NewChain->value = Start->value;
+					NewChain->next = nullptr;
+
+					if(!NewChainHead)
+					{
+						NewChainHead = NewChain;
+					}
+
+					if (NewChainPrev)
+					{
+						NewChainPrev->next = NewChain;
+					}
+
+					NewChainPrev = NewChain;
+					Start = Start->next;
+				}
+
+				table[i] = NewChainHead;
+
+
 			}
 		}
 

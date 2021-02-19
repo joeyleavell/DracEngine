@@ -1,7 +1,8 @@
 #include "TextureAsset.h"
 #include "Core/Globals.h"
 #include "Bitmap.h"
-#include "Interface/Rendering.h"
+#include "Interface2/RenderAPI.h"
+#include "Interface2/Texture2.h"
 
 namespace Ry
 {
@@ -11,16 +12,24 @@ namespace Ry
 		this->Resource = Resource;
 	}
 
-	Texture* TextureAsset::CreateRuntimeTexture()
+	Texture2* TextureAsset::CreateRuntimeTexture()
 	{
-		Texture* NewTexture = Ry::RenderAPI->make_texture();
+		Texture2* NewTexture = Ry::NewRenderAPI->CreateTexture();
 		NewTexture->Data(Resource);
+
+		RuntimeResources.Add(NewTexture);
 
 		return NewTexture;
 	}
 	
 	void TextureAsset::UnloadAsset()
 	{
+		for(Texture2* RuntimeResource : RuntimeResources)
+		{
+			RuntimeResource->DeleteTexture();
+			delete RuntimeResource;
+		}
+		
 		delete Resource;
 	}
 	

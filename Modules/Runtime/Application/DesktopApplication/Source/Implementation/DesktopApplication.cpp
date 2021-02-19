@@ -10,7 +10,7 @@
 #include "File/File.h"
 #include "Core/Globals.h"
 #include "Input.h"
-#include "GLRendering.h"
+#include "GLRenderAPI2.h"
 #include "RenderingEngine.h"
 #include "Interface/Rendering.h"
 #include "Scene.h"
@@ -188,7 +188,7 @@ namespace Ry
 	{
 		// Set singleton
 		Ry::app = this;
-		Ry::rplatform = new Ry::RenderingPlatform(Ry::RenderingPlatform::GL4); // TODO: this needs to be set somewhere else!!!
+		Ry::rplatform = new Ry::RenderingPlatform(Ry::RenderingPlatform::OpenGL); // TODO: this needs to be set somewhere else!!!
 
 		// Setup get viewport width and get viewport height delegates
 		Ry::ViewportWidthDel.BindLambda([]()
@@ -305,7 +305,7 @@ namespace Ry
 
 	bool DesktopApp::InitWindow(const DesktopConfig& Conf)
 	{
-		GameWindow = new Window;
+		GameWindow = new Window(Ry::RenderingPlatform::OpenGL);
 
 		if(!GameWindow->CreateWindow(*Conf.window.title, Conf.window.width, Conf.window.height))
 		{
@@ -321,7 +321,7 @@ namespace Ry
 		GameWindow->AddScrollDelegate(Ry::Delegate<void, double, double>::CreateMemberFunctionDelegate(this, &DesktopApp::OnScroll));
 
 		// Setup the window context
-		GameWindow->InitContext();
+		//GameWindow->InitContext();
 
 		GameWindow->SetVSyncEnabled(false);
 	
@@ -404,7 +404,7 @@ namespace Ry
 	void DesktopApp::render()
 	{		
 		Game->Render();
-		GameWindow->SwapBuffers();
+		//GameWindow->SwapBuffers();
 	}
 
 	void DesktopApp::Exit()

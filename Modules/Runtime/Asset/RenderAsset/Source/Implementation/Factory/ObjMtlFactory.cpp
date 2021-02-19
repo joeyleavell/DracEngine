@@ -5,6 +5,7 @@
 #include "Manager/IAssetManager.h"
 #include "File/File.h"
 #include "Core/Globals.h"
+#include "Interface2/Texture2.h"
 
 namespace Ry
 {
@@ -109,8 +110,9 @@ namespace Ry
 						Ry::String NewVirtual = Ry::File::Join(VirtualRoot, Path);
 
 						NewVirtual.Replace('\\', '/');
-						
-						Texture* Result = Ry::AssetMan->LoadAsset(NewVirtual, "image")->As<TextureAsset>()->CreateRuntimeTexture();
+
+						// Todo: Texture support needs to be re-added
+						Texture2* Result = Ry::AssetMan->LoadAsset(NewVirtual, "image")->As<TextureAsset>()->CreateRuntimeTexture();
 						CurrentMaterial->DiffuseTexture = Result;
 					}
 

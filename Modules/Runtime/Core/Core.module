@@ -1,6 +1,7 @@
 {
 	"Name": "Core",
 	"Type": "Runtime",
+	"Extern": [],
 	"Libraries": {
 		"x64": {
 			"Windows": {

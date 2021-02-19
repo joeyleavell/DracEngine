@@ -6,7 +6,7 @@ namespace Ry
 {
 	
 	class Bitmap;
-	class Texture;
+	class Texture2;
 	
 	class TextureAsset : public Asset
 	{
@@ -15,10 +15,12 @@ namespace Ry
 		TextureAsset(Bitmap* Resource);
 
 		void UnloadAsset() override;
-		Texture* CreateRuntimeTexture();
+		Texture2* CreateRuntimeTexture();
 		
 	private:
 		Ry::Bitmap* Resource;
+		Ry::ArrayList<Texture2*> RuntimeResources;
+		
 	};
 	
 }

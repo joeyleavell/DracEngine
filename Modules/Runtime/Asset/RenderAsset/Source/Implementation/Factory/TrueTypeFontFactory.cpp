@@ -3,8 +3,7 @@
 #include "VectorFontAsset.h"
 #include "File/File.h"
 #include <iostream>
-
-#include "stb_truetype.h"
+#include "Stb/stb_truetype.h"
 
 constexpr int64 MAX_FONT_SIZE = 50 * 1024 * 1024;
 

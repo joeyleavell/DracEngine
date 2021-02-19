@@ -16,6 +16,16 @@ namespace Ry
 		Vector() = default;
 		~Vector() = default;
 
+		float* Pack(float* Out) const
+		{
+			for(int32 Element = 0; Element < S; Element++)
+			{
+				Out[Element] = data[Element];
+			}
+
+			return Out + S;
+		}
+
 		Vector& operator-=(const Vector& o);
 		Vector& operator+=(const Vector& o);
 		Vector& operator*=(const Vector& o);
@@ -31,6 +41,8 @@ namespace Ry
 		const float* operator*() const;
 
 		bool operator==(const Vector& o) const;
+
+		int32 DataSizeBytes() const;
 
 		template <uint32 R_>
 		friend String to_string(const Vector<R_>& vec);
@@ -186,6 +198,11 @@ namespace Ry
 			return *this;
 		};
 	};
+
+	// For hlsl equivalence
+	typedef Vector2 Float2;
+	typedef Vector3 Float3;
+	typedef Vector4 Float4;
 
 
 	MATH_MODULE Vector3 MakeRotation(const Vector3& ForwardVector);

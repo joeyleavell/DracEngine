@@ -6,6 +6,7 @@
 #include "EntryPoint.h"
 #include "Core/PlatformProcess.h"
 #include "EditorMain.h"
+#include "CommandUtils.h"
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
@@ -22,9 +23,9 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 {
 	Ry::AbstractGame* ResultGame;
-
+	
 	Ry::String DllPath = Ry::File::ConvertToAbsolute(DLLLocation);
-
+	
 	//Ry::String DllName = DllPath.filename().string().substr(0, DllPath.filename().string().size() - DllPath.extension().string().size()).c_str();
 	Ry::String DllName = Ry::File::GetFileStem(DllPath);
 	Ry::String DllContainingFolder = Ry::File::GetParentPath(DllPath);
@@ -79,7 +80,24 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 
 int main(int ArgC, char** ArgV)
 {
-	Ry::Editor* Ed = new Ry::Editor;
+
+	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
+
+
+	Ry::ArrayList<Ry::String> Options;
+	for(int32 Opt = 0; Opt < ArgC; Opt++)
+	{
+		Options.Add(ArgV[Opt]);
+	}
+
+	if(Ry::HasOption(Options, "Vulkan"))
+	{
+		Plat = Ry::RenderingPlatform::Vulkan;
+	}
+
+	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
+
+	Ry::Editor* Ed = new Ry::Editor(Plat);
 	Ed->Run();
 	
 	/*if(ArgC == 1)

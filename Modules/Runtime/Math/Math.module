@@ -1,10 +1,6 @@
 {
 	"Name": "Math",
 	"Type": "Runtime",
-	"ThirdParty": {
-		"Include": [
-			"Include/"
-		]
-	},
+	"Extern": ["Glm"],
 	"Modules": ["Core"]
 }

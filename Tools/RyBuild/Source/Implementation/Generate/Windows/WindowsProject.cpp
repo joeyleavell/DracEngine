@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "Util/Util.h"
 
 #ifdef RYBUILD_WINDOWS
 #include "Generate/Windows/WindowsProject.h"
@@ -208,6 +209,13 @@ namespace RyBuild
 
 					// Add the module's generated directory
 					Output << Mod->GetGeneratedDir() << ";";
+
+					// Add module engine external include paths
+					for (const ExternDependency& Extern : Mod->ExternDependencies)
+					{
+						Output << Extern.GetIncludePath() << ";";
+					}
+
 					
 					if(!Mod->ModuleThirdParty.Includes.empty())
 					{

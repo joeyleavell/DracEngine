@@ -355,6 +355,12 @@ namespace Ry
 	}
 
 	template <uint32 S>
+	int32 Vector<S>::DataSizeBytes() const
+	{
+		return sizeof(data);
+	}
+
+	template <uint32 S>
 	Vector<S> Vector<S>::operator*(float s) const
 	{
 		Vector<S> result;

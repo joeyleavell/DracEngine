@@ -451,7 +451,7 @@ namespace Ry
 
 			if (IndexToRemove > 0)
 			{
-				Listeners.Remove(IndexToRemove);
+				Listeners.RemoveAt(IndexToRemove);
 				//Listeners.erase(Listeners.begin() + IndexToRemove);
 			}
 		}

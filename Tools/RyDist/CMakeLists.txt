@@ -26,3 +26,5 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyDist PRIVATE -lstdc++fs)
 endif()
+
+install(TARGETS RyDist DESTINATION .)

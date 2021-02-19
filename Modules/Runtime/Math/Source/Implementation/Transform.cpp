@@ -1,6 +1,6 @@
 #include "Transform.h"
-#include "Glm/glm.hpp"
-#include "Glm/gtc/quaternion.hpp"
+#include "glm.hpp"
+#include "gtc/quaternion.hpp"
 
 namespace Ry
 {

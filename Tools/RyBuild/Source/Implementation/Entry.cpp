@@ -23,7 +23,8 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 
 	std::string ProjectFilesDir = "Intermediate/ProjectFiles/";
 	std::string EngineProjectName = "AryzeEngine";
-	std::string EngineBinary = (Filesystem::path(EngineRootPath) / "Binary" / "RyRuntime-EditorMain.exe").string();
+	std::string WorkingDir = (Filesystem::canonical(EngineRootPath) / "Binary").string();
+	std::string EngineBinary = (Filesystem::canonical(EngineRootPath) / "Binary" / "RyRuntime-EditorMain.exe").string();
 
 	// Need to discover modules for project generation
 	std::vector<Module*> EngineModules;
@@ -46,6 +47,7 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 	ModulesProject->SetRebuildCmdLine("\"" + (BuildScriptsFolder / "Rebuild.bat").string() + "\" " + EngineModulesDir + " -" + Compiler);
 	ModulesProject->SetCleanCmdLine("\"" + (BuildScriptsFolder / "Clean.bat").string() + "\" " + EngineModulesDir);
 	ModulesProject->SetExecutable(EngineBinary);
+	ModulesProject->SetWorkingDirectory(WorkingDir);
 
 	Solution->AddSubProject(ModulesProject);
 	//ModulesFolder->AddSubProject(RuntimeProjectFolder);

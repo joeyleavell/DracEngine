@@ -1,5 +1,0 @@
-{
-	"Name": "UI",
-	"Type": "Runtime",
-	"Modules": ["Core", "Math", "AssetCore", "RenderingCore"]
-}

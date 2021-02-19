@@ -513,7 +513,7 @@ namespace Ry
 		return m;
 	}
 
-	Matrix4 perspective4(float aspect, float fov, float z_near, float z_far)
+	Matrix4 perspective4(float aspect, float fov, float z_near, float z_far, bool bFlipY)
 	{
 		float tan_half_fov = tan(DEG_TO_RAD(fov / 2.0f));
 
@@ -525,7 +525,7 @@ namespace Ry
 		m[0][3] = 0.0f;
 
 		m[1][0] = 0.0f;
-		m[1][1] = 1.0f / (tan_half_fov);
+		m[1][1] = 1.0f / (tan_half_fov) * (bFlipY ? -1.0f : 1.0f);
 		m[1][2] = 0.0f;
 		m[1][3] = 0.0f;
 

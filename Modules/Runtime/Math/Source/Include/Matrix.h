@@ -84,6 +84,24 @@ namespace Ry
 	typedef Matrix3x3 Matrix3;
 	typedef Matrix4x4 Matrix4;
 
+	// For hlsl equivalence
+	typedef Matrix<1, 1> Float1x1;
+	typedef Matrix<1, 2> Float1x2;
+	typedef Matrix<1, 3> Float1x3;
+	typedef Matrix<1, 4> Float1x4;
+	typedef Matrix<2, 1> Float2x1;
+	typedef Matrix<2, 2> Float2x2;
+	typedef Matrix<2, 3> Float2x3;
+	typedef Matrix<2, 4> Float2x4;
+	typedef Matrix<3, 1> Float3x1;
+	typedef Matrix<3, 2> Float3x2;
+	typedef Matrix<3, 3> Float3x3;
+	typedef Matrix<3, 4> Float3x4;
+	typedef Matrix<4, 1> Float4x1;
+	typedef Matrix<4, 2> Float4x2;
+	typedef Matrix<4, 3> Float4x3;
+	typedef Matrix<4, 4> Float4x4;
+
 	// Matrix utility functions
 	MATH_MODULE Matrix1 id1();
 	MATH_MODULE Matrix2 id2();
@@ -97,7 +115,7 @@ namespace Ry
 	MATH_MODULE Matrix4 rotatez4(float rotation);
 	MATH_MODULE Matrix4 scale4(float x, float y, float z);
 	MATH_MODULE Matrix4 ortho4(float left, float right, float bottom, float top, float far, float near);
-	MATH_MODULE Matrix4 perspective4(float aspect, float fov, float z_near, float z_far);
+	MATH_MODULE Matrix4 perspective4(float aspect, float fov, float z_near, float z_far, bool bFlipY = false);
 
 
 	extern MATH_MODULE const Matrix4 IDENTITY_4;

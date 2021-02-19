@@ -2,7 +2,7 @@
 
 namespace Ry
 {
-	void MemCpy(void* Dest, uint64 DstSize, void* Src, uint64 SrcSize)
+	void MemCpy(void* Dest, uint64 DstSize, const void* Src, uint64 SrcSize)
 	{
 	#ifdef MSVC_COMPILER
 		memcpy_s(Dest, DstSize, Src, SrcSize);

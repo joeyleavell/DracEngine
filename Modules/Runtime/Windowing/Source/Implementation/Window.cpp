@@ -1,7 +1,13 @@
 #include "Window.h"
-#include "GLFW/glfw3.h"
 #include "Algorithm/Algorithm.h"
 #include "Core/Globals.h"
+#include "RenderingEngine.h"
+#include "GLFW/glfw3.h"
+#include <set>
+#include "GLSwapChain2.h"
+#include "VulkanContext.h"
+#include "VulkanSwapChain.h"
+#include "SwapChain.h"
 
 namespace Ry
 {
@@ -20,7 +26,28 @@ namespace Ry
 	
 	Ry::Map<::GLFWwindow*, Window*> Window::Windows;
 
-	Window::Window(){}
+	bool InitWindowing()
+	{
+		// Setup the GLFW error callback early on
+		glfwSetErrorCallback(&WindowingErrorCallback);
+
+		if (!glfwInit())
+		{
+			Ry::Log->LogError("GLFW initialization failed!");
+			return false;
+		}
+
+	}
+
+	void WindowingErrorCallback(int Error, const char* Desc)
+	{
+		Ry::Log->LogError("GLFW: " + Ry::to_string(Error) + ": " + Ry::String(Desc));
+	}
+
+	Window::Window(Ry::RenderingPlatform Plat)
+	{
+		this->Platform = Plat;
+	}
 
 	bool Window::CreateWindow(int32 Width, int32 Height)
 	{
@@ -36,31 +63,9 @@ namespace Ry
 	{
 		this->FullscreenMonitor = FullscreenMonitor;
 
-		if (!glfwInit())
-		{
-			Ry::Log->LogError("GLFW initialization failed!");
-			
-			return false;
-		}
+		SetupWindowHints();
 
-		{
-			glfwSetErrorCallback(&ErrorCallback);
-
-			// Setup hints for rendering API
-
-			glfwWindowHint(GLFW_RED_BITS, 8);
-			glfwWindowHint(GLFW_GREEN_BITS, 8);
-			glfwWindowHint(GLFW_BLUE_BITS, 8);
-			glfwWindowHint(GLFW_ALPHA_BITS, 8);
-			glfwWindowHint(GLFW_DEPTH_BITS, 32);
-			glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
-
-			// TODO: do window hints separately
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-		}
-
-
+		// Window creation logic depending on if we want fullscreen
 		if(FSMonitor >= 0)
 		{
 			GLFWmonitor* Monitor = GetMonitorByIndex(FullscreenMonitor);
@@ -81,23 +86,24 @@ namespace Ry
 			WindowResource = glfwCreateWindow(Width, Height, *Title, nullptr, nullptr);
 		}
 
+		// Check that the window was created successfully
 		if (!WindowResource)
 		{
-
 			Ry::Log->LogError("GLFW window creation failed");
 			return false;
 		}
-		else
-		{
-			// Setup input callbacks
-			glfwSetKeyCallback(WindowResource, &KeyCallback);
-			glfwSetCharCallback(WindowResource, &CharacterEntryCallback);
-			glfwSetMouseButtonCallback(WindowResource, &MouseButtonCallback);
-			glfwSetScrollCallback(WindowResource, &ScrollCallback);
 
-			// Setup window callbacks
-			glfwSetWindowSizeCallback(WindowResource, &WindowSizeCallback);
-		}
+		// Create the rendering api specific swap chain
+		// Todo: investigate creating multiple contexts per window/swapchain, and multiple windows per context/swapchain
+		CreateSwapChain();
+		
+		// Setup callbacks
+		glfwSetKeyCallback(WindowResource, &KeyCallback);
+		glfwSetCharCallback(WindowResource, &CharacterEntryCallback);
+		glfwSetMouseButtonCallback(WindowResource, &MouseButtonCallback);
+		glfwSetScrollCallback(WindowResource, &ScrollCallback);
+		glfwSetWindowSizeCallback(WindowResource, &WindowSizeCallback);
+		glfwSetFramebufferSizeCallback(WindowResource, &FrameBufferSizeCallback);
 
 		// Insert window into static map
 		Windows.insert(WindowResource, this);
@@ -138,7 +144,6 @@ namespace Ry
 
 		if (Fullscreen)
 		{
-
 			// Store previous window position and size
 			glfwGetWindowPos(WindowResource, &WindowPosBuffer[0], &WindowPosBuffer[1]);
 			glfwGetWindowSize(WindowResource, &WindowSizeBuffer[0], &WindowSizeBuffer[1]);
@@ -168,9 +173,19 @@ namespace Ry
 		return glfwWindowShouldClose(WindowResource);
 	}
 
-	void Window::SwapBuffers()
+	void Window::BeginFrame()
 	{
-		glfwSwapBuffers(WindowResource);
+		SwapChain->BeginFrame(WindowResource, bFramebufferResized);
+
+		if(bFramebufferResized)
+		{
+			bFramebufferResized = false;
+		}
+	}
+
+	void Window::EndFrame()
+	{
+		SwapChain->EndFrame(WindowResource);
 	}
 
 	void Window::Update()
@@ -179,13 +194,10 @@ namespace Ry
 		glfwPollEvents();
 	}
 
-	void Window::InitContext()
-	{
-		glfwMakeContextCurrent(WindowResource);
-	}
-
 	void Window::Destroy()
 	{
+		SwapChain->DeleteSwapChain();
+				
 		glfwDestroyWindow(WindowResource);
 		glfwTerminate();
 	}
@@ -249,11 +261,6 @@ namespace Ry
 		{
 			return *Result;
 		}
-	}
-
-	void Window::ErrorCallback(int Error, const char* Desc)
-	{
-		Ry::Log->LogError("GLFW error: " + Ry::to_string(Error) + ": " + Ry::String(Desc));
 	}
 
 	void Window::KeyCallback(::GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods)
@@ -339,6 +346,16 @@ namespace Ry
 		}
 	}
 
+	void Window::FrameBufferSizeCallback(::GLFWwindow* Window, int NewWidth, int NewHeight)
+	{
+		Ry::Window* AssociatedWindow = FindWindow(Window);
+
+		if (AssociatedWindow)
+		{
+			AssociatedWindow->bFramebufferResized = true;
+		}
+	}
+
 	GLFWmonitor* Window::GetMonitorByIndex(int32 index)
 	{
 		// Get the correct monitor
@@ -355,6 +372,11 @@ namespace Ry
 		{
 			return monitors[index];
 		}
+	}
+
+	Ry::SwapChain* Window::GetSwapChain()
+	{
+		return SwapChain;
 	}
 
 	int32 Window::GetWindowWidth() const
@@ -386,5 +408,48 @@ namespace Ry
 			return height;
 		}
 	}
-	
+
+	void Window::GetWindowSize(int32& Width, int32& Height)
+	{
+		glfwGetFramebufferSize(WindowResource, &Width, &Height);
+	}
+
+	void Window::CreateSwapChain()
+	{
+		if(Platform == RenderingPlatform::OpenGL)
+		{
+			// todo: create gl swap chain
+			SwapChain = new Ry::GLSwapChain2;
+		}
+		else if(Platform == RenderingPlatform::Vulkan)
+		{
+			SwapChain = new Ry::VulkanSwapChain;
+		}
+
+		SwapChain->CreateSwapChain(WindowResource);
+	}
+
+	void Window::SetupWindowHints()
+	{
+		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+		if (Platform == RenderingPlatform::OpenGL)
+		{
+			// todo: create gl swap chain
+			glfwWindowHint(GLFW_RED_BITS, 8);
+			glfwWindowHint(GLFW_GREEN_BITS, 8);
+			glfwWindowHint(GLFW_BLUE_BITS, 8);
+			glfwWindowHint(GLFW_ALPHA_BITS, 8);
+			glfwWindowHint(GLFW_DEPTH_BITS, 32);
+			glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
+
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		}
+		else if (Platform == RenderingPlatform::Vulkan)
+		{
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		}
+	}
 }

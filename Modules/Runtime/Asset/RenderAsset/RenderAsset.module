@@ -1,6 +1,7 @@
 {
 	"Name": "RenderAsset",
 	"Type": "Runtime",
+	"Extern": ["Stb"],
 	"ThirdParty": {
 		"Include": [
 			"Include/Stb/"
@@ -43,5 +44,5 @@
 			}
 		}
 	},
-	"Modules": ["Core", "Math", "AssetCore", "RenderingCore", "Profiling"]
+	"Modules": ["Core", "Math", "AssetCore", "Rendering", "Profiling"]
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 
 namespace Ry
 {
@@ -105,9 +106,52 @@ namespace Ry
 			Data = new T[Reserve];
 		}
 
+		ArrayList(std::initializer_list<T> Init)
+		{
+			this->Data = new T[DEFAULT_ALLOC];
+			this->AllocatedSize = DEFAULT_ALLOC;
+			this->Size = 0;
+
+			for(const T& El : Init)
+			{
+				Add(El);
+			}
+		}
+
+		ArrayList(const ArrayList<T>& Other)
+		{
+			CopyFrom(Other);
+		}
+
 		~ArrayList()
 		{
 			delete[] Data;
+		}
+
+		T* CopyData()
+		{
+			if(Size == 0)
+			{
+				return nullptr;
+			}
+			
+			T* NewData = new T[Size];
+			for(int32 Index = 0; Index < Size; Index++)
+			{
+				NewData[Index] = Data[Index];
+			}
+
+			return NewData;			
+		}
+
+		T& Last()
+		{
+			return Data[Size - 1];
+		}
+
+		T& First()
+		{
+			return Data[0];
 		}
 
 		int32 GetAllocatedSize() const
@@ -165,25 +209,23 @@ namespace Ry
 
 			if(FoundIndex >= 0)
 			{
-				Remove(FoundIndex);
+				RemoveAt(FoundIndex);
 			}
 		}
 
-		void Remove(int32 Index)
+		void RemoveAt(int32 Index)
 		{
-			// Remove the item
-			if (Index >= 0 && Index < Size)
-			{
+			assert(Index >= 0 && Index < Size);
 				
-				// Shift data down to maintain contiguous nature of array
-				int32 ShiftIndex = Index;
-				while (ShiftIndex < Size - 1)
-				{
-					Data[ShiftIndex] = Data[ShiftIndex + 1];
-				}
-
-				Size--;
+			// Shift data down to maintain contiguous nature of array
+			int32 ShiftIndex = Index;
+			while (ShiftIndex < Size - 1)
+			{
+				Data[ShiftIndex] = Data[ShiftIndex + 1];
+				ShiftIndex++;
 			}
+
+			Size--;
 		}
 
 		bool IsEmpty() const
@@ -206,6 +248,26 @@ namespace Ry
 			// TODO: assert index in bounds
 			
 			return Data[Index];
+		}
+
+		ArrayList<T>& operator=(const ArrayList<T>& Other)
+		{
+			if (this == &Other)
+				return *this;
+			
+			CopyFrom(Other);
+			return *this;
+		}
+
+		void CopyFrom(const ArrayList<T>& Other)
+		{
+			this->Data = new T[Other.Size];
+			this->AllocatedSize = Other.Size;
+			this->Size = Other.Size;
+			for(int32 El = 0; El < Other.Size; El++)
+			{
+				this->Data[El] = Other.Data[El];
+			}
 		}
 
 		// Functions that have to be implemented for a range based for loop
@@ -248,7 +310,7 @@ namespace Ry
 				Size = NewSize;
 			}
 			
-			delete Data;
+			delete[] Data;
 
 			// Reassign to new array
 			this->Data = NewArray;

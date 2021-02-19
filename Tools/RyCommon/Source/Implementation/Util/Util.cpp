@@ -120,6 +120,11 @@ std::string GetEngineEditorModulesDir()
 	return ModEdPathCache;
 }
 
+std::string GetEngineExternPath(std::string ExternName)
+{
+	return (Filesystem::path(GetEngineRootDir()) / "External" / ExternName).string();
+}
+
 std::string GetEngineBinaryDir()
 {
 	if(BinPathCache.empty())

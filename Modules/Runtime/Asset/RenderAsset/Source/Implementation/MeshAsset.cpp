@@ -1,5 +1,6 @@
 #include "MeshAsset.h"
 #include "Mesh.h"
+#include "Mesh2.h"
 
 namespace Ry
 {
@@ -10,13 +11,21 @@ namespace Ry
 
 	void MeshAsset::UnloadAsset()
 	{
+		// Destroy all runtime meshes
+
+		for(Mesh2* RuntimeMesh : RuntimeMeshes)
+		{
+			RuntimeMesh->DeleteMesh();
+			delete RuntimeMesh;
+		}
 		
 	}
 
-	Ry::SharedPtr<Mesh> MeshAsset::CreateRuntimeMesh(Shader* Shader) const
+	Mesh2* MeshAsset::CreateRuntimeMesh() const
 	{
-		SharedPtr<Mesh> NewMesh = Ry::MakeShared(new Mesh(Data, BufferHint::STATIC));
-		NewMesh->GetMeshData()->SetShaderAll(Shader);
+		Mesh2* NewMesh = new Mesh2(Data);
+
+		RuntimeMeshes.Add(NewMesh);
 
 		return NewMesh;
 	}

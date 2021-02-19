@@ -6,6 +6,7 @@ namespace Ry
 {
 	Ry::Logger* Log = nullptr;
 	Ry::Renderer* RenderAPI = nullptr;
+	RenderAPI2* NewRenderAPI = nullptr;
 
 	Ry::String ResourcesDirectory = ".";
 	

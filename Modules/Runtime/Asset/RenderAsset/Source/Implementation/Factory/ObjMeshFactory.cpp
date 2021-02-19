@@ -290,36 +290,36 @@ namespace Ry
 				
 				Ry::Vertex1P1UV1N FirstVertex, SecondVertex, ThirdVertex, FourthVertex;
 				
-				FirstVertex.pos = OBJVertices.at(GroupFace.First.VertexIndex);
-				SecondVertex.pos = OBJVertices.at(GroupFace.Second.VertexIndex);
-				ThirdVertex.pos = OBJVertices.at(GroupFace.Third.VertexIndex);
+				FirstVertex.Position = OBJVertices.at(GroupFace.First.VertexIndex);
+				SecondVertex.Position = OBJVertices.at(GroupFace.Second.VertexIndex);
+				ThirdVertex.Position = OBJVertices.at(GroupFace.Third.VertexIndex);
 				
 				if(!OBJTexCoords.empty())
 				{
-					FirstVertex.tex_coord = OBJTexCoords.at(GroupFace.First.TexCoordIndex);
-					SecondVertex.tex_coord = OBJTexCoords.at(GroupFace.Second.TexCoordIndex);
-					ThirdVertex.tex_coord = OBJTexCoords.at(GroupFace.Third.TexCoordIndex);
+					FirstVertex.UV = OBJTexCoords.at(GroupFace.First.TexCoordIndex);
+					SecondVertex.UV = OBJTexCoords.at(GroupFace.Second.TexCoordIndex);
+					ThirdVertex.UV = OBJTexCoords.at(GroupFace.Third.TexCoordIndex);
 					if (!GroupFace.IsTriangle)
 					{
-						FourthVertex.tex_coord = OBJTexCoords.at(GroupFace.Fourth.TexCoordIndex);
+						FourthVertex.UV = OBJTexCoords.at(GroupFace.Fourth.TexCoordIndex);
 					}
 				}
 
 				if(!OBJNormals.empty())
 				{
-					FirstVertex.normal = OBJNormals.at(GroupFace.First.NormalIndex);
-					SecondVertex.normal = OBJNormals.at(GroupFace.Second.NormalIndex);
-					ThirdVertex.normal = OBJNormals.at(GroupFace.Third.NormalIndex);
+					FirstVertex.Normal = OBJNormals.at(GroupFace.First.NormalIndex);
+					SecondVertex.Normal = OBJNormals.at(GroupFace.Second.NormalIndex);
+					ThirdVertex.Normal = OBJNormals.at(GroupFace.Third.NormalIndex);
 					if(!GroupFace.IsTriangle)
 					{
-						FourthVertex.normal = OBJNormals.at(GroupFace.Fourth.NormalIndex);
+						FourthVertex.Normal = OBJNormals.at(GroupFace.Fourth.NormalIndex);
 					}
 				}
 
 
 				if(!GroupFace.IsTriangle)
 				{
-					FourthVertex.pos = OBJVertices.at(GroupFace.Fourth.VertexIndex);
+					FourthVertex.Position = OBJVertices.at(GroupFace.Fourth.VertexIndex);
 				}
 
 				uint32 FirstIndex, SecondIndex, ThirdIndex, FourthIndex;

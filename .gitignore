@@ -1,6 +1,6 @@
 # Ignore project files in the root
 *.sln
-.vs
+.vs/
 *.suo
 *.opensdf
 *.vcxproj

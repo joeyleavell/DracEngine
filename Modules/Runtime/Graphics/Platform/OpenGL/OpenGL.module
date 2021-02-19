@@ -1,0 +1,35 @@
+{
+	"Name": "OpenGL",
+	"Type": "Runtime",
+	"Macros":[
+		"GLEW_STATIC",
+		"GLEW_NO_GLU"
+	],
+	"Extern": ["Glew", "Glfw"],
+	"Libraries": {
+		"x64": {
+			"Windows": {
+				"MSVC": [
+					"user32.lib",
+					"gdi32.lib",
+					"Shell32.lib",
+					"OpenGL32.lib"
+				],
+				"MinGW": [
+					"user32",
+					"gdi32",
+					"shell32",
+					"opengl32"
+				]
+			},
+			"Linux": {
+				"GCC": [
+					"GL",
+					"pthread",
+					"dl"
+				]
+			}
+		}
+	},
+	"Modules": ["Core", "Math", "AssetCore", "Rendering"]
+}

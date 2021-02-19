@@ -37,3 +37,5 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyBuild PRIVATE -lstdc++fs)
 	target_link_libraries(RyBuild PRIVATE -lpthread)
 endif()
+
+install(TARGETS RyBuild DESTINATION .)

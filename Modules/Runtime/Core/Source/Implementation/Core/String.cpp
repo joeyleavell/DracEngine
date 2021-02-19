@@ -299,10 +299,12 @@ namespace Ry
 	String::String(String&& Other) noexcept
 	{
 		this->size = Other.size;
+		this->data = Other.data;
+		Other.data = nullptr;
 		
-		data = new char[(uint64) Other.size + 1];
+		//data = new char[(uint64) Other.size + 1];
 
-		StringCopy(this->data, *Other, ((uint64) this->size + 1) * sizeof(char));
+		//StringCopy(this->data, *Other, ((uint64) this->size + 1) * sizeof(char));
 		// for (uint32 i = 0; i < size + 1; i++)
 		// 	data[i] = Other.data[i];
 	}
@@ -334,7 +336,7 @@ namespace Ry
 
 	String::~String()
 	{
-		delete data;
+		delete[] data;
 	}
 
 	char* String::getData() const
