@@ -1,4 +1,4 @@
-# Ignore project files in the root
+# VS files
 *.sln
 .vs/
 *.suo
@@ -13,7 +13,7 @@
 ./Makefile
 ./.ue4dependencies
 
-# Ignore CMake generated files
+# CMake generated files
 .cmake/
 CMakeFiles/
 Testing/
@@ -38,21 +38,15 @@ ipch/*
 # Ignore crash reports
 crashinfo--*
  
-# Ignore linux project files
+# Linux project files
 *.user
 *.pro
 *.pri
 *.kdev4
  
-# Ignore project-specific files
+# Engine files
 Binaries/*.pdb
-Binaries/*-Shipping.*
-Build/Receipts/
-DerivedDataCache/
-Binaries/
 Binary/
 Intermediate/
-Saved/
-Builds/
 out/
-build/
+/Tools/Build
