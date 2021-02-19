@@ -1,7 +1,7 @@
 #include "VectorFontAsset.h"
 #include "Font.h"
 #include <iostream>
-#include "Stb/stb_truetype.h"
+#include "stb_truetype.h"
 
 constexpr uint32 START_CODEPOINT = 32;
 constexpr uint32 END_CODEPOINT = 126;

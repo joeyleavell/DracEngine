@@ -1,5 +1,5 @@
 #include "Language/ShaderCompiler.h"
-#include "ShaderConductor/ShaderConductor.hpp"
+#include "ShaderConductor.hpp"
 
 // Defined offsets for vulkan spirv
 #define C_BUFFER_OFFSET 0

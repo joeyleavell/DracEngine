@@ -31,6 +31,11 @@ std::string ExternDependency::GetPlatformLibraryPath(const BuildSettings& Settin
 	return (Filesystem::absolute((Filesystem::path(GetEngineExternPath(Name)) / "Libraries" / Settings.GetTargetPathString()))).string();
 }
 
+std::string ExternDependency::GetPlatformBinaryPath(const BuildSettings& Settings) const
+{
+	return (Filesystem::absolute((Filesystem::path(GetEngineExternPath(Name)) / "Binary" / Settings.GetTargetPathString()))).string();
+}
+
 void ExternDependency::GetPlatformLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs) const
 {
 	std::string LibPath = GetPlatformLibraryPath(Settings);
@@ -45,6 +50,23 @@ void ExternDependency::GetPlatformLibs(const BuildSettings& Settings, std::vecto
 
 		// It's assumed that the build tool will do the stemming on this string (i.e. libLibrary.a -> Library)
 		OutLibs.push_back(Path.path().filename().string());
+	}
+}
+
+void ExternDependency::GetPlatformBins(const BuildSettings& Settings, std::vector<std::string>& OutBins) const
+{
+	std::string BinPath = GetPlatformBinaryPath(Settings);
+
+	Filesystem::directory_iterator DirItr(BinPath);
+
+	for (auto& Path : DirItr)
+	{
+		// Libraries must have a name
+		if (!Path.path().has_stem())
+			continue;
+
+		// It's assumed that the build tool will do the stemming on this string (i.e. libLibrary.a -> Library)
+		OutBins.push_back(Filesystem::absolute(Path.path()).string());
 	}
 }
 

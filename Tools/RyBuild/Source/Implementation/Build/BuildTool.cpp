@@ -195,7 +195,16 @@ void AbstractBuildTool::CopyBinaries(std::string OutputDir)
 	for (auto& Mod : Modules)
 	{
 		std::vector<std::string> OutBins;
+
 		Module* Module = Mod.second;
+
+		// Copy all external dependency binaries
+		for (auto& ExternDep : Module->ExternDependencies)
+		{
+			ExternDep.GetPlatformBins(Settings, OutBins);
+		}
+
+		// Copy all module specific binaries
 		Module->GetTargetBins(Settings, OutBins);
 
 		for (const std::string& OutBin : OutBins)

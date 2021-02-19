@@ -2,7 +2,7 @@
 #include "Algorithm/Algorithm.h"
 #include "Core/Globals.h"
 #include "RenderingEngine.h"
-#include "GLFW/glfw3.h"
+#include "glfw3.h"
 #include <set>
 #include "GLSwapChain2.h"
 #include "VulkanContext.h"

@@ -52,7 +52,10 @@ public:
 	std::string GetIncludePath() const;
 
 	std::string GetPlatformLibraryPath(const BuildSettings& Settings) const;
+	std::string GetPlatformBinaryPath(const BuildSettings& Settings) const;
+
 	void GetPlatformLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs) const;
+	void GetPlatformBins(const BuildSettings& Settings, std::vector<std::string>& OutBins) const;
 
 };
 

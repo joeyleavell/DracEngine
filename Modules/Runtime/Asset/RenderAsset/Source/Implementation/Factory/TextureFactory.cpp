@@ -2,7 +2,7 @@
 #include "TextureAsset.h"
 #include "Bitmap.h"
 #include <iostream>
-#include "Stb/stb_image.h"
+#include "stb_image.h"
 
 namespace Ry
 {

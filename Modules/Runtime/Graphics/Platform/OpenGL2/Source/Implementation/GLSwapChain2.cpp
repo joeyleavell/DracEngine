@@ -1,6 +1,6 @@
 #include "GLSwapChain2.h"
 #include "glew.h"
-#include "GLFW/glfw3.h"
+#include "glfw3.h"
 #include "Core/Globals.h"
 
 namespace Ry

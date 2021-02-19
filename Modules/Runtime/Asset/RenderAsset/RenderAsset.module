@@ -2,47 +2,5 @@
 	"Name": "RenderAsset",
 	"Type": "Runtime",
 	"Extern": ["Stb"],
-	"ThirdParty": {
-		"Include": [
-			"Include/Stb/"
-		],
-		"LibraryPaths": {
-			"x64": {
-				"Windows": {
-					"MSVC": [
-						"Libraries/x64/Windows/MSVC/"
-					],
-					"MinGW": [
-						"Libraries/x64/Windows/MinGW/"
-					]
-				},
-				"Linux": {
-					"GCC": [
-						"Libraries/x64/Linux/GCC/"
-					]
-				}
-			}
-		}
-	},
-	"Libraries": {
-		"x64": {
-			"Windows": {
-				"MSVC": [
-					"stb-image.lib",
-					"stb-truetype.lib"
-				],
-				"MinGW": [
-					"stb_image",
-					"stb_truetype"
-				]
-			},
-			"Linux": {
-				"GCC": [
-					"stb_image",
-					"stb_truetype"
-				]
-			}
-		}
-	},
 	"Modules": ["Core", "Math", "AssetCore", "Rendering", "Profiling"]
 }
