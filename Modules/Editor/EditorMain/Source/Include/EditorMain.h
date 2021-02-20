@@ -380,8 +380,7 @@ namespace Ry
 			// Cleanup rendering resources
 
 			// Unload all assets
-			AssetMan->UnloadAll();
-
+ 
 			ResSet->DeleteBuffer();
 			delete ResSet;
 

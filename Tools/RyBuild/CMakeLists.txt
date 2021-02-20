@@ -13,7 +13,29 @@ set (SOURCES
 	Source/Implementation/Generate/Project.cpp
 )
 
+# External includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
 include_directories(Source/Include ../RyCommon/Source/Include)
+
+# Todo: Determine best way to switch architectures, probably using a flag
+if(MSVC)
+	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/x64/Windows/MSVC")
+elseif(MinGW)
+	# Todo: MinGW libs
+elseif(UNIX AND NOT APPLE)
+	# Todo: Linux libs
+elseif(APPLE)
+	# Todo: Apple libs
+endif()
+
+# Platform includes
+if(WIN32)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows)
+elseif(UNIX AND NOT APPLE)
+	# Todo: linux includes
+elseif(APPLE)
+	# Todo: apple includes
+endif()
 
 add_executable(RyBuild ${SOURCES})
 
@@ -22,13 +44,18 @@ set_target_properties(RyBuild PROPERTIES
 			CMAKE_CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF)
 
+# Link with RyCommon
 target_link_libraries(RyBuild PUBLIC RyCommon)
+#target_link_libraries(RyBuild PUBLIC python310)
 
+
+# Have to use separate threads library for MinGW builds
 if(MinGW)
 	message("${PROJECT_NAME}: mingw ${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator")
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator)
 endif()
 
+# Windows specific links
 if(MinGW OR WIN32)
 	target_link_libraries(RyBuild PRIVATE rpcrt4)
 endif()
@@ -39,3 +66,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 install(TARGETS RyBuild DESTINATION .)
+
+if(MSVC)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python310.dll DESTINATION ${CMAKE_INSTALL_PREFIX})
+elseif(MinGW)
+	# Todo: MinGW dlls
+elseif(UNIX AND NOT APPLE)
+	# Todo: Linux SOs
+elseif(APPLE)
+	# Todo: Apple SOs
+endif()

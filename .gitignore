@@ -45,8 +45,8 @@ crashinfo--*
 *.kdev4
  
 # Engine files
-Binaries/*.pdb
-Binary/
+/Binary
+/Tools/Build
+/Tools/Binary
 Intermediate/
 out/
-/Tools/Build

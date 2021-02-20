@@ -435,6 +435,8 @@ public:
 };
 
 Module* LoadModule(Filesystem::path Path);
+Module* LoadModulePython(Filesystem::path Path);
+
 void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules);
 bool VerifyModules(std::vector<Module*>& OutModules);
 bool IsModuleOutOfDate(const Module& Module, std::string BinaryDir, BuildSettings Settings);

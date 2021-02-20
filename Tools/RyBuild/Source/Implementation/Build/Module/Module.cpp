@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Common.h"
 #include "Util/Util.h"
+#include "Python/Python.h"
 
 void LoadPlatformStringArray(std::vector<std::string>& Out, const Json& ParentJson)
 {
@@ -285,11 +286,30 @@ Module* LoadModule(Filesystem::path Path)
 	return NewModule;
 }
 
+Module* LoadModulePython(Filesystem::path Path)
+{
+	// Initialize python
+	Py_Initialize();
+	
+	if (!Filesystem::exists(Path))
+	{
+		std::cerr << "No python module build file at " << Path.string() << std::endl;
+		return nullptr;
+	}
+
+	Module* NewModule = new Module;
+	NewModule->RootDir = Filesystem::absolute(Path.parent_path()).string();
+	NewModule->ModuleFilePath = Filesystem::canonical(Path).string();
+
+}
+
 void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 {
 	Filesystem::path FoundModuleFile;
-
 	Filesystem::directory_iterator NewDirectoryItr(RootDir);
+
+	bool bPythonModule = false;
+	
 	for (Filesystem::path File : NewDirectoryItr)
 	{
 		if (File.extension() == ".module")
@@ -298,11 +318,29 @@ void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 			FoundModuleFile = File;
 			break;
 		}
+
+		if (File.extension() == ".py")
+		{
+			// Do not recurse any further 
+			FoundModuleFile = File;
+			bPythonModule = true;
+			break;
+		}
+
 	}
 
 	if (!FoundModuleFile.empty())
 	{
-		Module* NewModule = LoadModule(FoundModuleFile);
+		Module* NewModule = nullptr;
+
+		if(bPythonModule)
+		{
+			NewModule = LoadModulePython(FoundModuleFile);
+		}
+		else
+		{
+			NewModule = LoadModule(FoundModuleFile);
+		}
 
 		if (NewModule)
 		{
