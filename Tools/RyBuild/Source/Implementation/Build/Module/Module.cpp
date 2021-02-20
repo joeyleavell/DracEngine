@@ -376,7 +376,7 @@ Module* LoadModulePython(Filesystem::path Path)
 
 	PyDict_SetItemString(Locals, "Modules", DefModulesList);
 	PyDict_SetItemString(Locals, "Type", DefType);
-	PyDict_SetItemString(Locals, "Externs", DefExterns);
+	PyDict_SetItemString(Locals, "Extern", DefExterns);
 	PyDict_SetItemString(Locals, "MacroDefs", DefMacroDefs);
 	PyDict_SetItemString(Locals, "Includes", DefIncludes);
 	PyDict_SetItemString(Locals, "LibraryPaths", DefLibraryPaths);
@@ -389,7 +389,7 @@ Module* LoadModulePython(Filesystem::path Path)
 	// Todo: add smart "FindLib" builtin function
 	PyObject* ModulesList = PyDict_GetItemString(Locals, "Modules");
 	PyObject* Type = PyDict_GetItemString(Locals, "Type");
-	PyObject* Externs = PyDict_GetItemString(Locals, "Externs");
+	PyObject* Externs = PyDict_GetItemString(Locals, "Extern");
 	PyObject* MacroDefs = PyDict_GetItemString(Locals, "MacroDefs");
 	PyObject* Includes = PyDict_GetItemString(Locals, "Includes");
 	PyObject* LibraryPaths = PyDict_GetItemString(Locals, "LibraryPaths");

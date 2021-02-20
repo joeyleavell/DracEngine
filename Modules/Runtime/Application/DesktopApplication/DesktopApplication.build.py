@@ -17,4 +17,4 @@ Modules = ["Core",
 Type = "Runtime"
 
 # Declare external dependencies
-Externs = ["Json"]
+Extern = ["Json"]
