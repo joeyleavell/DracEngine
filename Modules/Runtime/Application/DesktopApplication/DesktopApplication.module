@@ -1,6 +1,0 @@
-{
-	"Name": "DesktopApplication",
-	"Type": "Runtime",
-	"Extern": ["Json"],
-	"Modules": ["Core", "Application", "Audio", "AssetCore", "RenderAsset", "Rendering", "Math", "Physics", "Scene", "Automation", "Input", "OpenGL2", "Windowing"]
-}

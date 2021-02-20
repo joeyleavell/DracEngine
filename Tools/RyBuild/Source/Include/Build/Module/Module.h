@@ -72,6 +72,11 @@ public:
 	std::vector<ExternDependency> ExternDependencies;
 	// std::vector<std::string> SystemLibs;
 	PlatformLibDef Libs;
+
+	std::vector<std::string> PythonIncludes;
+	std::vector<std::string> PythonLibraryPaths;
+	std::vector<std::string> PythonLibraries;
+
 	std::string ModuleFilePath;
 	
 	// Whether this module built successfully without errors

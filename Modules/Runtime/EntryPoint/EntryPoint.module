@@ -1,5 +1,0 @@
-{
-	"Name": "EntryPoint",
-	"Type": "Runtime",
-	"Modules": ["Core", "Application", "DesktopApplication"]
-}

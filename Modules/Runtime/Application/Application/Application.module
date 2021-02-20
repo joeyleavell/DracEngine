@@ -1,5 +1,0 @@
-{
-	"Name": "Application",
-	"Type": "Runtime",
-	"Modules": ["Core"]
-}

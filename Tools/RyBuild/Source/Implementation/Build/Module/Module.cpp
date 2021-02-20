@@ -286,21 +286,179 @@ Module* LoadModule(Filesystem::path Path)
 	return NewModule;
 }
 
+bool LoadPythonStringList(std::vector<std::string>& Out, PyObject* List, std::string NullErr, std::string NotStringListErr, std::string ElementNotStringErr)
+{
+	if(!List)
+	{
+		if(!NullErr.empty())
+		{
+			std::cerr << NullErr << std::endl;
+			return false;
+		}
+
+		return true;
+	}
+	
+	if (!PyList_Check(List))
+	{
+		std::cerr << NotStringListErr << std::endl;
+		return false;
+	}
+
+	Py_ssize_t ListSize = PyList_Size(List);
+
+	for (Py_ssize_t Index = 0; Index < ListSize; Index++)
+	{
+		PyObject* PyModuleDependency = PyList_GetItem(List, Index);
+
+		if (PyUnicode_Check(PyModuleDependency))
+		{
+			PyObject* Utf8 = PyUnicode_AsEncodedString(PyModuleDependency, "utf-8", "~E~");
+			const char* Bytes = PyBytes_AsString(Utf8);
+
+			Out.push_back(Bytes);
+
+			Py_DECREF(Utf8);
+		}
+		else
+		{
+			std::cerr << ElementNotStringErr << std::endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
 Module* LoadModulePython(Filesystem::path Path)
 {
-	// Initialize python
-	Py_Initialize();
-	
 	if (!Filesystem::exists(Path))
 	{
 		std::cerr << "No python module build file at " << Path.string() << std::endl;
 		return nullptr;
 	}
+	
+	// Load module python
+	std::string ModulePython = "";
+	std::string NextLine = "";
+	std::ifstream ModuleInFile(Path.string());
+	while(std::getline(ModuleInFile, NextLine))
+	{
+		ModulePython += NextLine + "\n";
+	}
 
 	Module* NewModule = new Module;
+	NewModule->Name = Path.stem().string();
 	NewModule->RootDir = Filesystem::absolute(Path.parent_path()).string();
 	NewModule->ModuleFilePath = Filesystem::canonical(Path).string();
 
+	// Cut off the .build part
+	int FirstDot = NewModule->Name.find_first_of('.');
+	if(FirstDot != std::string::npos)
+	{
+		NewModule->Name = NewModule->Name.substr(0, FirstDot);
+	}
+	
+	// Initialize python
+	Py_Initialize();
+
+	PyObject* Globals = PyModule_GetDict(PyImport_AddModule("__main__"));
+	PyObject* Locals = PyDict_New();
+
+	// Create some default globals
+	PyObject* DefModulesList = PyList_New(0);
+	PyObject* DefType = PyUnicode_New(0, 10);
+	PyObject* DefExterns = PyList_New(0);
+	PyObject* DefMacroDefs = PyList_New(0);
+	PyObject* DefIncludes = PyList_New(0);
+	PyObject* DefLibraryPaths = PyList_New(0);
+	PyObject* DefLibraries = PyList_New(0);
+
+	PyDict_SetItemString(Locals, "Modules", DefModulesList);
+	PyDict_SetItemString(Locals, "Type", DefType);
+	PyDict_SetItemString(Locals, "Externs", DefExterns);
+	PyDict_SetItemString(Locals, "MacroDefs", DefMacroDefs);
+	PyDict_SetItemString(Locals, "Includes", DefIncludes);
+	PyDict_SetItemString(Locals, "LibraryPaths", DefLibraryPaths);
+	PyDict_SetItemString(Locals, "Libraries", DefLibraries);
+
+	PyObject* RetVal = PyRun_StringFlags(ModulePython.c_str(), Py_file_input, Globals, Locals, nullptr);
+
+	// Extract module list from globals
+
+	// Todo: add smart "FindLib" builtin function
+	PyObject* ModulesList = PyDict_GetItemString(Locals, "Modules");
+	PyObject* Type = PyDict_GetItemString(Locals, "Type");
+	PyObject* Externs = PyDict_GetItemString(Locals, "Externs");
+	PyObject* MacroDefs = PyDict_GetItemString(Locals, "MacroDefs");
+	PyObject* Includes = PyDict_GetItemString(Locals, "Includes");
+	PyObject* LibraryPaths = PyDict_GetItemString(Locals, "LibraryPaths");
+	PyObject* Libraries = PyDict_GetItemString(Locals, "Libraries");
+
+	std::vector<std::string> ExternDeps;
+
+	// Load all string lists
+	LoadPythonStringList(NewModule->ModuleDependencies, ModulesList, "", "Module dependencies must be list", "All module dependencies must be strings");
+	LoadPythonStringList(ExternDeps, Externs, "", "External dependencies must be list", "All external dependencies must be strings");
+	LoadPythonStringList(NewModule->MacroDefinitions, MacroDefs, "", "Macro definitions must be a list", "All macro definitions must be strings");
+	LoadPythonStringList(NewModule->PythonIncludes, Includes, "", "Include directories must be a list", "All include directories must be strings");
+	LoadPythonStringList(NewModule->PythonLibraryPaths, LibraryPaths, "", "Library paths must be a list", "All library paths must be strings");
+	LoadPythonStringList(NewModule->PythonLibraries, Libraries, "", "Libraries must be a list", "All libraries must be strings");
+
+	// Create external dependencies
+	for(const std::string& ExternDep : ExternDeps)
+	{
+		ExternDependency NewDep;
+		NewDep.Name = ExternDep;
+		NewModule->ExternDependencies.push_back(NewDep);
+	}
+
+	int Size = PyDict_Size(Locals);
+	PyObject* Rep = PyObject_Repr(Locals);
+	PyObject* Utf8 = PyUnicode_AsEncodedString(Rep, "utf-8", "~E~");
+	std::string ModType = PyBytes_AsString(Utf8);
+	std::cout << ModType << std::endl;
+	std::cout << Size << std::endl;
+
+	// Load module type
+	if(Type)
+	{
+		if (PyUnicode_Check(Type))
+		{
+			PyObject* Utf8 = PyUnicode_AsEncodedString(Type, "utf-8", "~E~");
+			std::string ModType = PyBytes_AsString(Utf8);
+
+			if(ModType == "Runtime")
+			{
+				NewModule->Type = LIBRARY;
+			}
+			else if(ModType == "Executable")
+			{
+				NewModule->Type = EXECUTABLE;
+			}
+			else
+			{
+				std::cerr << "Type must be either Runtime or Executable" << std::endl;
+				return nullptr;
+			}
+
+			Py_DECREF(Utf8);
+		}
+		else
+		{
+			std::cerr << "Module type was not a string" << std::endl;
+			return nullptr;
+		}
+	}
+	else
+	{
+		std::cerr << "Module type was not set: must be either Runtime or Executable" << std::endl;
+		return nullptr;
+	}
+
+	Py_Finalize();
+
+	return NewModule;
 }
 
 void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
@@ -372,6 +530,9 @@ bool VerifyModules(std::vector<Module*>& OutModules)
 
 	for (const Module* Module : OutModules)
 	{
+		if (!Module)
+			continue;
+		
 		int Current = NameCount[Module->Name] + 1;
 		NameCount[Module->Name] = Current;
 
