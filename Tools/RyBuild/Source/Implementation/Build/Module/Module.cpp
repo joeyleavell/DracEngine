@@ -352,6 +352,14 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	NewModule->RootDir = Filesystem::absolute(Path.parent_path()).string();
 	NewModule->ModuleFilePath = Filesystem::canonical(Path).string();
 
+	// Check if this module is an engine module.
+	// Differentiating engine modules from other modules is useful for splitting up binaries, intermediates, etc
+	std::string EngineModulePath = GetEngineModulesDir();
+	if (Filesystem::exists(EngineModulePath) && Filesystem::canonical(Path).string().find(Filesystem::canonical(EngineModulePath).string()) == 0)
+	{
+		NewModule->bEngineModule = true;
+	}
+
 	// Cut off the .build part
 	int FirstDot = NewModule->Name.find_first_of('.');
 	if(FirstDot != std::string::npos)
@@ -418,6 +426,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	PyDict_SetItemString(Locals, "BuildToolset", BuildToolset);
 	PyDict_SetItemString(Locals, "BuildConfig", BuildConfig);
 	PyDict_SetItemString(Locals, "BuildType", BuildType);
+	PyDict_SetItemString(Locals, "Distribute", Distribute);
 
 	PyObject* RetVal = PyRun_StringFlags(ModulePython.c_str(), Py_file_input, Globals, Locals, nullptr);
 

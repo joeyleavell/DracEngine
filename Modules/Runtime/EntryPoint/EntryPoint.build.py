@@ -4,4 +4,9 @@ Modules = ["Core",
 "DesktopApplication"]
 
 # Declare module type
-Type = "Executable"
+# This is considered the "entry point" for packaged applications, this should only
+# be an executable when in a distributed state. Otherwise, the editor will bootstrap the application.
+if Distribute:
+	Type = "Executable"
+else: 
+	Type = "Runtime"
