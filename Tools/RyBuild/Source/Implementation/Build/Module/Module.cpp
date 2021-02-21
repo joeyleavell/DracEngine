@@ -380,6 +380,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	PyObject* BuildToolset = nullptr;
 	PyObject* BuildConfig = nullptr;
 	PyObject* BuildType = nullptr;
+	PyObject* Distribute = nullptr;
 
 	if(Settings)
 	{
@@ -388,6 +389,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 		BuildToolset = PyUnicode_DecodeFSDefault(Settings->ToolsetToString().c_str());
 		BuildConfig = PyUnicode_DecodeFSDefault(Settings->ConfigToString().c_str());
 		BuildType = PyUnicode_DecodeFSDefault(Settings->BuildTypeToString().c_str());
+		Distribute = PyBool_FromLong(Settings->bDistribute);
 	}
 	else
 	{
@@ -396,6 +398,9 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 		BuildToolset = PyUnicode_DecodeFSDefault("None");
 		BuildConfig = PyUnicode_DecodeFSDefault("None");
 		BuildType = PyUnicode_DecodeFSDefault("None");
+		Distribute = PyBool_FromLong(0);
+
+		std::cout << "Warning: Build settings not passed in" << std::endl;
 	}
 
 	// Set global inputs

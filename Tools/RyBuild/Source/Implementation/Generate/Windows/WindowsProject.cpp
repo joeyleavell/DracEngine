@@ -550,7 +550,7 @@ namespace RyBuild
 							}
 							Output << "\t\t</ClCompile>" << std::endl;
 						}
-						else if(Filesystem::path(SourceFile).extension() == ".module")
+						else if(Filesystem::path(SourceFile).extension() == ".py")
 						{
 							Output << std::string("\t\t<None Include=\"") + SourceFile + "\">" << std::endl;
 							{

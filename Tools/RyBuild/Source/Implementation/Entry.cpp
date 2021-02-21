@@ -29,12 +29,12 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 	BuildSettings Settings;
 	Settings.Toolset = BuildToolset::MSVC;
 	Settings.TargetPlatform.OS = TargetOS::Windows;
+
+	std::string EngineModulesDir = GetEngineModulesDir();
 	
 	// Need to discover modules for project generation
 	std::vector<Module*> EngineModules;
-	LoadModules(EngineRootPath, EngineModules, &Settings);
-
-	std::string EngineModulesDir = GetEngineModulesDir();
+	LoadModules(EngineModulesDir, EngineModules, &Settings);
 
 	// Generate an engine project
 	RyBuild::WindowsProjectSolution* Solution = new RyBuild::WindowsProjectSolution("AryzeEngine", EngineRootPath);
