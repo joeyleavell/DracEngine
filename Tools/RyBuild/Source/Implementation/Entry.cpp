@@ -234,7 +234,7 @@ void GenerateModuleCmd(std::vector<std::string>& Args)
 	}
 
 	// Declare folders for module
-	Filesystem::path ModuleFilePath = ModulePath / (ModuleName + ".module");
+	Filesystem::path ModuleFilePath = ModulePath / (ModuleName + ".build.py");
 
 	Filesystem::create_directories(ModulePath / "Source");
 	Filesystem::create_directories(ModulePath / "Source" / "Include");
@@ -242,24 +242,33 @@ void GenerateModuleCmd(std::vector<std::string>& Args)
 
 	// Write out module file here so it's generated
 
-	Json ModuleJson;
-	ModuleJson["Name"] = ModuleName;
-
-	if(ModuleType == "Game" || ModuleType == "Executable")
-	{
-		ModuleJson["Type"] = "Executable";
-	}
-	else
-	{
-		ModuleJson["Type"] = "Runtime";
-	}
-
-	ModuleJson["Modules"] = {"Core", "Application"};
+	// Json ModuleJson;
+	// ModuleJson["Name"] = ModuleName;
+	//
+	// if(ModuleType == "Game" || ModuleType == "Executable")
+	// {
+	// 	ModuleJson["Type"] = "Executable";
+	// }
+	// else
+	// {
+	// 	ModuleJson["Type"] = "Runtime";
+	// }
+	//
+	// ModuleJson["Modules"] = {"Core", "Application"};
 
 	std::ofstream OutModuleFile;
 	OutModuleFile.open(ModuleFilePath.string());
 	{
-		OutModuleFile << ModuleJson.dump(1) << std::endl;
+		OutModuleFile << R"(Modules = ["Core", "Application", "EntryPoint"])" << std::endl;
+
+		if(ModuleType == "Game" || ModuleType == "Executable")
+		{
+			OutModuleFile << R"(Type = "Executable")" << std::endl;
+		}
+		else
+		{
+			OutModuleFile << R"(Type = "Runtime")" << std::endl;
+		}
 	}
 	OutModuleFile.close();
 
@@ -272,7 +281,7 @@ void GenerateModuleCmd(std::vector<std::string>& Args)
 		{
 			OutGameHeader << R"(#pragma once
 
-#include "Core/Application/Application.h"
+#include "Application.h"
 
 using namespace Ry;
 
@@ -294,6 +303,7 @@ public:
 		OutGameSource.open((Filesystem::path(ModulePath) / "Source" / "Implementation" / "Game.cpp").string());
 		{
 			OutGameSource << R"(#include "Game.h"
+#include "EntryPoint.h"
 
 void Game::Init()
 {

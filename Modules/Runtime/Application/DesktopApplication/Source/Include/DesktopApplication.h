@@ -10,6 +10,7 @@ struct GLFWmonitor;
 
 namespace Ry
 {
+	enum class RenderingPlatform;
 
 	class Window;
 
@@ -41,7 +42,7 @@ namespace Ry
 	{
 	public:
 		
-		DesktopApp(AbstractGame* game, Ry::String app_name);
+		DesktopApp(AbstractGame* game, Ry::RenderingPlatform Platform, Ry::String app_name);
 		virtual ~DesktopApp();
 
 		/**
@@ -61,9 +62,10 @@ namespace Ry
 		void OnScroll(double ScrollX, double ScrollY);
 		void OnWindowResized(int32 NewWidth, int32 NewHeight);
 
+		bool InitWindow(const DesktopConfig& Conf);
+		bool InitRenderAPI(const DesktopConfig& Conf);
 		bool InitEngine(const DesktopConfig& Conf);
 		bool InitFileSystem(const DesktopConfig& Conf);
-		bool InitWindow(const DesktopConfig& Conf);
 
 		void LoadConfig(const Ry::String& Name, Ry::DesktopConfig& Conf);
 

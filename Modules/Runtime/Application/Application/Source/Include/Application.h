@@ -7,6 +7,8 @@
 namespace Ry
 {
 
+	enum class RenderingPlatform;
+
 	class APPLICATION_MODULE ScreenSizeListener
 	{
 	public:
@@ -57,7 +59,7 @@ namespace Ry
 		 *
 		 * @param game The game that will be used for the application.
 		 */
-		Application(AbstractGame* Game, Ry::String AppName) : Running(false), ApplicationName(AppName) {};
+		Application(AbstractGame* Game, Ry::RenderingPlatform Platform, Ry::String AppName) : Running(false), ApplicationName(AppName) {};
 
 		/**
 		 * Frees allocated resources.

@@ -5,11 +5,11 @@
 namespace Ry
 {
 
-	Ry::Application* MakeApplication(const Ry::String& AppName, Ry::AbstractGame* Game)
+	Ry::Application* MakeApplication(const Ry::String& AppName, Ry::RenderingPlatform Platform, Ry::AbstractGame* Game)
 	{
 		// Create application based on defined target
-#if defined(RYBUILD_TARGET_WINDOWS) || defined(RYBUILD_TARGET_MAC) || defined(RYBUILD_TARGET_LINUX)
-		return new Ry::DesktopApp(Game, AppName);
+#if defined(RYBUILD_TARGET_Windows) || defined(RYBUILD_TARGET_Mac) || defined(RYBUILD_TARGET_Linux)
+		return new Ry::DesktopApp(Game, Platform, AppName);
 #else
 		return nullptr;
 #endif

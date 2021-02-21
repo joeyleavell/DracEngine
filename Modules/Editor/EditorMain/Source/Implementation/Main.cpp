@@ -20,7 +20,7 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 
 #ifdef WINDOWS_IMPLEMENTATION
 #include <windows.h>
-Ry::Application* LoadApplication(const Ry::String& DLLLocation)
+Ry::Application* LoadApplication(const Ry::String& DLLLocation, Ry::RenderingPlatform Platform)
 {
 	Ry::AbstractGame* ResultGame;
 	
@@ -68,7 +68,7 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 	if (ResultGame)
 	{
 		// TODO: Load this from project file
-		return Ry::MakeApplication("Game", ResultGame);
+		return Ry::MakeApplication("Game", Platform, ResultGame);
 	}
 	else
 	{
@@ -80,35 +80,44 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation)
 
 int main(int ArgC, char** ArgV)
 {
-
-	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
-
-
+	Ry::String NonOption = "";
+	
 	Ry::ArrayList<Ry::String> Options;
 	for(int32 Opt = 0; Opt < ArgC; Opt++)
 	{
 		Options.Add(ArgV[Opt]);
+
+		Ry::String OptStr = ArgV[Opt];
+
+		if(OptStr.getSize() > 0 && OptStr[0] != '-')
+		{
+			NonOption = OptStr;
+		}
 	}
 
-	if(Ry::HasOption(Options, "Vulkan"))
+	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
+
+	if (Ry::HasOption(Options, "Vulkan"))
 	{
 		Plat = Ry::RenderingPlatform::Vulkan;
 	}
 
 	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
 
-	Ry::Editor* Ed = new Ry::Editor(Plat);
-	Ed->Run();
-	
-	/*if(ArgC == 1)
+	// If there was a non option argument, assume it's the path of a game to startup with
+	// Otherwise, startup project launcher
+	if(NonOption.IsEmpty())
 	{
-		std::cerr << "Project loader not implemented yet, must specify which project DLL to launch from" << std::endl;
+		// Todo: this is where the project launcher should be started
+
+		Ry::Editor* Ed = new Ry::Editor(Plat);
+		Ed->Run();
 	}
-	else if(ArgC == 2)
+	else
 	{
 		// Run the loaded application
-		Ry::String DllPath = ArgV[1];
-		Ry::Application* App = LoadApplication(DllPath);
+		Ry::String DllPath = NonOption;
+		Ry::Application* App = LoadApplication(DllPath, Plat);
 
 		if(App)
 		{
@@ -116,16 +125,13 @@ int main(int ArgC, char** ArgV)
 			Ry::String ResourcesDir = Ry::File::GetParentPath(DllParent) + "\\Resources";
 			Ry::String DataDir = Ry::File::GetParentPath(DllParent) + "\\Data";
 
+			// Mount game resources and data here
 			Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(ResourcesDir), "Content");
 			Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(DataDir), "Data");
 
 			App->Run();
 		}
 	}
-	else
-	{
-		std::cerr << "Incorrect arguments, correct usage: <ProjectDLL>" << std::endl;
-	}*/
 	
 	return 0;
 }

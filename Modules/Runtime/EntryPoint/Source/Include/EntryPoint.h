@@ -4,12 +4,13 @@
 
 namespace Ry
 {
+	enum class RenderingPlatform;
 	class String;
 	class Application;
 	class AbstractGame;
 	
 
-	ENTRYPOINT_MODULE Ry::Application* MakeApplication(const Ry::String& AppName, Ry::AbstractGame* Game);
+	ENTRYPOINT_MODULE Ry::Application* MakeApplication(const Ry::String& AppName, Ry::RenderingPlatform Platform, Ry::AbstractGame* Game);
 
 #ifdef RYBUILD_DISTRIBUTE
 		/**
@@ -19,7 +20,7 @@ namespace Ry
 	int main() \
 	{ \
 	\
-		Ry::Application* App = MakeApplication(Name, new (Class)); \
+		Ry::Application* App = MakeApplication(Name, Ry::RenderingPlatform::OpenGL, new (Class)); \
 		App->Run(); \
 	\
 		return 0; \

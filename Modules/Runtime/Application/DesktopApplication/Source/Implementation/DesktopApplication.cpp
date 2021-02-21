@@ -11,6 +11,7 @@
 #include "Core/Globals.h"
 #include "Input.h"
 #include "GLRenderAPI2.h"
+#include "VulkanRenderAPI.h"
 #include "RenderingEngine.h"
 #include "Interface/Rendering.h"
 #include "Scene.h"
@@ -92,13 +93,16 @@ namespace Ry
 		return *this;
 	}
 
-	DesktopApp::DesktopApp(AbstractGame* game, Ry::String app_name):
-		Ry::Application(game, app_name)
+	DesktopApp::DesktopApp(AbstractGame* game, Ry::RenderingPlatform Plat, Ry::String app_name):
+		Ry::Application(game, Plat, app_name)
 	{
 		this->AverageFPS = 0;
 		this->FrameCounter = 0;
 		this->Running = false;
 		this->Game = game;
+
+		// Set the global rendering platform
+		Ry::rplatform = new Ry::RenderingPlatform(Plat);
 	}
 
 	DesktopApp::~DesktopApp()
@@ -188,7 +192,6 @@ namespace Ry
 	{
 		// Set singleton
 		Ry::app = this;
-		Ry::rplatform = new Ry::RenderingPlatform(Ry::RenderingPlatform::OpenGL); // TODO: this needs to be set somewhere else!!!
 
 		// Setup get viewport width and get viewport height delegates
 		Ry::ViewportWidthDel.BindLambda([]()
@@ -200,9 +203,9 @@ namespace Ry
 		{
 			return Ry::app->GetViewportHeight();
 		});
-		
-		auto A = &DesktopApp::GetViewportWidth;
 
+		// Select rendering API here
+		
 		// Initialize window
 		if(!InitWindow(Conf))
 		{
@@ -219,7 +222,7 @@ namespace Ry
 		// Initialize rendering engine.
 		// J.Leavell -- TODO: remove all opengl calls out of this class!
 		Ry::Log->Log("Initializing rendering engine");
-		Ry::InitRenderingEngine();
+		//Ry::InitRenderingEngine();
 
 		// Initialize scene
 		Ry::Log->Log("Initializing scene");
@@ -305,7 +308,19 @@ namespace Ry
 
 	bool DesktopApp::InitWindow(const DesktopConfig& Conf)
 	{
-		GameWindow = new Window(Ry::RenderingPlatform::OpenGL);
+		// Initialize the windowing subsystem
+		if(!InitWindowing())
+		{
+			Ry::Log->LogError("Failed to initialize windowing subsystem");
+		}
+
+		// Initialize the rendering API
+		if (!InitRenderAPI(Conf))
+		{
+			return false;
+		}
+		
+		GameWindow = new Window(*Ry::rplatform);
 
 		if(!GameWindow->CreateWindow(*Conf.window.title, Conf.window.width, Conf.window.height))
 		{
@@ -320,19 +335,33 @@ namespace Ry
 		GameWindow->AddKeyCharDelegate(Ry::Delegate<void, uint32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnCharPressed));
 		GameWindow->AddScrollDelegate(Ry::Delegate<void, double, double>::CreateMemberFunctionDelegate(this, &DesktopApp::OnScroll));
 
-		// Setup the window context
-		//GameWindow->InitContext();
-
-		GameWindow->SetVSyncEnabled(false);
+		// todo: make this platform agnostic
+		//GameWindow->SetVSyncEnabled(false);
 	
-		// Initialize opengl rendering api
-		if (!Ry::InitOGLRendering())
+		return true;
+	}
+
+	bool DesktopApp::InitRenderAPI(const DesktopConfig& Conf)
+	{
+		// Initialize the different rendering APIs here
+		
+		if(*Ry::rplatform == RenderingPlatform::OpenGL)
 		{
-			Ry::Log->Log("Failed to initialize OpenGL");
-			return false;
+			if (!Ry::InitOGLRendering())
+			{
+				Ry::Log->Log("Failed to initialize OpenGL");
+				return false;
+			}
+		}
+		else if (*Ry::rplatform == RenderingPlatform::Vulkan)
+		{
+			if (!Ry::InitVulkanAPI())
+			{
+				Ry::Log->Log("Failed to initialize Vulkan");
+				return false;
+			}
 		}
 
-		return true;
 	}
 
 	void DesktopApp::LoadConfig(const Ry::String& Name, Ry::DesktopConfig& Conf)

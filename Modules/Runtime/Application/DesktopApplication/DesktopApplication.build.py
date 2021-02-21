@@ -11,6 +11,7 @@ Modules = ["Core",
 "Automation", 
 "Input", 
 "OpenGL2", 
+"Vulkan",
 "Windowing"]
 
 # Declare module type
