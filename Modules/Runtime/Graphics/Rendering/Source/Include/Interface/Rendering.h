@@ -13,15 +13,6 @@
 namespace Ry
 {
 	
-	/**
-	 * All supported rendering platforms.
-	 */
-	enum class RENDERING_MODULE RenderingPlatform
-	{
-		OpenGL,
-		Vulkan
-	};
-
 	enum class RENDERING_MODULE RenderMode
 	{
 		FILLED, WIREFRAME

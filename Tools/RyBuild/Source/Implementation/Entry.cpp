@@ -376,6 +376,17 @@ void GenerateGameCmd(std::vector<std::string>& Args)
 		GenerateProjectFilesBatOut.close();
 	}
 
+	// Create distribute batch file
+	{
+		std::string DistributeGameBatchLoc = (Filesystem::path(GamePath) / "BuildScripts" / "BatchFiles" / "Distribute-x64-Windows-MSVC.bat").string();
+		std::ofstream DistributeGameBatchOut(DistributeGameBatchLoc);
+		{
+			std::string RyDistPath = (Filesystem::path(GetModulePath()).parent_path() / "RyDist.exe").string();
+			DistributeGameBatchOut << "\"" << RyDistPath << "\" \"" << Filesystem::canonical(GamePath) << "\"" << " -Toolset=MSVC -TargetOS=Windows -TargetArch=x86_64 -BuildType=Standalone -Distribute" << std::endl;
+		}
+		DistributeGameBatchOut.close();
+	}
+
 	// Create assets directory
 	Filesystem::create_directories(GameAssetsPath);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "CoreGen.h"
 
 /************************************************************************/
 /* Define types                                                         */
@@ -45,3 +46,16 @@ elif defined(__unix__)
 #if defined(_MSC_VER)
 	#define MSVC_COMPILER
 #endif
+
+namespace Ry
+{
+	/**
+	 * All supported rendering platforms.
+	 */
+	enum class CORE_MODULE RenderingPlatform
+	{
+		OpenGL,
+		Vulkan
+	};
+
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntryPointGen.h"
+#include "Core/Core.h"
 
 namespace Ry
 {

@@ -7,7 +7,7 @@ int main(int ArgC, char** ArgV)
 {
 	if(ArgC < 2)
 	{
-		std::cerr << "Incorrect usage: <GameModuleRoot> [Options]" << std::endl;
+		std::cerr << "Incorrect usage: <GameRoot> [Options]" << std::endl;
 		return 1;
 	}
 
