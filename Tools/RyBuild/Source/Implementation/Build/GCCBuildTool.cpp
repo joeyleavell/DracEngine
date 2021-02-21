@@ -129,16 +129,21 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 	}
 
 	// Add external includes
+	for (const std::string& IncludePath : TheModule.PythonIncludes)
+	{
+		CmdArgs.push_back("-I" + IncludePath);
+	}
+
 	for (const ExternDependency& Extern : TheModule.ExternDependencies)
 	{
 		CmdArgs.push_back("-I" + Extern.GetIncludePath());
 	}
 
 	// Add third party include paths to include path
-	for (const std::string& ThirdPartyInclude : TheModule.ModuleThirdParty.Includes)
-	{
-		CmdArgs.push_back("-I" + (Filesystem::path(TheModule.GetThirdPartyDir()) / ThirdPartyInclude).string());
-	}
+	// for (const std::string& ThirdPartyInclude : TheModule.ModuleThirdParty.Includes)
+	// {
+	// 	CmdArgs.push_back("-I" + (Filesystem::path(TheModule.GetThirdPartyDir()) / ThirdPartyInclude).string());
+	// }
 
 	// Only mark the specified source file for compilation
 	CmdArgs.push_back(SourceFile);
@@ -242,24 +247,25 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			CmdArgs.push_back("-L" + GetEngineLibraryDir());
 		}
 
-		std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
+		// std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
+		std::vector<std::string> Libs = TheModule.PythonLibraries;
 
-		if(Libs)
-		{
+		// if(Libs)
+		// {
 			// Add third party libraries
-			for (const std::string& Lib : *Libs)
+			for (const std::string& Lib : Libs)
 			{
 				// Make path relative to third party
 				Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
 
 				CmdArgs.push_back("-L" + LibPath.string());
 			}
-		}
-		else
-		{
-			std::cerr << "Module did not return a valid vector of target libs" << std::endl;
-			return false;
-		}
+		// }
+		// else
+		// {
+		// 	std::cerr << "Module did not return a valid vector of target libs" << std::endl;
+		// 	return false;
+		// }
 	
 	}
 
@@ -306,8 +312,8 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 
 
 	// Libraries that will be added to the compile path
-	std::vector<std::string> TargetLibs;
-	TheModule.GetTargetLibs(Settings, TargetLibs);
+	std::vector<std::string> TargetLibs = TheModule.PythonLibraries;
+	//TheModule.GetTargetLibs(Settings, TargetLibs);
 
 	// Add all extern library inputs
 	for (const ExternDependency& Extern : TheModule.ExternDependencies)
@@ -407,23 +413,25 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 		for (auto& Mod : Modules)
 		{
 			Module& TheModule = *Mod.second;
-			std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
-			if (Libs)
-			{
+			// std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
+			std::vector<std::string> Libs = TheModule.PythonLibraryPaths;
+
+			// if (Libs)
+			// {
 				// Add third party libraries
-				for (const std::string& Lib : *Libs)
+				for (const std::string& Lib : Libs)
 				{
 					// Make path relative to third party
 					Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
 
 					CmdArgs.push_back("-L" + LibPath.string());
 				}
-			}
-			else
-			{
-				std::cerr << "Module did not return a valid vector of target libs" << std::endl;
-				return false;
-			}
+			// }
+			// else
+			// {
+			// 	std::cerr << "Module did not return a valid vector of target libs" << std::endl;
+			// 	return false;
+			// }
 		}
 
 	}
@@ -459,8 +467,8 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 		// Todo: combine shared code between here and LinkModule()
 		
 		// Libraries that will be added to the compile path
-		std::vector<std::string> TargetLibs;
-		TheModule.GetTargetLibs(Settings, TargetLibs);
+		std::vector<std::string> TargetLibs = TheModule.PythonLibraries;
+		// TheModule.GetTargetLibs(Settings, TargetLibs);
 
 		// Add all extern library inputs
 		for (const ExternDependency& Extern : TheModule.ExternDependencies)

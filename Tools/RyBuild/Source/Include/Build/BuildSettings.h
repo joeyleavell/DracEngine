@@ -103,31 +103,72 @@ struct BuildSettings
 	/** The name of the standalone. This is only relevant if building in standalone mode. */
 	std::string StandaloneName = "Build";
 
-	std::string ConfigToString()
+	std::string BuildTypeToString() const
+	{
+		switch (Type)
+		{
+		case BuildType::Modular:
+			return "Modular";
+		case BuildType::Standalone:
+			return "Standalone";
+		}
+		return "None";
+	}
+
+	std::string ConfigToString() const
 	{
 		switch (Config)
 		{
 		case BuildConfiguration::Development:
-			return "DEVELOPMENT";
+			return "Development";
 		case BuildConfiguration::Shipping:
-			return "SHIPPING";
+			return "Shipping";
 		}
-		return "NONE";
+		return "None";
 	}
 
-	std::string TargetOSToString()
+	std::string TargetOSToString() const
 	{
 		switch(TargetPlatform.OS)
 		{
 		case TargetOS::Mac:
-			return "MAC";
+			return "Mac";
 		case TargetOS::Windows:
-			return "WINDOWS";
+			return "Windows";
 		case TargetOS::Linux:
-			return "LINUX";
+			return "Linux";
 		}
-		return "NONE";
+		return "None";
 	}
+
+	std::string TargetArchToString() const
+	{
+		switch (TargetPlatform.Arch)
+		{
+		case TargetArchitecture::x86_64:
+			return "x86_64";
+		case TargetArchitecture::x86:
+			return "x86";
+		case TargetArchitecture::Arm:
+			return "Arm";
+		}
+		return "None";
+	}
+
+	std::string ToolsetToString() const
+	{
+		switch (Toolset)
+		{
+		case BuildToolset::CLANG:
+			return "Clang";
+		case BuildToolset::GCC:
+			return "GCC";
+		case BuildToolset::MSVC:
+			return "MSVC";
+		}
+		return "None";
+	}
+
 
 	std::string GetTargetPathString() const
 	{

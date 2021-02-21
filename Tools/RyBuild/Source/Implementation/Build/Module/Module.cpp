@@ -175,27 +175,27 @@ Module* LoadModule(Filesystem::path Path)
 					Json WindowsJson = x64Json["Windows"];
 
 
-					if(WindowsJson.contains("MSVC"))
-					{
-						LoadPlatformStringArray(NewModule->Libs.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
-					}
-
-					if (WindowsJson.contains("MinGW"))
-					{
-						LoadPlatformStringArray(NewModule->Libs.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
-					}
+					// if(WindowsJson.contains("MSVC"))
+					// {
+					// 	LoadPlatformStringArray(NewModule->Libs.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
+					// }
+					//
+					// if (WindowsJson.contains("MinGW"))
+					// {
+					// 	LoadPlatformStringArray(NewModule->Libs.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
+					// }
 
 				}
 
-				if (x64Json.contains("Linux"))
-				{
-					Json LinuxJson = x64Json["Linux"];
-
-					if (LinuxJson.contains("GCC"))
-					{
-						LoadPlatformStringArray(NewModule->Libs.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
-					}
-				}
+				// if (x64Json.contains("Linux"))
+				// {
+				// 	Json LinuxJson = x64Json["Linux"];
+				//
+				// 	if (LinuxJson.contains("GCC"))
+				// 	{
+				// 		LoadPlatformStringArray(NewModule->Libs.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
+				// 	}
+				// }
 
 			}
 			
@@ -217,63 +217,63 @@ Module* LoadModule(Filesystem::path Path)
 			}
 		}
 
-		if (ModuleJson.contains(ThirdPartyField) && ModuleJson[ThirdPartyField].is_object())
-		{
-			Json ThirdPartyJson = ModuleJson[ThirdPartyField];
-			
-			if (ThirdPartyJson.contains(ThirdPartyIncludeField) && ThirdPartyJson[ThirdPartyIncludeField].is_array())
-			{
-				Json IncludeJson = ThirdPartyJson[ThirdPartyIncludeField];
-				
-				int IncludePathCount = IncludeJson.size();
-
-				for (int PathIndex = 0; PathIndex < IncludePathCount; PathIndex++)
-				{
-					if (IncludeJson[PathIndex].is_string())
-					{
-						NewModule->ModuleThirdParty.Includes.push_back(IncludeJson[PathIndex].get<std::string>());
-					}
-				}
-			}
-
-			if (ThirdPartyJson.contains(ThirdPartyLibrariesField))
-			{
-				Json LibrariesJson = ThirdPartyJson[ThirdPartyLibrariesField];
-
-				if (LibrariesJson.contains("x64"))
-				{
-					Json x64Json = LibrariesJson["x64"];
-
-					if (x64Json.contains("Windows"))
-					{
-						Json WindowsJson = x64Json["Windows"];
-
-
-						if (WindowsJson.contains("MSVC"))
-						{
-							LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
-						}
-
-						if (WindowsJson.contains("MinGW"))
-						{
-							LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
-						}
-
-					}
-
-					if (x64Json.contains("Linux"))
-					{
-						Json LinuxJson = x64Json["Linux"];
-
-						if (LinuxJson.contains("GCC"))
-						{
-							LoadPlatformStringArray(NewModule->ModuleThirdParty.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
-						}
-					}
-
-				}
-			}
-		}
+		// if (ModuleJson.contains(ThirdPartyField) && ModuleJson[ThirdPartyField].is_object())
+		// {
+		// 	Json ThirdPartyJson = ModuleJson[ThirdPartyField];
+		// 	
+		// 	if (ThirdPartyJson.contains(ThirdPartyIncludeField) && ThirdPartyJson[ThirdPartyIncludeField].is_array())
+		// 	{
+		// 		Json IncludeJson = ThirdPartyJson[ThirdPartyIncludeField];
+		// 		
+		// 		int IncludePathCount = IncludeJson.size();
+		//
+		// 		for (int PathIndex = 0; PathIndex < IncludePathCount; PathIndex++)
+		// 		{
+		// 			if (IncludeJson[PathIndex].is_string())
+		// 			{
+		// 				NewModule->ModuleThirdParty.Includes.push_back(IncludeJson[PathIndex].get<std::string>());
+		// 			}
+		// 		}
+		// 	}
+		//
+		// 	if (ThirdPartyJson.contains(ThirdPartyLibrariesField))
+		// 	{
+		// 		Json LibrariesJson = ThirdPartyJson[ThirdPartyLibrariesField];
+		//
+		// 		if (LibrariesJson.contains("x64"))
+		// 		{
+		// 			Json x64Json = LibrariesJson["x64"];
+		//
+		// 			if (x64Json.contains("Windows"))
+		// 			{
+		// 				Json WindowsJson = x64Json["Windows"];
+		//
+		//
+		// 				if (WindowsJson.contains("MSVC"))
+		// 				{
+		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
+		// 				}
+		//
+		// 				if (WindowsJson.contains("MinGW"))
+		// 				{
+		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
+		// 				}
+		//
+		// 			}
+		//
+		// 			if (x64Json.contains("Linux"))
+		// 			{
+		// 				Json LinuxJson = x64Json["Linux"];
+		//
+		// 				if (LinuxJson.contains("GCC"))
+		// 				{
+		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
+		// 				}
+		// 			}
+		//
+		// 		}
+		// 	}
+		// }
 
 
 	}
@@ -330,7 +330,7 @@ bool LoadPythonStringList(std::vector<std::string>& Out, PyObject* List, std::st
 	return true;
 }
 
-Module* LoadModulePython(Filesystem::path Path)
+Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 {
 	if (!Filesystem::exists(Path))
 	{
@@ -365,7 +365,7 @@ Module* LoadModulePython(Filesystem::path Path)
 	PyObject* Globals = PyModule_GetDict(PyImport_AddModule("__main__"));
 	PyObject* Locals = PyDict_New();
 
-	// Create some default globals
+	// Variables that can be set by the script
 	PyObject* DefModulesList = PyList_New(0);
 	PyObject* DefType = PyUnicode_New(0, 10);
 	PyObject* DefExterns = PyList_New(0);
@@ -374,6 +374,31 @@ Module* LoadModulePython(Filesystem::path Path)
 	PyObject* DefLibraryPaths = PyList_New(0);
 	PyObject* DefLibraries = PyList_New(0);
 
+	// Variables that are read by the script
+	PyObject* TargetArch = nullptr;
+	PyObject* TargetOS = nullptr;
+	PyObject* BuildToolset = nullptr;
+	PyObject* BuildConfig = nullptr;
+	PyObject* BuildType = nullptr;
+
+	if(Settings)
+	{
+		TargetArch = PyUnicode_DecodeFSDefault(Settings->TargetArchToString().c_str());
+		TargetOS = PyUnicode_DecodeFSDefault(Settings->TargetOSToString().c_str());
+		BuildToolset = PyUnicode_DecodeFSDefault(Settings->ToolsetToString().c_str());
+		BuildConfig = PyUnicode_DecodeFSDefault(Settings->ConfigToString().c_str());
+		BuildType = PyUnicode_DecodeFSDefault(Settings->BuildTypeToString().c_str());
+	}
+	else
+	{
+		TargetArch = PyUnicode_DecodeFSDefault("None");
+		TargetOS = PyUnicode_DecodeFSDefault("None");
+		BuildToolset = PyUnicode_DecodeFSDefault("None");
+		BuildConfig = PyUnicode_DecodeFSDefault("None");
+		BuildType = PyUnicode_DecodeFSDefault("None");
+	}
+
+	// Set global inputs
 	PyDict_SetItemString(Locals, "Modules", DefModulesList);
 	PyDict_SetItemString(Locals, "Type", DefType);
 	PyDict_SetItemString(Locals, "Extern", DefExterns);
@@ -382,11 +407,27 @@ Module* LoadModulePython(Filesystem::path Path)
 	PyDict_SetItemString(Locals, "LibraryPaths", DefLibraryPaths);
 	PyDict_SetItemString(Locals, "Libraries", DefLibraries);
 
+	// Set global constants
+	PyDict_SetItemString(Locals, "TargetArch", TargetArch);
+	PyDict_SetItemString(Locals, "TargetOS", TargetOS);
+	PyDict_SetItemString(Locals, "BuildToolset", BuildToolset);
+	PyDict_SetItemString(Locals, "BuildConfig", BuildConfig);
+	PyDict_SetItemString(Locals, "BuildType", BuildType);
+
 	PyObject* RetVal = PyRun_StringFlags(ModulePython.c_str(), Py_file_input, Globals, Locals, nullptr);
+
+	if(PyErr_Occurred())
+	{
+		std::cerr << "Error parsing build script file " << NewModule->Name << " in " << NewModule->RootDir << ": " << std::endl;
+		
+		PyErr_Print();
+		return nullptr;
+	}
 
 	// Extract module list from globals
 
 	// Todo: add smart "FindLib" builtin function
+
 	PyObject* ModulesList = PyDict_GetItemString(Locals, "Modules");
 	PyObject* Type = PyDict_GetItemString(Locals, "Type");
 	PyObject* Externs = PyDict_GetItemString(Locals, "Extern");
@@ -413,12 +454,12 @@ Module* LoadModulePython(Filesystem::path Path)
 		NewModule->ExternDependencies.push_back(NewDep);
 	}
 
-	int Size = PyDict_Size(Locals);
-	PyObject* Rep = PyObject_Repr(Locals);
-	PyObject* Utf8 = PyUnicode_AsEncodedString(Rep, "utf-8", "~E~");
-	std::string ModType = PyBytes_AsString(Utf8);
-	std::cout << ModType << std::endl;
-	std::cout << Size << std::endl;
+	// int Size = PyDict_Size(Locals);
+	// PyObject* Rep = PyObject_Repr(Locals);
+	// PyObject* Utf8 = PyUnicode_AsEncodedString(Rep, "utf-8", "~E~");
+	// std::string ModType = PyBytes_AsString(Utf8);
+	// std::cout << ModType << std::endl;
+	// std::cout << Size << std::endl;
 
 	// Load module type
 	if(Type)
@@ -461,7 +502,7 @@ Module* LoadModulePython(Filesystem::path Path)
 	return NewModule;
 }
 
-void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
+void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings)
 {
 	Filesystem::path FoundModuleFile;
 	Filesystem::directory_iterator NewDirectoryItr(RootDir);
@@ -493,7 +534,7 @@ void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 
 		if(bPythonModule)
 		{
-			NewModule = LoadModulePython(FoundModuleFile);
+			NewModule = LoadModulePython(FoundModuleFile, Settings);
 		}
 		else
 		{
@@ -518,7 +559,7 @@ void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 			// Only go into directories
 			if (Filesystem::is_directory(File))
 			{
-				DiscoverModules(Filesystem::absolute(File), OutModules);
+				LoadModules(Filesystem::absolute(File), OutModules, Settings);
 			}
 		}
 	}

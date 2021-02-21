@@ -217,9 +217,9 @@ namespace RyBuild
 					}
 
 					
-					if(!Mod->ModuleThirdParty.Includes.empty())
+					if(!Mod->PythonIncludes.empty())
 					{
-						for(const std::string& ThirdPartyIncludeDir : Mod->ModuleThirdParty.Includes)
+						for(const std::string& ThirdPartyIncludeDir : Mod->PythonIncludes)
 						{
 							std::string ThirdPartyDirAbs = Filesystem::absolute(Filesystem::path(Mod->GetThirdPartyDir()) / ThirdPartyIncludeDir).string();
 							Output << ThirdPartyDirAbs << ";";

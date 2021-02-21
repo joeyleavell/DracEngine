@@ -486,13 +486,13 @@ bool AbstractBuildTool::BuildAll(std::vector<std::string>& ModulesFailed)
 	std::vector<Module*> EngineModules;
 
 	// Discover modules in root path of project.
-	DiscoverModules(RootPath, Modules);
+	LoadModules(RootPath, Modules, &Settings);
 	if (!VerifyModules(Modules)) // Make sure modules are correct (no duplicate names)
 	{
 		return false;
 	}
 
-	bool bIsBuildingEngine = RootPath == Filesystem::path(GetEngineModulesDir());
+	bool bIsBuildingEngine = (RootPath == Filesystem::path(GetEngineModulesDir()));
 
 	// This only relavant if we're not building the engine. If we are, we have already loaded the engine modules above.
 	if (!bIsBuildingEngine)
@@ -513,7 +513,7 @@ bool AbstractBuildTool::BuildAll(std::vector<std::string>& ModulesFailed)
 
 		if (!bIsBuildingEngine && Filesystem::exists(EngineModulesPath))
 		{
-			DiscoverModules(EngineModulesPath, EngineModules);
+			LoadModules(EngineModulesPath, EngineModules, &Settings);
 			if (!VerifyModules(EngineModules))
 			{
 				return false;

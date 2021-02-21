@@ -66,12 +66,11 @@ public:
 	std::string Name;
 	ModuleType Type;
 	std::string RootDir;
-	PlatformThirdParty ModuleThirdParty;
+	//PlatformThirdParty ModuleThirdParty;
 	std::vector<std::string> ModuleDependencies;
 	std::vector<std::string> MacroDefinitions;
 	std::vector<ExternDependency> ExternDependencies;
-	// std::vector<std::string> SystemLibs;
-	PlatformLibDef Libs;
+	//PlatformLibDef Libs;
 
 	std::vector<std::string> PythonIncludes;
 	std::vector<std::string> PythonLibraryPaths;
@@ -369,80 +368,80 @@ public:
 
 	}
 
-	void GetTargetLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs)
-	{
-		std::vector<std::string>* TargetVec = nullptr;
-		
-		if (Settings.TargetPlatform.OS == TargetOS::Windows)
-		{
-			if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-			{
-				if (Settings.Toolset == BuildToolset::MSVC)
-				{
-					TargetVec = &Libs.Win64Libs.MSVCLibs;
-				}
-				else if (Settings.Toolset == BuildToolset::GCC)
-				{
-					TargetVec = &Libs.Win64Libs.MinGWLibs;
-				}
-			}
-		}
-		else if (Settings.TargetPlatform.OS == TargetOS::Linux)
-		{
-			if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-			{
-				if (Settings.Toolset == BuildToolset::GCC)
-				{
-					TargetVec = &Libs.Linux64Libs.GCCLibs;
-				}
-			}
-		}
+	// void GetTargetLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs)
+	// {
+	// 	std::vector<std::string>* TargetVec = nullptr;
+	// 	
+	// 	if (Settings.TargetPlatform.OS == TargetOS::Windows)
+	// 	{
+	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+	// 		{
+	// 			if (Settings.Toolset == BuildToolset::MSVC)
+	// 			{
+	// 				TargetVec = &Libs.Win64Libs.MSVCLibs;
+	// 			}
+	// 			else if (Settings.Toolset == BuildToolset::GCC)
+	// 			{
+	// 				TargetVec = &Libs.Win64Libs.MinGWLibs;
+	// 			}
+	// 		}
+	// 	}
+	// 	else if (Settings.TargetPlatform.OS == TargetOS::Linux)
+	// 	{
+	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+	// 		{
+	// 			if (Settings.Toolset == BuildToolset::GCC)
+	// 			{
+	// 				TargetVec = &Libs.Linux64Libs.GCCLibs;
+	// 			}
+	// 		}
+	// 	}
+	//
+	// 	if(TargetVec)
+	// 	{
+	// 		for(std::string& Lib : *TargetVec)
+	// 		{
+	// 			OutLibs.push_back(Lib);
+	// 		}
+	// 	}
+	// }
 
-		if(TargetVec)
-		{
-			for(std::string& Lib : *TargetVec)
-			{
-				OutLibs.push_back(Lib);
-			}
-		}
-	}
-
-	std::vector<std::string>* GetTargetLibPaths(const BuildSettings& Settings)
-	{
-		if(Settings.TargetPlatform.OS == TargetOS::Windows)
-		{
-			if(Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-			{
-				if(Settings.Toolset == BuildToolset::MSVC)
-				{
-					return &ModuleThirdParty.Win64Libs.MSVCLibs;
-				}
-				else if(Settings.Toolset == BuildToolset::GCC)
-				{
-					return &ModuleThirdParty.Win64Libs.MinGWLibs;
-				}
-			}
-		}
-		else if(Settings.TargetPlatform.OS == TargetOS::Linux)
-		{
-			if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-			{
-				if (Settings.Toolset == BuildToolset::GCC)
-				{
-					return &ModuleThirdParty.Linux64Libs.GCCLibs;
-				}
-			}
-		}
-
-		return nullptr;
-	}
+	// std::vector<std::string>* GetTargetLibPaths(const BuildSettings& Settings)
+	// {
+	// 	if(Settings.TargetPlatform.OS == TargetOS::Windows)
+	// 	{
+	// 		if(Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+	// 		{
+	// 			if(Settings.Toolset == BuildToolset::MSVC)
+	// 			{
+	// 				return &ModuleThirdParty.Win64Libs.MSVCLibs;
+	// 			}
+	// 			else if(Settings.Toolset == BuildToolset::GCC)
+	// 			{
+	// 				return &ModuleThirdParty.Win64Libs.MinGWLibs;
+	// 			}
+	// 		}
+	// 	}
+	// 	else if(Settings.TargetPlatform.OS == TargetOS::Linux)
+	// 	{
+	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+	// 		{
+	// 			if (Settings.Toolset == BuildToolset::GCC)
+	// 			{
+	// 				return &ModuleThirdParty.Linux64Libs.GCCLibs;
+	// 			}
+	// 		}
+	// 	}
+	//
+	// 	return nullptr;
+	// }
 	
 };
 
 Module* LoadModule(Filesystem::path Path);
-Module* LoadModulePython(Filesystem::path Path);
+Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings);
 
-void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules);
+void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings = nullptr);
 bool VerifyModules(std::vector<Module*>& OutModules);
 bool IsModuleOutOfDate(const Module& Module, std::string BinaryDir, BuildSettings Settings);
 

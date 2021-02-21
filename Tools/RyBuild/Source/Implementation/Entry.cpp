@@ -26,9 +26,13 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 	std::string WorkingDir = (Filesystem::canonical(EngineRootPath) / "Binary").string();
 	std::string EngineBinary = (Filesystem::canonical(EngineRootPath) / "Binary" / "RyRuntime-EditorMain.exe").string();
 
+	BuildSettings Settings;
+	Settings.Toolset = BuildToolset::MSVC;
+	Settings.TargetPlatform.OS = TargetOS::Windows;
+	
 	// Need to discover modules for project generation
 	std::vector<Module*> EngineModules;
-	DiscoverModules(EngineRootPath, EngineModules);
+	LoadModules(EngineRootPath, EngineModules, &Settings);
 
 	std::string EngineModulesDir = GetEngineModulesDir();
 
@@ -70,12 +74,16 @@ bool GenerateGameProjectFiles(std::string GameName, std::string GameRootPath, st
 	std::string EngineModulesDir = (Filesystem::canonical(Filesystem::path(EngineRootPath) / "Modules")).string();
 	std::string WorkingDirectory = "$(SolutionDir)Binary";
 
+	BuildSettings Settings;
+	Settings.Toolset = BuildToolset::MSVC;
+	Settings.TargetPlatform.OS = TargetOS::Windows;
+
 	// Need to discover modules for project generation
 	std::vector<Module*> EngineModules;
-	DiscoverModules(EngineModulesDir, EngineModules);
+	LoadModules(EngineModulesDir, EngineModules, &Settings);
 
 	std::vector<Module*> GameModules;
-	DiscoverModules((Filesystem::path(GameRootPath) / "Modules").string(), GameModules);
+	LoadModules((Filesystem::path(GameRootPath) / "Modules").string(), GameModules, &Settings);
 
 	// std::string ProjectFilesDir = (Filesystem::path(GameRootPath) / "Intermediate" / "ProjectFiles").string();
 	std::string ProjectFilesDir = (Filesystem::path(GameRootPath) / "Intermediate" / "ProjectFiles").string();

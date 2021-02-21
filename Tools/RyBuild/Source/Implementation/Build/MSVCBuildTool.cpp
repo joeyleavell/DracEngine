@@ -325,6 +325,12 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 		BuildCmd.push_back("/I\"" + Mod->GetGeneratedDir() + "\\\"");
 	}
 
+	// Add custom include paths
+	for (const std::string& IncludePath : TheModule.PythonIncludes)
+	{
+		BuildCmd.push_back("/I\"" + IncludePath + "\\\\\"");
+	}
+
 	// Add external includes
 	for (const ExternDependency& Dep : TheModule.ExternDependencies)
 	{
@@ -332,7 +338,7 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 	}
 
 	// Add third party include paths to include path
-	for (const std::string& ThirdPartyInclude : TheModule.ModuleThirdParty.Includes)
+	for (const std::string& ThirdPartyInclude : TheModule.PythonIncludes)
 	{
 		BuildCmd.push_back("/I\"" + (Filesystem::path(TheModule.GetThirdPartyDir()) / ThirdPartyInclude).string() + "\\\"");
 	}
@@ -418,9 +424,10 @@ bool MSVCBuildTool::LinkModule(Module& TheModule)
 		}
 
 		// Add third party library directories
-		for (const std::string& Lib : TheModule.ModuleThirdParty.Win64Libs.MSVCLibs)
+		for (const std::string& Lib : TheModule.PythonLibraryPaths)
 		{
 			// Make path relative to third party
+			// todo: don't force relative to third party
 			Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
 
 			BuildCmd.push_back("/LIBPATH:\"" + LibPath.string() + "\\\" ");
@@ -461,7 +468,7 @@ bool MSVCBuildTool::LinkModule(Module& TheModule)
 	}
 
 	// Add all libraries as input. This works for static as well as shared (dll) libraries.
-	for (const std::string& SystemLib : TheModule.Libs.Win64Libs.MSVCLibs)
+	for (const std::string& SystemLib : TheModule.PythonLibraries)
 	{
 		BuildCmd.push_back(SystemLib);
 	}
@@ -553,7 +560,7 @@ bool MSVCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Obje
 				BuildCmd.push_back("/LIBPATH:\"" + Lib.GetPlatformLibraryPath(Settings) + "\\\\\" ");
 			}
 
-			for (const std::string& Lib : TheModule.ModuleThirdParty.Win64Libs.MSVCLibs)
+			for (const std::string& Lib : TheModule.PythonLibraryPaths)
 			{
 				// Make path relative to third party
 				Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
@@ -583,7 +590,7 @@ bool MSVCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Obje
 			}
 		}
 		
-		for (const std::string& SystemLib : TheModule.Libs.Win64Libs.MSVCLibs)
+		for (const std::string& SystemLib : TheModule.PythonLibraries)
 		{
 			BuildCmd.push_back(SystemLib);
 		}
