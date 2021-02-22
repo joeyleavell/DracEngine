@@ -21,7 +21,7 @@ namespace Ry
 		return new GLVertexArray2(Format);
 	}
 
-	Shader2* GLRenderAPI::CreateShader(Ry::AssetRef VSAsset, Ry::AssetRef FSAsset)
+	Shader2* GLRenderAPI::CreateShader(Ry::String VSAsset, Ry::String FSAsset)
 	{
 		return new GLShader2(VSAsset, FSAsset);
 	}

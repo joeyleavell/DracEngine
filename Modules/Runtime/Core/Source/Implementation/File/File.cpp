@@ -4,19 +4,6 @@
 #include <sstream>
 #include <iostream>
 
-#if __GNUC__ >= 8
-	#include <filesystem>
-
-	namespace Filesystem = std::filesystem;
-#else
-	#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-	#include <experimental/filesystem>
-	#undef _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-
-	namespace Filesystem = std::experimental::filesystem;
-#endif
-
-
 namespace Ry
 {
 	namespace File
@@ -69,6 +56,11 @@ namespace Ry
 				DummyOutput.close();
 				return true;
 			}
+		}
+
+		FileWriteTime LastFileWrite(const Ry::String& FileName)
+		{
+			return Filesystem::last_write_time(*FileName);
 		}
 
 		Ry::String Join(const Ry::String& A, const Ry::String& B)
@@ -138,6 +130,69 @@ namespace Ry
 				return Ry::File::ConvertToAbsolute(Virtual);
 			}
 		}
+
+		String AbsoluteToVirtual(String Absolute)
+		{
+			Filesystem::path AbsPathOriginal = Filesystem::path(*Absolute);
+			Filesystem::path AbsPath = AbsPathOriginal;
+			
+			KeyIterator<Ry::String, Ry::String> MountItr = MountPoints.CreateKeyIterator();
+
+			while(MountItr)
+			{
+ 
+				Filesystem::path MountPoint = *VirtualToAbsolute(*MountItr.Key());
+				//Filesystem::path MountPointAbs = MountPointOriginal;
+
+				bool bIsUnderVirtual = false;
+
+				AbsPath = AbsPathOriginal;
+				while(AbsPath.has_parent_path())
+				{
+					// Check if paths equal
+
+					if(AbsPath == MountPoint)
+					{
+						bIsUnderVirtual = true;
+					}
+					
+					AbsPath = AbsPath.parent_path();
+				}
+
+				if(bIsUnderVirtual)
+				{
+					Ry::String VirtualPath = "";
+
+					// Build virtual path
+					AbsPath = AbsPathOriginal;
+
+					do
+					{
+						if(AbsPath.has_filename())
+						{
+							if(VirtualPath.IsEmpty())
+							{
+								VirtualPath += AbsPath.filename().string().c_str();
+							}
+							else
+							{
+								VirtualPath = AbsPath.filename().string().c_str() + ("/" + VirtualPath);
+							}
+						}
+
+						AbsPath = AbsPath.parent_path();
+
+					} while (MountPoint != AbsPath);
+
+					return VirtualPath;					
+				}
+				
+				++MountItr;
+			}
+
+			return "";
+		}
+
 
 		String ConvertToCanonical(String Path)
 		{

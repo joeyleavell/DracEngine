@@ -3,9 +3,29 @@
 #include "Core/Core.h"
 #include "Core/String.h"
 #include "Data/Map.h"
+#include <chrono>
+
+#if __GNUC__ >= 8
+
+#include <filesystem>
+
+	namespace Filesystem = std::filesystem;
+
+#else
+
+	#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+	#include <experimental/filesystem>
+	#undef _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
+	namespace Filesystem = std::experimental::filesystem;
+
+#endif
+
 
 namespace Ry
 {
+
+	typedef std::chrono::system_clock::time_point FileWriteTime;
 
 	namespace File
 	{
@@ -23,6 +43,8 @@ namespace Ry
 		 * @param FileName The name of the file. Can be relative or absolute.
 		 */
 		CORE_MODULE bool MakeFile(const Ry::String& FileName);
+
+		CORE_MODULE FileWriteTime LastFileWrite(const Ry::String& FileName);
 
 		CORE_MODULE Ry::String Join(const Ry::String& A, const Ry::String& B);
 
@@ -43,6 +65,14 @@ namespace Ry
 		 * Translates a virtual path to an absolute path using mount points.
 		 */
 		CORE_MODULE String VirtualToAbsolute(String Virtual);
+
+		/**
+		 * Attempts to convert an absolute path to a virtual path.
+		 * If possible, returns the first mapping that is detected. Multiple solutions can exist, but only the first will be returns.
+		 *
+		 * If no such mapping is found, the empty string is returned.
+		 */
+		CORE_MODULE String AbsoluteToVirtual(String Absolute);
 
 		CORE_MODULE String ConvertToCanonical(String Path);
 

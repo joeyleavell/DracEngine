@@ -8,7 +8,7 @@
 namespace Ry
 {
 
-	GLShader2::GLShader2(const AssetRef& VSAsset, const AssetRef& FSAsset):
+	GLShader2::GLShader2(const Ry::String& VSAsset, const Ry::String& FSAsset):
 	Shader2(VSAsset, FSAsset)
 	{
 		// todo: transpile source from hlsl to glsl
@@ -63,18 +63,18 @@ namespace Ry
 		glDeleteShader(FragShaderHandle);
 	}
 
-	bool GLShader2::CreateShader(GLuint& OutHandle, int32 Type, const Ry::AssetRef& Reference)
+	bool GLShader2::CreateShader(GLuint& OutHandle, int32 Type, const Ry::String& ShaderLoc)
 	{
 		// Load the text file asset
-		String HLSLShaderSource = AssetMan->LoadAsset(Reference, ASSET_TYPE_TEXT)->As<TextFileAsset>()->GetContents();
-		AssetMan->UnloadAsset(Reference);
+		//String HLSLShaderSource = AssetMan->LoadAsset(Reference, ASSET_TYPE_TEXT)->As<TextFileAsset>()->GetContents();
+		//AssetMan->UnloadAsset(Reference);
 
 		// Transpile the HLSL to GLSL
 		Ry::String OutGLSL;
 		Ry::String ErrWarn;
-		if(!HLSLtoGLSL(HLSLShaderSource, OutGLSL, ErrWarn, Type == GL_VERTEX_SHADER ? ShaderStage::Vertex : ShaderStage::Fragment))
+		if(!CompileToGlsl(ShaderLoc, OutGLSL, ErrWarn, Type == GL_VERTEX_SHADER ? ShaderStage::Vertex : ShaderStage::Fragment))
 		{
-			Ry::Log->LogErrorf("Failed to compile shader %s:\n%s", *Reference.GetVirtual(), *ErrWarn);
+			Ry::Log->LogErrorf("Failed to compile shader %s:\n%s", *ShaderLoc, *ErrWarn);
 			return false;
 		}
 		else
@@ -100,12 +100,12 @@ namespace Ry
 			GLchar InfoLog[1024];
 			glGetShaderInfoLog(Handle, 1024, &Length, InfoLog);
 
-			Ry::Log->LogErrorf("Shader %s failed to compile: %s", *Reference.GetVirtual(), InfoLog);
+			Ry::Log->LogErrorf("Shader %s failed to compile: %s", *ShaderLoc, InfoLog);
 			return false;
 		}
 		else
 		{
-			Ry::Log->Logf("%s compiled", *Reference.GetVirtual());
+			Ry::Log->Logf("%s compiled", *ShaderLoc);
 		}
 
 		OutHandle = Handle;

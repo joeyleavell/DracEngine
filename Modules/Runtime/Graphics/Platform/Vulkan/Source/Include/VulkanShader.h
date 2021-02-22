@@ -13,7 +13,7 @@ namespace Ry
 	{
 	public:
 
-		VulkanShader(const AssetRef& VSAsset, const AssetRef& FSAsset);
+		VulkanShader(const Ry::String& VertexLoc, const Ry::String& FragmentLoc);
 
 		VkPipelineShaderStageCreateInfo GetVSPipelineCreateInfo();
 		VkPipelineShaderStageCreateInfo GetFSPipelineCreateInfo();
@@ -23,7 +23,7 @@ namespace Ry
 	private:
 
 
-		bool CreateSingleShader(const AssetRef& HLSLSource, Ry::ShaderStage Stage, VkShaderModule& OutModule);
+		bool CreateSingleShader(const Ry::String& ShaderLoc, Ry::ShaderStage Stage, VkShaderModule& OutModule);
 
 		VkShaderModule VSShaderModule;
 		VkShaderModule FSShaderModule;

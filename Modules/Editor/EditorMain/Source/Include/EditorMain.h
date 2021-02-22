@@ -43,8 +43,12 @@ namespace Ry
 		{
 			Ry::String EngineRoot = Ry::File::GetParentPath(Ry::File::GetParentPath(GetPlatformModulePath()));
 			Ry::String ResourcesRoot = Ry::File::Join(EngineRoot, "Resources");
+			Ry::String ShadersRoot = Ry::File::Join(EngineRoot, "Shaders");
 
 			Ry::File::MountDirectory(ResourcesRoot, "Engine");
+
+			// Todo: Support custom game shaders as well
+			Ry::File::MountDirectory(ShadersRoot, "Shaders");
 		}
 
 		void InitAssetSystem()

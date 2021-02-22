@@ -65,7 +65,7 @@ namespace Ry
 	{
 	public:
 
-		Shader2(const AssetRef& VSAsset, const AssetRef& FSAsset)
+		Shader2(const Ry::String& VSAsset, const Ry::String& FSAsset)
 		{
 
 		}

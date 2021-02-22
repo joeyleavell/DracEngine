@@ -8,19 +8,19 @@
 namespace Ry
 {
 
-	bool VulkanShader::CreateSingleShader(const AssetRef& HLSLSource, ShaderStage Stage, VkShaderModule& OutModule)
+	bool VulkanShader::CreateSingleShader(const Ry::String& ShaderLoc, ShaderStage Stage, VkShaderModule& OutModule)
 	{
 		// Load the text file and immediately unload the asset
-		Ry::String SourceCode = AssetMan->LoadAsset(HLSLSource, ASSET_TYPE_TEXT)->As<Ry::TextFileAsset>()->GetContents();
-		AssetMan->UnloadAsset(HLSLSource);
+		//Ry::String SourceCode = AssetMan->LoadAsset(HLSLSource, ASSET_TYPE_TEXT)->As<Ry::TextFileAsset>()->GetContents();
+		//AssetMan->UnloadAsset(HLSLSource);
 
 		uint8* SpirV = nullptr;
 		int32 Size = 0;
 		Ry::String ErrWarnMsg;
 
-		if(!Ry::HLSLtoSPIRV(SourceCode, SpirV, Size, ErrWarnMsg, Stage))
+		if(!Ry::CompileToSpirV(ShaderLoc, SpirV, Size, ErrWarnMsg, Stage))
 		{
-			Ry::Log->LogErrorf("Failed to compile HLSL shader: %s\n%s", *HLSLSource.GetVirtual(), *ErrWarnMsg);
+			Ry::Log->LogErrorf("Failed to compile HLSL shader: %s\n%s", *ShaderLoc, *ErrWarnMsg);
 			return false;
 		}
 
@@ -36,12 +36,12 @@ namespace Ry
 		}
 		else
 		{
-			Ry::Log->Logf("Compiled %s successfully", *HLSLSource.GetVirtual());
+			Ry::Log->Logf("Compiled %s successfully", *ShaderLoc);
 			return true;
 		}
 	}
 
-	VulkanShader::VulkanShader(const AssetRef& VSAsset, const AssetRef& FSAsset):
+	VulkanShader::VulkanShader(const Ry::String& VSAsset, const Ry::String& FSAsset):
 	Shader2(VSAsset, FSAsset)
 	{
 		CreateSingleShader(VSAsset, ShaderStage::Vertex, VSShaderModule);

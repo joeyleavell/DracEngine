@@ -28,7 +28,7 @@ namespace Ry
 
 		virtual RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target) = 0;
 		virtual VertexArray2* CreateVertexArray(const Ry::VertexFormat& Format) = 0;
-		virtual Shader2* CreateShader(Ry::AssetRef VSAsset, Ry::AssetRef FSAsset) = 0;
+		virtual Shader2* CreateShader(Ry::String VertexShaderLoc, Ry::String FragShaderLoc) = 0;
 		virtual Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo) = 0;
 		virtual ResourceSetDescription* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) = 0;
 		virtual ResourceSet* CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC) = 0;

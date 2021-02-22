@@ -16,7 +16,7 @@ namespace Ry
 	{
 	public:
 
-		GLShader2(const AssetRef& VSAsset, const AssetRef& FSAsset);
+		GLShader2(const Ry::String& VertLoc, const Ry::String& FragLoc);
 		virtual ~GLShader2() = default;
 
 		/************************************************************************/
@@ -37,7 +37,7 @@ namespace Ry
 		
 		uint32 ProgramHandle;
 
-		bool CreateShader(GLuint& OutHandle, int32 Type, const AssetRef& Reference);
+		bool CreateShader(GLuint& OutHandle, int32 Type, const Ry::String& Reference);
 		bool ProgramStatusCheck(int32 Type, const String& Name);
 
 		// todo: move these to gl resources

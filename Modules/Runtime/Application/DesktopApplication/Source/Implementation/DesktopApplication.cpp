@@ -273,19 +273,25 @@ namespace Ry
 #ifdef RYBUILD_DISTRIBUTE
 		Ry::String ModuleRoot = Ry::File::GetParentPath(GetPlatformModulePath());
 		Ry::String ResourcesRoot = Ry::File::Join(ModuleRoot, "Resources");
+		Ry::String ShadersRoot = Ry::File::Join(ModuleRoot, "Shaders");
 		Ry::String EngineResRoot = Ry::File::Join(ResourcesRoot, "Engine");
 		Ry::String GameResRoot = Ry::File::Join(ResourcesRoot, "Game");
 		Ry::String DataRoot = Ry::File::Join(ModuleRoot, "Data");
 
 		Ry::File::MountDirectory(EngineResRoot, "Engine");
+		Ry::File::MountDirectory(ShadersRoot, "Shaders");
 		Ry::File::MountDirectory(GameResRoot, "Content");
 		Ry::File::MountDirectory(DataRoot, "Data");
 
 #else
 		Ry::String EngineRoot = Ry::File::GetParentPath(Ry::File::GetParentPath(GetPlatformModulePath()));
 		Ry::String ResourcesRoot = Ry::File::Join(EngineRoot, "Resources");
+		Ry::String ShadersRoot = Ry::File::Join(EngineRoot, "Shaders");
 
 		Ry::File::MountDirectory(ResourcesRoot, "Engine");
+
+		// Todo: support custom game shaders
+		Ry::File::MountDirectory(ShadersRoot, "Shaders");
 
 		// Allow the editor to mount the project directories
 #endif

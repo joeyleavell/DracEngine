@@ -24,9 +24,9 @@ namespace Ry
 		return new Ry::VulkanVertexArray(Format);
 	}
 
-	Shader2* VulkanRenderAPI::CreateShader(Ry::AssetRef VSAsset, Ry::AssetRef FSAsset)
+	Shader2* VulkanRenderAPI::CreateShader(Ry::String VertexLoc, Ry::String FragmentLoc)
 	{
-		VulkanShader* Shad = new Ry::VulkanShader(VSAsset, FSAsset);
+		VulkanShader* Shad = new Ry::VulkanShader(VertexLoc, FragmentLoc);
 		return Shad;
 	}
 
