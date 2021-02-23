@@ -21,6 +21,7 @@ std::string GetEngineEditorModulesDir();
 std::string GetEngineExternPath(std::string ExternName);
 
 std::string GetEngineBinaryDir();
+std::string GetEngineExecutable();
 std::string GetEngineIntermediateDir();
 std::string GetEngineObjectDir();
 std::string GetEngineLibraryDir();

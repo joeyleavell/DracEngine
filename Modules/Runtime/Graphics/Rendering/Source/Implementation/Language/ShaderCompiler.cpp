@@ -1,7 +1,10 @@
 #include "Language/ShaderCompiler.h"
-#include "ShaderConductor.hpp"
 #include "File/File.h"
 #include "Core/Globals.h"
+
+#ifndef RYBUILD_DISTRIBUTE
+	#include "ShaderConductor.hpp"
+#endif
 
 // Defined offsets for vulkan spirv
 #define C_BUFFER_OFFSET 0
@@ -11,6 +14,57 @@
 
 namespace Ry
 {
+
+	/**
+ * Retrieve the HLSL variant of the shader location.
+ */
+	Ry::String GetHlslLocAbs(const Ry::String& ShaderLoc)
+	{
+		Ry::String HLSLRoot = Ry::File::Join("Shaders", "Hlsl");
+		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".hlsl");
+
+		ShaderLocVirtual.Replace('\\', '/');
+
+		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
+	}
+
+	Ry::String GetSpirVLocAbs(const Ry::String& ShaderLoc)
+	{
+		Ry::String HLSLRoot = Ry::File::Join("Shaders", "SpirV");
+		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".spirv");
+
+		ShaderLocVirtual.Replace('\\', '/');
+
+		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
+	}
+
+	Ry::String GetGlslLocAbs(const Ry::String& ShaderLoc)
+	{
+		Ry::String HLSLRoot = Ry::File::Join("Shaders", "Glsl");
+		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".glsl");
+
+		ShaderLocVirtual.Replace('\\', '/');
+
+		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
+	}
+
+
+	bool GetHlslSource(const Ry::String& ShaderLoc, Ry::String& OutSource)
+	{
+		Ry::String ShaderLocAbs = GetHlslLocAbs(ShaderLoc);
+
+		if (!Ry::File::DoesFileExist(ShaderLocAbs))
+		{
+			Ry::Log->LogErrorf("HLSL shader location does not exist: %s", *ShaderLocAbs);
+			return false;
+		}
+		else
+		{
+			OutSource = Ry::File::LoadFileAsString2(ShaderLocAbs);
+			return true;
+		}
+	}
+
 
 	// Only compile shaders in non distributed builds
 #ifndef RYBUILD_DISTRIBUTE
@@ -35,6 +89,10 @@ namespace Ry
 		return Src;
 	}
 
+	void CacheSpirV(Ry::String Output, uint8* SpirV, int32 Size)
+	{
+		
+	}
 
 	bool HLSLtoSPIRV(const Ry::String& Source, uint8*& OutSpirV, int32& OutSize, Ry::String& ErrWarnMsg, ShaderStage Stage)
 	{
@@ -116,61 +174,141 @@ namespace Ry
 
 		return true;
 	}
-#endif
-	
-	/**
-	 * Retrieve the HLSL variant of the shader location.
-	 */
-	Ry::String GetHlslLocAbs(const Ry::String& ShaderLoc)
+
+
+	bool CompileAll(Ry::String OutputDir)
 	{
-		Ry::String HLSLRoot = Ry::File::Join("Shaders", "Hlsl");
-		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".hlsl");
+		// Todo: Use Dst
 
-		ShaderLocVirtual.Replace('\\', '/');
-		
-		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
-	}
+		Ry::String ParentLoc = "Shaders/Hlsl";
+		Ry::String Abs = Ry::File::VirtualToAbsolute(ParentLoc);
 
-	Ry::String GetSpirVLocAbs(const Ry::String& ShaderLoc)
-	{
-		Ry::String HLSLRoot = Ry::File::Join("Shaders", "SpirV");
-		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".spirv");
+		Filesystem::recursive_directory_iterator ShaderItr(*Abs);
 
-		ShaderLocVirtual.Replace('\\', '/');
-
-		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
-	}
-
-	Ry::String GetGlslLocAbs(const Ry::String& ShaderLoc)
-	{
-		Ry::String HLSLRoot = Ry::File::Join("Shaders", "Glsl");
-		Ry::String ShaderLocVirtual = Ry::File::Join(HLSLRoot, ShaderLoc + ".glsl");
-
-		ShaderLocVirtual.Replace('\\', '/');
-
-		return Ry::File::VirtualToAbsolute(ShaderLocVirtual);
-	}
-
-
-	bool GetHlslSource(const Ry::String& ShaderLoc, Ry::String& OutSource)
-	{
-		Ry::String ShaderLocAbs = GetHlslLocAbs(ShaderLoc);
-
-		if(!Ry::File::DoesFileExist(ShaderLocAbs))
+		for (auto& ShaderPath : ShaderItr)
 		{
-			Ry::Log->LogErrorf("HLSL shader location does not exist: %s", *ShaderLocAbs);
-			return false;
+			// Only compile hlsl files
+			if (ShaderPath.path().extension() == ".hlsl")
+			{
+				// Convert absolute to virtual by chopping off part before shaders
+
+				Ry::String VirtualOriginal = Ry::File::AbsoluteToVirtual(Filesystem::absolute(ShaderPath).string().c_str());
+				Ry::String ShaderLoc = VirtualOriginal;
+
+				// Remove the . from the virtual path
+				int32 FirstDot = ShaderLoc.find_first(".", 0);
+				ShaderLoc = ShaderLoc.substring(0, FirstDot);
+
+
+				// Remove "HLSL" from beginning of path string
+				if (ShaderLoc.find_first("Shaders/Hlsl", 0) == 0)
+				{
+					ShaderLoc = ShaderLoc.substring(Ry::String("Shaders/Hlsl").getSize());
+				}
+
+				if (!ShaderLoc.IsEmpty())
+				{
+					// std::cout << "Abs: " << *Abs << std::endl;
+					// std::cout << "Virtual: " << *Virtual << std::endl;
+
+					// Determine shader stage based on if the filepath contains vertex/fragment (for now)
+					// Todo: make this more robust
+					ShaderStage Stage;
+					if (ShaderLoc.find_first("Vertex", 0) >= 0)
+					{
+						Stage = ShaderStage::Vertex;
+					}
+					else if (ShaderLoc.find_first("Fragment", 0) >= 0)
+					{
+						Stage = ShaderStage::Fragment;
+					}
+
+					Ry::String ErrWarn;
+
+					Ry::String HlslSource;
+					if (!GetHlslSource(ShaderLoc, HlslSource))
+					{
+						return false;
+					}
+
+					// Compile the spirv shader
+					{
+						Ry::String SpirVLocAbs = Ry::File::Join(OutputDir, "Shaders");
+						SpirVLocAbs = Ry::File::Join(SpirVLocAbs, "SpirV");
+						SpirVLocAbs = Ry::File::Join(SpirVLocAbs, ShaderLoc + ".spirv");
+
+						uint8* OutSpirv;
+						int32 OutSize;
+						if (!HLSLtoSPIRV(HlslSource, OutSpirv, OutSize, ErrWarn, Stage))
+						{
+							Ry::Log->LogErrorf("Error compiling SpirV shader %s: \n%s", *SpirVLocAbs, *ErrWarn);
+							return false;
+						}
+
+						// Write out file to proper location
+
+						// Create directories
+						Ry::File::MakeDirectories(Ry::File::GetParentPath(SpirVLocAbs));
+
+						// Cache the results
+						std::ofstream SpirVOut;
+						SpirVOut.open(*SpirVLocAbs, std::ios::binary | std::ios::out);
+						{
+							SpirVOut.write(reinterpret_cast<const char*>(OutSpirv), OutSize);
+						}
+						SpirVOut.close();
+					}
+
+					// Compile the glsl shader
+					{
+						Ry::String GlslLocAbs = Ry::File::Join(OutputDir, "Shaders");
+						GlslLocAbs = Ry::File::Join(GlslLocAbs, "Glsl");
+						GlslLocAbs = Ry::File::Join(GlslLocAbs, ShaderLoc + ".glsl");
+
+						Ry::File::MakeDirectories(Ry::File::GetParentPath(GlslLocAbs));
+
+						Ry::String GLSL;
+						if (!HLSLtoGLSL(HlslSource, GLSL, ErrWarn, Stage))
+						{
+							Ry::Log->LogErrorf("Error compiling glsl shader %s: \n%s", *GLSL, *ErrWarn);
+							return false;
+						}
+
+						std::ofstream GlslOut;
+						GlslOut.open(*GlslLocAbs, std::ios::binary | std::ios::out);
+						{
+							GlslOut << *GLSL << std::endl;
+						}
+						GlslOut.close();
+					}
+				}
+
+			}
 		}
-		else
-		{
-			OutSource = Ry::File::LoadFileAsString2(ShaderLocAbs);
-			return true;
-		}		
+
+		return true;
 	}
+#endif
 	
 	bool CompileToSpirV(const Ry::String& ShaderLoc, uint8*& OutSpirV, int32& OutSize, Ry::String& ErrWarnMsg, ShaderStage Stage)
 	{
 		Ry::String SpirVLocAbs = GetSpirVLocAbs(ShaderLoc);
+
+#ifdef RYBUILD_DISTRIBUTE
+		// Cannot have a cache miss in a distributed build, error
+		if (!Ry::File::DoesFileExist(*SpirVLocAbs))
+		{
+			Ry::Log->LogErrorf("Cache miss for SpirV shader: %s", *ShaderLoc);
+			return false;
+		}
+		else
+		{
+			uint32 Size = 1024 * 10;
+			OutSpirV = new uint8[Size];
+			OutSize = Ry::File::LoadFileBytes(SpirVLocAbs, OutSpirV, Size);			
+			return true;
+		}
+#else
 		Ry::String HlslLocAbs = GetHlslLocAbs(ShaderLoc);
 		bool bCacheMiss = true;
 
@@ -185,12 +323,6 @@ namespace Ry
 		if(bCacheMiss)
 		{
 			// Cache miss, can only deal with successfully if not in distribute mode
-
-#ifdef RYBUILD_DISTRIBUTE
-			// Cannot have a cache miss in a distributed build, error
-			Ry::Log->LogErrorf("Cache miss compiling SpirV shader: %s", *ShaderLoc);
-			return false;
-#else
 
 			// Load the contents of the original HLSL
 			Ry::String HlslSource;
@@ -219,7 +351,6 @@ namespace Ry
 			SpirVOut.close();
 
 			return true;
-#endif
 		}
 		else
 		{
@@ -231,12 +362,26 @@ namespace Ry
 
 			return true;
 		}
-		
+#endif
+
 	}
 	
 	bool CompileToGlsl(const Ry::String& ShaderLoc, Ry::String& OutSource, Ry::String& ErrWarnMsg, ShaderStage Stage)
 	{
 		Ry::String GlslLocAbs = GetGlslLocAbs(ShaderLoc);
+#ifdef RYBUILD_DISTRIBUTE
+		// Cannot have a cache miss in a distributed build, error
+		if (!Ry::File::DoesFileExist(*GlslLocAbs))
+		{
+			Ry::Log->LogErrorf("Cache miss for Glsl shader: %s", *ShaderLoc);
+			return false;
+		}
+		else
+		{
+			OutSource = Ry::File::LoadFileAsString2(GlslLocAbs);
+			return true;
+		}
+#else		
 		Ry::String HlslLocAbs = GetHlslLocAbs(ShaderLoc);
 		bool bCacheMiss = true;
 
@@ -251,13 +396,6 @@ namespace Ry
 
 		if(bCacheMiss)
 		{
-			
-#ifdef RYBUILD_DISTRIBUTE
-			// Cannot have a cache miss in a distributed build, error
-			Ry::Log->LogErrorf("Cache miss compiling Glsl shader: %s", *ShaderLoc);
-			return false;
-#else
-
 			// Load the contents of the original HLSL
 			Ry::String HlslSource;
 
@@ -285,86 +423,15 @@ namespace Ry
 			GlslOut.close();
 
 			return true;
-#endif
-
 		}
 		else
 		{
 			// Cache hit, load the existing source
 			OutSource = Ry::File::LoadFileAsString2(GlslLocAbs);
+			return true;
 		}
+#endif
+
 	}
 
-	bool CompileAll()
-	{
-		// Todo: Use Dst
-		
-		Ry::String ParentLoc = "Shaders/Hlsl";
-		Ry::String Abs = Ry::File::VirtualToAbsolute(ParentLoc);
-
-		Filesystem::recursive_directory_iterator ShaderItr(*Abs);
-
-		for(auto& ShaderPath : ShaderItr)
-		{
-			// Only compile hlsl files
-			if(ShaderPath.path().extension() == ".hlsl")
-			{
-				// Convert absolute to virtual by chopping off part before shaders
-
-				Ry::String Virtual = Ry::File::AbsoluteToVirtual(Filesystem::absolute(ShaderPath).string().c_str());
-
-				// Remove the . from the virtual path
-				int32 FirstDot = Virtual.find_first(".", 0);
-				Virtual = Virtual.substring(0, FirstDot);
-
-				// Remove "HLSL" from beginning of path string
-				if(Virtual.find_first("Hlsl", 0) == 0)
-				{
-					Virtual = Virtual.substring(4);
-				}
-				
-				if(!Virtual.IsEmpty())
-				{
-					// std::cout << "Abs: " << *Abs << std::endl;
-					// std::cout << "Virtual: " << *Virtual << std::endl;
-
-					// Determine shader stage based on if the filepath contains vertex/fragment (for now)
-					// Todo: make this more robust
-					ShaderStage Stage;
-					if(Virtual.find_first("Vertex", 0) >= 0)
-					{
-						Stage = ShaderStage::Vertex;
-					}
-					else if (Virtual.find_first("Fragment", 0) >= 0)
-					{
-						Stage = ShaderStage::Fragment;
-					}
-
-					Ry::String ErrWarn;
-
-					// Compile the spirv shader
-					{
-						uint8* OutSpirv;
-						int32 OutSize;
-						if(!CompileToSpirV(Virtual, OutSpirv, OutSize, ErrWarn, Stage))
-						{
-							return false;
-						}
-					}
-
-					// Compile the glsl shader
-					{
-						Ry::String GLSL;
-						if(!CompileToGlsl(Virtual, GLSL, ErrWarn, Stage))
-						{
-							return false;
-						}					
-					}
-				}
-				
-			}
-		}
-
-		return true;
-	}
 }

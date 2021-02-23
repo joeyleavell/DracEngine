@@ -7,11 +7,11 @@
 namespace Ry
 {
 
-	class OPENGL2_MODULE GLContext : public Ry::Context
+	class OPENGL2_MODULE GLContext2 : public Ry::Context
 	{
 	public:
-		GLContext();
-		virtual ~GLContext() {  };
+		GLContext2();
+		virtual ~GLContext2() {  };
 
 		virtual bool PreWindowCreation(::GLFWwindow* Window);
 

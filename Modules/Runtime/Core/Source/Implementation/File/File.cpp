@@ -76,7 +76,18 @@ namespace Ry
 
 		bool MakeDirectories(const Ry::String& Path)
 		{
-			return Filesystem::create_directories(*Path);
+			std::error_code Error;
+			Filesystem::create_directories(*Path, Error);
+
+			if(Error != std::error_code())
+			{
+				std::cerr << "MakeDirectories() error: " << Error.message() << std::endl;
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 		}
 
 		void MountDirectory(String Path, String MountPoint)
@@ -184,7 +195,8 @@ namespace Ry
 
 					} while (MountPoint != AbsPath);
 
-					return VirtualPath;					
+					// Finally, append the mount point
+					return *MountItr.Key() + "/" + VirtualPath;
 				}
 				
 				++MountItr;

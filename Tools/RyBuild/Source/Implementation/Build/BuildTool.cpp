@@ -779,7 +779,8 @@ bool AbstractBuildTool::BuildAllModular(std::vector<std::string>& ModulesFailed)
 	// If we succeeded, copy all binaries into the binary directory
 	if (bSuccess)
 	{
-		CopyBinaries(BinaryDir);
+		// Todo: Binaries should go wherever the executable is located, this may be a fair assumption for now
+		CopyBinaries(GetEngineBinaryDir());
 	}
 
 	return bSuccess;

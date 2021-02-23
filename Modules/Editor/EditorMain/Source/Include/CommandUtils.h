@@ -18,7 +18,7 @@ namespace Ry
 		return false;
 	}
 
-	Ry::StringView ParseOption(std::vector<Ry::String>& Args, Ry::String Option)
+	Ry::StringView ParseOption(Ry::ArrayList<Ry::String>& Args, Ry::String Option)
 	{
 		for (Ry::String& Opt : Args)
 		{
@@ -26,7 +26,7 @@ namespace Ry
 			{
 				int SepIndex = Opt.find_first("=", 0);
 
-				return Opt.substring(SepIndex);
+				return Opt.substring(SepIndex + 1);
 			}
 		}
 

@@ -114,7 +114,7 @@ bool GenerateGameProjectFiles(std::string GameName, std::string GameRootPath, st
 	GameProject->SetModuleRoot(GameRootPath);
 	GameProject->SetArtifactDirectory(ProjectFilesDir);
 	GameProject->SetExecutable(EngineBinary);
-	GameProject->SetArguments(GameDLL);
+	GameProject->SetArguments("launch " + GameDLL);
 	GameProject->SetWorkingDirectory(WorkingDirectory);
 
 	EngineProject->SetBuildCmdLine("\"" + (BuildScriptsFolder / "Build.bat").string() + "\" " + EngineModulesDir + " -" + Compiler);
@@ -123,7 +123,7 @@ bool GenerateGameProjectFiles(std::string GameName, std::string GameRootPath, st
 	EngineProject->SetModuleRoot(EngineRootPath);
 	EngineProject->SetArtifactDirectory(ProjectFilesDir);
 	EngineProject->SetExecutable(EngineBinary);
-	EngineProject->SetArguments(GameDLL);
+	EngineProject->SetArguments("launch " + GameDLL);
 	EngineProject->SetWorkingDirectory(WorkingDirectory);
 
 	GameSolution->AddSubProject(EngineProject);

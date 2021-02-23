@@ -4,26 +4,26 @@
 namespace Ry
 {
 
-	GLContext::GLContext()
+	GLContext2::GLContext2()
 	{
 		
 	}
 	
-	bool GLContext::PreWindowCreation(::GLFWwindow* Window)
+	bool GLContext2::PreWindowCreation(::GLFWwindow* Window)
 	{
 		// TODO: do we want these to be configurable?
 
 		return true;
 	}
 
-	bool GLContext::InitContext(::GLFWwindow* Window, SwapChain* SwapChains)
+	bool GLContext2::InitContext(::GLFWwindow* Window, SwapChain* SwapChains)
 	{
 		glfwMakeContextCurrent(Window);
 
 		return true;
 	}
 
-	void GLContext::CleanupContext()
+	void GLContext2::CleanupContext()
 	{
 		// Do nothing here - GLFW will cleanup context when destroy window is called
 	}

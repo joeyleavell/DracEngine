@@ -142,5 +142,27 @@ int main(int ArgC, char** ArgV)
 
 	std::cout << "========== PACKAGING ASSETS COMPLETE ==========" << std::endl;
 
+	bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize = 0, char* StdOut = nullptr, int ErrorBuffSize = 0, char* StdErr = nullptr);
+
+	std::cout << "========== COMPILING SHADERS ==========" << std::endl;
+	{
+		std::string EngineExe = GetEngineExecutable();
+
+		std::vector<std::string> ShaderCompCmdArgs;
+		ShaderCompCmdArgs.push_back("compile-shaders");
+		ShaderCompCmdArgs.push_back("-Output=" + BuildDir);
+
+		if(!ExecProc(EngineExe, ShaderCompCmdArgs))
+		{
+			std::cout << "========== SHADER COMPILATION FAILED ==========" << std::endl;
+
+			return 1;
+		}
+		else
+		{
+			std::cout << "========== SHADER COMPILATION SUCCEEDED ==========" << std::endl;
+		}
+	}
+
 	return 0;
 }

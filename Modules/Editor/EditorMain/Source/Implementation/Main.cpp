@@ -7,6 +7,7 @@
 #include "Core/PlatformProcess.h"
 #include "EditorMain.h"
 #include "CommandUtils.h"
+#include "Language/ShaderCompiler.h"
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
@@ -78,22 +79,22 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation, Ry::RenderingPla
 }
 #endif
 
-int main(int ArgC, char** ArgV)
+Ry::String FindNonOption(Ry::ArrayList<Ry::String>& Options)
 {
-	Ry::String NonOption = "";
-	
-	Ry::ArrayList<Ry::String> Options;
-	for(int32 Opt = 0; Opt < ArgC; Opt++)
+	for (const Ry::String& Opt : Options)
 	{
-		Options.Add(ArgV[Opt]);
-
-		Ry::String OptStr = ArgV[Opt];
-
-		if(OptStr.getSize() > 0 && OptStr[0] != '-')
+		if (Opt.getSize() > 0 && Opt[0] != '-')
 		{
-			NonOption = OptStr;
+			return Opt;
 		}
 	}
+
+	return "";
+}
+
+void LaunchProject(Ry::ArrayList<Ry::String>& Options)
+{
+	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
 
 	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
 
@@ -102,36 +103,77 @@ int main(int ArgC, char** ArgV)
 		Plat = Ry::RenderingPlatform::Vulkan;
 	}
 
-	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
+	Ry::String Path = FindNonOption(Options);
 
-	// If there was a non option argument, assume it's the path of a game to startup with
-	// Otherwise, startup project launcher
-	if(NonOption.IsEmpty())
+	// Run the loaded application
+	Ry::String DllPath = Path;
+	Ry::Application* App = LoadApplication(DllPath, Plat);
+
+	if (App)
 	{
-		// Todo: this is where the project launcher should be started
+		Ry::String DllParent = Ry::File::GetParentPath(DllPath);
+		Ry::String ResourcesDir = Ry::File::GetParentPath(DllParent) + "\\Resources";
+		Ry::String DataDir = Ry::File::GetParentPath(DllParent) + "\\Data";
 
-		Ry::Editor* Ed = new Ry::Editor(Plat);
-		Ed->Run();
+		// Mount game resources and data here
+		Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(ResourcesDir), "Content");
+		Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(DataDir), "Data");
+
+		App->Run();
+	}
+}
+
+void CompileShaders(Ry::ArrayList<Ry::String>& Options)
+{
+	Ry::Log = new Ry::Logger;
+
+	Ry::String OutputPath;
+
+	if(Ry::HasOption(Options, "Output"))
+	{
+		OutputPath = Ry::ParseOption(Options, "Output");
+	}
+
+	// Mount shaders
+	Ry::String EngineRoot = Ry::File::GetParentPath(Ry::File::GetParentPath(Ry::GetPlatformModulePath()));
+	Ry::String ShadersRoot = Ry::File::Join(EngineRoot, "Shaders");
+	Ry::File::MountDirectory(ShadersRoot, "Shaders");
+
+	Ry::CompileAll(OutputPath);
+}
+
+int main(int ArgC, char** ArgV)
+{
+	if(ArgC < 2)
+	{
+		std::cerr << "Must provide a command to the editor, project launcher not supported yet" << std::endl;
+		return 1;
+	}
+
+	Ry::String Command = ArgV[1];
+
+	// Only add options after editor command
+	Ry::ArrayList<Ry::String> Options;
+	for(int32 Opt = 2; Opt < ArgC; Opt++)
+	{
+		Options.Add(ArgV[Opt]);
+	}
+
+	if(Command == "launch")
+	{
+		LaunchProject(Options);
+	}
+	else if(Command == "compile-shaders")
+	{
+		CompileShaders(Options);
 	}
 	else
 	{
-		// Run the loaded application
-		Ry::String DllPath = NonOption;
-		Ry::Application* App = LoadApplication(DllPath, Plat);
-
-		if(App)
-		{
-			Ry::String DllParent = Ry::File::GetParentPath(DllPath);
-			Ry::String ResourcesDir = Ry::File::GetParentPath(DllParent) + "\\Resources";
-			Ry::String DataDir = Ry::File::GetParentPath(DllParent) + "\\Data";
-
-			// Mount game resources and data here
-			Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(ResourcesDir), "Content");
-			Ry::File::MountDirectory(Ry::File::ConvertToAbsolute(DataDir), "Data");
-
-			App->Run();
-		}
+		// Todo: project launcher
+		//Ry::Editor* Ed = new Ry::Editor(Plat);
+		//Ed->Run();
 	}
+
 	
 	return 0;
 }

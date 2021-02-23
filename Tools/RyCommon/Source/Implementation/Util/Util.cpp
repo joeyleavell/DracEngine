@@ -135,6 +135,13 @@ std::string GetEngineBinaryDir()
 	return BinPathCache;
 }
 
+std::string GetEngineExecutable()
+{
+	std::string EngineBin = GetEngineBinaryDir();
+
+	return (Filesystem::path(EngineBin) / "RyRuntime-EditorMain.exe").string();
+}
+
 std::string GetEngineIntermediateDir()
 {
 	if(IntPathCache.empty())
