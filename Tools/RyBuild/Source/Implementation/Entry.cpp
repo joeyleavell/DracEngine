@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "Util/Util.h"
 #include "Build/BuildTool.h"
+#include "Deps/BuildDeps.h"
 
 #ifdef RYBUILD_WINDOWS
 	#include "Generate/Windows/WindowsProject.h"
@@ -423,12 +424,17 @@ void GenerateCmd(std::vector<std::string>& Args)
 	
 }
 
+void PrintManPages()
+{
+	// Todo: Implement	
+}
+
 int main(int ArgCount, char** ArgValues)
 {
 	
 	if (ArgCount < 2)
 	{
-		std::cerr << "RyBuild requires you specify a command: generate, build" << std::endl;
+		std::cerr << "RyBuild requires you specify a command: generate, build, rebuild, clean, deps" << std::endl;
 		return 1;
 	}
 
@@ -470,6 +476,13 @@ int main(int ArgCount, char** ArgValues)
 	else if(SubprogramCmd == "clean")
 	{
 		if(!CleanCmd(Args))
+		{
+			return 1;
+		}
+	}
+	else if(SubprogramCmd == "deps")
+	{
+		if (!BuildDepsCmd(Args))
 		{
 			return 1;
 		}

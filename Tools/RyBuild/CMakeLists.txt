@@ -6,6 +6,7 @@ set (SOURCES
 	Source/Implementation/Build/BuildTool.cpp
 	Source/Implementation/Build/MSVCBuildTool.cpp
 	Source/Implementation/Build/GCCBuildTool.cpp
+	Source/Implementation/Deps/BuildDeps.cpp
 	Source/Implementation/Generate/Windows/WindowsProject.cpp
 	Source/Implementation/Generate/Windows/WindowsProjectBase.cpp
 	Source/Implementation/Generate/Windows/WindowsProjectFolder.cpp
@@ -37,7 +38,7 @@ elseif(APPLE)
 	# Todo: apple includes
 endif()
 
-add_executable(RyBuild ${SOURCES})
+add_executable(RyBuild ${SOURCES} "Source/Include/Deps/BuildDeps.h" "Source/Implementation/Deps/BuildDeps.cpp")
 
 set_target_properties(RyBuild PROPERTIES
             CXX_STANDARD 17
@@ -66,7 +67,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 install(TARGETS RyBuild DESTINATION .)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib DESTINATION ${CMAKE_INSTALL_PREFIX})
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib DESTINATION ${CMAKE_INSTALL_PREFIX})
 
 if(MSVC)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python310.dll DESTINATION ${CMAKE_INSTALL_PREFIX})

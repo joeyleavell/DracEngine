@@ -30,6 +30,24 @@ std::string ToUpper(std::string Word)
 	return Caps;
 }
 
+Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other)
+{
+	Filesystem::path BaseAbs = Filesystem::absolute(Base);
+	Filesystem::path OtherAbs = Filesystem::absolute(Other);
+
+	Filesystem::path Relative;
+
+	while(OtherAbs.has_parent_path() && OtherAbs != BaseAbs)
+	{
+		Filesystem::path FileName = OtherAbs.filename();
+		Relative = FileName / Relative;
+
+		OtherAbs = OtherAbs.parent_path();
+	}
+
+	return Relative;
+}
+
 bool HasOption(std::vector<std::string>& Args, std::string Option)
 {
 	for (std::string& Opt : Args)
@@ -52,6 +70,19 @@ std::string ParseOption(std::vector<std::string>& Args, std::string Option)
 			int SepIndex = Opt.find("=");
 
 			return Opt.substr(SepIndex + 1);
+		}
+	}
+
+	return "";
+}
+
+std::string FindNonOption(std::vector<std::string>& Options)
+{
+	for (const std::string& Opt : Options)
+	{
+		if (Opt.size() > 0 && Opt[0] != '-')
+		{
+			return Opt;
 		}
 	}
 
@@ -256,6 +287,8 @@ bool ExecProc(std::string Program, std::vector<std::string>& CmdLineVec, int Out
 	}
 
 	bool bExecSuccessful = true;
+
+	std::cout << CmdLine << std::endl;
 
 	// Start the child process. 
 	if (!CreateProcessA(NULL,   // No module name (use command line)

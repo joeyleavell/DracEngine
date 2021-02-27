@@ -2,13 +2,16 @@
 
 #include <string>
 #include <vector>
+#include "Common.h"
 
 void IncorrectUsage(std::string Usage);
 bool HasOption(std::vector<std::string>& Args, std::string Option);
 std::string ParseOption(std::vector<std::string>& Args, std::string Option);
-std::string FindPathArg(std::vector<std::string>& Args);
+std::string FindNonOption(std::vector<std::string>& Options);
 std::string FullPath(std::string Path);
 std::string ToUpper(std::string Word);
+Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other);
+
 void FormatString(char* OutBuffer, int OutBufferSize, const char* Format, ...);
 
 bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize = 0, char* StdOut = nullptr, int ErrorBuffSize = 0, char* StdErr = nullptr);
