@@ -5,6 +5,7 @@
 
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
+#include <set>
 #undef _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 namespace Filesystem = std::experimental::filesystem;
@@ -14,6 +15,40 @@ struct FileLOC
 	std::string FileName;
 	int LOC;
 };
+
+bool FilterDirectory(Filesystem::path Dir)
+{
+	std::set<std::string> FilterOutDirs = {"ThirdParty", "Generated", "Intermediate", "Binary", "RapidXML", "Json", "Python", "mingw-std-threads", "Binary", "External"};
+	
+	std::string DirName = Dir.filename().string();
+
+	if(FilterOutDirs.find(DirName) != FilterOutDirs.end())
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool FilterFile(Filesystem::path File)
+{
+	std::set<std::string> Exts = {".hpp", ".h", ".cpp", ".hlsl"};
+	std::set<std::string> ExcludeFilenames = { "pyconfig", "CMakeCXXCompilerId"};
+
+	if(Exts.find(File.extension().string()) == Exts.end())
+	{
+		return false;
+	}
+	
+	if(ExcludeFilenames.find(File.stem().string()) != ExcludeFilenames.end())
+	{
+		return false;
+	}
+
+	return true;
+}
 
 int main(int ArgC, char** ArgV)
 {
@@ -40,7 +75,7 @@ int main(int ArgC, char** ArgV)
 
 		// Remove that first element from the vector
 		DirectoriesToIterate.erase(DirectoriesToIterate.begin());
-
+		
 		Filesystem::directory_iterator NewDirectoryItr(NextDir);
 		for(Filesystem::path Path : NewDirectoryItr)
 		{
@@ -49,13 +84,18 @@ int main(int ArgC, char** ArgV)
 				// Do directory check
 
 				// Don't count anything in third party directories
-				if(Path.stem().string() != "ThirdParty" && Path.stem().string() != "Generated" && Path.stem().string() != "Intermediate" && Path.stem().string() != "Binary" && Path.stem().string() != "RapidXML" && Path.stem().string() != "Json")
+				if(FilterDirectory(Path))
 				{
 					FoundDirectories.push_back(Path.string());
 				}
 			}
 			else
 			{
+				if (!FilterFile(Path))
+				{
+					continue;
+				}
+
 				// Do source file check
 				if(Path.extension() == ".h" || Path.extension() == ".hpp")
 				{
@@ -149,7 +189,7 @@ int main(int ArgC, char** ArgV)
 	// Print out the top N files
 	constexpr int N = 50;
 	std::cout << "Top " << N << " files by size: " << std::endl;
-	for(int I = 0; I < N; I++)
+	for(int I = 0; I < N && I < LOCs.size(); I++)
 	{
 		int _I = LOCs.size() - I - 1;
 		std::cout << Filesystem::path(LOCs[_I].FileName).filename().string() << ", " << LOCs[_I].LOC << " LOC, % of total=" << ((float)LOCs[_I].LOC / (SourceCount + HeaderCount)) << std::endl;
