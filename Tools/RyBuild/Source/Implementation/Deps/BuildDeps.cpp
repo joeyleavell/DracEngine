@@ -679,7 +679,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Glm.bRunCMakeBuild = false;
 	Glm.IncludesDirectories = {"glm/"};
 	Glm.GitPath = "https://github.com/g-truc/glm.git";
-	Glm.GitLabel = "0.9.9.8";
+	Glm.GitLabel = "0.9.9.0";
 
 	Filesystem::path VulkanHeadersPath = Filesystem::path(BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Tools) / "install";
 //	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);
