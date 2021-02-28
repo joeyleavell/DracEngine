@@ -702,8 +702,8 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	
 	Dependency VulkanLoader;
 	VulkanLoader.Name = "VulkanLoader";
-	VulkanLoader.SharedLibNames = { "vulkan-1" };
-	VulkanLoader.LibNames = {"vulkan-1"};
+	VulkanLoader.SharedLibNames = { "vulkan" };
+	VulkanLoader.LibNames = {"vulkan"};
 	VulkanLoader.LocatorMethod = ArtifactLocatorMethod::NameHint;
 	VulkanLoader.CMakeGenArgs = {
 		"BUILD_TESTS=OFF",
