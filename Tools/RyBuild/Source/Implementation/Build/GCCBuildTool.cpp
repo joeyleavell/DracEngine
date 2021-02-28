@@ -160,7 +160,65 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 }
 
 bool GCCBuildTool::LinkModule(Module& TheModule)
-{	
+{
+	std::vector<std::string> ModulesToLink;
+	std::vector<std::string> DepsTopOrder;
+	std::vector<std::string> TargetLibs;
+	std::vector<std::string> TargetLibraryPaths;	
+	std::vector<ExternDependency> ExternalDependencies;
+
+	if (TheModule.IsExecutable(Settings))
+	{
+		// Do a full recurse to find all dependent modules
+		RecurseDependencies(TheModule, Modules, ModulesToLink);
+
+		// Add external libs for every module so gcc linker doesn't complain
+		for (std::string& DownstreamModule : ModulesToLink)
+		{
+			Module* ModDep = Modules.at(DownstreamModule);
+
+			// Add all external dependencies
+			for (const ExternDependency& Extern : ModDep->ExternDependencies)
+			{
+				ExternalDependencies.push_back(Extern);
+			}
+
+			// Add all library paths
+			for (std::string& LibPath : ModDep->PythonLibraryPaths)
+			{
+				// Make path relative to third party
+				Filesystem::path LibPathRel = Filesystem::absolute(Filesystem::path(ModDep->GetThirdPartyDir()) / LibPath);
+				TargetLibraryPaths.push_back(LibPathRel.string());
+			}
+
+		}
+	}
+	else
+	{
+		ModulesToLink = TheModule.ModuleDependencies;
+		ExternalDependencies = TheModule.ExternDependencies;
+		TargetLibs = TheModule.PythonLibraries;
+
+		for(std::string& LibPath : TheModule.PythonLibraryPaths)
+		{
+			// Make path relative to third party
+			Filesystem::path LibPathRel = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / LibPath);
+			TargetLibraryPaths.push_back(LibPathRel.string());
+		}
+	}
+
+	// Add the libs of all of the external dependencies to the target libraries
+	for (const ExternDependency& Extern : ExternalDependencies)
+	{
+		Extern.GetPlatformLibs(Settings, TargetLibs);
+	}
+
+	// Do a topological sort of the module dependencies
+	// This is required since GCC expects a certain link order
+	// If Module A depends on Module B, Module A must appear first
+	// So, it's sort of a reverse topoglogical sort
+	TopSort(ModulesToLink, Modules, DepsTopOrder);
+
 	std::string ModBinDir = GetModuleBinaryDir(TheModule);
 	std::string ModLibDir = GetModuleLibraryDir(TheModule);
 	std::string ModObjDir = GetModuleObjectDir(TheModule);
@@ -234,7 +292,6 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		CmdArgs.push_back(LinkerOptions);
 	}
 
-
 	// Set up library paths
 	{
 		CmdArgs.push_back("-L" + ModLibDir);
@@ -248,16 +305,12 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			CmdArgs.push_back("-L" + GetEngineLibraryDir());
 		}
 
-		std::vector<std::string> Libs = TheModule.PythonLibraries;
-		for (const std::string& Lib : Libs)
+		for (const std::string& Lib : TargetLibraryPaths)
 		{
-			// Make path relative to third party
-			Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
-
-			CmdArgs.push_back("-L" + LibPath.string());
+			CmdArgs.push_back("-L" + Lib);
 		}
 
-		for (const ExternDependency& Extern : TheModule.ExternDependencies)
+		for (const ExternDependency& Extern : ExternalDependencies)
 		{
 			CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
 		}
@@ -290,21 +343,6 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		CmdArgs.push_back(ObjFile);
 	}
 
-	std::vector<std::string> ModulesToLink;
-	std::vector<std::string> DepsTopOrder;
-
-	if(TheModule.IsExecutable(Settings))
-	{
-		// Do a full recurse to find all dependent modules
-		RecurseDependencies(TheModule, Modules, ModulesToLink);
-	}
-	else
-	{
-		ModulesToLink = TheModule.ModuleDependencies;
-	}
-
-	TopSort(ModulesToLink, Modules, DepsTopOrder);
-
 	// Add the modules to the link list in their topological order
 	for (const std::string& ModDep : DepsTopOrder)
 	{
@@ -314,17 +352,6 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		// Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(LibraryDir) / DepLibName);
 
 		CmdArgs.push_back("-l" + DepLibName); /*Use so extension*/
-	}
-
-
-	// Libraries that will be added to the compile path
-	std::vector<std::string> TargetLibs = TheModule.PythonLibraries;
-	//TheModule.GetTargetLibs(Settings, TargetLibs);
-
-	// Add all extern library inputs
-	for (const ExternDependency& Extern : TheModule.ExternDependencies)
-	{
-		Extern.GetPlatformLibs(Settings, TargetLibs);
 	}
 
 	for (const std::string& Library : TargetLibs)
