@@ -451,7 +451,7 @@ bool BuildDep(Dependency& Dep, std::string RootDir, Toolset Tools)
 
 		// Determine correct installation location
 		std::string StaticLibsInstallLoc = (Filesystem::path(RootDir).parent_path().parent_path() / Dep.Name / "Libraries" / GetPlatformPath(Tools)).string();
-		std::string SharedLibsInstallLoc = (Filesystem::path(RootDir).parent_path().parent_path() / Dep.Name / "Binaries" / GetPlatformPath(Tools)).string();
+		std::string SharedLibsInstallLoc = (Filesystem::path(RootDir).parent_path().parent_path() / Dep.Name / "Binary" / GetPlatformPath(Tools)).string();
 
 		// Install targets to location
 		if (SharedLibs.size() > 0)
@@ -676,7 +676,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Dependency ShaderConductor;
 	ShaderConductor.Name = "ShaderConductor";
 	ShaderConductor.LocatorMethod = ArtifactLocatorMethod::NameHint;
-	ShaderConductor.SharedLibNames = {"shaderconductor, dxcompiler"};
+	ShaderConductor.SharedLibNames = {"shaderconductor", "dxcompiler"};
 	ShaderConductor.IncludesDirectories = {"Include/ShaderConductor"};
 	ShaderConductor.LabelType = GitLabelType::None; // Get the latest of master, doesn't compile otherwise
 	ShaderConductor.GitPath = "https://github.com/microsoft/ShaderConductor.git";
