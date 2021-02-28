@@ -8,3 +8,7 @@ else:
 	Extern = []
 
 Modules = ["Core", "Math", "AssetCore", "Physics", "Profiling"]
+
+if TargetOS == "Linux":
+	if BuildToolset == "GCC":
+		Libraries = ["stdc++fs"]
