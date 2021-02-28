@@ -249,7 +249,7 @@ namespace Ry
 				
 				MatSet->CreateBuffer();
 			
-				ResourceSets.insert(Mat->Name, new ResourceSet*[]{ResSet, MatSet});
+				ResourceSets.insert(Mat->Name, new ResourceSet*[2]{ResSet, MatSet});
 			
 			}
 

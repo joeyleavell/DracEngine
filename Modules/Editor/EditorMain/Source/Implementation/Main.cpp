@@ -12,12 +12,11 @@
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
 #ifdef LINUX_IMPLEMENTATION
-Ry::Application* LoadApplication(const Ry::String& DLLLocation)
+Ry::Application* LoadApplication(const Ry::String& SOLocation, Ry::RenderingPlatform Platform)
 {
 	return nullptr;
 }
 #endif
-
 
 #ifdef WINDOWS_IMPLEMENTATION
 #include <windows.h>
