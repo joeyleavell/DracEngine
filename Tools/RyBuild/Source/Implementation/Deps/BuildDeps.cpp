@@ -681,15 +681,25 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Glm.GitPath = "https://github.com/g-truc/glm.git";
 	Glm.GitLabel = "0.9.9.8";
 
+	Filesystem::path VulkanHeadersPath = Filesystem::path(BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Tools) / "install";
+//	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);
+
+	if(!Filesystem::exists(VulkanHeadersPath))
+	{
+		Filesystem::create_directories(VulkanHeadersPath);
+	}
+	
 	Dependency VulkanHeaders;
 	VulkanHeaders.Name = "VulkanHeaders";
 	VulkanHeaders.IncludesDirectories = {"include"};
+	VulkanHeaders.CMakeGenArgs = {
+		"CMAKE_INSTALL_PREFIX=" + Filesystem::canonical(VulkanHeadersPath).string()
+	};
 	VulkanHeaders.GitPath = "https://github.com/KhronosGroup/Vulkan-Headers.git";
 	VulkanHeaders.GitLabel = "v1.2.170";
 	VulkanHeaders.bInstallIncludes = true;
 	VulkanHeaders.bRunCMakeInstall = true;
-
-	Filesystem::path VulkanHeadersPath = Filesystem::path(BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Tools) / "install";
+	
 	Dependency VulkanLoader;
 	VulkanLoader.Name = "VulkanLoader";
 	VulkanLoader.SharedLibNames = { "vulkan-1" };
@@ -697,7 +707,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	VulkanLoader.LocatorMethod = ArtifactLocatorMethod::NameHint;
 	VulkanLoader.CMakeGenArgs = {
 		"BUILD_TESTS=OFF",
-		"VULKAN_HEADERS_INSTALL_DIR=" + Filesystem::absolute(VulkanHeadersPath).string()
+		"VULKAN_HEADERS_INSTALL_DIR=" + Filesystem::canonical(VulkanHeadersPath).string()
 	};
 	VulkanLoader.GitPath = "https://github.com/joeyleavell/Vulkan-Loader.git";
 	VulkanLoader.GitLabel = "drac-1";
