@@ -135,6 +135,12 @@ bool CMakeGenerate(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 {
 	std::vector<std::string> CMakeGenerateArgs;
 
+	// Add position independent code flag if on linux since we'll be using these in SOs
+#ifdef RYBUILD_LINUX
+	CMakeGenerateArgs.push_back("-D");
+	CMakeGenerateArgs.push_back("CMAKE_POSITION_INDEPENDENT_CODE=ON");
+#endif
+
 	if(Tools == Toolset::MSVC)
 	{
 #ifdef RYBUILD_LINUX
@@ -721,8 +727,27 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Stb.GitPath = "https://github.com/joeyleavell/Stb.git";
 	Stb.LabelType = GitLabelType::None; // Todo: Make this a fork of stb with cmakelists
 
-	//std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb};
-	std::vector<Dependency> TestDeps = { Glm };
+	std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb};
+	std::vector<Dependency> Targets;
 
-	return BuildDeps(TestDeps, BuildDir, Tools);
+	// Optionally select the target
+	if (HasOption(Args, "Target"))
+	{
+		std::string Target = ParseOption(Args, "Target");
+
+		for(Dependency& Dep : TestDeps)
+		{
+			if(ToUpper(Dep.Name) == ToUpper(Target))
+			{
+				Targets.push_back(Dep);
+			}
+		}
+	}
+	else
+	{
+		Targets = TestDeps;
+	}
+
+
+	return BuildDeps(Targets, BuildDir, Tools);
 }
