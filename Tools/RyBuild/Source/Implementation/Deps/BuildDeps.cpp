@@ -156,35 +156,47 @@ bool CMakeGenerate(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 		return false;
 	}
 
-	// Add dependency options
-	for(const std::string& CMakeOpt : Dep.CMakeGenArgs)
-	{
-		CMakeGenerateArgs.push_back("-D");
-		CMakeGenerateArgs.push_back(CMakeOpt);
-	}
-
 	Filesystem::path SourceDir = Filesystem::path(RootDirectory) / Dep.CMakeRoot;
 	Filesystem::path BuildDir = Filesystem::path(RootDirectory) / "Build" / GetPlatformPath(Tools);
 
-	// Add source directory and build directories
-	CMakeGenerateArgs.push_back("-H\"" + SourceDir.string() + "\"");
-	CMakeGenerateArgs.push_back("-B\"" + BuildDir.string() + "\"");
+	if (!Filesystem::exists(BuildDir))
+	{
+		Filesystem::create_directories(BuildDir);
+	}
 
+	std::cout << ("-H\"" + Filesystem::canonical(SourceDir).string() + "\"") << std::endl;
+
+	Filesystem::path SourceRelativeToWD = PathRelativeTo(Filesystem::canonical("."), Filesystem::canonical(SourceDir));
+	Filesystem::path BuildRelativeToWD = PathRelativeTo(Filesystem::canonical("."), Filesystem::canonical(BuildDir));
+
+	CMakeGenerateArgs.push_back("-H" + SourceRelativeToWD.string());
+	CMakeGenerateArgs.push_back("-B" + BuildRelativeToWD.string());
+
+	// Add dependency options
+	for(const std::string& CMakeOpt : Dep.CMakeGenArgs)
+	{
+		//CMakeGenerateArgs.push_back();
+		CMakeGenerateArgs.push_back("-D" + CMakeOpt);
+	}
+		
 	// Run cmake generate
 	if (!ExecProc("cmake", CMakeGenerateArgs))
 	{
 		std::cerr << "CMake generate failed" << std::endl;
 		return false;
 	}
+
+	return true;
 }
 
 bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 {
 	Filesystem::path BuildDir = Filesystem::path(RootDirectory) / "Build" / GetPlatformPath(Tools);
-
+	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), BuildDir);
+	
 	std::vector<std::string> CMakeBuildArgs;
 	CMakeBuildArgs.push_back("--build");
-	CMakeBuildArgs.push_back("\"" + BuildDir.string() + "\"");
+	CMakeBuildArgs.push_back(RelativeToWD.string());
 	CMakeBuildArgs.push_back("--config");
 	CMakeBuildArgs.push_back("Release");
 
@@ -205,6 +217,8 @@ bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 		std::cerr << "CMake build failed" << std::endl;
 		return false;
 	}
+
+	return true;
 }
 
 bool CMakeInstall(Dependency& Dep, std::string RootDirectory, Toolset Tools)
@@ -225,6 +239,8 @@ bool CMakeInstall(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 		std::cerr << "CMake build failed" << std::endl;
 		return false;
 	}
+
+	return true;
 }
 
 bool SharedLibTest_Ext(const std::string& Path)
