@@ -338,6 +338,12 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		// Take only the stem (part prior to extension). This is in case Windows libs have a.lib, it'll only take the "a".
 		std::string LibStemmed = Filesystem::path(Library).stem().string();
 
+		// Remove lib prefix
+		if(LibStemmed.find("lib") == 0)
+		{
+			LibStemmed = LibStemmed.substr(3);
+		}
+		
 		CmdArgs.push_back("-l" + LibStemmed);
 	}
 

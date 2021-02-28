@@ -38,7 +38,7 @@ std::string ExternDependency::GetPlatformBinaryPath(const BuildSettings& Setting
 }
 
 void ExternDependency::GetPlatformLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs) const
-{	
+{
 	std::string LibPath = GetPlatformLibraryPath(Settings);
 
 	if (!Filesystem::exists(LibPath))
