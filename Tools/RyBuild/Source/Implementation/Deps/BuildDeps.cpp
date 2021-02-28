@@ -709,7 +709,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	VulkanLoader.LocatorMethod = ArtifactLocatorMethod::NameHint;
 	VulkanLoader.CMakeGenArgs = {
 		"BUILD_TESTS=OFF",
-		"VULKAN_HEADERS_INSTALL_DIR=" + Filesystem::canonical(VulkanHeadersPath).string()
+		"VULKAN_HEADERS_INSTALL_DIR=" + Filesystem::absolute(VulkanHeadersPath).string()
 	};
 	VulkanLoader.GitPath = "https://github.com/joeyleavell/Vulkan-Loader.git";
 	VulkanLoader.GitLabel = "drac-1";
