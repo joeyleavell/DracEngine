@@ -509,7 +509,8 @@ bool BuildDep(Dependency& Dep, std::string RootDir, Toolset Tools)
 				{
 					if (SubPath.path().extension() == ".hpp"
 						|| SubPath.path().extension() == ".h"
-						|| SubPath.path().extension() == ".c")
+						|| SubPath.path().extension() == ".c"
+						|| SubPath.path().extension() == ".inl")
 					{
 						// Make file relative to abs
 						Filesystem::path RelativeToPath = PathRelativeTo(Abs, Filesystem::canonical(SubPath));
@@ -720,7 +721,8 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Stb.GitPath = "https://github.com/joeyleavell/Stb.git";
 	Stb.LabelType = GitLabelType::None; // Todo: Make this a fork of stb with cmakelists
 
-	std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb};
-	
+	//std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb};
+	std::vector<Dependency> TestDeps = { Glm };
+
 	return BuildDeps(TestDeps, BuildDir, Tools);
 }
