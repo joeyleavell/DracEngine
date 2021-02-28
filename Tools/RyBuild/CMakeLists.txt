@@ -16,6 +16,7 @@ set (SOURCES
 
 # External includes
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include/Python)
 include_directories(Source/Include ../RyCommon/Source/Include)
 
 # Todo: Determine best way to switch architectures, probably using a flag
@@ -24,7 +25,7 @@ if(MSVC)
 elseif(MinGW)
 	# Todo: MinGW libs
 elseif(UNIX AND NOT APPLE)
-	# Todo: Linux libs
+	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/x64/Linux/GCC")
 elseif(APPLE)
 	# Todo: Apple libs
 endif()
@@ -33,7 +34,7 @@ endif()
 if(WIN32)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows)
 elseif(UNIX AND NOT APPLE)
-	# Todo: linux includes
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Linux)
 elseif(APPLE)
 	# Todo: apple includes
 endif()
@@ -42,7 +43,7 @@ add_executable(RyBuild ${SOURCES} "Source/Include/Deps/BuildDeps.h" "Source/Impl
 
 set_target_properties(RyBuild PROPERTIES
             CXX_STANDARD 17
-			CMAKE_CXX_STANDARD_REQUIRED ON
+	    CMAKE_CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF)
 
 # Link with RyCommon
@@ -59,12 +60,22 @@ endif()
 # Windows specific links
 if(MinGW OR WIN32)
 	target_link_libraries(RyBuild PRIVATE rpcrt4)
+	target_link_libraries(RyBuild PRIVATE python310)
 endif()
 
+# Linux specific libraries
+if(UNIX AND NOT APPLE)
+	target_link_libraries(RyBuild PRIVATE python3.10)
+	target_link_libraries(RyBuild PRIVATE dl)
+	target_link_libraries(RyBuild PRIVATE util)
+endif()
+
+# GCC specific libraries
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyBuild PRIVATE -lstdc++fs)
 	target_link_libraries(RyBuild PRIVATE -lpthread)
 endif()
+
 
 install(TARGETS RyBuild DESTINATION .)
 #install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib DESTINATION ${CMAKE_INSTALL_PREFIX})
