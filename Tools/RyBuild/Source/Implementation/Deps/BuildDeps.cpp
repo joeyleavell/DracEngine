@@ -224,10 +224,11 @@ bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 bool CMakeInstall(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 {
 	Filesystem::path BuildDir = Filesystem::path(RootDirectory) / "Build" / GetPlatformPath(Tools);
+	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), BuildDir);
 
 	std::vector<std::string> CMakeBuildArgs;
 	CMakeBuildArgs.push_back("--build");
-	CMakeBuildArgs.push_back("\"" + BuildDir.string() + "\"");
+	CMakeBuildArgs.push_back(RelativeToWD.string());
 	CMakeBuildArgs.push_back("--target");
 	CMakeBuildArgs.push_back("install");
 	CMakeBuildArgs.push_back("--config");
