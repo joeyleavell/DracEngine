@@ -201,7 +201,7 @@ void AbstractBuildTool::CopyBinaries(std::string OutputDir)
 		// Copy all external dependency binaries
 		for (auto& ExternDep : Module->ExternDependencies)
 		{
-			ExternDep.GetPlatformBins(Settings, OutBins);
+			ExternDep.GetPlatformBinPaths(Settings, OutBins);
 		}
 
 		// Copy all module specific binaries

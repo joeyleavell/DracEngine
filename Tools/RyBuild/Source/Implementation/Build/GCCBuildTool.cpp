@@ -163,8 +163,8 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 {
 	std::vector<std::string> ModulesToLink;
 	std::vector<std::string> DepsTopOrder;
-	std::vector<std::string> TargetLibs;
-	std::vector<std::string> TargetLibraryPaths;	
+	std::set<std::string> TargetLibs;
+	std::set<std::string> TargetLibraryPaths;	
 	std::vector<ExternDependency> ExternalDependencies;
 
 	if (TheModule.IsExecutable(Settings))
@@ -188,7 +188,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			{
 				// Make path relative to third party
 				Filesystem::path LibPathRel = Filesystem::absolute(Filesystem::path(ModDep->GetThirdPartyDir()) / LibPath);
-				TargetLibraryPaths.push_back(LibPathRel.string());
+				TargetLibraryPaths.insert(LibPathRel.string());
 			}
 
 		}
@@ -197,20 +197,37 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	{
 		ModulesToLink = TheModule.ModuleDependencies;
 		ExternalDependencies = TheModule.ExternDependencies;
-		TargetLibs = TheModule.PythonLibraries;
+
+		for (std::string& Lib : TheModule.PythonLibraries)
+		{
+			TargetLibs.insert(Lib);
+		}
 
 		for(std::string& LibPath : TheModule.PythonLibraryPaths)
 		{
 			// Make path relative to third party
 			Filesystem::path LibPathRel = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / LibPath);
-			TargetLibraryPaths.push_back(LibPathRel.string());
+			TargetLibraryPaths.insert(LibPathRel.string());
 		}
 	}
 
 	// Add the libs of all of the external dependencies to the target libraries
 	for (const ExternDependency& Extern : ExternalDependencies)
 	{
-		Extern.GetPlatformLibs(Settings, TargetLibs);
+		std::vector<std::string> ExternPlatformLibs;
+
+		Extern.GetPlatformLibs(Settings, ExternPlatformLibs);
+
+		// Also need to check for bins on Linux
+		if(Settings.TargetPlatform.OS == TargetOS::Linux)
+		{
+			Extern.GetPlatformBins(Settings, ExternPlatformLibs);
+		}
+
+		for(std::string& ExternLib : ExternPlatformLibs)
+		{
+			TargetLibs.insert(ExternLib);
+		}
 	}
 
 	// Do a topological sort of the module dependencies
@@ -313,6 +330,12 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		for (const ExternDependency& Extern : ExternalDependencies)
 		{
 			CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
+
+			// Also need to add binary path for Linux (SOs)
+			if (Settings.TargetPlatform.OS == TargetOS::Linux)
+			{
+				CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
+			}
 		}
 		
 	}
@@ -465,6 +488,13 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 			for (const ExternDependency& Extern : TheModule.ExternDependencies)
 			{
 				CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
+
+				// Also need to add bins path for SOs on Linux
+				if(Settings.TargetPlatform.OS == TargetOS::Linux)
+				{
+					CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
+				}
+				
 			}
 
 		}
@@ -509,12 +539,26 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 		for (const ExternDependency& Extern : TheModule.ExternDependencies)
 		{
 			Extern.GetPlatformLibs(Settings, TargetLibs);
+
+			// Also need to check for SOs on Linux
+			if(Settings.TargetPlatform.OS == TargetOS::Linux)
+			{
+				Extern.GetPlatformBins(Settings, TargetLibs);
+			}
 		}
 
+		// Todo: put this into its own function
+		// It's also used in LinkModule
 		for (const std::string& Library : TargetLibs)
 		{
 			// Take only the stem (part prior to extension). This is in case Windows libs have a.lib, it'll only take the "a".
 			std::string LibStemmed = Filesystem::path(Library).stem().string();
+
+			// Remove lib prefix
+			if (LibStemmed.find("lib") == 0)
+			{
+				LibStemmed = LibStemmed.substr(3);
+			}
 
 			CmdArgs.push_back("-l" + LibStemmed);
 		}

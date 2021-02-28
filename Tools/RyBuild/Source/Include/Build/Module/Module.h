@@ -56,6 +56,7 @@ public:
 
 	void GetPlatformLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs) const;
 	void GetPlatformBins(const BuildSettings& Settings, std::vector<std::string>& OutBins) const;
+	void GetPlatformBinPaths(const BuildSettings& Settings, std::vector<std::string>& OutBins) const;
 
 };
 

@@ -77,6 +77,28 @@ void ExternDependency::GetPlatformBins(const BuildSettings& Settings, std::vecto
 			continue;
 
 		// It's assumed that the build tool will do the stemming on this string (i.e. libLibrary.a -> Library)
+		OutBins.push_back(Path.path().filename().string());
+	}
+}
+
+void ExternDependency::GetPlatformBinPaths(const BuildSettings& Settings, std::vector<std::string>& OutBins) const
+{
+	std::string BinPath = GetPlatformBinaryPath(Settings);
+
+	if (!Filesystem::exists(BinPath))
+	{
+		return;
+	}
+
+	Filesystem::directory_iterator DirItr(BinPath);
+
+	for (auto& Path : DirItr)
+	{
+		// Libraries must have a name
+		if (!Path.path().has_stem())
+			continue;
+
+		// It's assumed that the build tool will do the stemming on this string (i.e. libLibrary.a -> Library)
 		OutBins.push_back(Filesystem::absolute(Path.path()).string());
 	}
 }
@@ -709,6 +731,7 @@ void TopSort_Helper(std::vector<std::string>& OutModules, const std::map<std::st
 
 void RecurseDependencies(const Module& Mod, const std::map<std::string, Module*>& ModMap, std::vector<std::string>& OutMods)
 {
+	std::set<std::string> HitModules;
 	std::vector<std::string> ModFrontier;
 
 	for(const std::string& ModDep : Mod.ModuleDependencies)
@@ -722,7 +745,7 @@ void RecurseDependencies(const Module& Mod, const std::map<std::string, Module*>
 		ModFrontier.erase(ModFrontier.begin());
 
 		// Add this module to the output list
-		OutMods.push_back(Next);
+		HitModules.insert(Next);
 		
 		if(ModMap.find(Next) != ModMap.end())
 		{
@@ -738,6 +761,10 @@ void RecurseDependencies(const Module& Mod, const std::map<std::string, Module*>
 			}
 		}	
 	}
-	
+
+	for(std::string HitMod : HitModules)
+	{
+		OutMods.push_back(HitMod);
+	}	
 	
 }
