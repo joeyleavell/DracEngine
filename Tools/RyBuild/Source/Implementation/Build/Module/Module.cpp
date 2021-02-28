@@ -63,6 +63,11 @@ void ExternDependency::GetPlatformBins(const BuildSettings& Settings, std::vecto
 {
 	std::string BinPath = GetPlatformBinaryPath(Settings);
 
+	if(!Filesystem::exists(BinPath))
+	{
+		return;
+	}
+
 	Filesystem::directory_iterator DirItr(BinPath);
 
 	for (auto& Path : DirItr)
