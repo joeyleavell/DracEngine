@@ -191,6 +191,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	}
 
 	// Tell GCC to statically link libgcc and libstdc++ if on Windows
+	// This prevents people from needing to download mingw binaries
 	if(Settings.TargetPlatform.OS == TargetOS::Windows)
 	{
 		CmdArgs.push_back("-static");
@@ -295,9 +296,20 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		CmdArgs.push_back(ObjFile);
 	}
 
+	std::vector<std::string> ModulesToLink;
 	std::vector<std::string> DepsTopOrder;
 
-	TopSort(TheModule.ModuleDependencies, Modules, DepsTopOrder);
+	if(TheModule.IsExecutable(Settings))
+	{
+		// Do a full recurse to find all dependent modules
+		RecurseDependencies(TheModule, Modules, ModulesToLink);
+	}
+	else
+	{
+		ModulesToLink = TheModule.ModuleDependencies;
+	}
+
+	TopSort(ModulesToLink, Modules, DepsTopOrder);
 
 	// Add the modules to the link list in their topological order
 	for (const std::string& ModDep : DepsTopOrder)

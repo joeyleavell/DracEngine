@@ -485,6 +485,12 @@ bool AbstractBuildTool::BuildAll(std::vector<std::string>& ModulesFailed)
 	std::vector<Module*> Modules;
 	std::vector<Module*> EngineModules;
 
+	if(!Filesystem::exists(RootPath))
+	{
+		std::cerr << "Modules path " << RootPath << " does not exist!" << std::endl;
+		return false;
+	}
+
 	// Discover modules in root path of project.
 	LoadModules(RootPath, Modules, &Settings);
 	if (!VerifyModules(Modules)) // Make sure modules are correct (no duplicate names)

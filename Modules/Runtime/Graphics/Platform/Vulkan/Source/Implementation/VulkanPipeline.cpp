@@ -26,16 +26,16 @@ namespace Ry
 	bool VulkanPipeline::CreateVertInputBinding(VkPipelineVertexInputStateCreateInfo& OutVertexInputState, Ry::ArrayList<VkVertexInputBindingDescription>& BindingDescriptions)
 	{
 		// Setup attribute array
-		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[PipelineCreateInfo.VertFormat.attribute_count];
+		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[CreateInfo.VertFormat.attribute_count];
 		
 		VkVertexInputBindingDescription BindingDesc;
 		BindingDesc.binding = 0;
 		BindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		int32 Offset = 0;
-		for (int32 AttributeDescIndex = 0; AttributeDescIndex < PipelineCreateInfo.VertFormat.attribute_count; AttributeDescIndex++)
+		for (int32 AttributeDescIndex = 0; AttributeDescIndex < CreateInfo.VertFormat.attribute_count; AttributeDescIndex++)
 		{
-			const Ry::VertexAttrib& VertAttrib = PipelineCreateInfo.VertFormat.attributes[AttributeDescIndex];
+			const Ry::VertexAttrib& VertAttrib = CreateInfo.VertFormat.attributes[AttributeDescIndex];
 
 			VkVertexInputAttributeDescription NewAttributeDesc;
 			NewAttributeDesc.binding = 0;
@@ -81,7 +81,7 @@ namespace Ry
 		OutVertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		OutVertexInputState.vertexBindingDescriptionCount = BindingDescriptions.GetSize();
 		OutVertexInputState.pVertexBindingDescriptions = BindingDescriptions.CopyData();
-		OutVertexInputState.vertexAttributeDescriptionCount = PipelineCreateInfo.VertFormat.attribute_count;
+		OutVertexInputState.vertexAttributeDescriptionCount = CreateInfo.VertFormat.attribute_count;
 		OutVertexInputState.pVertexAttributeDescriptions = VkAttributes;
 
 		return true;
@@ -176,13 +176,13 @@ namespace Ry
 	{
 		OutViewport.x = 0.0f;
 		OutViewport.y = 0.0f;
-		OutViewport.width = (float)PipelineCreateInfo.ViewportWidth;
-		OutViewport.height = (float)PipelineCreateInfo.ViewportHeight;
+		OutViewport.width = (float)CreateInfo.ViewportWidth;
+		OutViewport.height = (float)CreateInfo.ViewportHeight;
 		OutViewport.minDepth = 0.0f;
 		OutViewport.maxDepth = 1.0f;
 
 		OutScissor.offset = { 0, 0 };
-		OutScissor.extent = VkExtent2D{ PipelineCreateInfo.ViewportWidth, PipelineCreateInfo.ViewportHeight };
+		OutScissor.extent = VkExtent2D{ CreateInfo.ViewportWidth, CreateInfo.ViewportHeight };
 
 		ViewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		ViewportState.viewportCount = 1;
@@ -215,14 +215,14 @@ namespace Ry
 	bool VulkanPipeline::CreatePipelineLayout(VkPipelineLayout& OutLayout)
 	{
 
-		VkPipelineLayoutCreateInfo CreateInfo{};
-		CreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		CreateInfo.pushConstantRangeCount = 0; // Optional
-		CreateInfo.pPushConstantRanges = nullptr; // Optional
+		VkPipelineLayoutCreateInfo VkCreateInfo{};
+		VkCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		VkCreateInfo.pushConstantRangeCount = 0; // Optional
+		VkCreateInfo.pPushConstantRanges = nullptr; // Optional
 
 		Ry::ArrayList<VkDescriptorSetLayout> Layouts;
 
-		for(ResourceSetDescription* SetDesc : PipelineCreateInfo.ResourceDescriptions)
+		for(ResourceSetDescription* SetDesc : CreateInfo.ResourceDescriptions)
 		{
 			// Create uniform layout information here
 			VulkanResourceSetDescription* VkResSetDesc = dynamic_cast<VulkanResourceSetDescription*>(SetDesc);
@@ -233,15 +233,15 @@ namespace Ry
 			}
 		}
 
-		CreateInfo.pSetLayouts = Layouts.CopyData();
-		CreateInfo.setLayoutCount = Layouts.GetSize();
+		VkCreateInfo.pSetLayouts = Layouts.CopyData();
+		VkCreateInfo.setLayoutCount = Layouts.GetSize();
 
 		if(Layouts.GetSize() <= 0)
 		{
 			Ry::Log->LogWarn("No resource layouts specified");
 		}
 
-		if (vkCreatePipelineLayout(GVulkanContext->GetLogicalDevice(), &CreateInfo, nullptr, &OutLayout) != VK_SUCCESS)
+		if (vkCreatePipelineLayout(GVulkanContext->GetLogicalDevice(), &VkCreateInfo, nullptr, &OutLayout) != VK_SUCCESS)
 		{
 			return false;
 		}
@@ -251,13 +251,13 @@ namespace Ry
 
 	bool VulkanPipeline::CreatePipeline()
 	{
-		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(PipelineCreateInfo.RenderPass);
-		VulkanShader* VkShader = dynamic_cast<VulkanShader*>(PipelineCreateInfo.PipelineShader);
+		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(CreateInfo.RenderPass);
+		VulkanShader* VkShader = dynamic_cast<VulkanShader*>(CreateInfo.PipelineShader);
 
 		assert(VkRenderPass != nullptr);
 		assert(VkShader != nullptr);
 
-		if(PipelineCreateInfo.VertFormat.element_count <= 0)
+		if(CreateInfo.VertFormat.element_count <= 0)
 		{
 			Ry::Log->LogError("Vertex format element count is zero");
 			return false;

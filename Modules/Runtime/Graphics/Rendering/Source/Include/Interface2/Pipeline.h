@@ -31,7 +31,7 @@ namespace Ry
 		
 		Pipeline2(const Ry::PipelineCreateInfo& CreateInfo)
 		{
-			this->PipelineCreateInfo = CreateInfo;
+			this->CreateInfo = CreateInfo;
 		}
 		
 		virtual ~Pipeline2() = default;
@@ -41,12 +41,12 @@ namespace Ry
 
 		const PipelineCreateInfo& GetCreateInfo()
 		{
-			return PipelineCreateInfo;
+			return CreateInfo;
 		}
 
 	protected:
 
-		Ry::PipelineCreateInfo PipelineCreateInfo;
+		Ry::PipelineCreateInfo CreateInfo;
 
 	};
 	

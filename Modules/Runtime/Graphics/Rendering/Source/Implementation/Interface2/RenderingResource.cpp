@@ -1,4 +1,4 @@
-#include "Interface2\RenderingResource.h"
+#include "Interface2/RenderingResource.h"
 
 namespace Ry
 {

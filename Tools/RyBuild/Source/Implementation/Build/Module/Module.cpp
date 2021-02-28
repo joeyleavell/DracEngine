@@ -38,8 +38,13 @@ std::string ExternDependency::GetPlatformBinaryPath(const BuildSettings& Setting
 }
 
 void ExternDependency::GetPlatformLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs) const
-{
+{	
 	std::string LibPath = GetPlatformLibraryPath(Settings);
+
+	if (!Filesystem::exists(LibPath))
+	{
+		return;
+	}
 
 	Filesystem::directory_iterator DirItr(LibPath);
 
@@ -366,7 +371,11 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	{
 		NewModule->Name = NewModule->Name.substr(0, FirstDot);
 	}
-	
+
+	// Set system path for python libs
+	Filesystem::path LibsPath = Filesystem::path(".") / "PythonLib";
+	Py_SetPath(LibsPath.wstring().c_str());
+
 	// Initialize python
 	Py_Initialize();
 
@@ -691,4 +700,39 @@ void TopSort_Helper(std::vector<std::string>& OutModules, const std::map<std::st
 
 	// Add ourself
 	OutModules.insert(OutModules.begin(), RootModule);
+}
+
+void RecurseDependencies(const Module& Mod, const std::map<std::string, Module*>& ModMap, std::vector<std::string>& OutMods)
+{
+	std::vector<std::string> ModFrontier;
+
+	for(const std::string& ModDep : Mod.ModuleDependencies)
+	{
+		ModFrontier.push_back(ModDep);
+	}
+
+	while(!ModFrontier.empty())
+	{
+		std::string Next = ModFrontier[0];
+		ModFrontier.erase(ModFrontier.begin());
+
+		// Add this module to the output list
+		OutMods.push_back(Next);
+		
+		if(ModMap.find(Next) != ModMap.end())
+		{
+			Module* MappedMod = ModMap.at(Next);
+
+			if (!MappedMod)
+				continue;
+
+			// Add all of this module's dependencies
+			for(const std::string ModDep : MappedMod->ModuleDependencies)
+			{
+				ModFrontier.push_back(ModDep);
+			}
+		}	
+	}
+	
+	
 }
