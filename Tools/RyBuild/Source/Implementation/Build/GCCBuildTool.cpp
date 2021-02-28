@@ -248,26 +248,20 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			CmdArgs.push_back("-L" + GetEngineLibraryDir());
 		}
 
-		// std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
 		std::vector<std::string> Libs = TheModule.PythonLibraries;
+		for (const std::string& Lib : Libs)
+		{
+			// Make path relative to third party
+			Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
 
-		// if(Libs)
-		// {
-			// Add third party libraries
-			for (const std::string& Lib : Libs)
-			{
-				// Make path relative to third party
-				Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
+			CmdArgs.push_back("-L" + LibPath.string());
+		}
 
-				CmdArgs.push_back("-L" + LibPath.string());
-			}
-		// }
-		// else
-		// {
-		// 	std::cerr << "Module did not return a valid vector of target libs" << std::endl;
-		// 	return false;
-		// }
-	
+		for (const ExternDependency& Extern : TheModule.ExternDependencies)
+		{
+			CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
+		}
+		
 	}
 
 	// Set the name of the output file depending on if we're building a shared library or an executable.
@@ -431,25 +425,21 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 		for (auto& Mod : Modules)
 		{
 			Module& TheModule = *Mod.second;
-			// std::vector<std::string>* Libs = TheModule.GetTargetLibPaths(Settings);
+
 			std::vector<std::string> Libs = TheModule.PythonLibraryPaths;
+			for (const std::string& Lib : Libs)
+			{
+				// Make path relative to third party
+				Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
 
-			// if (Libs)
-			// {
-				// Add third party libraries
-				for (const std::string& Lib : Libs)
-				{
-					// Make path relative to third party
-					Filesystem::path LibPath = Filesystem::absolute(Filesystem::path(TheModule.GetThirdPartyDir()) / Lib);
+				CmdArgs.push_back("-L" + LibPath.string());
+			}
 
-					CmdArgs.push_back("-L" + LibPath.string());
-				}
-			// }
-			// else
-			// {
-			// 	std::cerr << "Module did not return a valid vector of target libs" << std::endl;
-			// 	return false;
-			// }
+			for (const ExternDependency& Extern : TheModule.ExternDependencies)
+			{
+				CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
+			}
+
 		}
 
 	}
