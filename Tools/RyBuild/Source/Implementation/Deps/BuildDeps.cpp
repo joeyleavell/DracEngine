@@ -689,18 +689,13 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Glm.GitLabel = "0.9.9.0";
 
 	Filesystem::path VulkanHeadersPath = Filesystem::path(BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Tools) / "install";
-//	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);
+	//Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);	
 
-	if(!Filesystem::exists(VulkanHeadersPath))
-	{
-		Filesystem::create_directories(VulkanHeadersPath);
-	}
-	
 	Dependency VulkanHeaders;
 	VulkanHeaders.Name = "VulkanHeaders";
 	VulkanHeaders.IncludesDirectories = {"include"};
 	VulkanHeaders.CMakeGenArgs = {
-		"CMAKE_INSTALL_PREFIX=" + Filesystem::canonical(VulkanHeadersPath).string()
+		"CMAKE_INSTALL_PREFIX=" + Filesystem::absolute(VulkanHeadersPath).string()
 	};
 	VulkanHeaders.GitPath = "https://github.com/KhronosGroup/Vulkan-Headers.git";
 	VulkanHeaders.GitLabel = "v1.2.170";
