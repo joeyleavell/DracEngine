@@ -23,6 +23,8 @@ namespace Ry
 	int32 CalcBufferSize(const ConstantBuffer* Buffer);
 	void CalcMemberSize(const BufferMember* Layout, int32& Offset);
 
+	int32 SizeOf(const ShaderPrimitiveDataType& PrimData);
+
 	class UniformStorage
 	{
 		
