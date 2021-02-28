@@ -579,7 +579,7 @@ bool BuildDeps(std::vector<Dependency>& Deps, std::string Dir, Toolset Tools)
 }
 
 bool BuildDepsCmd(std::vector<std::string>& Args)
-{
+{	
 	// Cut out first arg
 	std::vector<std::string> DepsArgs;
 	for(int Index = 1; Index < Args.size(); Index++)

@@ -30,22 +30,116 @@ std::string ToUpper(std::string Word)
 	return Caps;
 }
 
-Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other)
+/**
+ * Checks if A is the parent of B 
+ */
+bool IsParentOf(Filesystem::path A, Filesystem::path B)
 {
-	Filesystem::path BaseAbs = Filesystem::absolute(Base);
-	Filesystem::path OtherAbs = Filesystem::absolute(Other);
+	Filesystem::path BaseAbs = Filesystem::absolute(A);
+	Filesystem::path OtherAbs = Filesystem::absolute(B);
 
-	Filesystem::path Relative;
+	// Todo: check if this removes trailing path separator ?
+	BaseAbs.replace_filename(BaseAbs.filename());
+	OtherAbs.replace_filename(OtherAbs.filename());
 
-	while(OtherAbs.has_parent_path() && OtherAbs != BaseAbs)
+	while(OtherAbs.has_parent_path())
 	{
-		Filesystem::path FileName = OtherAbs.filename();
-		Relative = FileName / Relative;
-
+		if(OtherAbs == BaseAbs)
+		{
+			return true;
+		}
+		
 		OtherAbs = OtherAbs.parent_path();
 	}
 
-	return Relative;
+	return false;
+}
+
+Filesystem::path PathRelativeTo_UnRelated(Filesystem::path Base, Filesystem::path Path)
+{
+	Filesystem::path AbsBase = Filesystem::absolute(Base);
+	Filesystem::path AbsPath = Filesystem::absolute(Path);
+
+	Filesystem::path BaseMod = AbsBase;
+	Filesystem::path PathMod = AbsPath;
+
+	// The part accumulated from the unrelated path
+	Filesystem::path AccumPath;
+	int ParentCounter = 0;
+	bool bFoundCommonality = false;
+
+	while(PathMod.has_parent_path() && !bFoundCommonality)
+	{
+		// Step through the B path
+		BaseMod = AbsBase;
+		ParentCounter = 0;
+		
+		while(BaseMod.has_parent_path() && !bFoundCommonality)
+		{
+			if (BaseMod == PathMod)
+			{
+				bFoundCommonality = true;
+			}
+			else
+			{
+				ParentCounter++;
+				BaseMod = BaseMod.parent_path();
+			}
+
+		}
+
+		if(!bFoundCommonality)
+		{
+			// Accumulate this part and step up
+			AccumPath = PathMod.filename() / AccumPath;
+			PathMod = PathMod.parent_path();
+		}
+		
+	}
+
+	// Add the parent path markers
+	// This goes up until we have a common base, then we can go until we reached the other path
+	for(int ParentUp = 0; ParentUp < ParentCounter; ParentUp++)
+	{
+		AccumPath = ".." / AccumPath;
+	}
+
+	return AccumPath;
+
+}
+
+Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other)
+{
+	return PathRelativeTo_UnRelated(Base, Other);
+	
+	// Filesystem::path BaseAbs = Filesystem::absolute(Base);
+	// Filesystem::path OtherAbs = Filesystem::absolute(Other);
+	//
+	//
+	// if(IsParentOf(BaseAbs, OtherAbs))
+	// {
+	// 	Filesystem::path Relative;
+	//
+	// 	while (OtherAbs.has_parent_path() && OtherAbs != BaseAbs)
+	// 	{
+	// 		Filesystem::path FileName = OtherAbs.filename();
+	// 		Relative = FileName / Relative;
+	//
+	// 		OtherAbs = OtherAbs.parent_path();
+	// 	}
+	//
+	// 	return Relative;
+	// }
+	// else if(IsParentOf(OtherAbs, BaseAbs))
+	// {
+	// 	
+	// }
+	// else
+	// {
+	// 	// Most difficult case
+	// }
+	//
+
 }
 
 bool HasOption(std::vector<std::string>& Args, std::string Option)
