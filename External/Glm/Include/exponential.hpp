@@ -6,11 +6,9 @@
 /// @defgroup core_func_exponential Exponential functions
 /// @ingroup core
 ///
-/// Provides GLSL exponential functions
+/// Include <glm/exponential.hpp> to use these core features.
 ///
 /// These all operate component-wise. The description is per component.
-///
-/// Include <glm/exponential.hpp> to use these core features.
 
 #pragma once
 

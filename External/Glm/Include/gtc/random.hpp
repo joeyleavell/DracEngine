@@ -14,11 +14,10 @@
 #pragma once
 
 // Dependency:
-#include "../ext/scalar_int_sized.hpp"
-#include "../ext/scalar_uint_sized.hpp"
-#include "../detail/qualifier.hpp"
+#include "../vec2.hpp"
+#include "../vec3.hpp"
 
-#if GLM_MESSAGES == GLM_ENABLE && !defined(GLM_EXT_INCLUDED)
+#if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTC_random extension included")
 #endif
 

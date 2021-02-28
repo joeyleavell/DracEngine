@@ -1,3 +1,6 @@
+/// @ref core
+/// @file glm/detail/_features.hpp
+
 #pragma once
 
 // #define GLM_CXX98_EXCEPTIONS

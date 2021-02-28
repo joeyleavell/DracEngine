@@ -6,15 +6,13 @@
 /// @defgroup core_func_trigonometric Angle and Trigonometry Functions
 /// @ingroup core
 ///
+/// Include <glm/trigonometric.hpp> to use these core features.
+///
 /// Function parameters specified as angle are assumed to be in units of radians.
 /// In no case will any of these functions result in a divide by zero error. If
 /// the divisor of a ratio is 0, then results will be undefined.
 ///
 /// These all operate component-wise. The description is per component.
-///
-/// Include <glm/trigonometric.hpp> to use these core features.
-///
-/// @see ext_vector_trigonometric
 
 #pragma once
 
@@ -96,7 +94,7 @@ namespace glm
 	template<length_t L, typename T, qualifier Q>
 	GLM_FUNC_DECL vec<L, T, Q> asin(vec<L, T, Q> const& x);
 
-	/// Arc cosine. Returns an angle whose cosine is x.
+	/// Arc cosine. Returns an angle whose sine is x.
 	/// The range of values returned by this function is [0, PI].
 	/// Results are undefined if |x| > 1.
 	///
