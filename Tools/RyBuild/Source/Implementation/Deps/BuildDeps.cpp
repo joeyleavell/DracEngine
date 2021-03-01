@@ -120,12 +120,15 @@ Filesystem::path GetPlatformPath(Toolset Tools)
 
 	if(Tools == Toolset::GCC)
 	{
+#if defined(RYBUILD_WINDOWS)
+		PlatformPath /= "MinGW";
+#elif defined(RYBUILD_LINUX)
 		PlatformPath /= "GCC";
+#endif
 	}
 	else if(Tools == Toolset::MSVC)
 	{
 		PlatformPath /= "MSVC";
-
 	}
 
 	return PlatformPath;
@@ -614,7 +617,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 		{
 			Settings.Tools = Toolset::MSVC;
 		}
-		else if(Parsed == "GCC")
+		else if(Parsed == "GCC" || Parsed == "MinGW")
 		{
 			Settings.Tools = Toolset::GCC;
 		}
@@ -736,7 +739,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Glm.GitPath = "https://github.com/g-truc/glm.git";
 	Glm.GitLabel = "0.9.9.0";
 
-	Filesystem::path VulkanHeadersPath = Filesystem::path(Settings.BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Settings.Tools) / "install";
+	Filesystem::path VulkanHeadersPath = Filesystem::path(Settings.ReposDir) / "VulkanHeaders" / "Build" / GetPlatformPath(Settings.Tools) / "Install";
 	//Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);	
 
 	Dependency VulkanHeaders;

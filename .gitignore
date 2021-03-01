@@ -46,7 +46,7 @@ crashinfo--*
  
 # Engine files
 /Binary
+/External
 /Tools/Build
 /Tools/Binary
 Intermediate/
-out/
