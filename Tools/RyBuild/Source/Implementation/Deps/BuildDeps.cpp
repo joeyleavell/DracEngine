@@ -639,7 +639,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 	if(HasOption(Args, "Repos"))
 	{
-		Settings.ReposDir = ParseOption(Args, "Repos");
+		Settings.ReposDir = Filesystem::absolute(ParseOption(Args, "Repos")).string();
 	}
 
 	if(HasOption(Args, "InstallIncludes"))
