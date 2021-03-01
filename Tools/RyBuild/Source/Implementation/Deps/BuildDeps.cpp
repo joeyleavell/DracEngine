@@ -402,18 +402,18 @@ void FindTargetStaticLibs(Dependency& Dep, std::string BuildDirectory, std::vect
 	}
 }
 
-bool BuildDep(Dependency& Dep, std::string OutputDir, std::string RepoDir, Toolset Tools)
+bool BuildDep(Dependency& Dep, GlobalBuildSettings BuildSettings, std::string OutputDir, std::string RepoDir)
 {
 	// Don't build if this platform is excluded
-	Platform TargetPlat = GetTargetPlatform(Tools);
+	Platform TargetPlat = GetTargetPlatform(BuildSettings.Tools);
 	if (IsPlatformExcluded(Dep.ExcludedPlatforms, TargetPlat))
 	{
 		// Don't consider this a fail
-		std::cout << "Dependency " << Dep.Name << " will not be built for platform " << GetPlatformPath(Tools).string() << std::endl;
+		std::cout << "Dependency " << Dep.Name << " will not be built for platform " << GetPlatformPath(BuildSettings.Tools).string() << std::endl;
 		return true;
 	}
 	
-	Filesystem::path BuildDir = Filesystem::path(RepoDir) / "Build" / GetPlatformPath(Tools);
+	Filesystem::path BuildDir = Filesystem::path(RepoDir) / "Build" / GetPlatformPath(BuildSettings.Tools);
 
 	// Git clone
 	if(!GitCloneDep(Dep, RepoDir))
@@ -422,22 +422,22 @@ bool BuildDep(Dependency& Dep, std::string OutputDir, std::string RepoDir, Tools
 	}
 	
 	// Cmake generate
-	if(Dep.bRunCMakeBuild)
+	if(Dep.bRunCMakeBuild && (BuildSettings.bInstallBins || BuildSettings.bInstallLibs))
 	{
-		if (!CMakeGenerate(Dep, RepoDir, Tools))
+		if (!CMakeGenerate(Dep, RepoDir, BuildSettings.Tools))
 		{
 			return false;
 		}
 
 		// Cmake build
-		if (!CMakeBuild(Dep, RepoDir, Tools))
+		if (!CMakeBuild(Dep, RepoDir, BuildSettings.Tools))
 		{
 			return false;
 		}
 
 		if (Dep.bRunCMakeInstall)
 		{
-			if (!CMakeInstall(Dep, RepoDir, Tools))
+			if (!CMakeInstall(Dep, RepoDir, BuildSettings.Tools))
 			{
 				return false;
 			}
@@ -450,8 +450,8 @@ bool BuildDep(Dependency& Dep, std::string OutputDir, std::string RepoDir, Tools
 		FindTargetStaticLibs(Dep, BuildDir.string(), StaticLibs);
 
 		// Determine correct installation location
-		std::string StaticLibsInstallLoc = (Filesystem::path(OutputDir) / "Libraries" / GetPlatformPath(Tools)).string();
-		std::string SharedLibsInstallLoc = (Filesystem::path(OutputDir) / "Binary" / GetPlatformPath(Tools)).string();
+		std::string StaticLibsInstallLoc = (Filesystem::path(OutputDir) / "Libraries" / GetPlatformPath(BuildSettings.Tools)).string();
+		std::string SharedLibsInstallLoc = (Filesystem::path(OutputDir) / "Binary" / GetPlatformPath(BuildSettings.Tools)).string();
 
 		// Install targets to location
 		if (SharedLibs.size() > 0)
@@ -500,7 +500,7 @@ bool BuildDep(Dependency& Dep, std::string OutputDir, std::string RepoDir, Tools
 	}
 	
 	// Install include directories
-	if(Dep.bInstallIncludes)
+	if(Dep.bInstallIncludes && BuildSettings.bInstallIncludes)
 	{
 		std::string IncludesInstallLoc = (Filesystem::path(OutputDir) / "Include").string();
 		for (const std::string IncludePathOrDir : Dep.IncludesDirectories)
@@ -546,10 +546,10 @@ bool BuildDep(Dependency& Dep, std::string OutputDir, std::string RepoDir, Tools
 	return true;
 }
 
-bool BuildDeps(std::vector<Dependency>& Deps, std::string BuildRoot, std::string ReposDir, Toolset Tools)
+bool BuildDeps(std::vector<Dependency>& Deps, GlobalBuildSettings BuildSettings)
 {	
-	Filesystem::path BuildAbs = Filesystem::absolute(BuildRoot);
-	Filesystem::path ReposAbs = Filesystem::absolute(ReposDir);
+	Filesystem::path BuildAbs = Filesystem::absolute(BuildSettings.BuildDir);
+	Filesystem::path ReposAbs = Filesystem::absolute(BuildSettings.ReposDir);
 
 	// Create the root directories
 	if(!Filesystem::exists(BuildAbs))
@@ -557,9 +557,9 @@ bool BuildDeps(std::vector<Dependency>& Deps, std::string BuildRoot, std::string
 		Filesystem::create_directories(BuildAbs);
 	}
 
-	if (!Filesystem::exists(ReposDir))
+	if (!Filesystem::exists(BuildSettings.ReposDir))
 	{
-		Filesystem::create_directories(ReposDir);
+		Filesystem::create_directories(BuildSettings.ReposDir);
 	}
 
 	
@@ -567,8 +567,8 @@ bool BuildDeps(std::vector<Dependency>& Deps, std::string BuildRoot, std::string
 	{
 		// Todo: check if dependency can be built for target platform
 
-		std::string RepoDir = (Filesystem::path(ReposDir) / Dep.Name).string();
-		std::string BuildDir = (Filesystem::path(BuildRoot) / Dep.Name).string();
+		std::string RepoDir = (Filesystem::path(BuildSettings.ReposDir) / Dep.Name).string();
+		std::string BuildDir = (Filesystem::path(BuildSettings.BuildDir) / Dep.Name).string();
 
 		// If directory exists, error out
 		// if (Filesystem::exists(DepDir))
@@ -577,7 +577,7 @@ bool BuildDeps(std::vector<Dependency>& Deps, std::string BuildRoot, std::string
 		// 	return false;
 		// }
 		
-		if(!BuildDep(Dep, BuildDir, RepoDir, Tools))
+		if(!BuildDep(Dep, BuildSettings, BuildDir, RepoDir))
 		{
 			return false;
 		}
@@ -601,21 +601,22 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 		return false;
 	}
 
-	std::string BuildDir = FindNonOption(DepsArgs);
-	std::string ReposDir = (Filesystem::path(BuildDir) / "Repos").string(); // This can be changed with the -Repos= option
-	Toolset Tools;
+	GlobalBuildSettings Settings;
 
+	Settings.BuildDir = FindNonOption(DepsArgs);
+	Settings.ReposDir = (Filesystem::path(Settings.BuildDir) / "Repos").string(); // This can be changed with the -Repos= option
+	
 	if(HasOption(DepsArgs, "Toolset"))
 	{
 		std::string Parsed = ParseOption(DepsArgs, "Toolset");
 
 		if(Parsed == "MSVC")
 		{
-			Tools = Toolset::MSVC;
+			Settings.Tools = Toolset::MSVC;
 		}
 		else if(Parsed == "GCC")
 		{
-			Tools = Toolset::GCC;
+			Settings.Tools = Toolset::GCC;
 		}
 		else
 		{
@@ -626,15 +627,46 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	else
 	{
 #ifdef RYBUILD_WINDOWS
-		Tools = Toolset::MSVC;
+		Settings.Tools = Toolset::MSVC;
 #elif defined(RYBUILD_LINUX)
-		Tools = Toolset::GCC;
+		Settings.Tools = Toolset::GCC;
 #endif
+
 	}
 
 	if(HasOption(Args, "Repos"))
 	{
-		ReposDir = ParseOption(Args, "Repos");
+		Settings.ReposDir = ParseOption(Args, "Repos");
+	}
+
+	if(HasOption(Args, "InstallIncludes"))
+	{
+		std::string Value = ParseOption(Args, "InstallIncludes");
+
+		if(ToUpper(Value) == "FALSE")
+		{
+			Settings.bInstallIncludes = false;
+		}
+	}
+
+	if (HasOption(Args, "InstallBins"))
+	{
+		std::string Value = ParseOption(Args, "InstallBins");
+
+		if (ToUpper(Value) == "FALSE")
+		{
+			Settings.bInstallBins = false;
+		}
+	}
+
+	if (HasOption(Args, "InstallLibs"))
+	{
+		std::string Value = ParseOption(Args, "InstallLibs");
+
+		if (ToUpper(Value) == "FALSE")
+		{
+			Settings.bInstallLibs = false;
+		}
 	}
 
 	// Future todo: Store these dependencies in a file?
@@ -704,7 +736,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Glm.GitPath = "https://github.com/g-truc/glm.git";
 	Glm.GitLabel = "0.9.9.0";
 
-	Filesystem::path VulkanHeadersPath = Filesystem::path(BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Tools) / "install";
+	Filesystem::path VulkanHeadersPath = Filesystem::path(Settings.BuildDir) / "Repos/VulkanHeaders/Build/" / GetPlatformPath(Settings.Tools) / "install";
 	//Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), VulkanHeadersPath);	
 
 	Dependency VulkanHeaders;
@@ -759,5 +791,6 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 		Targets = TestDeps;
 	}
 
-	return BuildDeps(Targets, BuildDir, ReposDir, Tools);
+	return BuildDeps(Targets, Settings);
+
 }

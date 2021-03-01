@@ -49,6 +49,20 @@ enum class GitLabelType
 	Branch
 };
 
+struct GlobalBuildSettings
+{
+	bool bInstallIncludes = true;
+	bool bInstallLibs = true;
+	bool bInstallBins = true;
+
+	Toolset Tools;
+
+	std::string BuildDir;
+	std::string ReposDir;
+
+
+};
+
 struct Dependency
 {
 	std::string Name;
