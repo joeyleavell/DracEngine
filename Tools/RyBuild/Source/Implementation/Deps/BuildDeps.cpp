@@ -719,6 +719,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Dependency Json;
 	Json.Name = "Json";
 	Json.bRunCMakeBuild = false;
+	Json.IncludesDirectories = {"include"};
 	Json.GitPath = "https://github.com/nlohmann/json.git";
 	Json.GitLabel = "v3.9.1";
 
