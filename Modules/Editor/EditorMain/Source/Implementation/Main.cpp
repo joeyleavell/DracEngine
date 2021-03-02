@@ -91,16 +91,8 @@ Ry::String FindNonOption(Ry::ArrayList<Ry::String>& Options)
 	return "";
 }
 
-void LaunchProject(Ry::ArrayList<Ry::String>& Options)
+void LaunchProject(Ry::ArrayList<Ry::String>& Options, Ry::RenderingPlatform Plat)
 {
-	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
-
-	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
-
-	if (Ry::HasOption(Options, "Vulkan"))
-	{
-		Plat = Ry::RenderingPlatform::Vulkan;
-	}
 
 	Ry::String Path = FindNonOption(Options);
 
@@ -158,9 +150,18 @@ int main(int ArgC, char** ArgV)
 		Options.Add(ArgV[Opt]);
 	}
 
+	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
+
+	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
+
+	if (Ry::HasOption(Options, "Vulkan"))
+	{
+		Plat = Ry::RenderingPlatform::Vulkan;
+	}
+
 	if(Command == "launch")
 	{
-		LaunchProject(Options);
+		LaunchProject(Options, Plat);
 	}
 	else if(Command == "compile-shaders")
 	{
@@ -169,8 +170,8 @@ int main(int ArgC, char** ArgV)
 	else
 	{
 		// Todo: project launcher
-		//Ry::Editor* Ed = new Ry::Editor(Plat);
-		//Ed->Run();
+		Ry::Editor* Ed = new Ry::Editor(Plat);
+		Ed->Run();
 	}
 
 	

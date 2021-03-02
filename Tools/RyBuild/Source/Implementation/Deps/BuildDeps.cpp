@@ -727,6 +727,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	ShaderConductor.Name = "ShaderConductor";
 	ShaderConductor.LocatorMethod = ArtifactLocatorMethod::NameHint;
 	ShaderConductor.SharedLibNames = {"shaderconductor", "dxcompiler"};
+	ShaderConductor.LibNames = { "shaderconductor", "dxcompiler" };
 	ShaderConductor.IncludesDirectories = {"Include/ShaderConductor"};
 	ShaderConductor.LabelType = GitLabelType::None; // Get the latest of master, doesn't compile otherwise
 	ShaderConductor.GitPath = "https://github.com/microsoft/ShaderConductor.git";
