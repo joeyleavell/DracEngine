@@ -135,45 +135,63 @@ void CompileShaders(Ry::ArrayList<Ry::String>& Options)
 
 int main(int ArgC, char** ArgV)
 {
-	if(ArgC < 2)
-	{
-		std::cerr << "Must provide a command to the editor, project launcher not supported yet" << std::endl;
-		return 1;
-	}
+	// if(ArgC < 2)
+	// {
+	// 	std::cerr << "Must provide a command to the editor, project launcher not supported yet" << std::endl;
+	// 	return 1;
+	// }
 
-	Ry::String Command = ArgV[1];
+	Ry::String Command = "";
+
+	if(ArgC > 1 && ArgV[1][0] != '-')
+	{
+		Command = ArgV[1];
+	}
 
 	// Only add options after editor command
 	Ry::ArrayList<Ry::String> Options;
-	for(int32 Opt = 2; Opt < ArgC; Opt++)
+
+	if(Command == "")
 	{
-		Options.Add(ArgV[Opt]);
+		for (int32 Opt = 1; Opt < ArgC; Opt++)
+		{
+			Options.Add(ArgV[Opt]);
+		}
+	}
+	else
+	{
+		for (int32 Opt = 2; Opt < ArgC; Opt++)
+		{
+			Options.Add(ArgV[Opt]);
+		}
 	}
 
-	//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
-
-	Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
-
-	if (Ry::HasOption(Options, "Vulkan"))
+	if(Command == "launch" || Command == "")
 	{
-		Plat = Ry::RenderingPlatform::Vulkan;
-	}
+		//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
 
-	if(Command == "launch")
-	{
-		LaunchProject(Options, Plat);
+		Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
+
+		if (Ry::HasOption(Options, "Vulkan"))
+		{
+			Plat = Ry::RenderingPlatform::Vulkan;
+		}
+
+		if(Command == "launch")
+		{
+			LaunchProject(Options, Plat);
+		}
+		else
+		{
+			// Todo: project launcher
+			Ry::Editor* Ed = new Ry::Editor(Plat);
+			Ed->Run();
+		}
 	}
 	else if(Command == "compile-shaders")
 	{
 		CompileShaders(Options);
 	}
-	else
-	{
-		// Todo: project launcher
-		Ry::Editor* Ed = new Ry::Editor(Plat);
-		Ed->Run();
-	}
-
 	
 	return 0;
 }

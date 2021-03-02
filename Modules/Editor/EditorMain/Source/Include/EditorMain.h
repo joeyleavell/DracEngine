@@ -253,7 +253,7 @@ namespace Ry
 			
 			}
 
-			Shader = Ry::NewRenderAPI->CreateShader("/Engine/Shaders/Vertex/Vulkan.hlsl", "/Engine/Shaders/Fragment/Vulkan.hlsl");
+			Shader = Ry::NewRenderAPI->CreateShader("Vertex/Vulkan", "Fragment/Vulkan");
 
 			// Create new pipeline
 			Ry::PipelineCreateInfo CreateInfo;

@@ -1,6 +1,6 @@
 Type = "Runtime"
 
-Extern = ["Glfw", "VulkanLoader"]
+Extern = ["Glfw", "VulkanLoader", "VulkanHeaders"]
 
 Modules = ["Core", "Rendering", "AssetCore", "Math", "OpenGL2", "Vulkan"]
 
