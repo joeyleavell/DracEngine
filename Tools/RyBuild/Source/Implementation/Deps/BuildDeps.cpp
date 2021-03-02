@@ -700,7 +700,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 		"glew-cmake_BUILD_SHARED=OFF",
 		"ONLY_LIBS=ON",
 	};
-	Glew.IncludesDirectories = {"src/"};
+	Glew.IncludesDirectories = {"include/GL"};
 	Glew.GitPath = "https://github.com/Perlmint/glew-cmake.git";
 	Glew.GitLabel = "glew-cmake-2.2.0";
 
