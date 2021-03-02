@@ -316,7 +316,10 @@ std::string GetModulePath()
 	{
 		constexpr int MAX_NAME_SIZE = 300;
 		char NameSize[MAX_NAME_SIZE];
-		GetModuleFileNameA(NULL, NameSize, MAX_NAME_SIZE);
+
+		HMODULE Mod;
+		GetModuleHandleEx(NULL, NULL, &Mod);
+		GetModuleFileNameA(Mod, NameSize, MAX_NAME_SIZE);
 
 		ModulePathCache = Filesystem::canonical(std::string(NameSize)).string();
 	}
