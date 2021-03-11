@@ -30,24 +30,24 @@ namespace Ry
 
 		void Log(Ry::String Format)
 		{
-			this->Log(Sev::Normal, Format, nullptr);
+			this->Log(Sev::Normal, Format);
 		}
 
 		void LogWarn(Ry::String Format)
 		{
-			this->Log(Sev::Warning, Format, nullptr);
+			this->Log(Sev::Warning, Format);
 		}
 
 		void LogError(Ry::String Format)
 		{
-			this->Log(Sev::Error, Format, nullptr);
+			this->VariadicLog(Sev::Error, Format, nullptr);
 		}
 
 		void Logf(Ry::String Format...)
 		{
 			va_list List;
 			va_start(List, Format);
-			this->Log(Sev::Normal, Format, List);
+			this->VariadicLog(Sev::Normal, Format, List);
 			va_end(List);
 		}
 
@@ -55,7 +55,7 @@ namespace Ry
 		{
 			va_list List;
 			va_start(List, Format);
-			this->Log(Sev::Warning, Format, List);
+			this->VariadicLog(Sev::Warning, Format, List);
 			va_end(List);
 		}
 
@@ -63,7 +63,7 @@ namespace Ry
 		{
 			va_list List;
 			va_start(List, Format);
-			this->Log(Sev::Error, Format, List);
+			this->VariadicLog(Sev::Error, Format, List);
 			va_end(List);
 		}
 
@@ -77,16 +77,15 @@ namespace Ry
 		// 	this->Log(Sev::Error, Format, Args);
 		// }
 
-		void Log(Sev Severity, Ry::String Format, va_list Args)
+		Ry::String GetFormatted(Sev Severity, Ry::String LogEntry)
 		{
-			std::ostream& OS = (Severity == Sev::Error) ? std::cerr : std::cout;	
 			Ry::String Msg = "[" + GetTimestamp("%H:%M:%S") + "]";
 
-			if(Severity == Sev::Warning)
+			if (Severity == Sev::Warning)
 			{
 				Msg += "[WARNING]: ";
 			}
-			else if(Severity == Sev::Error)
+			else if (Severity == Sev::Error)
 			{
 				Msg += "[ERROR]: ";
 			}
@@ -95,9 +94,31 @@ namespace Ry
 				Msg += ": ";
 			}
 
-			Msg += Ry::CreateFormatted(Format, Args) + "\n";
+			Msg += LogEntry;
 
-			OS << *Msg;
+			return Msg;
+		}
+		
+		
+		void Log(Sev Severity, Ry::String LogEntry)
+		{
+			std::ostream& OS = (Severity == Sev::Error) ? std::cerr : std::cout;
+			Ry::String FullLogMsg = GetFormatted(Severity, LogEntry);
+
+			OS << *FullLogMsg << std::endl;
+
+			// if(FileOutput.is_open())
+			// {
+			// 	FileOutput << *Msg;
+			// }
+		}
+		
+		void VariadicLog(Sev Severity, Ry::String Format, va_list Args)
+		{
+			std::ostream& OS = (Severity == Sev::Error) ? std::cerr : std::cout;	
+			Ry::String FullLogMsg = GetFormatted(Severity, Ry::CreateFormatted(Format, Args));
+
+			OS << *FullLogMsg << std::endl;
 			
 			// if(FileOutput.is_open())
 			// {
