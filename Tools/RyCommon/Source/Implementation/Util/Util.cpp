@@ -385,7 +385,7 @@ bool ExecProc(std::string Program, std::vector<std::string>& CmdLineVec, int Out
 
 	bool bExecSuccessful = true;
 
-	std::cout << CmdLine << std::endl;
+	//std::cout << CmdLine << std::endl;
 
 	// Start the child process. 
 	if (!CreateProcessA(NULL,   // No module name (use command line)

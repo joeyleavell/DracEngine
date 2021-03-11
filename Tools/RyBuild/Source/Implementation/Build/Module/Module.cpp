@@ -400,7 +400,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	}
 
 	// Set system path for python libs
-	Filesystem::path LibsPath = Filesystem::path(".") / "PythonLib";
+	Filesystem::path LibsPath = Filesystem::absolute(Filesystem::path(GetModulePath()).parent_path() / "PythonLib");
 	Py_SetPath(LibsPath.wstring().c_str());
 
 	// Initialize python
