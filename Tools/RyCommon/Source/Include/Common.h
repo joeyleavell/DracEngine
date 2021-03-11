@@ -21,7 +21,7 @@ extern bool bIsVerbose;
 #if defined(_M_AMD64) || defined(__amd64__) // amd64/x86_64
 	#define RYBUILD_Arch_x86_64
 #elif defined(_M_IX86) ||defined(__i686__) // i686/x86
-	#define RYBUILD_Arch_Arm
+	#define RYBUILD_Arch_x86
 #elif defined(__arm__) || defined(_M_ARM) // arm todo: (need to take into account version)
 	#define RYBUILD_Arch_Arm
 #endif
