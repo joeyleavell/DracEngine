@@ -64,6 +64,8 @@ namespace Ry
 		{
 			return false;
 		}
+
+		return true;
 	}
 
 	void ShutdownVulkanAPI()

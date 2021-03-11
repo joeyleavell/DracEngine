@@ -342,7 +342,7 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredDeviceExtensions.GetSize());
 		CreateInfo.ppEnabledExtensionNames = DeviceExtensionsAsCString;
 
-#ifndef RYBUILD_CONFIG_SHIPPING
+#ifndef RYBUILD_DISTRIBUTE
 		CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
 		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else
@@ -399,7 +399,7 @@ namespace Ry
 	{
 		Ry::ArrayList<Ry::String> SupportedExtensions;
 
-#ifndef RYBUILD_CONFIG_SHIPPING
+#ifndef RYBUILD_DISTRIBUTE
 		if (!CheckValidationLayerSupport(RequiredValidationLayers))
 		{
 			Ry::Log->LogError("Requested validation layers not available");
@@ -471,7 +471,7 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = RequiredInstanceExtensions.GetSize();
 		CreateInfo.ppEnabledExtensionNames = InstanceExtCString;
 
-#ifndef RYBUILD_CONFIG_SHIPPING
+#ifndef RYBUILD_DISTRIBUTE
 		// Create the c string array of validation layers as these will also be used later in device creation
 		ValidationLayers = new char* [RequiredValidationLayers.GetSize()];
 		NumValidationLayers = RequiredValidationLayers.GetSize();

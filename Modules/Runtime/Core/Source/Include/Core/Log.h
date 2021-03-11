@@ -40,7 +40,7 @@ namespace Ry
 
 		void LogError(Ry::String Format)
 		{
-			this->VariadicLog(Sev::Error, Format, nullptr);
+			this->Log(Sev::Error, Format);
 		}
 
 		void Logf(Ry::String Format...)
