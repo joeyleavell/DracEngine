@@ -25,7 +25,7 @@
 namespace Ry
 {
 
-	typedef std::chrono::system_clock::time_point FileWriteTime;
+	typedef Filesystem::file_time_type FileWriteTime;
 
 	namespace File
 	{
