@@ -50,6 +50,7 @@ set_target_properties(RyBuild PROPERTIES
 target_link_libraries(RyBuild PUBLIC RyCommon)
 #target_link_libraries(RyBuild PUBLIC python310)
 
+set_property(TARGET RyBuild PROPERTY CXX_STANDARD 17)
 
 # Have to use separate threads library for MinGW builds
 if(MinGW)

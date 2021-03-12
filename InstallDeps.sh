@@ -7,10 +7,10 @@ wget -O ./External/Common.zip 192.168.1.66:8090/0.1/Downloads/Common.zip
 wget -O ./External/x86_64-Windows-MSVC.zip 192.168.1.66:8090/0.1/Downloads/x86_64-Windows-MSVC.zip
 
 # Download x86_64-Windows-MSVC dependencies
-curl --output ./External/x86_64-Windows-MinGW.zip --url 192.168.1.66:8090/0.1/Downloads/x86_64-Windows-MinGW.zip
+wget -O ./External/x86_64-Windows-MinGW.zip 192.168.1.66:8090/0.1/Downloads/x86_64-Windows-MinGW.zip
 
 # Download x86_64-Linux-GCC dependencies
-curl --output ./External/x86_64-Linux-GCC.zip --url 192.168.1.66:8090/0.1/Downloads/x86_64-Linux-GCC.zip
+wget -O ./External/x86_64-Linux-GCC.zip 192.168.1.66:8090/0.1/Downloads/x86_64-Linux-GCC.zip
 
 # Unzip the dependencies
 unzip ./External/Common.zip -d ./External
