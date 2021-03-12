@@ -301,6 +301,7 @@ namespace Ry
 			vkGetPhysicalDeviceProperties(PhysicalDevice, &DeviceProps);
 
 			Ry::Log->Logf("Found suitable Vulkan device: %s", DeviceProps.deviceName);
+			Ry::Log->Logf("\tminUniformBufferOffsetAlignment: %ld", DeviceProps.limits.minUniformBufferOffsetAlignment);
 
 			return true;
 		}
