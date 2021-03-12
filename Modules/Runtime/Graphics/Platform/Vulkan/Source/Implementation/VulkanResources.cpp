@@ -561,6 +561,9 @@ namespace Ry
 		for (size_t SwapChainImageIndex = 0; SwapChainImageIndex < SwapChain->SwapChainImages.size(); SwapChainImageIndex++)
 		{
 			Ry::ArrayList<VkWriteDescriptorSet> Descriptors;
+			Ry::ArrayList<VkDescriptorBufferInfo> BufferInfos;
+			Ry::ArrayList<VkDescriptorImageInfo> ImageInfos;
+
 			for(const ConstantBuffer* ConstBuffer : Info->ConstantBuffers)
 			{
 				MappedConstantBuffer* Mapped = *MappedConstantBuffers.get(ConstBuffer->Name);
@@ -569,6 +572,7 @@ namespace Ry
 				BufferInfo.buffer = Mapped->VulkanBuffers[SwapChainImageIndex]->GetBufferObject();
 				BufferInfo.offset = 0;
 				BufferInfo.range = Mapped->HostBufferSize;
+				BufferInfos.Add(BufferInfo);
 
 				VkWriteDescriptorSet DescriptorWrite{};
 				DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -577,7 +581,7 @@ namespace Ry
 				DescriptorWrite.dstArrayElement = 0;
 				DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 				DescriptorWrite.descriptorCount = 1;
-				DescriptorWrite.pBufferInfo = &BufferInfo;
+				DescriptorWrite.pBufferInfo = BufferInfos.GetData() + (BufferInfos.GetSize() - 1);
 
 				Descriptors.Add(DescriptorWrite);
 			}
@@ -598,6 +602,8 @@ namespace Ry
 				ImageInfo.imageView = Mapping->Image;
 				ImageInfo.sampler = Mapping->Sampler;
 
+				ImageInfos.Add(ImageInfo);
+
 				VkWriteDescriptorSet DescriptorWrite{};
 				DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				DescriptorWrite.dstSet = DescriptorSets[SwapChainImageIndex];
@@ -605,7 +611,7 @@ namespace Ry
 				DescriptorWrite.dstArrayElement = 0;
 				DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 				DescriptorWrite.descriptorCount = 1;
-				DescriptorWrite.pImageInfo = &ImageInfo;
+				DescriptorWrite.pImageInfo = ImageInfos.GetData() + (ImageInfos.GetSize() - 1);
 
 				Descriptors.Add(DescriptorWrite);
 			}
