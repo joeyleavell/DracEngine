@@ -12,6 +12,8 @@ include_directories(Source/Include)
 
 add_library(RyCommon STATIC ${SOURCES} "Source/Implementation/Common.cpp")
 
+set_property(TARGET RyCommon PROPERTY CXX_STANDARD 17)
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyCommon PRIVATE -lstdc++fs)
 endif()
