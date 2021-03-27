@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\e023baac6a5dc839ba56f9fc075c4480\AttrParsedAttrKinds.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\97f84d1c2bdb097a9f80005780fff07d\ClangAttrParsedAttrKinds.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\clang\include\clang\Sema\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Dependencies\Repos\llvm-project\Build\tools\clang\include\clang\Sema\CMakeFiles\ClangAttrParsedAttrKinds" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{910E9F2D-9F75-3297-BC33-F7AD12D32EAB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

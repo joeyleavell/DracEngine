@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\5db8fc107ceabe6468a65b966e4c0ab2\VCSRevision.h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\bc99d22566a360885174d0c244e2b675\llvm_vcsrevision_h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\llvm\include\llvm\Support\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Dependencies\Repos\llvm-project\Build\include\llvm\Support\CMakeFiles\llvm_vcsrevision_h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{910E9F2D-9F75-3297-BC33-F7AD12D32EAB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

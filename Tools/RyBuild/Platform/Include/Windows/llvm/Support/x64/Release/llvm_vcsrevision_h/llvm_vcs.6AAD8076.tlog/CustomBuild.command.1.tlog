@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\5DB8FC107CEABE6468A65B966E4C0AB2\VCSREVISION.H.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -DNAMES=LLVM -DLLVM_SOURCE_DIR=C:/Dependencies/Repos/llvm-project/llvm -DHEADER_FILE=C:/Dependencies/Repos/llvm-project/Build/include/llvm/Support/VCSRevision.h -P C:/Dependencies/Repos/llvm-project/llvm/cmake/modules/GenerateVersionFromVCS.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\BC99D22566A360885174D0C244E2B675\LLVM_VCSREVISION_H.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\LLVM\INCLUDE\LLVM\SUPPORT\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/include/llvm/Support/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

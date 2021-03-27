@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\75A35EF021FB12662CD251DA9820FD53\CHECKERS.INC.RULE
+setlocal
+..\..\..\..\..\..\Release\bin\clang-tblgen.exe -gen-clang-sa-checkers -I C:/Dependencies/Repos/llvm-project/clang/include/clang/StaticAnalyzer/Checkers -IC:/Dependencies/Repos/llvm-project/clang/include -IC:/Dependencies/Repos/llvm-project/Build/tools/clang/include -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include C:/Dependencies/Repos/llvm-project/clang/include/clang/StaticAnalyzer/Checkers/Checkers.td -o C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/StaticAnalyzer/Checkers/Checkers.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\0C3C010C739757E4EE3378184A741ECD\CLANGSACHECKERS.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\CLANG\INCLUDE\CLANG\STATICANALYZER\CHECKERS\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/StaticAnalyzer/Checkers/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

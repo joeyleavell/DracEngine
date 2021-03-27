@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\75a35ef021fb12662cd251da9820fd53\Checkers.inc.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\Build\CMakeFiles\0c3c010c739757e4ee3378184a741ecd\ClangSACheckers.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Dependencies\Repos\llvm-project\clang\include\clang\StaticAnalyzer\Checkers\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Dependencies\Repos\llvm-project\Build\tools\clang\include\clang\StaticAnalyzer\Checkers\CMakeFiles\ClangSACheckers" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{910E9F2D-9F75-3297-BC33-F7AD12D32EAB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

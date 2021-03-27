@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\5AAD925FA674B63AAD57930BF14CACEE\NODECLASSES.INC.RULE
+setlocal
+..\..\..\..\..\..\Release\bin\clang-tblgen.exe -gen-clang-syntax-node-classes -I C:/Dependencies/Repos/llvm-project/clang/include/clang/Tooling/Syntax -IC:/Dependencies/Repos/llvm-project/clang/include -IC:/Dependencies/Repos/llvm-project/Build/tools/clang/include -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include C:/Dependencies/Repos/llvm-project/clang/include/clang/Tooling/Syntax/Nodes.td -o C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Tooling/Syntax/NodeClasses.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\548C79D7E9FF81DA20F284760B48C82D\CLANGSYNTAXNODECLASSES.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\CLANG\INCLUDE\CLANG\TOOLING\SYNTAX\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Tooling/Syntax/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

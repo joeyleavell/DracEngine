@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\A16AC5165438B496F14D315FB2C3A69F\ABSTRACTBASICREADER.INC.RULE
+setlocal
+..\..\..\..\..\Release\bin\clang-tblgen.exe -gen-clang-basic-reader -I C:/Dependencies/Repos/llvm-project/clang/include/clang/AST -IC:/Dependencies/Repos/llvm-project/clang/include -IC:/Dependencies/Repos/llvm-project/Build/tools/clang/include -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include C:/Dependencies/Repos/llvm-project/clang/include/clang/AST/PropertiesBase.td -o C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/AST/AbstractBasicReader.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\FD6212C4643060496C923EA588D00618\CLANGABSTRACTBASICREADER.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\CLANG\INCLUDE\CLANG\AST\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/AST/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

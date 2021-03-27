@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\8FE6BE68AC21AAB34C64BE99E655AF54\DIAGNOSTICFRONTENDKINDS.INC.RULE
+setlocal
+..\..\..\..\..\Release\bin\clang-tblgen.exe -gen-clang-diags-defs -clang-component=Frontend -I C:/Dependencies/Repos/llvm-project/clang/include/clang/Basic -IC:/Dependencies/Repos/llvm-project/clang/include -IC:/Dependencies/Repos/llvm-project/Build/tools/clang/include -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include C:/Dependencies/Repos/llvm-project/clang/include/clang/Basic/Diagnostic.td -o C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Basic/DiagnosticFrontendKinds.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\EA5CC239AEF8DE1798E86423F4AEE61F\CLANGDIAGNOSTICFRONTEND.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\CLANG\INCLUDE\CLANG\BASIC\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Basic/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

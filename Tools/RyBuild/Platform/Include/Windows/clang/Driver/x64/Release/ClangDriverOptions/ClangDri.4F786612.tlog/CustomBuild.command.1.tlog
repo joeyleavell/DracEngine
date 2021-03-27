@@ -1,0 +1,28 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\72A5825611ACA5F137FF6FCB82A04B7A\OPTIONS.INC.RULE
+setlocal
+..\..\..\..\..\Release\bin\llvm-tblgen.exe -gen-opt-parser-defs -I C:/Dependencies/Repos/llvm-project/clang/include/clang/Driver -IC:/Dependencies/Repos/llvm-project/clang/include -IC:/Dependencies/Repos/llvm-project/Build/tools/clang/include -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/clang/include/clang/Driver/Options.td -o C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Driver/Options.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\ED4A64F8D7119442C39613BE16F4A4A1\CLANGDRIVEROPTIONS.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\CLANG\INCLUDE\CLANG\DRIVER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/tools/clang/include/clang/Driver/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

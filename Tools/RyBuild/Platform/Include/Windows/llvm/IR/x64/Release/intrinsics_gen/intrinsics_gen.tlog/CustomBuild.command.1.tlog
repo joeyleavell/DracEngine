@@ -1,0 +1,198 @@
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\ATTRIBUTES.INC.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-attrs -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Attributes.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/Attributes.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICIMPL.INC.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-impl -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicImpl.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICENUMS.INC.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicEnums.inc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSAARCH64.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=aarch64 -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsAArch64.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSAMDGPU.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=amdgcn -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsAMDGPU.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSARM.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=arm -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsARM.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSBPF.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=bpf -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsBPF.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSHEXAGON.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=hexagon -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsHexagon.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSMIPS.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=mips -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsMips.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSNVPTX.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=nvvm -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsNVPTX.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSPOWERPC.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=ppc -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsPowerPC.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSR600.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=r600 -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsR600.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSRISCV.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=riscv -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsRISCV.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSS390.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=s390 -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsS390.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSWEBASSEMBLY.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=wasm -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsWebAssembly.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSX86.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=x86 -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsX86.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSXCORE.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=xcore -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsXCore.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\1A0C2E1C8E06E64A0B76A397839EF207\INTRINSICSVE.H.RULE
+setlocal
+..\..\..\Release\bin\llvm-tblgen.exe -gen-intrinsic-enums -intrinsic-prefix=ve -I C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR -IC:/Dependencies/Repos/llvm-project/Build/include -IC:/Dependencies/Repos/llvm-project/llvm/include --long-string-literals=0 C:/Dependencies/Repos/llvm-project/llvm/include/llvm/IR/Intrinsics.td -o C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/IntrinsicsVE.h
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\BUILD\CMAKEFILES\E24DEED5F9EF8E30039F73386D8AD846\INTRINSICS_GEN.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\DEPENDENCIES\REPOS\LLVM-PROJECT\LLVM\INCLUDE\LLVM\IR\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Dependencies/Repos/llvm-project/llvm -BC:/Dependencies/Repos/llvm-project/Build --check-stamp-file C:/Dependencies/Repos/llvm-project/Build/include/llvm/IR/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
