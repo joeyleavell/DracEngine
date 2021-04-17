@@ -1,7 +1,7 @@
 #include "Factory/AudioFactory.h"
-// #include "FMod/fmod.hpp"
-// #include "FMod/fmod_errors.h"
-// #include "Audio/Audio.h"
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#include "Audio.h"
 #include "AudioAsset.h"
 
 namespace Ry
@@ -9,13 +9,13 @@ namespace Ry
 
 	void AudioFactory::LoadAssets(const Ry::AssetRef& Reference, std::vector<Asset*>& AssetDst)
 	{
-		/*FMOD::Sound* InternalAsset;
+		FMOD::Sound* InternalAsset;
 		FmodSystem->createSound(*Reference.GetAbsolute(), FMOD_DEFAULT, nullptr, &InternalAsset);
 
 		AudioAsset* Result = new AudioAsset;
 		Result->SetSound(InternalAsset);
 
-		AssetDst.push_back(Result);*/
+		AssetDst.push_back(Result);
 	}
 
 }
