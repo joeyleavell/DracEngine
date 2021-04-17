@@ -6,12 +6,17 @@
 //#include "Input/Input.h"
 //#include "Rendering/Interface/Rendering.h"
 //#include "Asset/Manager/IAssetManager.h"
-#include "Globals.gen.h"
 
 class TestReflectedClass
 {
-
+public:
+	
+	Field()
+	int TestProp;
+	
 } Class();
+
+#include "Globals.gen.h"
 
 namespace Ry
 {

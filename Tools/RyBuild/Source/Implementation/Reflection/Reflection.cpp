@@ -40,7 +40,7 @@ namespace Ry
 			GeneratedSource << "{" << std::endl;
 			{
 				GeneratedSource << "\ttemplate<>" << std::endl;
-				GeneratedSource << "\tconst Ry::ReflectedClass*" << std::endl;
+				GeneratedSource << "\tinline const Ry::ReflectedClass*" << std::endl;
 				GeneratedSource << "\tGetClassImpl(Ry::ClassTag<class " << Record.Name << ">)" << std::endl;
 				GeneratedSource << "\t{" << std::endl;
 				{
@@ -57,7 +57,7 @@ namespace Ry
 					for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
 					{
 						const FieldDecl* Decl = Record.Fields[FieldIndex];
-						std::string FieldType = Decl->getType()->getTypeClassName();
+						std::string FieldType = Decl->getType().getAsString();
 						std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
 
 						GeneratedSource << "\t\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();" << std::endl;

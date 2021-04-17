@@ -113,10 +113,13 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 
 			Filesystem::path FullGeneratedPath = Filesystem::path(GeneratedDirectory) / HeaderName;
 
-			std::ofstream Tap;
-			Tap.open(FullGeneratedPath.string());
-			Tap << "#include \"Core/Reflection.h\"" << std::endl;
-			Tap.close();
+			if(!Filesystem::exists(FullGeneratedPath))
+			{
+				std::ofstream Tap;
+				Tap.open(FullGeneratedPath.string());
+				Tap << "#include \"Core/Reflection.h\"" << std::endl;
+				Tap.close();
+			}
 		}
 	}	
 
