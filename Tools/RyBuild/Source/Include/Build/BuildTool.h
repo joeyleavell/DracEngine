@@ -36,7 +36,7 @@ public:
 		
 	}
 
-	virtual void CreateGeneratedModuleSource(Module& TheModule);
+	virtual bool CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory);
 	
 	/**
 	 * Instructs the build tool to compile a single source file.

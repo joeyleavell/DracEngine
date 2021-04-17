@@ -5,10 +5,16 @@
 #include "CoreGen.h"
 
 #define REFLECT_PRIMITIVE(Name)template<> \
-inline DataType CORE_MODULE GetType<Name>() { return DataType{ #Name, sizeof(Name) }; };
+inline DataType CORE_MODULE GetTypeImpl<Name>(TypeTag<Name>) { return DataType{ #Name, sizeof(Name) }; };
 
 namespace Ry
 {
+
+	template<typename T>
+	struct TypeTag {};
+
+	template<typename T>
+	struct ClassTag {};
 
 	class DataType
 	{
@@ -32,13 +38,12 @@ namespace Ry
 	class Field
 	{
 	public:
-		DataType* Type;
+		DataType Type;
 		Ry::String Name;
 		uint64 Offset;
 
 		Field()
 		{
-			Type = nullptr;
 			Name = "";
 			Offset = 0;
 		}
@@ -62,13 +67,26 @@ namespace Ry
 	{
 	public:
 
+		Ry::String Name;
+
 		Ry::ArrayList<Ry::Field> Fields;
 		Ry::ArrayList<Ry::Function> Functions;
 
 	};
 
 	template<typename T>
-	DataType GetType() { return DataType{ "none", 0 }; };
+	DataType GetTypeImpl(TypeTag<T>)
+	{
+		return DataType{ "none", 0 };
+	}
+
+	// Create GetTypeImpl for arrays lists, maps, sets, etc.
+	
+	template<typename T>
+	DataType GetType()
+	{
+		return GetTypeImpl(TypeTag<T>{});
+	};
 
 	REFLECT_PRIMITIVE(uint8)
 	REFLECT_PRIMITIVE(uint16)

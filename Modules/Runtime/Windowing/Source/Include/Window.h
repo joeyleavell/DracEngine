@@ -64,8 +64,6 @@ namespace Ry
 		void AddMouseButtonDelegate(const Ry::Delegate<void, int32, bool>& Delegate);
 		void AddScrollDelegate(const Ry::Delegate<void, double, double>& Delegate);
 
-		static Ry::Map<::GLFWwindow*, Window*> Windows;
-
 	private:
 
 		bool bFramebufferResized = false;
@@ -104,6 +102,5 @@ namespace Ry
 		static void ScrollCallback(::GLFWwindow* Window, double XOff, double YOff);
 		static void CharacterEntryCallback(::GLFWwindow* Window, unsigned int Codepoint);		
 	};
-
 	
 }

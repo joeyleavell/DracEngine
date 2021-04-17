@@ -432,7 +432,6 @@ void PrintManPages()
 
 int main(int ArgCount, char** ArgValues)
 {
-	Ry::Test();
 	
 	if (ArgCount < 2)
 	{

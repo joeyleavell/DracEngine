@@ -43,7 +43,7 @@ namespace Ry
 				CurrentIndex++;
 			}
 
-			bool operator==(const typename ArrayList<T>::Iterator& Other) const
+			bool operator==(const typename ArrayList<T>::ConstIterator& Other) const
 			{
 				return CurrentIndex == Other.GetIndex();
 			}
@@ -292,31 +292,31 @@ namespace Ry
 			return ArrayList<T>::Iterator(*this, Size);
 		}
 
-	private:
-
 		void Resize(int32 NewSize)
 		{
 			// Allocate with new size
 			T* NewArray = new T[NewSize];
 
 			// Copy old values into the new array
-			for(int32 Index = 0; Index < Size && Index < NewSize; Index++)
+			for (int32 Index = 0; Index < Size && Index < NewSize; Index++)
 			{
 				NewArray[Index] = Data[Index];
 			}
 
 			// Account for shrinking elements out of existence
-			if(NewSize < Size)
+			if (NewSize < Size)
 			{
 				Size = NewSize;
 			}
-			
+
 			delete[] Data;
 
 			// Reassign to new array
 			this->Data = NewArray;
 			this->AllocatedSize = NewSize;
 		}
+
+	private:
 
 		/**
 		 * How many elements we actually allocated

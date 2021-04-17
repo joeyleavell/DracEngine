@@ -52,7 +52,7 @@ namespace Ry
 	/**
 	 * All supported rendering platforms.
 	 */
-	enum class CORE_MODULE RenderingPlatform
+	enum class RenderingPlatform
 	{
 		OpenGL,
 		Vulkan

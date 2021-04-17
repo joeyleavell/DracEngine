@@ -1,11 +1,11 @@
 #include "Core/String.h"
-#include "Algorithm/Algorithm.h"
 #include <string>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include "Core/Assert.h"
 
 namespace Ry
 {
@@ -672,25 +672,6 @@ namespace Ry
 	Ry::StringView String::Trim()
 	{
 		return TrimString(data, size);
-	}
-
-	// Specialize hash function for string
-	template <>
-	CORE_MODULE uint32 Hash<Ry::String>(const Ry::String& Object)
-	{
-		const int32 p = 31;
-		const int32 m = (uint32)1e9 + 9;
-		uint32 hash_value = 0;
-		uint32 p_pow = 1;
-
-		for (uint32 Character = 0; Character < Object.getSize(); Character++)
-		{
-			char c = Object[Character];
-			hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
-			p_pow = (p_pow * p) % m;
-		}
-
-		return hash_value;
 	}
 
 	String CreateFormatted(Ry::String Format, va_list ArgsList)

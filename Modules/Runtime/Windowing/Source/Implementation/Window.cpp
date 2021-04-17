@@ -24,7 +24,7 @@ namespace Ry
 		return reinterpret_cast<uint64>(Object);
 	}
 	
-	Ry::Map<::GLFWwindow*, Window*> Window::Windows;
+	static Ry::Map<::GLFWwindow*, Window*> Windows;
 
 	bool InitWindowing()
 	{

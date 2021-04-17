@@ -13,8 +13,9 @@
 #include "Util/Util.h"
 #include "Build/MSVCBuildTool.h"
 #include "Build/GCCBuildTool.h"
+#include "Reflection/Reflection.h"
 
-void AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule)
+bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
 {
 	constexpr int BUFFER_SIZE = 1024 * 5;
 	char GeneratedCodeBuffer[BUFFER_SIZE];
@@ -69,6 +70,83 @@ void AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule)
 	ModuleSourceOut << GeneratedCodeBuffer << std::endl;
 
 	ModuleSourceOut.close();
+
+	// Now generate reflection data for each class
+
+	// Determine includes for module
+	// TODO: since all of the compilers use this, should probably separate it into a function
+	std::vector<std::string> ModuleIncludes;
+	{
+		//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), TheModule.GetIncludeDir()).string());
+		ModuleIncludes.push_back(TheModule.GetIncludeDir());
+		ModuleIncludes.push_back(TheModule.GetGeneratedDir());
+
+		for (ExternDependency& ExternDep : TheModule.ExternDependencies)
+		{
+			//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ExternDep.GetIncludePath()).string());
+			ModuleIncludes.push_back(ExternDep.GetIncludePath());
+		}
+		for (std::string& ModuleDep : TheModule.ModuleDependencies)
+		{
+			Module* ModDep = Modules.at(ModuleDep);
+
+			if (ModDep)
+			{
+				//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ModDep->GetIncludeDir()).string());
+				ModuleIncludes.push_back(ModDep->GetIncludeDir());
+				ModuleIncludes.push_back(ModDep->GetGeneratedDir());
+			}
+		}
+	}
+
+	std::vector<std::string> SourcesNeedingGeneration;
+	FindOutOfDateSourceFiles(TheModule, ObjectDirectory, SourcesNeedingGeneration);
+
+	// Generate reflection data for source files
+	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
+	//Filesystem::recursive_directory_iterator HeaderItr(TheModule.GetSourceDir());
+	for (std::string Path : SourcesNeedingGeneration)
+	{
+		Filesystem::path SourcePath = Path;
+
+		if (Filesystem::is_directory(Path) || SourcePath.extension() != ".cpp")
+		{
+			continue;
+		}
+
+		std::string HeaderName = SourcePath.stem().string() + ".gen.h";
+		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+
+		// Generate the source code
+		std::ofstream OutputGenerated(GenPath.string());
+		{
+			// Load the header source
+			// std::string InputFile;
+			// std::ifstream Input(Path.path().string());
+			// std::string Line;
+			//
+			// while (std::getline(Input, Line))
+			// {
+			// 	InputFile += Line + "\n";
+			// }
+
+			std::string GeneratedSource;
+			if(!Ry::GenerateReflectionCode(SourcePath.string(), ModuleIncludes, GeneratedSource))
+			{
+				return false;
+			}
+
+			// Append an include for the base module generated file
+			GeneratedSource = "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n" + GeneratedSource;
+
+			// TODO: include base generated module include as well
+			OutputGenerated << GeneratedSource;
+		}
+		OutputGenerated.close();
+
+	}
+
+	return true;
 }
 
 void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles)
@@ -248,7 +326,7 @@ bool AbstractBuildTool::CompileModule(Module& TheModule, std::string OutputDirec
 		std::cerr << "Module failed: must have at least one CPP file" << std::endl;
 		return false;
 	}
-	
+
 	// std::string ModuleBinaryDir = GetModuleBinaryDir(TheModule);
 	// std::string ModuleObjectDir = GetModuleObjectDir(TheModule);
 	// std::string ModuleLibraryDir = GetModuleLibraryDir(TheModule);
@@ -322,6 +400,7 @@ bool AbstractBuildTool::CompileModule(Module& TheModule, std::string OutputDirec
 					bool bPrintErr = ErrorBuff.find("warn") != std::string::npos || ErrorBuff.find("err") != std::string::npos;
 					OutWriteLock.lock();
 					{
+						
 						// Print out a message showing the file index being compiled and the file name
 						std::cout << "\t[" << (*CompletionIndex + 1) << " of " << SourcesNeedingBuild->size() << "] " << SourcePath.filename().string();
 						(*CompletionIndex)++;
@@ -383,14 +462,12 @@ bool AbstractBuildTool::BuildModule(std::string ModuleName)
 	{
 		// Mark this module as visited so we don't act on it again
 		TheModule.bVisisted = true;
-
-		// Generate module source code
-		CreateGeneratedModuleSource(TheModule);
 	}
 
 	std::string ModuleBinaryDir = GetModuleBinaryDir(TheModule);
 	std::string ModuleObjectDir = GetModuleObjectDir(TheModule);
 	std::string ModuleLibraryDir = GetModuleLibraryDir(TheModule);
+
 
 	// We need to rebuild this module regardless if one of the dependencies was built due to needing updated linkage
 	bool bNeedsBuildDueToChild = false;
@@ -726,12 +803,20 @@ bool AbstractBuildTool::BuildAllStandalone()
 
 	bool bBuiltSuccessfully = true;
 
+	for (auto& Mod : Modules)
+	{
+		// Create generated source for each module
+		if(!CreateGeneratedModuleSource(*Mod.second, StandaloneObjectDir))
+		{
+			std::cerr << "Failed to generate source for module " << Mod.first << std::endl;
+			return false;
+		}
+	}
+
 	// Compile all modules. Order doesn't matter here since they're all being linked together inevitably.
 	// Discover source for all of the modules
 	for (auto& Mod : Modules)
 	{
-		// Generate module source code while we're at it
-		CreateGeneratedModuleSource(*Mod.second);
 
 		bool bNeedsLink; // We can ignore this as we're always going to build the executable
 		if (!CompileModule(*Mod.second, StandaloneObjectDir, bNeedsLink))
@@ -767,6 +852,16 @@ bool AbstractBuildTool::BuildAllModular(std::vector<std::string>& ModulesFailed)
 
 	if(Modules.size() > 0)
 	{
+		// Generate module source
+		for (auto& Mod : Modules)
+		{
+			if(!CreateGeneratedModuleSource(*Mod.second, GetModuleObjectDir(*Mod.second)))
+			{
+				std::cerr << "Failed to generate source for module " << Mod.first << std::endl;
+				return false;
+			}
+		}
+		
 		for (auto& Mod : Modules)
 		{
 			// Build the module by name (first in the pair)

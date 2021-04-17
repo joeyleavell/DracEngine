@@ -567,7 +567,7 @@ namespace Ry
 		CreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 		QueueFamilies& Indices = GVulkanContext->GetQueueIndices();
-		uint32_t QueueFamilyIndices[] = { Indices.GraphicsFamily, Indices.PresentFamily };
+		uint32_t QueueFamilyIndices[] = { (uint32) Indices.GraphicsFamily, (uint32) Indices.PresentFamily };
 
 		// If our queues are not the same, make the sharing mode concurrent
 		if (Indices.GraphicsFamily != Indices.PresentFamily)
