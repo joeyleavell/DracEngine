@@ -99,23 +99,50 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 		}
 	}
 
+	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
+
+	// Pre create all .gen.h files in case they don't exist so pre build doesn't fail
+	{
+		std::vector<std::string> AllSource;
+		TheModule.DiscoverSource(AllSource, false);
+
+		for(std::string& SourceFile : AllSource)
+		{
+			Filesystem::path AsPath = SourceFile;
+			std::string HeaderName = AsPath.stem().string() + ".gen.h";
+
+			Filesystem::path FullGeneratedPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+
+			std::ofstream Tap;
+			Tap.open(FullGeneratedPath.string());
+			Tap << "#include \"Core/Reflection.h\"" << std::endl;
+			Tap.close();
+		}
+	}	
+
 	std::vector<std::string> SourcesNeedingGeneration;
 	FindOutOfDateSourceFiles(TheModule, ObjectDirectory, SourcesNeedingGeneration);
 
 	// Generate reflection data for source files
-	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
 	//Filesystem::recursive_directory_iterator HeaderItr(TheModule.GetSourceDir());
 	for (std::string Path : SourcesNeedingGeneration)
 	{
 		Filesystem::path SourcePath = Path;
 
-		if (Filesystem::is_directory(Path) || SourcePath.extension() != ".cpp")
-		{
-			continue;
-		}
 
 		std::string HeaderName = SourcePath.stem().string() + ".gen.h";
 		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+
+		if (Filesystem::exists(GenPath))
+		{
+			std::error_code Error;
+			Filesystem::remove(GenPath, Error);
+
+			if (Error != std::error_code())
+			{
+				std::cerr << "Failed to delete generated header: " << GenPath.string() << std::endl;
+			}
+		}
 
 		// Generate the source code
 		std::ofstream OutputGenerated(GenPath.string());
@@ -130,6 +157,8 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 			// 	InputFile += Line + "\n";
 			// }
 
+			// If current generated exists, delete it otherwise we'll fail trying to generate it
+			
 			std::string GeneratedSource;
 			if(!Ry::GenerateReflectionCode(SourcePath.string(), ModuleIncludes, GeneratedSource))
 			{
@@ -852,14 +881,33 @@ bool AbstractBuildTool::BuildAllModular(std::vector<std::string>& ModulesFailed)
 
 	if(Modules.size() > 0)
 	{
-		// Generate module source
-		for (auto& Mod : Modules)
+
+		// Top sort all modules and generate the reflection data in order
+		std::vector<std::string> AllModules;
+		std::vector<std::string> ModulesTopSorted;
+
+		auto ModulesItr = Modules.begin();
+		while(ModulesItr != Modules.end())
 		{
-			if(!CreateGeneratedModuleSource(*Mod.second, GetModuleObjectDir(*Mod.second)))
+			AllModules.push_back(ModulesItr->first);
+			++ModulesItr;
+		}
+
+		TopSort(AllModules, Modules, ModulesTopSorted);
+
+		
+		// Generate module source
+		for(int ModIndex = ModulesTopSorted.size() - 1; ModIndex >= 0; ModIndex--)
+		{
+			std::string& ModuleName = ModulesTopSorted[ModIndex];
+			Module* Mod = Modules[ModuleName];
+			
+			if (!CreateGeneratedModuleSource(*Mod, GetModuleObjectDir(*Mod)))
 			{
-				std::cerr << "Failed to generate source for module " << Mod.first << std::endl;
+				std::cerr << "Failed to generate source for module " << ModuleName << std::endl;
 				return false;
 			}
+
 		}
 		
 		for (auto& Mod : Modules)
@@ -1134,12 +1182,25 @@ bool BuildCmd(std::vector<std::string>& Args)
 
 bool CleanAll(std::string RootDir)
 {
+
 	Filesystem::path ModulesRootParent = Filesystem::absolute(Filesystem::path(RootDir)).parent_path();
 	std::string BinaryDir = Filesystem::absolute(ModulesRootParent / "Binary").string();
 	std::string LibsDir = Filesystem::absolute(ModulesRootParent / "Intermediate" / "Libraries").string();
 	std::string ObjectFilesDir = Filesystem::absolute(ModulesRootParent / "Intermediate" / "Object").string();
 
 	std::error_code FileError;
+
+	// Delete module generated directories
+	std::vector<Module*> DiscoveredModules;
+	DiscoverModules(ModulesRootParent, DiscoveredModules);
+
+	// Clean data put in module folders
+	// Todo: move this out of module sub directory
+	for(const Module* FoundModule : DiscoveredModules)
+	{
+		std::string IntermediatePath = FoundModule->GetGeneratedDir();
+		Filesystem::remove_all(IntermediatePath);
+	}
 
 	Filesystem::remove_all(BinaryDir, FileError);
 

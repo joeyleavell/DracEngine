@@ -6,7 +6,12 @@
 //#include "Input/Input.h"
 //#include "Rendering/Interface/Rendering.h"
 //#include "Asset/Manager/IAssetManager.h"
-#include "CoreGen.h"
+#include "Globals.gen.h"
+
+class TestReflectedClass
+{
+
+} Class();
 
 namespace Ry
 {
@@ -17,6 +22,7 @@ namespace Ry
 	class InputHandler;
 	class RenderAPI2;
 	enum class RenderingPlatform;
+
 	
 	extern Ry::String ResourcesDirectory;
 

@@ -362,6 +362,47 @@ bool LoadPythonStringList(std::vector<std::string>& Out, PyObject* List, std::st
 	return true;
 }
 
+Module* DiscoverModule(Filesystem::path Path)
+{
+	if (!Filesystem::exists(Path))
+	{
+		std::cerr << "No python module build file at " << Path.string() << std::endl;
+		return nullptr;
+	}
+
+	Module* NewModule = new Module;
+	NewModule->Name = Path.stem().string();
+	NewModule->RootDir = Filesystem::absolute(Path.parent_path()).string();
+	NewModule->ModuleFilePath = Filesystem::canonical(Path).string();
+
+	// Check if this module is an engine module.
+	// Differentiating engine modules from other modules is useful for splitting up binaries, intermediates, etc
+	std::string EngineModulePath = GetEngineModulesDir();
+	if (Filesystem::exists(EngineModulePath) && Filesystem::canonical(Path).string().find(Filesystem::canonical(EngineModulePath).string()) == 0)
+	{
+		NewModule->bEngineModule = true;
+	}
+
+	// Cut off the .build part
+	int FirstDot = NewModule->Name.find_first_of('.');
+	if (FirstDot != std::string::npos)
+	{
+		NewModule->Name = NewModule->Name.substr(0, FirstDot);
+	}
+
+	std::vector<std::string> ExternDeps;
+
+	// Create external dependencies
+	for (const std::string& ExternDep : ExternDeps)
+	{
+		ExternDependency NewDep;
+		NewDep.Name = ExternDep;
+		NewModule->ExternDependencies.push_back(NewDep);
+	}
+
+	return NewModule;
+}
+
 Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 {
 	if (!Filesystem::exists(Path))
@@ -550,6 +591,52 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	Py_Finalize();
 
 	return NewModule;
+}
+
+void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
+{
+	Filesystem::path FoundModuleFile;
+	Filesystem::directory_iterator NewDirectoryItr(RootDir);
+
+	for (Filesystem::path File : NewDirectoryItr)
+	{
+		if (File.extension() == ".py" && File.stem().string().find(".build") != std::string::npos)
+		{
+			// Do not recurse any further 
+			FoundModuleFile = File;
+			break;
+		}
+
+	}
+
+	if (!FoundModuleFile.empty())
+	{
+		Module* NewModule = nullptr;
+
+		NewModule = DiscoverModule(FoundModuleFile);
+
+		if (NewModule)
+		{
+			OutModules.push_back(NewModule);
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		// Recurse into each directory to try and find a module definition
+		Filesystem::directory_iterator NewDirectoryItr(RootDir);
+		for (Filesystem::path File : NewDirectoryItr)
+		{
+			// Only go into directories
+			if (Filesystem::is_directory(File))
+			{
+				DiscoverModules(Filesystem::absolute(File), OutModules);
+			}
+		}
+	}
 }
 
 void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings)

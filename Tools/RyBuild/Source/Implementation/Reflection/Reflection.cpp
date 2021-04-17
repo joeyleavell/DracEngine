@@ -36,44 +36,48 @@ namespace Ry
 
 		void GenerateReflectedRecord(const ReflectedRecord& Record)
 		{
-
-			GeneratedSource << "template<>" << std::endl;
-			GeneratedSource << "const Class*" << std::endl;
-			GeneratedSource << "GetClassImpl(ClassTag<" << Record.Name << ">)" << std::endl;
+			GeneratedSource << "namespace Ry" << std::endl;
 			GeneratedSource << "{" << std::endl;
 			{
-				// Declare class
-				GeneratedSource << "static Class C;" << std::endl;
-
-				// Reflected class name
-				GeneratedSource << "C.Name = \"" << Record.Name << "\";" << std::endl;
-
-				// Resize fields member
-				GeneratedSource << "C.Fields.Resize(" << Record.Fields.size() << ");" << std::endl;
-
-				// Reflect all fields
-				for(int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
+				GeneratedSource << "\ttemplate<>" << std::endl;
+				GeneratedSource << "\tconst Ry::ReflectedClass*" << std::endl;
+				GeneratedSource << "\tGetClassImpl(Ry::ClassTag<class " << Record.Name << ">)" << std::endl;
+				GeneratedSource << "\t{" << std::endl;
 				{
-					const FieldDecl* Decl = Record.Fields[FieldIndex];
-					std::string FieldType = Decl->getType()->getTypeClassName();
-					std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
-					
-					GeneratedSource << FieldsVar << ".Type = GetType<" << FieldType << ">();" << std::endl;
-					GeneratedSource << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";" << std::endl;
-					GeneratedSource << FieldsVar << ".Offset = offsetof(" << Record.Name << ", " << Decl->getNameAsString() << ");" << std::endl;					
+					// Declare class
+					GeneratedSource << "\t\tstatic Ry::ReflectedClass C;" << std::endl;
+
+					// Reflected class name
+					GeneratedSource << "\t\tC.Name = \"" << Record.Name << "\";" << std::endl;
+
+					// Resize fields member
+					GeneratedSource << "\t\tC.Fields.Resize(" << Record.Fields.size() << ");" << std::endl;
+
+					// Reflect all fields
+					for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
+					{
+						const FieldDecl* Decl = Record.Fields[FieldIndex];
+						std::string FieldType = Decl->getType()->getTypeClassName();
+						std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
+
+						GeneratedSource << "\t\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();" << std::endl;
+						GeneratedSource << "\t\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";" << std::endl;
+						GeneratedSource << "\t\t" << FieldsVar << ".Offset = offsetof(" << Record.Name << ", " << Decl->getNameAsString() << ");" << std::endl;
+					}
+
+					GeneratedSource << "\t\treturn &C;" << std::endl;
+
 				}
+				GeneratedSource << "\t}" << std::endl << std::endl;
 			}
-			GeneratedSource << "}" << std::endl << std::endl;
+			GeneratedSource << "}" << std::endl;
+
+
 		}
 		
 		virtual void run(const MatchFinder::MatchResult& Result)
 		{
 			const Decl* Declaration = Result.Nodes.getNodeAs<clang::Decl>("id");
-
-			// Records (structs/unions/classes)
-			const CXXRecordDecl* AsRecord = dynamic_cast<const CXXRecordDecl*>(Declaration);
-			const FieldDecl* AsField = dynamic_cast<const FieldDecl*>(Declaration);
-			const FunctionDecl* AsFunction = dynamic_cast<const FunctionDecl*>(Declaration);
 
 			bool bReflectDecl = false;
 
@@ -90,7 +94,7 @@ namespace Ry
 					{
 						AnnotateAttr* AnnotationAttrib = static_cast<AnnotateAttr*>(Attrib);
 
-						if(AnnotationAttrib->getAnnotation().str() == "reflect")
+						if(AnnotationAttrib->getAnnotation().str() == "Reflect")
 						{
 							bReflectDecl = true;
 						}
@@ -103,8 +107,16 @@ namespace Ry
 
 			if(bReflectDecl)
 			{
-				if (AsRecord)
+				bool bIsRecord = Declaration->getKind() == Decl::CXXRecord;
+				bool bIsFunction = Declaration->getKind() == Decl::Function;
+				bool bIsField = Declaration->getKind() == Decl::Field;
+
+				if (bIsRecord)
 				{
+					const CXXRecordDecl* AsRecord = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("id");
+
+					//const CXXRecordDecl* AsRecord = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("id");
+
 					// Start new record
 					ReflectedRecord NewRecord;
 					NewRecord.Name = AsRecord->getNameAsString();
@@ -112,7 +124,7 @@ namespace Ry
 					ReflectedRecords.push_back(NewRecord);
 				}
 
-				if(!AsFunction && !AsField)
+				if(!bIsFunction && !bIsField)
 				{
 					std::cerr << "Unexpected reflection declaration " << Declaration->getDeclKindName() << std::endl;
 					return;
@@ -122,22 +134,30 @@ namespace Ry
 				{
 					ReflectedRecord& CurRecord = ReflectedRecords[ReflectedRecords.size() - 1];
 
-					if (AsField)
+					if (bIsField)
 					{
+						const FieldDecl* AsField = Result.Nodes.getNodeAs<clang::FieldDecl>("id");
+
 						CurRecord.Fields.push_back(AsField);
 					}
-					else if (AsFunction)
+					else if (bIsFunction)
 					{
+						const FunctionDecl* AsFunction = Result.Nodes.getNodeAs<clang::FunctionDecl>("id");
+
 						CurRecord.Functions.push_back(AsFunction);
 					}
 					
 				}
-				else if(AsFunction)
+				else if(bIsFunction)
 				{
+					const FunctionDecl* AsFunction = Result.Nodes.getNodeAs<clang::FunctionDecl>("id");
+
 					std::cerr << "Unexpected function before record " << AsFunction->getNameAsString() << std::endl;
 				}
-				else if(AsField)
+				else if(bIsField)
 				{
+					const FieldDecl* AsField = Result.Nodes.getNodeAs<clang::FieldDecl>("id");
+
 					std::cerr << "Unexpected field before record " << AsField->getNameAsString() << std::endl;
 				}
 
@@ -153,7 +173,7 @@ namespace Ry
 		virtual void onEndOfTranslationUnit()
 		{
 			// Generate reflection source
-			GeneratedSource << "#include \"Reflection/Reflection.h\"" << std::endl;
+			GeneratedSource << "#include \"Core/Reflection.h\"" << std::endl;
 			
 			for(const ReflectedRecord& Rec : ReflectedRecords)
 			{

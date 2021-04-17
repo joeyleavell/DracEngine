@@ -35,42 +35,42 @@ namespace Ry
 		}
 	};
 
-	class Field
+	class ReflectedField
 	{
 	public:
 		DataType Type;
 		Ry::String Name;
 		uint64 Offset;
 
-		Field()
+		ReflectedField()
 		{
 			Name = "";
 			Offset = 0;
 		}
 	};
 
-	class Function
+	class ReflectedFunction
 	{
 	public:
 
-		Field RetVal;
-		Ry::ArrayList<Field> Parameters;
+		ReflectedField RetVal;
+		Ry::ArrayList<ReflectedField> Parameters;
 
-		Function()
+		ReflectedFunction()
 		{
 			
 		}
 		
 	};
 
-	class Class
+	class ReflectedClass
 	{
 	public:
 
 		Ry::String Name;
 
-		Ry::ArrayList<Ry::Field> Fields;
-		Ry::ArrayList<Ry::Function> Functions;
+		Ry::ArrayList<Ry::ReflectedField> Fields;
+		Ry::ArrayList<Ry::ReflectedFunction> Functions;
 
 	};
 
@@ -86,6 +86,20 @@ namespace Ry
 	DataType GetType()
 	{
 		return GetTypeImpl(TypeTag<T>{});
+	};
+
+	template<typename T>
+	const ReflectedClass* GetClassImpl(ClassTag<T>)
+	{
+		return nullptr;
+	}
+
+	// Create GetTypeImpl for arrays lists, maps, sets, etc.
+
+	template<typename T>
+	const ReflectedClass* GetClass()
+	{
+		return GetClassImpl(ClassTag<T>{});
 	};
 
 	REFLECT_PRIMITIVE(uint8)

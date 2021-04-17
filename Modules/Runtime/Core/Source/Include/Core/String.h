@@ -4,12 +4,12 @@
 #include "Core/Platform.h"
 #include <cstring>
 #include <cstdarg>
-#include "CoreGen.h"
 
 #define PRINTF_BUFFER_SIZE (5*1024)
 
 namespace Ry
 {
+	
 	class CORE_MODULE StringView;
 
 	void StringCopy(char* Dst, const char* Src, uint64 DstSize);
