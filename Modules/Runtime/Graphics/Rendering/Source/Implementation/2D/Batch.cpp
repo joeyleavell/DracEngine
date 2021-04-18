@@ -11,6 +11,11 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include "Interface2/Pipeline.h"
+#include "SwapChain.h"
+#include "Interface2/RenderAPI.h"
+#include "Interface2/RenderingResource.h"
+#include "Interface2/RenderCommand.h"
 
 namespace Ry
 {
@@ -316,17 +321,38 @@ namespace Ry
 		}
 	}
 	
-	Batch::Batch(const VertexFormat& Format)
+	Batch::Batch(Ry::SwapChain* Target, const VertexFormat& Format, Ry::Shader2* Shad)
 	{
 		// Initialize dynamic mesh
-		BatchMesh = new Ry::Mesh(Format, BufferHint::DYNAMIC);
+		BatchMesh = new Ry::Mesh2(Format);
+		
+		Ry::Shader2* ShaderToUse = Shad;
+		if(!ShaderToUse)
+		{
+			ShaderToUse = Ry::GetShader("Shape");
+		}
 
-		SetShader("Shape");
+		//BatchMesh->GetMeshData()->SetShaderAll(ShaderToUse);
+
+		// Initialize resources
+		CreateResources(Target);
+		
+		// Initialize pipeline
+		CreatePipeline(Format, Target, ShaderToUse);
+
+		// Create command buffer
+		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target);
+		RecordCommands();
 
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
 
 		Tex = nullptr;
+
+		// Update uniform
+		BatchRes->SetMatConstant("Scene", "ViewProj", Projection * View);
+
+		// Create rendering pipeline
 	}
 
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item)
@@ -364,12 +390,6 @@ namespace Ry
 		this->Projection = Proj;
 	}
 
-	void Batch::SetShader(const Ry::String& ShaderName)
-	{
-		this->Shad = Ry::GetShader(ShaderName);
-		BatchMesh->GetMeshData()->SetShaderAll(Shad);
-	}
-
 	void Batch::Camera(const Ry::Camera* Cam)
 	{
 		this->View = Cam->get_view();
@@ -397,6 +417,8 @@ namespace Ry
 		});
 
 		BatchMesh->Update();
+
+		RecordCommands();
 	}
 
 	void Batch::SetTexture(Ry::Texture* Texture)
@@ -410,13 +432,77 @@ namespace Ry
 		{
 			Tex->Bind();
 		}
-		
-		Shad->uniformMat44("UCamera", Projection * View);
 
-		// todo: mesh doesn't render directly
+		// todo: uniforms aren't set in the shader anymore
+		//Shad->uniformMat44("UCamera", Projection * View);
+
+		// todo: mesh doesn't render directly, instead render command buffer
 		//		BatchMesh->Render(Primitive::TRIANGLE);
+
+		// Submit command buffer, assume we're in a valid context
+		CommandBuffer->Submit();
 	}
-	
+
+	void Batch::CreateResources(SwapChain* Swap)
+	{
+		BatchResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex}, 0);
+		BatchResDesc->AddConstantBuffer(0, "Scene", {
+			DeclPrimitive(Float4x4, "ViewProj")
+		});
+		
+		BatchResDesc->CreateDescription();
+
+		// Create actual resource set now
+		BatchRes = Ry::NewRenderAPI->CreateResourceSet(BatchResDesc, Swap);
+		BatchRes->CreateBuffer();
+
+	}
+
+	void Batch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad)
+	{
+		
+		// Create new pipeline
+		Ry::PipelineCreateInfo CreateInfo;
+		CreateInfo.ViewportWidth = SwapChain->GetSwapChainWidth();
+		CreateInfo.ViewportHeight = SwapChain->GetSwapChainHeight();
+		CreateInfo.PipelineShader = Shad;
+		CreateInfo.VertFormat = Format;
+		CreateInfo.RenderPass = SwapChain->GetDefaultRenderPass();
+
+		// Add resource description to pipeline
+		CreateInfo.ResourceDescriptions.Add(BatchResDesc);
+
+		Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
+		Pipeline->CreatePipeline();
+	}
+
+	void Batch::RecordCommands()
+	{
+		CommandBuffer->Reset();
+		
+		CommandBuffer->BeginCmd();
+		{
+			CommandBuffer->BeginRenderPass();
+			{
+				CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+				CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+
+				// Bind pipeline
+				CommandBuffer->BindPipeline(Pipeline);
+
+				// Bind resources
+				CommandBuffer->BindResources(&BatchRes, 1);
+
+				// Draw the mesh
+				CommandBuffer->DrawVertexArrayIndexed(BatchMesh->GetVertexArray(), BatchMesh->GetMeshData()->Sections.get(0)->StartIndex, BatchMesh->GetMeshData()->Sections.get(0)->Count);
+				
+			}
+			CommandBuffer->EndRenderPass();
+
+		}
+		CommandBuffer->EndCmd();
+	}
+
 	/*
 	ShapeBatch::ShapeBatch()
 	{
@@ -744,8 +830,8 @@ namespace Ry
 	{
 		this->FontShader = Ry::RenderAPI->make_shader(VF1P1UV, TEXT_VERT, TEXT_FRAG);
 
-		this->FontMesh = new Mesh(VF1P1UV, BufferHint::DYNAMIC);
-		this->FontMesh->GetMeshData()->SetShaderAll(FontShader);
+		//this->FontMesh = new Mesh(VF1P1UV, BufferHint::DYNAMIC);
+		//this->FontMesh->GetMeshData()->SetShaderAll(FontShader);
 
 		this->began = false;
 

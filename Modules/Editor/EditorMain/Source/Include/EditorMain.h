@@ -139,15 +139,15 @@ namespace Ry
 
 				Ry::BoxWidget* Canvas;
 				NewWidgetAssign(Canvas, BoxWidget)
-					.FillX(1.0f)
-					.FillY(1.0f)
-					.SetHAlign(HAlign::CENTER)
-					.SetVAlign(VAlign::BOTTOM)
-					[
-						NewWidget(Ry::BoxWidget)
-						.Padding(100.0f, 100.0f)
-						.DefaultBox(GREEN, GREEN, 0, 0)
-					];
+				.FillX(1.0f)
+				.FillY(1.0f)
+				.SetHAlign(HAlign::CENTER)
+				.SetVAlign(VAlign::BOTTOM)
+				[
+					NewWidget(Ry::BoxWidget)
+					.Padding(100.0f, 100.0f)
+					.DefaultBox(GREEN, GREEN, 0, 0)
+				];
 
 
 				UI->AddRoot(*Canvas);

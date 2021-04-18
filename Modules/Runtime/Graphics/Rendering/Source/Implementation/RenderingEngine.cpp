@@ -1,9 +1,9 @@
 #include "RenderingEngine.h"
 #include "2D/Batch/Batch.h"
 #include "RenderingPass.h"
-#include "Interface/Shader.h"
 #include "RenderPipeline.h"
 #include "Asset.h"
+#include "Interface2/RenderAPI.h"
 
 //#include "Core/Application/Application.h"
 
@@ -19,7 +19,7 @@ namespace Ry
 	UniquePtr<RenderPipeline> ObjectPipeline;
 
 	// Shaders
-	Ry::Map<String, Ry::Shader*> CompiledShaders;
+	Ry::Map<String, Ry::Shader2*> CompiledShaders;
 
 	// Batchers
 	Batch* TextBatcher = nullptr;
@@ -32,27 +32,29 @@ namespace Ry
 		// Compile standard shaders
 		Ry::Log->Log("Compiling shaders");
 		{
-			CompileShader("Impose", Ry::VF1P1UV, "/Engine/Shaders/Vertex/Impose.glv", "/Engine/Shaders/Fragment/Impose.glf");
-			CompileShader("PhongDirectional", Ry::VF1P1UV1N, "/Engine/Shaders/Vertex/Phong.glv", "/Engine/Shaders/Fragment/PhongDirectional.glf");
-			CompileShader("Font", Ry::VF1P1UV1C, "/Engine/Shaders/Vertex/font.glv", "/Engine/Shaders/Fragment/font.glf");
-			CompileShader("Shape", Ry::VF1P1C, "/Engine/Shaders/Vertex/shape.glv", "/Engine/Shaders/Fragment/shape.glf");
-			CompileShader("Texture2D", Ry::VF1P1UV1C, "/Engine/Shaders/Vertex/base.glv", "/Engine/Shaders/Fragment/texture_tint.glf");
+			CompileShader("Impose", "/Engine/Shaders/Vertex/Impose.glv", "/Engine/Shaders/Fragment/Impose.glf");
+			CompileShader("PhongDirectional", "/Engine/Shaders/Vertex/Phong.glv", "/Engine/Shaders/Fragment/PhongDirectional.glf");
+			CompileShader("Font", "/Engine/Shaders/Vertex/font.glv", "/Engine/Shaders/Fragment/font.glf");
+			CompileShader("Texture2D", "/Engine/Shaders/Vertex/base.glv", "/Engine/Shaders/Fragment/texture_tint.glf");
+
+			CompileShader("Shape", "Vertex/Shape", "Fragment/Shape");
+
 		}
 
 		// Initialize batches
 		{
-			ShapeBatcher = new Batch(Ry::VF1P1C);
-			ShapeBatcher->SetShader("Shape");
+			//ShapeBatcher = new Batch(Ry::VF1P1C);
+			//ShapeBatcher->SetShader("Shape");
 
-			TextBatcher = new Batch(Ry::VF1P1UV1C);
-			TextBatcher->SetShader("Font");
+			//TextBatcher = new Batch(Ry::VF1P1UV1C);
+			//TextBatcher->SetShader("Font");
 
 			//TextureBatcher = new TextureBatch;
 			//ShapeBatcher = new ShapeBatch;
 		}
 
 		// Initialize passes
-		{
+/*		{
 			ScenePass = new Ry::OffScreenRenderingPass(4);
 			ScenePass->SetDepthTestEnabled(true);
 			ScenePass->SetBlendingEnabled(true);
@@ -102,7 +104,7 @@ namespace Ry
 
 		// Initialize rendering pipeline to a forward renderer
 		ObjectPipeline = MakeUnique<ForwardRenderer>();
-
+		*/
 		// Hook into resize events
 		Ry::OnWindowResize.AddFunction(&HandleResize);
 	}
@@ -129,15 +131,16 @@ namespace Ry
 	//	TextureBatcher->ResizeProjection(Width, Height);
 	}
 
-	Shader* CompileShader(const String& Name, const VertexFormat& Format, const AssetRef& VertexShader, const AssetRef& FragmentShader)
+	Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc)
 	{
-		Shader* Result = Ry::RenderAPI->make_shader(Format, VertexShader, FragmentShader);
+		Ry::Shader2* Result = Ry::NewRenderAPI->CreateShader(VertexLoc, FragmentLoc);
+//		Shader2* Result = Ry::RenderAPI->make_shader(Format, );
 		CompiledShaders.insert(Name, Result);
 
 		return Result;
 	}
 
-	Shader* GetShader(const String& Name)
+	Shader2* GetShader(const String& Name)
 	{
 		if(CompiledShaders.contains(Name))
 		{

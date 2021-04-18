@@ -190,7 +190,7 @@ namespace Ry
 		ScreenSpaceMesh->GetMeshData()->AddTriangle(2, 3, 0);
 
 		ScreenSpaceMesh->Update();
-		ScreenSpaceMesh->GetMeshData()->SetShaderAll(Shader);
+		//ScreenSpaceMesh->GetMeshData()->SetShaderAll(Shader);
 
 		return ScreenSpaceMesh;
 	}

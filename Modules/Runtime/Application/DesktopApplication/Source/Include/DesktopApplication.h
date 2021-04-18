@@ -52,6 +52,10 @@ namespace Ry
 		void Stop() override;
 		int32 GetViewportWidth() const override;
 		int32 GetViewportHeight() const override;
+		Ry::SwapChain* GetSwapChain() const override;
+		void BeginFrame() override;
+		void EndFrame() override;
+
 		int32 GetAverageFPS() const override;
 
 	private:

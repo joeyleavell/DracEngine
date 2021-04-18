@@ -8,6 +8,7 @@
 #include "Core/Globals.h"
 #include "Data/ArrayList.h"
 #include <vector>
+#include "Entity.gen.h"
 
 namespace Ry
 {

@@ -8,6 +8,7 @@ namespace Ry
 {
 
 	enum class RenderingPlatform;
+	class SwapChain;
 
 	class APPLICATION_MODULE ScreenSizeListener
 	{
@@ -90,6 +91,11 @@ namespace Ry
 		 * @return int32 The current operating frames per second the application is achieving.
 		 */
 		virtual int32 GetAverageFPS() const = 0;
+
+		virtual Ry::SwapChain* GetSwapChain() const = 0;
+
+		virtual void BeginFrame() = 0;
+		virtual void EndFrame() = 0;
 
 		// virtual bool IsFullscreen() const = 0;
 		// virtual void SetFullscreen(bool fullscreen) = 0;

@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "Data/ArrayList.h"
 #include <cstdarg>
+#include "Mesh2.h"
 
 #define TEXT_VERT "/Engine/Shaders/Vertex/font.glv"
 #define TEXT_FRAG "/Engine/Shaders/Fragment/font.glf"
@@ -77,6 +78,12 @@ namespace Ry
 	class Shader;
 	class Texture;
 	class BitmapFont;
+	class Pipeline2;
+	class SwapChain;
+	class Shader2;
+	class ResourceSet;
+	class ResourceSetDescription;
+	class RenderingCommandBuffer2;
 
 	struct RENDERING_MODULE BatchItem
 	{
@@ -183,15 +190,17 @@ namespace Ry
 	{
 	public:
 
-		Batch(const VertexFormat& Format);
+		Batch(Ry::SwapChain* Target, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr);
+		
 		void AddItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
+		
 		void SetView(const Matrix4& View);
 		void Resize(int32 Width, int32 Height);
 		void SetProjection(const Matrix4& Proj);
-		void SetShader(const Ry::String& ShaderName);
+		//void SetShader(const Ry::String& ShaderName);
 		void Camera(const Camera* Cam);
 		void Update();
 		void SetTexture(Texture* Texture);
@@ -199,12 +208,22 @@ namespace Ry
 		
 	private:
 
-		Shader* Shad;
+		void CreateResources(SwapChain* Swap);
+		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad);
+
+		void RecordCommands();
+
+		//Shader* Shad;
 		Texture* Tex;
 		Matrix4 Projection;
 		Matrix4 View;
-		
-		Mesh* BatchMesh;
+
+		Mesh2* BatchMesh;
+
+		Ry::RenderingCommandBuffer2* CommandBuffer;
+		Ry::ResourceSetDescription* BatchResDesc;
+		Ry::ResourceSet* BatchRes;
+		Ry::Pipeline2* Pipeline;
 
 		// Maps depth to a list of items
 		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;

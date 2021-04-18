@@ -282,7 +282,7 @@ namespace Ry
 				MeshData->NewSection();
 
 			MeshData->SetMaterial(MatGroupIndex, MatGroup->Mat);
-			MeshData->SetShader(0, nullptr); // TODO: Set shader here
+			//MeshData->SetShader(0, nullptr); // TODO: Set shader here
 
 			for(int32 GroupFaceIndex = 0; GroupFaceIndex < MatGroup->Faces.size(); GroupFaceIndex++)
 			{

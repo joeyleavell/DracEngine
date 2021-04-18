@@ -4,6 +4,7 @@
 #include "Core/Globals.h"
 #include "Mesh.h"
 #include "Color.h"
+#include "Interface2/Shader2.h"
 
 namespace Ry
 {
@@ -145,7 +146,7 @@ namespace Ry
 			delete ScreenSpaceMesh;
 		}
 
-		void SetImposeShader(Shader* ImposeShader)
+		void SetImposeShader(Shader2* ImposeShader)
 		{
 			ScreenSpaceMesh->GetMeshData()->SetShaderAll(ImposeShader);
 			this->ImposeShader = ImposeShader;
@@ -171,10 +172,11 @@ namespace Ry
 
 			int32 ViewportWidth = Ry::GetViewportWidth();
 			int32 ViewportHeight = Ry::GetViewportHeight();
-			
-			ImposeShader->uniform_float("ScreenWidth", (float) ViewportWidth);
-			ImposeShader->uniform_float("ScreenHeight", (float) ViewportHeight);
-			ImposeShader->uniform_int32("USamples", Source.Buffer->GetSamples());
+
+			// todo: uniforms aren't set using the shader anymore
+			//ImposeShader->uniform_float("ScreenWidth", (float) ViewportWidth);
+			//ImposeShader->uniform_float("ScreenHeight", (float) ViewportHeight);
+			//ImposeShader->uniform_int32("USamples", Source.Buffer->GetSamples());
 			Source.Buffer->GetColorAttachment(Source.ColorAttachment)->Bind();
 
 			// todo: mesh doesn't render directly anymore
@@ -186,7 +188,7 @@ namespace Ry
 	private:
 		ColorSource Source;
 		Ry::Mesh* ScreenSpaceMesh;
-		Ry::Shader* ImposeShader;
+		Ry::Shader2* ImposeShader;
 	};
 
 	class RENDERING_MODULE OffScreenRenderingPass : public RenderingPass
@@ -270,7 +272,7 @@ namespace Ry
 			ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
 		}
 
-		void SetPostProcessShader(Shader* PostProcess)
+		void SetPostProcessShader(Shader2* PostProcess)
 		{
 			ScreenSpaceMesh->GetMeshData()->SetShaderAll(PostProcess);
 			this->PostProcessShader = PostProcess;
@@ -337,7 +339,7 @@ namespace Ry
 
 	private:
 		Ry::Mesh* ScreenSpaceMesh;
-		Ry::Shader* PostProcessShader;
+		Ry::Shader2* PostProcessShader;
 
 		// Texture sources
 		Ry::ArrayList<ColorSource> ColorSources;

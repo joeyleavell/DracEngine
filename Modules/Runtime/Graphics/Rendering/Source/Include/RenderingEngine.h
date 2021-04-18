@@ -39,9 +39,9 @@ namespace Ry
 	extern RENDERING_MODULE class Batch* TextBatcher;
 
 	// Shader management
-	class Shader;
-	extern Map<String, Ry::Shader*> CompiledShaders;
-	RENDERING_MODULE Shader* CompileShader(const String& Name, const VertexFormat& Format, const AssetRef& VertexShader, const AssetRef& FragmentShader);
-	RENDERING_MODULE Shader* GetShader(const String& Name);
+	class Shader2;
+	extern Map<String, Ry::Shader2*> CompiledShaders;
+	RENDERING_MODULE Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc);
+	RENDERING_MODULE Shader2* GetShader(const String& Name);
 
 }

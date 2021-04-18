@@ -4,6 +4,7 @@
 #include "Data/Map.h"
 #include "Data/ArrayList.h"
 #include <vector>
+#include "Interface2/Shader2.h"
 #include "RenderingGen.h"
 
 namespace Ry
@@ -33,7 +34,7 @@ namespace Ry
 		Material* Mat = nullptr;
 
 		// Load appropriate shader for mesh depending on attributes, materials, and provided parameters.
-		Shader* Shad = nullptr;
+		Shader2* Shad = nullptr;
 	};
 
 	class RENDERING_MODULE MeshData
@@ -95,12 +96,12 @@ namespace Ry
 			Sections.get(Slot)->Mat = Material;
 		}
 
-		Shader* GetShader(int32 MeshSlot)
+		Shader2* GetShader(int32 MeshSlot)
 		{
 			return Sections.get(MeshSlot)->Shad;
 		}
 
-		void SetShaderAll(Shader* Shader)
+		void SetShaderAll(Shader2* Shader)
 		{
 			KeyIterator<int32, MeshSection> KeyItr = Sections.CreateKeyIterator();
 
@@ -120,7 +121,7 @@ namespace Ry
 		 * Sets the shader that is used to render this mesh.
 		 * @param shader The shader
 		 */
-		void SetShader(int32 Slot, Shader* Shader)
+		void SetShader(int32 Slot, Shader2* Shader)
 		{
 			Sections.get(Slot)->Shad = Shader;
 		}

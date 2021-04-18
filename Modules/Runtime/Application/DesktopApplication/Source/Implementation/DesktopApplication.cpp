@@ -156,6 +156,8 @@ namespace Ry
 					AverageFPS = FrameCounter;
 					FrameCounter = 0;
 					last_second = now;
+
+					std::cout << AverageFPS << std::endl;
 				}
 
 				// Sleep the thread to reduce power usage
@@ -181,6 +183,21 @@ namespace Ry
 	int32 DesktopApp::GetViewportHeight() const
 	{
 		return GameWindow->GetWindowHeight();
+	}
+
+	Ry::SwapChain* DesktopApp::GetSwapChain() const
+	{
+		return GameWindow->GetSwapChain();
+	}
+
+	void DesktopApp::BeginFrame()
+	{
+		GameWindow->BeginFrame();
+	}
+
+	void DesktopApp::EndFrame()
+	{
+		GameWindow->EndFrame();
 	}
 
 	int32 DesktopApp::GetAverageFPS() const
@@ -222,7 +239,7 @@ namespace Ry
 		// Initialize rendering engine.
 		// J.Leavell -- TODO: remove all opengl calls out of this class!
 		Ry::Log->Log("Initializing rendering engine");
-		//Ry::InitRenderingEngine();
+		Ry::InitRenderingEngine();
 
 		// Initialize scene
 		Ry::Log->Log("Initializing scene");

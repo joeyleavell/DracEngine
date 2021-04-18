@@ -62,6 +62,9 @@ namespace Ry
 	template<typename T>
 	void VulkanBuffer::UploadData(const T* Data, uint32 Count)
 	{
+		if (Count == 0)
+			return;
+
 		int32 BufferSize = sizeof(T) * Count;
 
 		void* MappedMemory = nullptr;
