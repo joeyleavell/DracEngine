@@ -359,16 +359,19 @@ namespace Ry
 			return;
 		}
 
-		VkBuffer VertexBuffers[] = { VkArray->DeviceVertexBuffer->GetBufferObject() };
-		VkDeviceSize Offsets[] = { 0 };
-
-		vkCmdBindVertexBuffers(CmdBuffer, 0, 1, VertexBuffers, Offsets);
+		if(VkArray->GetVertexCount() > 0 && VkArray->GetIndexCount() > 0)
 		{
-			vkCmdBindIndexBuffer(CmdBuffer, VkArray->DeviceIndexBuffer->GetBufferObject(), 0, VK_INDEX_TYPE_UINT32);
-			{
-				int32 IndexCount = Count > 0 ? Count : VkArray->GetIndexCount(); // Draw all elements if count is zero
+			VkBuffer VertexBuffers[] = { VkArray->DeviceVertexBuffer->GetBufferObject() };
+			VkDeviceSize Offsets[] = { 0 };
 
-				vkCmdDrawIndexed(CmdBuffer, IndexCount, 1, FirstIndex, 0, 0);
+			vkCmdBindVertexBuffers(CmdBuffer, 0, 1, VertexBuffers, Offsets);
+			{
+				vkCmdBindIndexBuffer(CmdBuffer, VkArray->DeviceIndexBuffer->GetBufferObject(), 0, VK_INDEX_TYPE_UINT32);
+				{
+					int32 IndexCount = Count > 0 ? Count : VkArray->GetIndexCount(); // Draw all elements if count is zero
+
+					vkCmdDrawIndexed(CmdBuffer, IndexCount, 1, FirstIndex, 0, 0);
+				}
 			}
 		}
 

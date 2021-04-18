@@ -33,18 +33,21 @@ namespace Ry
 			DeviceVertexBuffer = nullptr;
 		}
 		
-		if(!StagingVertexBuffer)
+		if(!StagingVertexBuffer && Size > 0)
 		{
 			this->StagingVertexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Size);
 			this->DeviceVertexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, Size);
 		}
 		
 		this->VertCount = Vertices;
-		
-		// Map the memory to the staging buffer
-		StagingVertexBuffer->UploadVertData(Data, Vertices, Format.element_count);
-		
-		TransferStagedToDevice(Size, StagingVertexBuffer->GetBufferObject(), DeviceVertexBuffer->GetBufferObject());
+
+		if(StagingVertexBuffer && DeviceVertexBuffer)
+		{
+			// Map the memory to the staging buffer
+			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.element_count);
+
+			TransferStagedToDevice(Size, StagingVertexBuffer->GetBufferObject(), DeviceVertexBuffer->GetBufferObject());
+		}
 	}
 
 	void VulkanVertexArray::PushIndexData(uint32* Indices, uint32 Count)
@@ -61,7 +64,7 @@ namespace Ry
 			DeviceIndexBuffer = nullptr;
 		}
 
-		if (!StagingIndexBuffer)
+		if (!StagingIndexBuffer && Size > 0)
 		{
 			this->StagingIndexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Size);
 			this->DeviceIndexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, Size);
@@ -69,10 +72,14 @@ namespace Ry
 
 		this->IndexCount = Count;
 
-		// Map the memory to the staging buffer
-		StagingIndexBuffer->UploadData(Indices, Count);
+		if (StagingIndexBuffer)
+		{
+			// Map the memory to the staging buffer
+			StagingIndexBuffer->UploadData(Indices, Count);
 
-		TransferStagedToDevice(Size, StagingIndexBuffer->GetBufferObject(), DeviceIndexBuffer->GetBufferObject(), DeviceIndexBuffer != nullptr);
+			TransferStagedToDevice(Size, StagingIndexBuffer->GetBufferObject(), DeviceIndexBuffer->GetBufferObject(), DeviceIndexBuffer != nullptr);
+		}
+
 	}
 
 	void VulkanVertexArray::DeleteArray()

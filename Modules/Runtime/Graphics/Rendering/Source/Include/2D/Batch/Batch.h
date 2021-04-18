@@ -220,6 +220,8 @@ namespace Ry
 
 		Mesh2* BatchMesh;
 
+		int LastIndexCount = -1;
+		
 		Ry::RenderingCommandBuffer2* CommandBuffer;
 		Ry::ResourceSetDescription* BatchResDesc;
 		Ry::ResourceSet* BatchRes;

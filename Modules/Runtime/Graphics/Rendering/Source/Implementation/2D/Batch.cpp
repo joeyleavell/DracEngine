@@ -16,6 +16,7 @@
 #include "Interface2/RenderAPI.h"
 #include "Interface2/RenderingResource.h"
 #include "Interface2/RenderCommand.h"
+#include "Interface2/VertexArray2.h"
 
 namespace Ry
 {
@@ -112,7 +113,9 @@ namespace Ry
 
 			// Add the next triangle
 			Item->AddVertex1P1C(x_o, y_o, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
-			Item->AddTriangle(0, RadialIndex /*Previous vertex*/, 1 + RadialIndex /*Current vertex*/);
+			//Item->AddTriangle(0, RadialIndex /*Previous vertex*/, 1 + RadialIndex /*Current vertex*/);
+			Item->AddTriangle(1 + RadialIndex, RadialIndex /*Previous vertex*/ /*Current vertex*/, 0);
+
 		}
 	}
 
@@ -342,7 +345,7 @@ namespace Ry
 
 		// Create command buffer
 		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target);
-		RecordCommands();
+		//RecordCommands();
 
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
@@ -400,6 +403,8 @@ namespace Ry
 	{
 		BatchMesh->Reset();
 
+		bool bNeedsRecord = false;
+
 		auto AddItem = [this](Ry::SharedPtr<BatchItem> Item)
 		{
 			uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
@@ -418,7 +423,15 @@ namespace Ry
 
 		BatchMesh->Update();
 
-		RecordCommands();
+		int CurrentIndexCount = BatchMesh->GetVertexArray()->GetIndexCount();
+		if (LastIndexCount < 0 || LastIndexCount != CurrentIndexCount)
+		{
+			LastIndexCount = CurrentIndexCount;
+
+			// Re-record commands
+			RecordCommands();
+		}
+
 	}
 
 	void Batch::SetTexture(Ry::Texture* Texture)

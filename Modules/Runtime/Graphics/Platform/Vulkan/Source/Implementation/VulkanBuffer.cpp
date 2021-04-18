@@ -55,8 +55,11 @@ namespace Ry
 
 	VulkanBuffer::~VulkanBuffer()
 	{
-		vkDestroyBuffer(GVulkanContext->GetLogicalDevice(), BufferObject, nullptr);
-		vkFreeMemory(GVulkanContext->GetLogicalDevice(), BufferMemory, nullptr);
+		if(BufferSize > 0)
+		{
+			vkDestroyBuffer(GVulkanContext->GetLogicalDevice(), BufferObject, nullptr);
+			vkFreeMemory(GVulkanContext->GetLogicalDevice(), BufferMemory, nullptr);
+		}
 	}
 
 	template<typename T>
