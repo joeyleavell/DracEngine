@@ -71,6 +71,7 @@ Mesh->GetMeshData()->AddTriangle(i0+2, i0+3, i0+0); \
 
 namespace Ry
 {
+	class Texture2;
 	class Text;
 	class Color;
 	class Mesh;
@@ -203,7 +204,7 @@ namespace Ry
 		//void SetShader(const Ry::String& ShaderName);
 		void Camera(const Camera* Cam);
 		void Update();
-		void SetTexture(Texture* Texture);
+		void SetTexture(Texture2* Texture);
 		void Render();
 		
 	private:
@@ -214,7 +215,7 @@ namespace Ry
 		void RecordCommands();
 
 		//Shader* Shad;
-		Texture* Tex;
+		Texture2* Tex;
 		Matrix4 Projection;
 		Matrix4 View;
 
@@ -223,8 +224,15 @@ namespace Ry
 		int LastIndexCount = -1;
 		
 		Ry::RenderingCommandBuffer2* CommandBuffer;
-		Ry::ResourceSetDescription* BatchResDesc;
-		Ry::ResourceSet* BatchRes;
+
+		// Texture resources
+		Ry::ResourceSetDescription* TextureResDesc;
+		Ry::ResourceSet* TextureRes;
+
+		// Scene resources
+		Ry::ResourceSetDescription* SceneResDesc;
+		Ry::ResourceSet* SceneRes;
+
 		Ry::Pipeline2* Pipeline;
 
 		// Maps depth to a list of items
@@ -236,7 +244,7 @@ namespace Ry
 	class RENDERING_MODULE TextBatch
 	{
 	public:
-		TextBatch();
+		TextBatch(Ry::SwapChain* Target, Shader2* Shad);
 
 		void Begin();
 
@@ -250,11 +258,31 @@ namespace Ry
 
 	private:
 
+		void CreateResources(SwapChain* Swap);
+		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad);
+		void RecordCommands();
+
 		bool began;
 		BitmapFont* Font;
 		Ry::Vector3 Color;
 		Shader* FontShader;
-		Mesh* FontMesh;
+		
+		Mesh2* FontMesh;
+
+		Ry::ResourceSet* Resources[2];
+
+		// Texture resources
+		Ry::ResourceSetDescription* TextureResDesc;
+		Ry::ResourceSet* TextureRes;
+
+		// Scene resources
+		Ry::ResourceSetDescription* SceneResDesc;
+		Ry::ResourceSet* SceneRes;
+
+		Ry::RenderingCommandBuffer2* CommandBuffer;
+
+		Ry::Pipeline2* Pipeline;
+
 
 	};
 	

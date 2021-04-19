@@ -11,7 +11,7 @@ namespace Ry
 	class ShapeBatch;
 	class TextureBatch;
 	class String;
-	class Texture;
+	class Texture2;
 
 	constexpr uint32 FONT_BITMAP_SIZE = 1024;
 
@@ -56,7 +56,7 @@ namespace Ry
 		int32 GetMinCodepoint() const;
 		int32 GetMaxCodepoint() const;
 		BitmapGlyph* GetGlyph(int32 Codepoint) const;
-		Ry::Texture* GetAtlasTexture() const;
+		Ry::Texture2* GetAtlasTexture() const;
 
 		void SetAscent(int32 Ascent);
 		void SetDescent(int32 Descent);
@@ -79,7 +79,7 @@ namespace Ry
 		int32 MinCodepoint;
 		int32 MaxCodepoint;
 		Ry::Map<int32, Ry::BitmapGlyph*> RegisteredGlyphs;
-		class Texture* AtlasTexture;
+		class Texture2* AtlasTexture;
 	};
 	
 }
