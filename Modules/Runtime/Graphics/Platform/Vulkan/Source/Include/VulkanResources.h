@@ -163,6 +163,7 @@ namespace Ry
 
 		void CreateBuffer() override;
 		void DeleteBuffer() override;
+		bool Update() override;
 		void FlushBuffer(int32 Frame) override;
 
 		void BindTexture(Ry::String TextureName, const Ry::Texture2* Resource) override;
@@ -170,11 +171,16 @@ namespace Ry
 
 		void CreateUniformBuffers(VulkanSwapChain* SwapChain);
 		void CreateDescriptorSets(VulkanSwapChain* SwapChain);
+		void UpdateDescriptorSet(VulkanSwapChain* SwapChain, int32 SwapChainImageIndex);
 		
 		void PrintData();
 
 
 	private:
+
+		bool bDirtyThisFrame = false;
+		
+		Ry::ArrayList<uint32> DirtyFrames;
 
 		//std::vector<VulkanBuffer*> UniformBuffers;
 

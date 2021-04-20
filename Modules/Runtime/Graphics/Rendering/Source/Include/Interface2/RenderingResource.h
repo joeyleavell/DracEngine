@@ -173,6 +173,7 @@ namespace Ry
 
 		virtual void CreateBuffer() = 0;
 		virtual void DeleteBuffer() = 0;
+		virtual bool Update() = 0;
 		virtual void FlushBuffer(int32 Frame) = 0;
 
 		virtual void BindTexture(Ry::String TextureName, const Ry::Texture2* Resource) = 0;

@@ -17,7 +17,9 @@ PixelOutput main(PixelInput In)
 {
 	PixelOutput Out;
 	
-	Out.PixelColor = FontTexture.Sample(FontSampler, In.VertTexCoord);
+	Out.PixelColor = In.VertColor * FontTexture.Sample(FontSampler, In.VertTexCoord).r;
+
+	//Out.PixelColor = In.VertColor;
 	
 	// Todo: do we want an if statement here?
 	if(Out.PixelColor.r <= .01)

@@ -68,6 +68,30 @@ namespace Ry
 		
 	}
 
+	bool VulkanResourceSet::Update()
+	{
+		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
+		int FlightIndex = VkSC->GetCurrentImageIndex();
+
+		if(FlightIndex >= 0 && DirtyFrames.Contains(FlightIndex))
+		{
+			DirtyFrames.Remove(FlightIndex);
+
+			// Update this descriptor set
+			UpdateDescriptorSet(VkSC, FlightIndex);
+
+			return true;
+		}
+
+		if(bDirtyThisFrame)
+		{
+			bDirtyThisFrame = false;
+			return true;
+		}
+
+		return false;
+	}
+
 	void VulkanResourceSet::FlushBuffer(int32 Frame)
 	{
 		// Flush all constant buffers
@@ -87,11 +111,58 @@ namespace Ry
 		const VulkanTexture* VkTexture = dynamic_cast<const VulkanTexture*>(Resource);
 		assert(VkTexture != nullptr);
 
-		MappedTexture* NewMap = new MappedTexture;
-		NewMap->Image = VkTexture->GetImageView();
-		NewMap->Sampler = VkTexture->GetSampler();
+		MappedTexture* Map = nullptr;
 
-		MappedTextures.insert(TextureName, NewMap);
+		if(MappedTextures.contains(TextureName))
+		{
+			Map = *MappedTextures.get(TextureName);
+		}
+		else
+		{
+			Map = new MappedTexture;
+			MappedTextures.insert(TextureName, Map);
+		}
+
+		if(Map)
+		{
+			Map->Image = VkTexture->GetImageView();
+			Map->Sampler = VkTexture->GetSampler();
+		}
+
+		// Update descriptor sets if we've already created them
+		if(DescriptorSets.size() > 0)
+		{
+			VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
+			int FlightIndex = VkSC->GetCurrentImageIndex();
+
+			if(FlightIndex < 0)
+			{
+				// Device wait, not in a frame so we have to update all (not efficient)			
+				vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+
+				for(int32 Index = 0; Index < VkSC->SwapChainImages.size(); Index++)
+				{
+					UpdateDescriptorSet(VkSC, Index);
+				}
+			}
+			else
+			{
+				// Update this frame, mark others as dirty
+				UpdateDescriptorSet(VkSC, FlightIndex);
+
+				for (int32 Index = 0; Index < VkSC->SwapChainImages.size(); Index++)
+				{
+					if(Index != FlightIndex && !DirtyFrames.Contains(Index))
+					{
+						DirtyFrames.Add(Index);
+					}
+				}
+
+				bDirtyThisFrame = true;
+			}
+
+		}
+
 	}
 
 	void VulkanResourceSet::SetConstant(Ry::String BufferName, Ry::String Id, const void* Data)
@@ -558,66 +629,75 @@ namespace Ry
 			Ry::Log->LogErrorf("Failed to allocate descriptor sets");
 		}
 
-		for (size_t SwapChainImageIndex = 0; SwapChainImageIndex < SwapChain->SwapChainImages.size(); SwapChainImageIndex++)
+		// Update each descriptor set image
+		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
+		for(int32 SwapChainImage = 0; SwapChainImage < VkSC->SwapChainImages.size(); SwapChainImage++)
 		{
-			Ry::ArrayList<VkWriteDescriptorSet> Descriptors;
-			Ry::ArrayList<VkDescriptorBufferInfo> BufferInfos;
-			Ry::ArrayList<VkDescriptorImageInfo> ImageInfos;
-
-			for(const ConstantBuffer* ConstBuffer : Info->ConstantBuffers)
-			{
-				MappedConstantBuffer* Mapped = *MappedConstantBuffers.get(ConstBuffer->Name);
-				
-				VkDescriptorBufferInfo BufferInfo{};
-				BufferInfo.buffer = Mapped->VulkanBuffers[SwapChainImageIndex]->GetBufferObject();
-				BufferInfo.offset = 0;
-				BufferInfo.range = Mapped->HostBufferSize;
-				BufferInfos.Add(BufferInfo);
-
-				VkWriteDescriptorSet DescriptorWrite{};
-				DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				DescriptorWrite.dstSet = DescriptorSets[SwapChainImageIndex];
-				DescriptorWrite.dstBinding = C_BUFFER_OFFSET + ConstBuffer->Index;
-				DescriptorWrite.dstArrayElement = 0;
-				DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				DescriptorWrite.descriptorCount = 1;
-				DescriptorWrite.pBufferInfo = BufferInfos.GetData() + (BufferInfos.GetSize() - 1);
-
-				Descriptors.Add(DescriptorWrite);
-			}
-
-			for (int32 TextureBindingIndex = 0; TextureBindingIndex < Info->TextureBindings.GetSize(); TextureBindingIndex++)
-			{
-				const TextureBinding* Binding = Info->TextureBindings[TextureBindingIndex];
-
-				if(!MappedTextures.contains(Binding->Name))
-				{
-					continue;
-				}
-
-				MappedTexture* Mapping = *MappedTextures.get(Binding->Name);
-
-				VkDescriptorImageInfo ImageInfo{};
-				ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				ImageInfo.imageView = Mapping->Image;
-				ImageInfo.sampler = Mapping->Sampler;
-
-				ImageInfos.Add(ImageInfo);
-
-				VkWriteDescriptorSet DescriptorWrite{};
-				DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				DescriptorWrite.dstSet = DescriptorSets[SwapChainImageIndex];
-				DescriptorWrite.dstBinding = T_BUFFER_OFFSET + Binding->Index;
-				DescriptorWrite.dstArrayElement = 0;
-				DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				DescriptorWrite.descriptorCount = 1;
-				DescriptorWrite.pImageInfo = ImageInfos.GetData() + (ImageInfos.GetSize() - 1);
-
-				Descriptors.Add(DescriptorWrite);
-			}
-			
-			vkUpdateDescriptorSets(GVulkanContext->GetLogicalDevice(), Descriptors.GetSize(), Descriptors.GetData(), 0, nullptr);
+			UpdateDescriptorSet(VkSC, SwapChainImage);
 		}
+
+	}
+
+	void VulkanResourceSet::UpdateDescriptorSet(VulkanSwapChain* SwapChain, int32 SwapChainImageIndex)
+	{
+		Ry::ArrayList<VkWriteDescriptorSet> Descriptors;
+		Ry::ArrayList<VkDescriptorBufferInfo> BufferInfos;
+		Ry::ArrayList<VkDescriptorImageInfo> ImageInfos;
+
+		for (const ConstantBuffer* ConstBuffer : Info->ConstantBuffers)
+		{
+			MappedConstantBuffer* Mapped = *MappedConstantBuffers.get(ConstBuffer->Name);
+
+			VkDescriptorBufferInfo BufferInfo{};
+			BufferInfo.buffer = Mapped->VulkanBuffers[SwapChainImageIndex]->GetBufferObject();
+			BufferInfo.offset = 0;
+			BufferInfo.range = Mapped->HostBufferSize;
+			BufferInfos.Add(BufferInfo);
+
+			VkWriteDescriptorSet DescriptorWrite{};
+			DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			DescriptorWrite.dstSet = DescriptorSets[SwapChainImageIndex];
+			DescriptorWrite.dstBinding = C_BUFFER_OFFSET + ConstBuffer->Index;
+			DescriptorWrite.dstArrayElement = 0;
+			DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			DescriptorWrite.descriptorCount = 1;
+			DescriptorWrite.pBufferInfo = BufferInfos.GetData() + (BufferInfos.GetSize() - 1);
+
+			Descriptors.Add(DescriptorWrite);
+		}
+
+		for (int32 TextureBindingIndex = 0; TextureBindingIndex < Info->TextureBindings.GetSize(); TextureBindingIndex++)
+		{
+			const TextureBinding* Binding = Info->TextureBindings[TextureBindingIndex];
+
+			if (!MappedTextures.contains(Binding->Name))
+			{
+				continue;
+			}
+
+			MappedTexture* Mapping = *MappedTextures.get(Binding->Name);
+
+			VkDescriptorImageInfo ImageInfo{};
+			ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			ImageInfo.imageView = Mapping->Image;
+			ImageInfo.sampler = Mapping->Sampler;
+
+			ImageInfos.Add(ImageInfo);
+
+			VkWriteDescriptorSet DescriptorWrite{};
+			DescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			DescriptorWrite.dstSet = DescriptorSets[SwapChainImageIndex];
+			DescriptorWrite.dstBinding = T_BUFFER_OFFSET + Binding->Index;
+			DescriptorWrite.dstArrayElement = 0;
+			DescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			DescriptorWrite.descriptorCount = 1;
+			DescriptorWrite.pImageInfo = ImageInfos.GetData() + (ImageInfos.GetSize() - 1);
+
+			Descriptors.Add(DescriptorWrite);
+		}
+
+		vkUpdateDescriptorSets(GVulkanContext->GetLogicalDevice(), Descriptors.GetSize(), Descriptors.GetData(), 0, nullptr);
+
 	}
 
 	void VulkanResourceSetDescription::SetShaderFlags(VkDescriptorSetLayoutBinding& Binding)

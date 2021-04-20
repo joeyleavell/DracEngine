@@ -191,7 +191,7 @@ namespace Ry
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr);
+		Batch(Ry::SwapChain* Target, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr, bool bTexture = false);
 		
 		void AddItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
@@ -208,6 +208,8 @@ namespace Ry
 		void Render();
 		
 	private:
+
+		bool bNeedsRecord = false;
 
 		void CreateResources(SwapChain* Swap);
 		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad);
@@ -235,16 +237,20 @@ namespace Ry
 
 		Ry::Pipeline2* Pipeline;
 
+		Ry::ArrayList<ResourceSet*> ResourceSets;
+
 		// Maps depth to a list of items
 		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
 		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
+
+		bool bUseTexture;
 	};
 
 
 	class RENDERING_MODULE TextBatch
 	{
 	public:
-		TextBatch(Ry::SwapChain* Target, Shader2* Shad);
+		TextBatch(Ry::SwapChain* Target, Shader2* Shad = nullptr);
 
 		void Begin();
 
@@ -265,7 +271,7 @@ namespace Ry
 		bool began;
 		BitmapFont* Font;
 		Ry::Vector3 Color;
-		Shader* FontShader;
+		//Shader* FontShader;
 		
 		Mesh2* FontMesh;
 

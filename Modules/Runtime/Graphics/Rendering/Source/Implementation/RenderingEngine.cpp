@@ -4,6 +4,8 @@
 #include "RenderPipeline.h"
 #include "Asset.h"
 #include "Interface2/RenderAPI.h"
+#include "Bitmap.h"
+#include "Interface2/Texture2.h"
 
 //#include "Core/Application/Application.h"
 
@@ -17,6 +19,8 @@ namespace Ry
 	ImposePass* SceneImposePass = nullptr;
 	RenderingPass* TextPass = nullptr;
 	UniquePtr<RenderPipeline> ObjectPipeline;
+
+	Ry::Texture2* DefaultTexture = nullptr;
 
 	// Shaders
 	Ry::Map<String, Ry::Shader2*> CompiledShaders;
@@ -108,10 +112,19 @@ namespace Ry
 		*/
 		// Hook into resize events
 		Ry::OnWindowResize.AddFunction(&HandleResize);
+
+		// Create 1x1 default texture
+		Ry::Bitmap DefaultTextureBmp (1, 1, PixelStorage::FOUR_BYTE_RGBA);
+		DefaultTextureBmp.SetPixel(0, 0, 0xFFFFFFFF);
+		DefaultTexture = Ry::NewRenderAPI->CreateTexture();
+		DefaultTexture->Data(&DefaultTextureBmp);		
 	}
 
 	void QuitRenderingEngine()
 	{
+		DefaultTexture->DeleteTexture();
+		delete DefaultTexture;
+		
 		delete ShapeBatcher;
 		delete TextBatcher;
 		//delete ShapeBatcher;

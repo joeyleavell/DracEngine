@@ -230,6 +230,11 @@ namespace Ry
 		}
 	}
 
+	void GLResources2::Update()
+	{
+		
+	}
+
 	void GLResources2::FlushBuffer(int32 Frame)
 	{
 		// Send data
@@ -248,17 +253,29 @@ namespace Ry
 
 	void GLResources2::BindTexture(Ry::String TextureName, const Ry::Texture2* Resource)
 	{
-		MappedTexture* NewMappedTexture = new MappedTexture;
+		MappedTexture* NewMappedTexture = nullptr;
 
-		const GLTexture2* GLTexture = dynamic_cast<const GLTexture2*>(Resource);
+		if(MappedTextures.contains(TextureName))
+		{
+			NewMappedTexture = *MappedTextures.get(TextureName);
+		}
+		else
+		{
+			NewMappedTexture = new MappedTexture;
+			MappedTextures.insert(TextureName, NewMappedTexture);
+			NewMappedTexture->Slot = Textures;
 
-		NewMappedTexture->Slot = Textures;
-		NewMappedTexture->Texture = GLTexture->GetHandle();
-		NewMappedTexture->Target = GLTexture->GetTarget();
+			Textures++;
+		}
 
-		Textures++;
+		if(NewMappedTexture)
+		{
+			const GLTexture2* GLTexture = dynamic_cast<const GLTexture2*>(Resource);
+			
+			NewMappedTexture->Texture = GLTexture->GetHandle();
+			NewMappedTexture->Target = GLTexture->GetTarget();
+		}
 
-		MappedTextures.insert(TextureName, NewMappedTexture);
 	}
 
 	void GLResources2::SetConstant(Ry::String BufferName, Ry::String Id, const void* Data)

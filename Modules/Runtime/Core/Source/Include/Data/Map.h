@@ -267,24 +267,38 @@ namespace Ry
 		{
 			uint32 hash_value = Ry::Hash(key);
 			uint32 bucket = hash_value % TABLE_SIZE;
+			
+			// Travel to the last element in the bucket
+			// OR overwrite key if inserting duplicate
+			MapChain<K, V>* head = table[bucket];
+			MapChain<K, V>* head_prev = nullptr;
+			
+			while (head != nullptr)
+			{
+				// Found existing element
+				// Overwrite key
+				if(head->key == key)
+				{
+					head->value = value;
+					return;
+				}
+
+				head_prev = head;
+				head = head->next;
+			}
 
 			MapChain<K, V>* new_chain = new MapChain<K, V>();
 			new_chain->key = key;
 			new_chain->value = value;
 			new_chain->next = nullptr;
 
-			// Travel to the last element in the bucket
-			MapChain<K, V>* head = table[bucket];
-			while (head != nullptr && head->next != nullptr)
-				head = head->next;
-
-			if (head == nullptr)
+			if (head_prev == nullptr)
 			{
 				table[bucket] = new_chain;
 			}
 			else
 			{
-				head->next = new_chain;
+				head_prev->next = new_chain;
 			}
 
 		}

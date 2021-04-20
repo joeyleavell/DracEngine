@@ -291,8 +291,8 @@ namespace Ry
 						GlyphItem->AddVertex1P1UV1C(TR_X, TR_Y, 0.0f, U + UVW, V, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Top right
 						GlyphItem->AddVertex1P1UV1C(BR_X, BR_Y, 0.0f, U + UVW, V + UVH, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Bottom right
 						GlyphItem->AddVertex1P1UV1C(BL_X, BL_Y, 0.0f, U, V + UVH, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Bottom left
-						GlyphItem->AddTriangle(0, 1, 2);
-						GlyphItem->AddTriangle(2, 3, 0);
+						GlyphItem->AddTriangle(2, 1, 0);
+						GlyphItem->AddTriangle(0, 3, 2);
 						ItemSet->AddItem(GlyphItem);
 
 						// Advance the cursor
@@ -325,7 +325,7 @@ namespace Ry
 		}
 	}
 	
-	Batch::Batch(Ry::SwapChain* Target, const VertexFormat& Format, Ry::Shader2* Shad)
+	Batch::Batch(Ry::SwapChain* Target, const VertexFormat& Format, Ry::Shader2* Shad, bool bTexture)
 	{
 		// Initialize dynamic mesh
 		BatchMesh = new Ry::Mesh2(Format);
@@ -335,6 +335,10 @@ namespace Ry
 		{
 			ShaderToUse = Ry::GetShader("Shape");
 		}
+
+		this->bUseTexture = bTexture;
+		this->Tex = nullptr;
+
 
 		//BatchMesh->GetMeshData()->SetShaderAll(ShaderToUse);
 
@@ -350,11 +354,6 @@ namespace Ry
 
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
-
-		Tex = nullptr;
-
-		// Update uniform
-		SceneRes->SetMatConstant("Scene", "ViewProj", Projection * View);
 
 		// Create rendering pipeline
 	}
@@ -404,54 +403,68 @@ namespace Ry
 	{
 		BatchMesh->Reset();
 
-		bool bNeedsRecord = false;
-
 		auto AddItem = [this](Ry::SharedPtr<BatchItem> Item)
 		{
 			uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
-	
+
 			// Add all vertices and indices
-			BatchMesh->GetMeshData()->AddVertexRaw(Item->Data.GetData(), (int32) Item->Data.GetSize(), Item->VertexCount);
+			BatchMesh->GetMeshData()->AddVertexRaw(Item->Data.GetData(), (int32)Item->Data.GetSize(), Item->VertexCount);
 			BatchMesh->GetMeshData()->AddIndexRaw(Item->Indices.GetData(), (int32)Item->Indices.GetSize(), BaseIndex);
 		};
 
 		// Rebuild the mesh
 		std::for_each(Items.begin(), Items.end(), AddItem);
 		std::for_each(ItemSets.begin(), ItemSets.end(), [AddItem](Ry::SharedPtr<BatchItemSet> ItemSet)
-		{
-			std::for_each(ItemSet->Items.begin(), ItemSet->Items.end(), AddItem);
-		});
+			{
+				std::for_each(ItemSet->Items.begin(), ItemSet->Items.end(), AddItem);
+			});
 
 		BatchMesh->Update();
 
 		int CurrentIndexCount = BatchMesh->GetVertexArray()->GetIndexCount();
 		if (LastIndexCount < 0 || LastIndexCount != CurrentIndexCount)
 		{
+			bNeedsRecord = true;
 			LastIndexCount = CurrentIndexCount;
-
-			// Re-record commands
-			RecordCommands();
 		}
-
 	}
 
 	void Batch::SetTexture(Ry::Texture2* Texture)
 	{
-		this->Tex = Texture;
+		if(Texture != this->Tex)
+		{
+			this->Tex = Texture;
+
+			// Bind the texture to texture resources
+			TextureRes->BindTexture("BatchTexture", Texture);
+
+			// Need to re-record buffer since we updated descriptor set
+			bNeedsRecord = true;
+		}
+		
 	}
 
 	void Batch::Render()
 	{
-		if(Tex)
+		// Update uniform
+		// Todo: change this to a push constant and only change it if needed
+		SceneRes->SetMatConstant("Scene", "ViewProj", Projection * View);
+
+		// Update resource resets and re-record command buffers if needed
+		for(ResourceSet* Set : ResourceSets)
 		{
-			//Tex->Bind();
+			if(Set->Update())
+			{
+				bNeedsRecord = true;
+			}
 		}
 
-		// todo: uniforms aren't set in the shader anymore
-		//Shad->uniformMat44("UCamera", Projection * View);
-
-		// todo: mesh doesn't render directly, instead render command buffer
-		//		BatchMesh->Render(Primitive::TRIANGLE);
+		if (bNeedsRecord)
+		{
+			// Re-record commands
+			RecordCommands();
+			bNeedsRecord = false;
+		}
 
 		// Submit command buffer, assume we're in a valid context
 		CommandBuffer->Submit();
@@ -465,18 +478,31 @@ namespace Ry
 		});
 		SceneResDesc->CreateDescription();
 
-		TextureResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 1);
-		TextureResDesc->AddTextureBinding(0, "BatchTexture");
-		TextureResDesc->CreateDescription();
 
 		// Create actual resource set now
 		SceneRes = Ry::NewRenderAPI->CreateResourceSet(SceneResDesc, Swap);
 		SceneRes->CreateBuffer();
 
-		// Create texture resources
-		TextureRes = Ry::NewRenderAPI->CreateResourceSet(TextureResDesc, Swap);
-		TextureRes->CreateBuffer();
-		
+		ResourceSets.Add(SceneRes);
+
+		if (bUseTexture)
+		{
+			TextureResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
+			TextureResDesc->AddTextureBinding(0, "BatchTexture");
+			TextureResDesc->CreateDescription();
+
+			// Create texture resources
+			// Bind the default texture to start with
+			TextureRes = Ry::NewRenderAPI->CreateResourceSet(TextureResDesc, Swap);
+			TextureRes->BindTexture("BatchTexture", DefaultTexture);
+			TextureRes->CreateBuffer();
+
+			ResourceSets.Add(TextureRes);
+
+			this->Tex = DefaultTexture;
+
+		}
+
 	}
 
 	void Batch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad)
@@ -492,6 +518,11 @@ namespace Ry
 
 		// Add resource description to pipeline
 		CreateInfo.ResourceDescriptions.Add(SceneResDesc);
+
+		if(bUseTexture)
+		{
+			CreateInfo.ResourceDescriptions.Add(TextureResDesc);
+		}
 
 		Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
 		Pipeline->CreatePipeline();
@@ -512,7 +543,7 @@ namespace Ry
 				CommandBuffer->BindPipeline(Pipeline);
 
 				// Bind resources
-				CommandBuffer->BindResources(&SceneRes, 1);
+				CommandBuffer->BindResources(ResourceSets.GetData(), ResourceSets.GetSize());
 
 				// Draw the mesh
 				CommandBuffer->DrawVertexArrayIndexed(BatchMesh->GetVertexArray(), BatchMesh->GetMeshData()->Sections.get(0)->StartIndex, BatchMesh->GetMeshData()->Sections.get(0)->Count);
@@ -849,7 +880,7 @@ namespace Ry
 
 	TextBatch::TextBatch(Ry::SwapChain* Target, Shader2* Shad)
 	{
-		this->FontShader = Ry::RenderAPI->make_shader(VF1P1UV, TEXT_VERT, TEXT_FRAG);
+		//this->FontShader = Ry::RenderAPI->make_shader(VF1P1UV, TEXT_VERT, TEXT_FRAG);
 
 		//this->FontMesh = new Mesh(VF1P1UV, BufferHint::DYNAMIC);
 		//this->FontMesh->GetMeshData()->SetShaderAll(FontShader);
@@ -862,7 +893,7 @@ namespace Ry
 		CreateResources(Target);
 
 		// Initialize pipeline
-		CreatePipeline(VF1P1UV1C, Target, Shad);
+		CreatePipeline(VF1P1UV1C, Target, Shad ? Shad : GetShader("Font"));
 
 		// Create command buffer
 		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target);

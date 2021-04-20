@@ -12,6 +12,7 @@ namespace Ry
 {
 
 	class RenderPipeline;
+	class Texture2;
 
 	/**
 	 * Initializes rendering engine resources.
@@ -23,6 +24,8 @@ namespace Ry
 	 * Global resize manager. Resizes framebuffers associated with global rendering passes.
 	 */
 	void HandleResize(int32 Width, int32 Height);
+
+	extern RENDERING_MODULE Ry::Texture2* DefaultTexture;
 
 	// Standard rendering passes
 	extern RENDERING_MODULE class OffScreenRenderingPass* UIPass;
