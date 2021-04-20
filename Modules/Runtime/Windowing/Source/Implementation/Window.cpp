@@ -176,16 +176,26 @@ namespace Ry
 	void Window::BeginFrame()
 	{
 		SwapChain->BeginFrame(WindowResource, bFramebufferResized);
-
-		if(bFramebufferResized)
-		{
-			bFramebufferResized = false;
-		}
 	}
 
 	void Window::EndFrame()
 	{
 		SwapChain->EndFrame(WindowResource);
+
+		// Invoke window size callbacks since swap chain delayed recreation
+		if (bFramebufferResized)
+		{
+			bFramebufferResized = false;
+
+			int Width, Height;
+			glfwGetFramebufferSize(WindowResource, &Width, &Height);
+			
+			for (const Delegate<void, int32, int32>& Callback : WindowResizedDelegates)
+			{
+				Callback.Execute(Width, Height);
+			}
+		}
+		
 	}
 
 	void Window::Update()
@@ -339,10 +349,7 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
-			for (const Delegate<void, int32, int32>& Callback : AssociatedWindow->WindowResizedDelegates)
-			{
-				Callback.Execute(NewWidth, NewHeight);
-			}
+
 		}
 	}
 
@@ -388,7 +395,7 @@ namespace Ry
 		else
 		{
 			int32 width, height;
-			glfwGetWindowSize(WindowResource, &width, &height);
+			glfwGetFramebufferSize(WindowResource, &width, &height);
 
 			return width;
 		}
@@ -403,7 +410,7 @@ namespace Ry
 		else
 		{
 			int32 width, height;
-			glfwGetWindowSize(WindowResource, &width, &height);
+			glfwGetFramebufferSize(WindowResource, &width, &height);
 
 			return height;
 		}

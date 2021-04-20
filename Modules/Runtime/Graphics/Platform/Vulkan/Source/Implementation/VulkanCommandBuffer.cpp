@@ -439,6 +439,7 @@ namespace Ry
 
 		if(SwapChainVersion != VkSC->GetSwapchainVersion())
 		{
+			// TODO: CAN CRASH WITH INVALID RENDERPASS - should recreate as soon as screen is resized
 			vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
 			// Recreate command buffers (swap chain image count could have changed for all we know)

@@ -386,6 +386,8 @@ namespace Ry
 	void Batch::Resize(int32 Width, int32 Height)
 	{
 		Projection = Ry::ortho4(0, (float) Width, (float)Height, 0, -1, 1);
+
+		bNeedsRecord = true;
 	}
 
 	void Batch::SetProjection(const Matrix4& Proj)

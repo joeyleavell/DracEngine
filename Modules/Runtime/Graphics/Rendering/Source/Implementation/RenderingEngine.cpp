@@ -134,11 +134,11 @@ namespace Ry
 	void HandleResize(int32 Width, int32 Height)
 	{
 		// Resize frame buffers
-		UIPass->ResizeBuffer(Width, Height);
-		ScenePass->ResizeBuffer(Width, Height);
+		//UIPass->ResizeBuffer(Width, Height);
+		//ScenePass->ResizeBuffer(Width, Height);
 
-		ShapeBatcher->Resize(Width, Height);
-		TextBatcher->Resize(Width, Height);
+		//ShapeBatcher->Resize(Width, Height);
+		//TextBatcher->Resize(Width, Height);
 
 		// Resize standard batches
 	//	ShapeBatcher->ResizeProjection(Width, Height);
