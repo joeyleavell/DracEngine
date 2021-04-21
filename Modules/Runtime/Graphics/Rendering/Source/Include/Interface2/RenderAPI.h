@@ -16,6 +16,7 @@ namespace Ry
 	class ResourceSetDescription;
 	class ResourceSet;
 	class Texture2;
+	class RenderPass2;
 	struct PipelineCreateInfo;
 	enum class ShaderStage;
 
@@ -26,7 +27,7 @@ namespace Ry
 		RenderAPI2() {};
 		virtual ~RenderAPI2() = default;
 
-		virtual RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target) = 0;
+		virtual RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass = nullptr) = 0;
 		virtual VertexArray2* CreateVertexArray(const Ry::VertexFormat& Format) = 0;
 		virtual Shader2* CreateShader(Ry::String VertexShaderLoc, Ry::String FragShaderLoc) = 0;
 		virtual Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo) = 0;

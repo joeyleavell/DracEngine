@@ -37,10 +37,10 @@ namespace Ry
 	{
 	public:
 
-		VulkanCommandBuffer2(SwapChain* SC);
+		VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {});
 		virtual ~VulkanCommandBuffer2();
 
-		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass);
+		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass, bool bUseSecondary);
 		void RecordEndRenderPass(VkCommandBuffer CmdBuffer);
 		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline2* Pipeline);
 		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight);
@@ -48,10 +48,12 @@ namespace Ry
 		void RecordBindResourceSet(VkCommandBuffer CmdBuffer, int32 CmdBufferIndex, BindResourcesCommand* Cmd);
 		void RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, uint32 FirstVertex, uint32 Count);
 		void RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, uint32 FirstIndex, uint32 Count);
+		void RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer2* Secondary);
 
 
 		void ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, VulkanFrameBuffer* Target, uint8* Data, uint32& Marker);
 
+		bool CheckDirty() override;
 		void Submit() override;
 		void BeginCmd() override;
 		void EndCmd() override;
@@ -63,6 +65,8 @@ namespace Ry
 		Ry::ArrayList<VkCommandBuffer> GeneratedBuffers;
 
 	private:
+
+		void ForceRecord();
 
 		int32 SwapChainVersion;
 

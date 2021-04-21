@@ -15,7 +15,7 @@ namespace Ry
 	{
 	public:
 
-		RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target) override;
+		RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass = nullptr) override;
 		VertexArray2* CreateVertexArray(const Ry::VertexFormat& Format) override;
 		Shader2* CreateShader(Ry::String VertexLoc, Ry::String FragmentLoc) override;
 		Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo) override;

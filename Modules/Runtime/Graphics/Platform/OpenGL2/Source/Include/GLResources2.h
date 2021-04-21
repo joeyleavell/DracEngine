@@ -70,7 +70,7 @@ namespace Ry
 
 		void CreateBuffer() override;
 		void DeleteBuffer() override;
-		void Update() override;
+		bool Update() override;
 		void FlushBuffer(int32 Frame) override;
 
 		void BindTexture(Ry::String TextureName, const Ry::Texture2* Resource) override;

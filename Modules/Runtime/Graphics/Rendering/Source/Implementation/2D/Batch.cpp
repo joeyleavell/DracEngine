@@ -325,8 +325,10 @@ namespace Ry
 		}
 	}
 	
-	Batch::Batch(Ry::SwapChain* Target, const VertexFormat& Format, Ry::Shader2* Shad, bool bTexture)
+	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass2* ParentPass, const VertexFormat& Format, Ry::Shader2* Shad, bool bTexture)
 	{
+		this->ParentPass = ParentPass;
+		
 		// Initialize dynamic mesh
 		BatchMesh = new Ry::Mesh2(Format);
 		
@@ -349,8 +351,8 @@ namespace Ry
 		CreatePipeline(Format, Target, ShaderToUse);
 
 		// Create command buffer
-		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target);
-		//RecordCommands();
+		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target, ParentPass);
+		RecordCommands();
 
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
@@ -446,7 +448,7 @@ namespace Ry
 		
 	}
 
-	void Batch::Render()
+	bool Batch::Render()
 	{
 		// Update uniform
 		// Todo: change this to a push constant and only change it if needed
@@ -461,15 +463,32 @@ namespace Ry
 			}
 		}
 
+		bool bWasDirty = CommandBuffer->CheckDirty();
+		bool bReturn = bWasDirty || bNeedsRecord;
+
+		// Check dirty will see if the command buffer needs to be re-recorded
 		if (bNeedsRecord)
 		{
-			// Re-record commands
-			RecordCommands();
+			if(!bWasDirty)
+			{
+				// Re-record commands
+				RecordCommands();
+			}
+
 			bNeedsRecord = false;
 		}
 
-		// Submit command buffer, assume we're in a valid context
-		CommandBuffer->Submit();
+		return bReturn;
+	}
+
+	void Batch::SetRenderPass(RenderPass2* ParentRenderPass)
+	{
+		CommandBuffer->UpdateParentRenderPass(ParentRenderPass);
+	}
+
+	Ry::RenderingCommandBuffer2* Batch::GetCommandBuffer()
+	{
+		return CommandBuffer;
 	}
 
 	void Batch::CreateResources(SwapChain* Swap)
@@ -536,23 +555,17 @@ namespace Ry
 		
 		CommandBuffer->BeginCmd();
 		{
-			CommandBuffer->BeginRenderPass();
-			{
-				CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
-				CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+			CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+			CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
 
-				// Bind pipeline
-				CommandBuffer->BindPipeline(Pipeline);
+			// Bind pipeline
+			CommandBuffer->BindPipeline(Pipeline);
 
-				// Bind resources
-				CommandBuffer->BindResources(ResourceSets.GetData(), ResourceSets.GetSize());
+			// Bind resources
+			CommandBuffer->BindResources(ResourceSets.GetData(), ResourceSets.GetSize());
 
-				// Draw the mesh
-				CommandBuffer->DrawVertexArrayIndexed(BatchMesh->GetVertexArray(), BatchMesh->GetMeshData()->Sections.get(0)->StartIndex, BatchMesh->GetMeshData()->Sections.get(0)->Count);
-				
-			}
-			CommandBuffer->EndRenderPass();
-
+			// Draw the mesh
+			CommandBuffer->DrawVertexArrayIndexed(BatchMesh->GetVertexArray(), BatchMesh->GetMeshData()->Sections.get(0)->StartIndex, BatchMesh->GetMeshData()->Sections.get(0)->Count);
 		}
 		CommandBuffer->EndCmd();
 	}
@@ -1012,7 +1025,7 @@ namespace Ry
 
 		CommandBuffer->BeginCmd();
 		{
-			CommandBuffer->BeginRenderPass();
+			//CommandBuffer->BeginRenderPass();
 			{
 				CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
 				CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
@@ -1027,7 +1040,7 @@ namespace Ry
 				CommandBuffer->DrawVertexArrayIndexed(FontMesh->GetVertexArray(), FontMesh->GetMeshData()->Sections.get(0)->StartIndex, FontMesh->GetMeshData()->Sections.get(0)->Count);
 
 			}
-			CommandBuffer->EndRenderPass();
+			//CommandBuffer->EndRenderPass();
 
 		}
 		CommandBuffer->EndCmd();

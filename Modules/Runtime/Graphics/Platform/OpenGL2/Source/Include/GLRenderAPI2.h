@@ -16,7 +16,7 @@ namespace Ry
 		GLRenderAPI() {};
 		virtual ~GLRenderAPI() = default;
 
-		RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target);
+		RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass = nullptr);
 		VertexArray2* CreateVertexArray(const Ry::VertexFormat& Format);
 		Shader2* CreateShader(Ry::String VSAsset, Ry::String FSAsset);
 		Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo);

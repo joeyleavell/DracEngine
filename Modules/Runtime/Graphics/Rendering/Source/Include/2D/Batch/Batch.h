@@ -71,6 +71,7 @@ Mesh->GetMeshData()->AddTriangle(i0+2, i0+3, i0+0); \
 
 namespace Ry
 {
+	class RenderPass2;
 	class Texture2;
 	class Text;
 	class Color;
@@ -191,7 +192,7 @@ namespace Ry
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr, bool bTexture = false);
+		Batch(Ry::SwapChain* Target, Ry::RenderPass2* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr, bool bTexture = false);
 		
 		void AddItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
@@ -205,7 +206,11 @@ namespace Ry
 		void Camera(const Camera* Cam);
 		void Update();
 		void SetTexture(Texture2* Texture);
-		void Render();
+		bool Render();
+
+		void SetRenderPass(RenderPass2* ParentRenderPass);
+
+		Ry::RenderingCommandBuffer2* GetCommandBuffer();
 		
 	private:
 
@@ -226,7 +231,8 @@ namespace Ry
 		int LastIndexCount = -1;
 		
 		Ry::RenderingCommandBuffer2* CommandBuffer;
-
+		Ry::RenderPass2* ParentPass;
+		
 		// Texture resources
 		Ry::ResourceSetDescription* TextureResDesc;
 		Ry::ResourceSet* TextureRes;

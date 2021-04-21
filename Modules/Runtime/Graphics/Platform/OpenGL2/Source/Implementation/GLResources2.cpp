@@ -230,9 +230,9 @@ namespace Ry
 		}
 	}
 
-	void GLResources2::Update()
+	bool GLResources2::Update()
 	{
-		
+		return false;
 	}
 
 	void GLResources2::FlushBuffer(int32 Frame)

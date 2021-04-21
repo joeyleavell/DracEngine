@@ -20,6 +20,7 @@ namespace Ry
 	constexpr uint8 OP_SET_VIEWPORT_SIZE = 6;
 	constexpr uint8 OP_SET_SCISSOR_SIZE = 7;
 	constexpr uint8 OP_BIND_RESOURCE_SET = 8;
+	constexpr uint8 OP_COMMAND_BUFFER = 9;
 
 	class Pipeline2;
 	class VertexArray2;
@@ -69,9 +70,16 @@ namespace Ry
 		int32 IndexCount = 0;
 	};
 
+	struct RENDERING_MODULE CommandBufferCommand
+	{
+		Ry::RenderingCommandBuffer2* CmdBuffer = nullptr;
+	};
+
+
 	struct RENDERING_MODULE BeginRenderPassCommand
 	{
 		Ry::RenderPass2* RenderPass;
+		bool bUseSecondary;
 	};
 
 	class RENDERING_MODULE RenderCommand
@@ -84,6 +92,12 @@ namespace Ry
 		
 	};
 
+	struct SecondaryCommandBufferInfo
+	{
+		bool bSecondary = false;
+		RenderPass2* ParentRenderPass = nullptr;
+	};
+
 	class RENDERING_MODULE RenderingCommandBuffer2
 	{
 	public:
@@ -91,10 +105,11 @@ namespace Ry
 		/**
 		 * Tells the command buffer to generate a buffer compatible with the swap chain frame buffer.
 		 */
-		RenderingCommandBuffer2(SwapChain* SC) :
+		RenderingCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {}) :
 		Marker(0)
 		{
 			this->Swap = SC;
+			this->SecondaryInfo = SecondaryInfo;
 			bDirty = false;
 			bOneTimeUse = false;
 			bImmediate = false;
@@ -119,6 +134,11 @@ namespace Ry
 			this->bOneTimeUse = bUseOnce;
 		}
 
+		void UpdateParentRenderPass(RenderPass2* RenderPass)
+		{
+			this->SecondaryInfo.ParentRenderPass = RenderPass;
+		}
+
 		template<typename T>
 		T* ExtractToken(uint32& Marker, uint8* Data)
 		{
@@ -132,7 +152,7 @@ namespace Ry
 			return ExtractedCmd;
 		}
 
-		virtual void BeginRenderPass()
+		virtual void BeginRenderPass(bool bUseSecondary)
 		{
 			if(!Swap)
 			{
@@ -140,13 +160,13 @@ namespace Ry
 				return;
 			}
 			
-			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass() };
+			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), bUseSecondary };
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		
-		virtual void BeginRenderPass(Ry::RenderPass2* RenderPass)
+		virtual void BeginRenderPass(Ry::RenderPass2* RenderPass, bool bUseSecondary)
 		{
-			BeginRenderPassCommand Cmd{ RenderPass };
+			BeginRenderPassCommand Cmd{ RenderPass, bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		
@@ -194,18 +214,33 @@ namespace Ry
 			PushCmdData(&Cmd, sizeof(Cmd), OP_DRAW_VERTEX_ARRAY_INDEXED);
 		}
 
+		virtual void CommandBuffer(Ry::RenderingCommandBuffer2* CmdBuffer)
+		{
+			CommandBufferCommand Cmd{ CmdBuffer };
+			PushCmdData(&Cmd, sizeof(Cmd), OP_COMMAND_BUFFER);
+
+			SecondaryBuffers.Add(CmdBuffer);
+		}
+
 		virtual void Reset()
 		{
 			Marker = 0;
 			bDirty = true;
+
+			SecondaryBuffers.Clear();
 		}
 
+		virtual bool CheckDirty() = 0;
 		virtual void Submit() = 0;
 		virtual void BeginCmd() = 0;
 		virtual void EndCmd() = 0;
 
 	protected:
 
+		Ry::ArrayList<RenderingCommandBuffer2*> SecondaryBuffers;
+
+		SecondaryCommandBufferInfo SecondaryInfo;
+		
 		bool bDirty;
 		SwapChain* Swap;
 

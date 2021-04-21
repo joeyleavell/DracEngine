@@ -14,9 +14,16 @@
 namespace Ry
 {
 
-	RenderingCommandBuffer2* VulkanRenderAPI::CreateCommandBuffer(Ry::SwapChain* Target)
-	{		
-		return new Ry::VulkanCommandBuffer2(Target);
+	RenderingCommandBuffer2* VulkanRenderAPI::CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass)
+	{
+		if(ParentRenderPass)
+		{
+			return new Ry::VulkanCommandBuffer2(Target, SecondaryCommandBufferInfo{true, ParentRenderPass});
+		}
+		else
+		{
+			return new Ry::VulkanCommandBuffer2(Target);
+		}
 	}
 
 	VertexArray2* VulkanRenderAPI::CreateVertexArray(const Ry::VertexFormat& Format)

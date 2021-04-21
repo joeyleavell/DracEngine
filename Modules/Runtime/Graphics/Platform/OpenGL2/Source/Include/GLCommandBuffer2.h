@@ -12,8 +12,11 @@ namespace Ry
 
 	public:
 
-		GLCommandBuffer2(SwapChain* SC) :
-		RenderingCommandBuffer2(SC){}
+		GLCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {}) :
+		RenderingCommandBuffer2(SC, SecondaryInfo)
+		{
+			BoundState = nullptr;
+		}
 
 		void Submit() override;
 		void BeginCmd() override;

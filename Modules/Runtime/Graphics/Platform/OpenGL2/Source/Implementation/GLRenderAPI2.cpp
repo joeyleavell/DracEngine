@@ -11,9 +11,16 @@
 
 namespace Ry
 {
-	RenderingCommandBuffer2* GLRenderAPI::CreateCommandBuffer(Ry::SwapChain* Target)
+	RenderingCommandBuffer2* GLRenderAPI::CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass)
 	{
-		return new GLCommandBuffer2(Target);
+		if(ParentRenderPass)
+		{
+			return new GLCommandBuffer2(Target, SecondaryCommandBufferInfo{true, ParentRenderPass});
+		}
+		else
+		{
+			return new GLCommandBuffer2(Target);
+		}
 	}
 
 	VertexArray2* GLRenderAPI::CreateVertexArray(const Ry::VertexFormat& Format)

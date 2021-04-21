@@ -189,8 +189,8 @@ namespace Ry
 		return &CmdBuffer;
 	}
 
-	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC) :
-	RenderingCommandBuffer2(SC)
+	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo) :
+	RenderingCommandBuffer2(SC, SecondaryInfo)
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -238,7 +238,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass)
+	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass, bool bUseSecondary)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -262,7 +262,14 @@ namespace Ry
 		RenderPassInfo.clearValueCount = 2;
 		RenderPassInfo.pClearValues = ClearValues.GetData();
 
-		vkCmdBeginRenderPass(CmdBuffer, &RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		if(bUseSecondary)
+		{
+			vkCmdBeginRenderPass(CmdBuffer, &RenderPassInfo, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+		}
+		else
+		{
+			vkCmdBeginRenderPass(CmdBuffer, &RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		}
 	}
 
 	void VulkanCommandBuffer2::RecordEndRenderPass(VkCommandBuffer CmdBuffer)
@@ -377,6 +384,13 @@ namespace Ry
 
 	}
 
+	void VulkanCommandBuffer2::RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer2* Secondary)
+	{
+
+		vkCmdExecuteCommands(CmdBuffer, 1, &Secondary->GeneratedBuffers[Index]);
+
+	}
+
 	void VulkanCommandBuffer2::ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, VulkanFrameBuffer* Target, uint8* Data, uint32& Marker)
 	{
 		uint8 NextOpCode = Data[Marker];
@@ -386,7 +400,7 @@ namespace Ry
 		if (NextOpCode == OP_BEGIN_RENDER_PASS)
 		{
 			BeginRenderPassCommand* BeginCmd = ExtractToken<BeginRenderPassCommand>(Marker, Data);
-			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass);
+			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary);
 		}
 
 		if (NextOpCode == OP_END_RENDER_PASS)
@@ -431,7 +445,55 @@ namespace Ry
 			RecordDrawVertexArrayIndexed(CurrentCmdBuffer, Cmd->VertexArray, Cmd->FirstIndex, Cmd->IndexCount);
 		}
 
+		if (NextOpCode == OP_COMMAND_BUFFER)
+		{
+			CommandBufferCommand* Cmd = ExtractToken<CommandBufferCommand>(Marker, Data);
+			RecordCommandBuffer(CurrentCmdBuffer, CmdBufferIndex, dynamic_cast<VulkanCommandBuffer2*>(Cmd->CmdBuffer));
+		}
+
 	}
+
+	bool VulkanCommandBuffer2::CheckDirty()
+	{
+		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);		
+		int32 FrameIndex = VkSC->GetCurrentImageIndex();
+
+		CORE_ASSERT(FrameIndex >= 0);
+
+		if (DirtyImages.Contains(FrameIndex))
+		{
+			// Rebuild this buffer
+			RecordForIndex(FrameIndex);
+
+			DirtyImages.Remove(FrameIndex);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void VulkanCommandBuffer2::ForceRecord()
+	{
+		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
+
+		// TODO: CAN CRASH WITH INVALID RENDERPASS - should recreate as soon as screen is resized
+		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+
+		// Recreate command buffers (swap chain image count could have changed for all we know)
+		FreeBuffers();
+		CreateBuffers();
+
+		// Re-record all children buffers 
+
+		for (uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+		{
+			RecordForIndex(Fb);
+		}
+
+		SwapChainVersion = VkSC->GetSwapchainVersion();
+	}
+
 
 	void VulkanCommandBuffer2::Submit()
 	{		
@@ -439,19 +501,15 @@ namespace Ry
 
 		if(SwapChainVersion != VkSC->GetSwapchainVersion())
 		{
-			// TODO: CAN CRASH WITH INVALID RENDERPASS - should recreate as soon as screen is resized
-			vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
-
-			// Recreate command buffers (swap chain image count could have changed for all we know)
-			FreeBuffers();
-			CreateBuffers();
-
-			for(uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+			// Force re-create all children
+			for(RenderingCommandBuffer2* Child : SecondaryBuffers)
 			{
-				RecordForIndex(Fb);
+				VulkanCommandBuffer2* VkCmd = dynamic_cast<VulkanCommandBuffer2*>(Child);
+
+				VkCmd->ForceRecord();
 			}
 			
-			SwapChainVersion = VkSC->GetSwapchainVersion();
+			ForceRecord();
 		}
 		else if (!bHasUpdatedThisFrame)
 		{
@@ -549,13 +607,31 @@ namespace Ry
 		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		BeginInfo.pInheritanceInfo = nullptr;
 
+		// Pass in information if a secondary command buffer
+		if(SecondaryInfo.bSecondary)
+		{
+			VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(SecondaryInfo.ParentRenderPass);
+			
+			// Setup renderpass inheritance info			
+			VkCommandBufferInheritanceInfo InheritanceInfo{};
+			InheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+			InheritanceInfo.pNext = nullptr;
+			InheritanceInfo.framebuffer = VK_NULL_HANDLE;
+			InheritanceInfo.occlusionQueryEnable = false;
+			InheritanceInfo.subpass = 0; // TODO: need to specify this as well
+			InheritanceInfo.renderPass = VkRenderPass->GetRenderPass();
+			
+			BeginInfo.pInheritanceInfo = &InheritanceInfo;
+			BeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+		}
+
 		if (bOneTimeUse)
 		{
-			BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+			BeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 		}
 		else
 		{
-			BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+			BeginInfo.flags |= VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 		}
 
 		if (vkBeginCommandBuffer(NewBuffer, &BeginInfo) != VK_SUCCESS)
@@ -608,8 +684,16 @@ namespace Ry
 		VkCommandBufferAllocateInfo AllocInfo{};
 		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
-		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
+
+		if(SecondaryInfo.bSecondary)
+		{
+			AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+		}
+		else
+		{
+			AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		}
 
 		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &Result) == VK_SUCCESS)
 		{
