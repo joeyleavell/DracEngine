@@ -537,6 +537,7 @@ namespace Ry
 		CreateInfo.VertFormat = Format;
 		CreateInfo.RenderPass = SwapChain->GetDefaultRenderPass();
 		CreateInfo.Depth.bEnableDepthTest = false; // Turn off depth test
+		CreateInfo.Blend.bEnabled = true; // Enable blending
 
 		// Add resource description to pipeline
 		CreateInfo.ResourceDescriptions.Add(SceneResDesc);

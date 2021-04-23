@@ -89,16 +89,36 @@ namespace Ry
 
 	bool VulkanPipeline::CreateBlendState(VkPipelineColorBlendStateCreateInfo& OutBlendState)
 	{
+		// Map enum blend to vulkan blend factor
+
+		static VkBlendFactor MappedFactors[] = {
+			VK_BLEND_FACTOR_SRC_ALPHA,
+			VK_BLEND_FACTOR_DST_ALPHA,
+			VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+			VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
+			VK_BLEND_FACTOR_ONE,
+			VK_BLEND_FACTOR_ZERO
+		};
+
+		static VkBlendOp MappedOps[] = {
+			VK_BLEND_OP_ADD
+		};
+
+		VkBlendFactor SrcFactor      = MappedFactors[(int32)CreateInfo.Blend.SrcFactor];
+		VkBlendFactor DstFactor      = MappedFactors[(int32)CreateInfo.Blend.DstFactor];
+		VkBlendFactor SrcAlphaFactor = MappedFactors[(int32)CreateInfo.Blend.SrcAlphaFactor];
+		VkBlendFactor DstAlphaFactor = MappedFactors[(int32)CreateInfo.Blend.DstAlphaFactor];
+		VkBlendOp     BlendOp        = MappedOps[(int32)CreateInfo.Blend.Op];
 
 		VkPipelineColorBlendAttachmentState ColorBlendAttachment{};
 		ColorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		ColorBlendAttachment.blendEnable = VK_TRUE;
-		ColorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA; // Optional
-		ColorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Optional
-		ColorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-		ColorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-		ColorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-		ColorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+		ColorBlendAttachment.blendEnable = CreateInfo.Blend.bEnabled ? VK_TRUE : VK_FALSE;
+		ColorBlendAttachment.srcColorBlendFactor = SrcFactor;
+		ColorBlendAttachment.dstColorBlendFactor = DstFactor;
+		ColorBlendAttachment.colorBlendOp = BlendOp;
+		ColorBlendAttachment.srcAlphaBlendFactor = SrcAlphaFactor;
+		ColorBlendAttachment.dstAlphaBlendFactor = DstAlphaFactor;
+		ColorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 
 		Ry::ArrayList<VkPipelineColorBlendAttachmentState> ColorBlendAttachments = {
 			ColorBlendAttachment
@@ -106,13 +126,13 @@ namespace Ry
 		
 		OutBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 		OutBlendState.logicOpEnable = VK_FALSE;
-		OutBlendState.logicOp = VK_LOGIC_OP_COPY; // Optional
+		OutBlendState.logicOp = VK_LOGIC_OP_COPY;
 		OutBlendState.attachmentCount = ColorBlendAttachments.GetSize();
 		OutBlendState.pAttachments = ColorBlendAttachments.CopyData();
-		OutBlendState.blendConstants[0] = 0.0f; // Optional
-		OutBlendState.blendConstants[1] = 0.0f; // Optional
-		OutBlendState.blendConstants[2] = 0.0f; // Optional
-		OutBlendState.blendConstants[3] = 0.0f; // Optional
+		OutBlendState.blendConstants[0] = 0.0f;
+		OutBlendState.blendConstants[1] = 0.0f;
+		OutBlendState.blendConstants[2] = 0.0f;
+		OutBlendState.blendConstants[3] = 0.0f;
 
 		return true;
 	}

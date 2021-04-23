@@ -18,6 +18,35 @@ namespace Ry
 		bool bEnableDepthTest;
 	};
 
+	enum class BlendingFactor
+	{
+		SrcAlpha,
+		DstAlpha,
+		OneMinusSrcAlpha,
+		OneMinusDstAlpha,
+		One,
+		Zero
+	};
+
+	enum class BlendOperator
+	{
+		Add
+	};
+
+	struct PipelineBlendInfo
+	{
+		// Whether blending should be enabled
+		bool bEnabled = false;
+
+		BlendingFactor SrcFactor = Ry::BlendingFactor::SrcAlpha;
+		BlendingFactor DstFactor = Ry::BlendingFactor::OneMinusSrcAlpha;
+		BlendingFactor SrcAlphaFactor = Ry::BlendingFactor::One;
+		BlendingFactor DstAlphaFactor = BlendingFactor::Zero;
+
+		BlendOperator Op = Ry::BlendOperator::Add;
+
+	};
+
 	struct PipelineCreateInfo
 	{
 		Ry::ArrayList<Ry::ResourceSetDescription*> ResourceDescriptions;
@@ -25,6 +54,7 @@ namespace Ry
 		Ry::RenderPass2* RenderPass = nullptr;
 		Ry::VertexFormat VertFormat;
 		PipelineDepth Depth;
+		PipelineBlendInfo Blend;
 
 		// todo: GET THESE FROM SWAP CHAIN WHEN CREATING
 		uint32 ViewportWidth = 0;
