@@ -8,6 +8,10 @@
 
 namespace Ry
 {
+	bool GLCommandBuffer2::CheckDirty()
+	{
+		return false;
+	}
 
 	void GLCommandBuffer2::Submit()
 	{

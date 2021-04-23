@@ -13,12 +13,18 @@ namespace Ry
 	class UniformBuffer;
 	class ResourceSetDescription;
 
+	struct PipelineDepth
+	{
+		bool bEnableDepthTest;
+	};
+
 	struct PipelineCreateInfo
 	{
 		Ry::ArrayList<Ry::ResourceSetDescription*> ResourceDescriptions;
 		Ry::Shader2* PipelineShader = nullptr;
 		Ry::RenderPass2* RenderPass = nullptr;
 		Ry::VertexFormat VertFormat;
+		PipelineDepth Depth;
 
 		// todo: GET THESE FROM SWAP CHAIN WHEN CREATING
 		uint32 ViewportWidth = 0;

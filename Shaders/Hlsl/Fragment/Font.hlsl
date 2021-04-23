@@ -16,13 +16,13 @@ struct PixelInput
 PixelOutput main(PixelInput In)
 {
 	PixelOutput Out;
-	
-	Out.PixelColor = In.VertColor * FontTexture.Sample(FontSampler, In.VertTexCoord).r;
 
-	//Out.PixelColor = In.VertColor;
-	
+	float Value = FontTexture.Sample(FontSampler, In.VertTexCoord).r;
+	Out.PixelColor = In.VertColor * Value;
+	Out.PixelColor.a = Value;
+		
 	// Todo: do we want an if statement here?
-	if(Out.PixelColor.r <= .01)
+	if(Value <= .01)
 		discard;
 			
 	return Out;

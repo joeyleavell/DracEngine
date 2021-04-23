@@ -556,10 +556,13 @@ namespace Ry
 			if(CurrentImageIndex < 0)
 			{
 				// Record all buffers, have to perform device wait to ensure no operations
+				vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+
 				for(uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
 				{
 					BuffersToRecord.Add(Fb);
 				}
+
 			}
 			else
 			{

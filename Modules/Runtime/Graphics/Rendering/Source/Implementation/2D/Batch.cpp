@@ -536,6 +536,7 @@ namespace Ry
 		CreateInfo.PipelineShader = Shad;
 		CreateInfo.VertFormat = Format;
 		CreateInfo.RenderPass = SwapChain->GetDefaultRenderPass();
+		CreateInfo.Depth.bEnableDepthTest = false; // Turn off depth test
 
 		// Add resource description to pipeline
 		CreateInfo.ResourceDescriptions.Add(SceneResDesc);

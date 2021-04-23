@@ -18,6 +18,8 @@ namespace Ry
 			BoundState = nullptr;
 		}
 
+
+		bool CheckDirty() override;
 		void Submit() override;
 		void BeginCmd() override;
 		void EndCmd() override;

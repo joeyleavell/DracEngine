@@ -152,7 +152,7 @@ namespace Ry
 			return ExtractedCmd;
 		}
 
-		virtual void BeginRenderPass(bool bUseSecondary)
+		virtual void BeginRenderPass(bool bUseSecondary = false)
 		{
 			if(!Swap)
 			{

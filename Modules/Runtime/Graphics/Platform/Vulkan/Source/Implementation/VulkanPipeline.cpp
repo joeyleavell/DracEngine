@@ -92,9 +92,9 @@ namespace Ry
 
 		VkPipelineColorBlendAttachmentState ColorBlendAttachment{};
 		ColorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		ColorBlendAttachment.blendEnable = VK_FALSE;
-		ColorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-		ColorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
+		ColorBlendAttachment.blendEnable = VK_TRUE;
+		ColorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA; // Optional
+		ColorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA; // Optional
 		ColorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
 		ColorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
 		ColorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
@@ -196,8 +196,10 @@ namespace Ry
 	bool VulkanPipeline::CreateDepthStencilState(VkPipelineDepthStencilStateCreateInfo& OutState)
 	{
 		OutState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-		OutState.depthTestEnable = VK_TRUE;
-		OutState.depthWriteEnable = VK_TRUE;
+
+		// Depth test setting
+		OutState.depthTestEnable = CreateInfo.Depth.bEnableDepthTest ? VK_TRUE : VK_FALSE;
+		OutState.depthWriteEnable = CreateInfo.Depth.bEnableDepthTest ? VK_TRUE : VK_FALSE;
 
 		OutState.depthCompareOp = VK_COMPARE_OP_LESS;
 
