@@ -19,9 +19,11 @@ layout(location = 0) out vec4 out_var_SV_Target;
 
 PixelOutput src_main(PixelInput In)
 {
+    float Value = texture(SPIRV_Cross_CombinedFontTextureFontSampler, In.VertTexCoord).x;
     PixelOutput Out;
-    Out.PixelColor = In.VertColor * texture(SPIRV_Cross_CombinedFontTextureFontSampler, In.VertTexCoord).x;
-    if (Out.PixelColor.x <= 0.00999999977648258209228515625)
+    Out.PixelColor = In.VertColor * Value;
+    Out.PixelColor.w = Value;
+    if (Value <= 0.00999999977648258209228515625)
     {
         discard;
     }
@@ -31,8 +33,8 @@ PixelOutput src_main(PixelInput In)
 void main()
 {
     PixelInput param_var_In = PixelInput(in_var_TEXCOORD, in_var_COLOR);
-    PixelOutput _31 = src_main(param_var_In);
-    out_var_SV_Target = _31.PixelColor;
+    PixelOutput _34 = src_main(param_var_In);
+    out_var_SV_Target = _34.PixelColor;
 }
 
 

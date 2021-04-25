@@ -170,12 +170,18 @@ int main(int ArgC, char** ArgV)
 	{
 		//"-RenderAPI=[OpenGL|GLES|Metal|Vulkan|DX12|DX11]"
 
-		Ry::RenderingPlatform Plat = Ry::RenderingPlatform::OpenGL;
+		Ry::RenderingPlatform Plat = Ry::RenderingPlatform::Vulkan;
 
 		if (Ry::HasOption(Options, "Vulkan"))
 		{
 			Plat = Ry::RenderingPlatform::Vulkan;
 		}
+
+		if (Ry::HasOption(Options, "OpenGL"))
+		{
+			Plat = Ry::RenderingPlatform::OpenGL;
+		}
+
 
 		if(Command == "launch")
 		{

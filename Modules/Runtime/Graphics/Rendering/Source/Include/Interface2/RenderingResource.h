@@ -4,7 +4,7 @@
 #include "Interface2/Shader2.h"
 #include "RenderingGen.h"
 
-#define DeclPrimitive(DataType, Name) new Ry::PrimitiveBufferMember(Name, ShaderPrimitiveDataType::DataType, 1)
+#define DeclPrimitive(DataType, Name) new Ry::PrimitiveBufferMember(Name, Ry::ShaderPrimitiveDataType::DataType, 1)
 #define DeclStruct(Name, InitializerList) new Ry::StructBufferMember(Name, 1, InitializerList)
 #define DeclPrimitiveArray(DataType, Name, ArraySize) new Ry::PrimitiveBufferMember(Name, ShaderPrimitiveDataType::DataType, ArraySize)
 #define DeclStructArray(Name, ArraySize, InitializerList) new Ry::StructBufferMember(Name, ArraySize, InitializerList)

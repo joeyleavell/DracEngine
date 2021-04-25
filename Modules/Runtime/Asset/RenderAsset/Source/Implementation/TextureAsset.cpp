@@ -21,7 +21,12 @@ namespace Ry
 
 		return NewTexture;
 	}
-	
+
+	Ry::Bitmap* TextureAsset::GetResource()
+	{
+		return Resource;
+	}
+
 	void TextureAsset::UnloadAsset()
 	{
 		for(Texture2* RuntimeResource : RuntimeResources)

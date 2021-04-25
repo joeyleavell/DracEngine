@@ -113,6 +113,22 @@ namespace Ry
 		}
 	};
 
+	struct RENDERING_MODULE Vertex1P1UV1N1C : public Vertex1P1UV1N
+	{
+		Vector4 Color;
+
+		Vertex1P1UV1N1C(float X = 0.0f, float Y = 0.0f, float Z = 0.0f, float U = 0.0f, float V = 0.0f, float Nx = 0.0f, float Ny = 0.0f, float Nz = 0.0f, float R = 0.0f, float G = 0.0f, float B = 0.0f, float A = 0.0f) :
+			Vertex1P1UV1N(X, Y, Z, U, V, Nx, Ny, Nz),
+			Color(R, G, B, A){}
+
+		bool operator==(const Vertex1P1UV1N1C& Other) const;
+
+		virtual void Pack(float* Out) const
+		{
+			Color.Pack(Normal.Pack(UV.Pack(Position.Pack(Out))));
+		}
+	};
+
 	/**
 	 * Defines meta information about a vertex attribute. A vertex attribute is an atomic element of a vertex.
 	 */

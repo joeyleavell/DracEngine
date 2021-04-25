@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Asset.h"
+#include "RenderAssetGen.h"
 
 namespace Ry
 {
@@ -8,7 +9,7 @@ namespace Ry
 	class Bitmap;
 	class Texture2;
 	
-	class TextureAsset : public Asset
+	class RENDERASSET_MODULE TextureAsset : public Asset
 	{
 	public:
 
@@ -16,6 +17,8 @@ namespace Ry
 
 		void UnloadAsset() override;
 		Texture2* CreateRuntimeTexture();
+
+		Ry::Bitmap* GetResource();
 		
 	private:
 		Ry::Bitmap* Resource;

@@ -363,21 +363,29 @@ namespace Ry
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item)
 	{
 		Items.Add(Item);
+
+		bNeedsRecord = true;
 	}
 
 	void Batch::RemoveItem(Ry::SharedPtr<BatchItem> Item)
 	{
 		Items.Remove(Item);
+
+		bNeedsRecord = true;
 	}
 
 	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item)
 	{
 		ItemSets.Add(Item);
+
+		bNeedsRecord = true;
 	}
 
 	void Batch::RemoveItemSet(Ry::SharedPtr<BatchItemSet> Item)
 	{
 		ItemSets.Remove(Item);
+
+		bNeedsRecord = true;
 	}
 
 	void Batch::SetView(const Matrix4& View)

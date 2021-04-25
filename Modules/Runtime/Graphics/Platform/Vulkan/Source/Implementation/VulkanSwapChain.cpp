@@ -132,14 +132,16 @@ namespace Ry
 		// Todo: need to determine how big of a descriptor pool to allocate and keep allocations within this range
 		Ry::ArrayList<VkDescriptorPoolSize> PoolSizes;
 
+		int32 MaxValues = 30;
+
 		// todo: Figure out best max values
 		VkDescriptorPoolSize UniformPoolSize{};
 		UniformPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		UniformPoolSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * 20;
+		UniformPoolSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
 
 		VkDescriptorPoolSize CombinedImageSamplerSize{};
 		CombinedImageSamplerSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		CombinedImageSamplerSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * 20;
+		CombinedImageSamplerSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
 
 		PoolSizes.Add(UniformPoolSize);
 		PoolSizes.Add(CombinedImageSamplerSize);
@@ -148,7 +150,7 @@ namespace Ry
 		PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		PoolInfo.poolSizeCount = PoolSizes.GetSize();
 		PoolInfo.pPoolSizes = PoolSizes.GetData();
-		PoolInfo.maxSets = static_cast<uint32_t>(SwapChainImages.size()) * 20; 
+		PoolInfo.maxSets = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
 
 		if (vkCreateDescriptorPool(GVulkanContext->GetLogicalDevice(), &PoolInfo, nullptr, &DescriptorPool) != VK_SUCCESS)
 		{

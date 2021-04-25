@@ -163,9 +163,11 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 			// If current generated exists, delete it otherwise we'll fail trying to generate it
 			
 			std::string GeneratedSource;
-			if(!Ry::GenerateReflectionCode(SourcePath.string(), ModuleIncludes, GeneratedSource))
+
+			// TODO: Commented for now until after ludum dare
+			//if(!Ry::GenerateReflectionCode(SourcePath.string(), ModuleIncludes, GeneratedSource))
 			{
-				return false;
+				//return false;
 			}
 
 			// Append an include for the base module generated file

@@ -6,7 +6,16 @@ namespace Ry
 	
 	InputHandler::InputHandler()
 	{
-	
+		// Init keys down to all false
+		for(int32 Key = 0; Key < MAX_KEYS; Key++)
+		{
+			keys_down[Key] = false;
+		}
+		
+		for (int32 Button = 0; Button < MAX_BUTTONS; Button++)
+		{
+			buttons_down[Button] = false;
+		}
 	}
 	
 	InputHandler::~InputHandler()
@@ -57,13 +66,13 @@ namespace Ry
 	{
 		if (keys_down[key] != value)
 		{
-			/*for (KeyListener* handler : keyListeners)
+			for (KeyListener* handler : keyListeners)
 			{
 				if (value)
 					handler->onKeyPressed(key);
 				else
 					handler->onKeyReleased(key);
-			}*/
+			}
 		}
 
 		keys_down[key] = value;
@@ -126,7 +135,7 @@ namespace Ry
 	
 	void InputHandler::addKeyListener(KeyListener* listener)
 	{
-	//	keyListeners.insert(listener);
+		keyListeners.insert(listener);
 	}
 	
 	void InputHandler::removeKeyListener(KeyListener* listener)

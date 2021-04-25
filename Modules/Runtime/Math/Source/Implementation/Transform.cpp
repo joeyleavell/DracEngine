@@ -35,18 +35,23 @@ namespace Ry
 		return rotation_mat_z * rotation_mat_y * rotation_mat_x;
 	}
 
-	void Transform::LookAt(const Ry::Vector3& Position)
+	void Transform::LookAt(const Ry::Vector3& Position, const Ry::Vector3& Eye)
 	{
-		
+		Ry::Vector3 Dir = Position - Eye;
+		normalize(Dir);
+
+		this->rotation = MakeRotation(Dir);
 	}
 
 	void Transform::Orbit(const Ry::Vector3& Position, float Elevation, float Azimuth, float Radius)
 	{
+		Ry::Vector3 RightVector = get_right();
+		
 		Ry::Vector3 UpVector = Ry::Vector3(0.0f, 1.0f, 0.0f);
 
 		Ry::Vector3 Forward = Ry::Vector3(0.0f, 0.0f, -1.0f);
 		Ry::Vector3 AzimuthVec = Forward.RotatedVector(UpVector, Azimuth);
-		Ry::Vector3 AzimuthElevationVec = Forward.RotatedVector(UpVector, Azimuth);
+		Ry::Vector3 AzimuthElevationVec = AzimuthVec.RotatedVector(RightVector, Elevation);
 		Ry::Vector3 Direction = normalized((AzimuthElevationVec * -1.0f));
 
 		this->position = Position + Direction * Radius;
@@ -87,6 +92,26 @@ namespace Ry
 		return Result;
 	}
 
+	Vector3 CombineRot(const Vector3& A, const Vector3& B)
+	{
+		glm::quat ThisRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(A.x), DEG_TO_RAD(A.y), DEG_TO_RAD(A.z)));
+		glm::quat OtherRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(B.x), DEG_TO_RAD(B.y), DEG_TO_RAD(B.z)));
+		glm::quat Product = OtherRotQuat * ThisRotQuat;
+		glm::vec3 EulerAngles = glm::eulerAngles(Product);
+		return Ry::Vector3(RAD_TO_DEG(EulerAngles.x), RAD_TO_DEG(EulerAngles.y), RAD_TO_DEG(EulerAngles.z));
+	}
+
+	Vector3 RotInterp(const Vector3& A, const Vector3& B, float Delta)
+	{
+		glm::quat ThisRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(A.x), DEG_TO_RAD(A.y), DEG_TO_RAD(A.z)));
+		glm::quat OtherRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(B.x), DEG_TO_RAD(B.y), DEG_TO_RAD(B.z)));
+		glm::quat Mix = glm::slerp(ThisRotQuat, OtherRotQuat, Delta);
+		glm::vec3 EulerAngles = glm::eulerAngles(Mix);
+
+		return Ry::Vector3(RAD_TO_DEG(EulerAngles.x), RAD_TO_DEG(EulerAngles.y), RAD_TO_DEG(EulerAngles.z));
+
+	}
+
 	Transform LinearInterp(const Transform& A, const Transform& B, float Delta)
 	{
 		// Extract parameters from matrix		
@@ -94,11 +119,11 @@ namespace Ry
 		Result.position = A.position * (1 - Delta) + B.position * Delta;
 		Result.scale    = A.scale * (1 - Delta) + B.scale * Delta;
 
-		glm::quat ThisRotQuat = glm::quat(glm::vec3(A.rotation.x, A.rotation.y, A.rotation.z));
-		glm::quat OtherRotQuat = glm::quat(glm::vec3(B.rotation.x, B.rotation.y, B.rotation.z));
+		glm::quat ThisRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(A.rotation.x), DEG_TO_RAD(A.rotation.y), DEG_TO_RAD(A.rotation.z)));
+		glm::quat OtherRotQuat = glm::quat(glm::vec3(DEG_TO_RAD(B.rotation.x), DEG_TO_RAD(B.rotation.y), DEG_TO_RAD(B.rotation.z)));
 		glm::quat Mix = glm::mix(ThisRotQuat, OtherRotQuat, Delta);
 		glm::vec3 EulerAngles = glm::eulerAngles(Mix);
-		Result.rotation = Ry::Vector3(EulerAngles.x, EulerAngles.y, EulerAngles.z);
+		Result.rotation = Ry::Vector3(RAD_TO_DEG(EulerAngles.x), RAD_TO_DEG(EulerAngles.y), RAD_TO_DEG(EulerAngles.z));
 
 		return Result;
 	}

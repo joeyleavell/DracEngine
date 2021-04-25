@@ -34,10 +34,12 @@ namespace Ry
 
 		}
 
-		Transform(float X, float Y, float Z, float Rx, float Ry, float Rz)
+		Transform(float X, float Y, float Z, float Rx = 0.0f, float Ry = 0.0f, float Rz = 0.0f, float Scale=1.0f)
 		{
 			position = Ry::Vector3(X, Y, Z);
 			rotation = Ry::Vector3(Rx, Ry, Rz);
+			scale = Ry::Vector3(Scale, Scale, Scale);
+
 		}
 
 		Vector3 get_forward() const;
@@ -51,7 +53,7 @@ namespace Ry
 		/**
 		 * Looks at a point, using the transforms position as the current eye.
 		 */
-		void LookAt(const Ry::Vector3& Position);
+		void LookAt(const Ry::Vector3& Position, const Ry::Vector3& Eye);
 
 		/**
 		 * Places this transform radius distance away from position, given the elevation (pitch) and azimuth (heading) of the position.
@@ -72,6 +74,10 @@ namespace Ry
 
 	};
 
+	MATH_MODULE Vector3 CombineRot(const Vector3& A, const Vector3& B);
+
+
+	MATH_MODULE Vector3 RotInterp(const Vector3& A, const Vector3& B, float Delta);
 	MATH_MODULE Transform LinearInterp(const Transform& A, const Transform& B, float Delta);
 
 }

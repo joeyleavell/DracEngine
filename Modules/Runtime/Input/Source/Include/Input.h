@@ -177,7 +177,7 @@ namespace Ry
 
 	private:
 
-		//std::set<KeyListener*> keyListeners;
+		std::set<KeyListener*> keyListeners;
 		//std::set<ButtonListener*> buttonListeners;
 		//std::set<CharListener*> charListeners;
 		//std::set<ScrollListener*> scrollListeners;

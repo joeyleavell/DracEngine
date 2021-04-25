@@ -455,18 +455,19 @@ namespace Ry
 		return result;
 	}
 
-	template <uint32 S>
-	float dot(const Vector<S>& a, const Vector<S>& b)
+	template <unsigned R_>
+	float dot(const Vector<R_>& a, const Vector<R_>& b)
 	{
 		float result = 0.0f;
 
-		for (uint32 i = 0; i < S; i++)
+		for (uint32 i = 0; i < R_; i++)
 		{
-			result += a.data[i] * b.data[i];
+			result += a[i] * b[i];
 		}
 
 		return result;
 	}
+
 
 	Vector3 cross(const Vector3& a, const Vector3& b)
 	{
