@@ -1,5 +1,6 @@
 #include "Asset.h"
 #include "File/File.h"
+#include "Algorithm/Algorithm.h"
 
 namespace Ry
 {
@@ -59,10 +60,5 @@ namespace Ry
 		return Path;
 	}
 
-	template <>
-	uint32 Hash<Ry::AssetRef>(const Ry::AssetRef& Object)
-	{
-		return Hash(Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
-	}
 	
 }

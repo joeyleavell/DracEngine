@@ -17,27 +17,38 @@ namespace Ry
 		virtual Iterator& operator++() = 0;
 	};
 
-	/**
-	 * Overloaded hashing for object references
-	 */
+	template<typename Tag>
+	struct TypeTag {};
+
+	// Generic hash impl, must be implemented
 	template <typename T>
-	uint32 Hash(const T& Object);
+	uint32 HashImpl(TypeTag<T>, const T& Object)
+	{
+		return 0; // Needs to be implemented for each type
+	}
+
+	// Hash impl for pointer types
+	template <typename T>
+	inline uint32 HashImpl(TypeTag<T*>, const T& Object)
+	{
+		return reinterpret_cast<uint32>(Object);
+	}
 
 	template <>
-	inline CORE_MODULE uint32 Hash<int32>(const int32& Object)
+	inline uint32 HashImpl<int32>(TypeTag<int32>, const int32& Object)
 	{
 		return Object;
 	}
 
 	template <>
-	inline CORE_MODULE uint32 Hash<uint32>(const uint32& Object)
+	inline uint32 HashImpl<uint32>(TypeTag<uint32>, const uint32& Object)
 	{
 		return Object;
 	}
 
 	// Specialize hash function for string
 	template <>
-	inline CORE_MODULE uint32 Hash<Ry::String>(const Ry::String& Object)
+	inline uint32 HashImpl<Ry::String>(TypeTag<Ry::String>, const Ry::String& Object)
 	{
 		const int32 p = 31;
 		const int32 m = (uint32)1e9 + 9;
@@ -54,6 +65,14 @@ namespace Ry
 		return hash_value;
 	}
 
+	/**
+	 * Overloaded hashing for object references
+	 */
+	template <typename T>
+	uint32 Hash(const T& Object)
+	{
+		return HashImpl(TypeTag<T>{}, Object);
+	}
 
 
 }

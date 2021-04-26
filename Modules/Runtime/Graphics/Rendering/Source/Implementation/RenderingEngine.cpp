@@ -117,7 +117,7 @@ namespace Ry
 		Ry::Bitmap DefaultTextureBmp (1, 1, PixelStorage::FOUR_BYTE_RGBA);
 		DefaultTextureBmp.SetPixel(0, 0, 0xFFFFFFFF);
 		DefaultTexture = Ry::NewRenderAPI->CreateTexture();
-		DefaultTexture->Data(&DefaultTextureBmp);		
+		DefaultTexture->Data(&DefaultTextureBmp);
 	}
 
 	void QuitRenderingEngine()

@@ -2,6 +2,7 @@
 
 #include "Core/Core.h"
 #include "AssetCoreGen.h"
+#include "Algorithm/Algorithm.h"
 
 namespace Ry
 {
@@ -48,5 +49,12 @@ namespace Ry
 	private:
 		Ry::String Path;
 	};
+
+	template <>
+	inline uint32 HashImpl<Ry::AssetRef>(TypeTag<Ry::AssetRef>, const Ry::AssetRef& Object)
+	{
+		return HashImpl<Ry::String>(TypeTag<Ry::String>{}, Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
+	}
+
 	
 }
