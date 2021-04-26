@@ -3,6 +3,7 @@
 #include "SceneRenderer.gen.h"
 #include "Core/Core.h"
 #include "Data/Map.h"
+#include "Transform.h"
 
 namespace Ry
 {
@@ -48,6 +49,9 @@ namespace Ry
 		void SetPrimitiveSpecificResources(ResourceSet* PrimSpec);
 		ResourceSet* GetPrimitiveSpecificResources();
 
+		void SetVertexArray(VertexArray2* Verts);
+		VertexArray2* GetVertexArray();
+
 		void RecordDraw(Ry::RenderingCommandBuffer2* DstBuffer);
 
 	private:
@@ -62,6 +66,11 @@ namespace Ry
 	class SCENEGRAPH_MODULE SceneRenderer
 	{
 	public:
+
+		// ---------- Scene properties
+
+		// Combined view and projection matrix, usually the inverse of the camera matrix
+		Ry::Matrix4 ViewProjectionMatrix;
 
 		SceneRenderer(Ry::SceneGraph* TarScene);
 		virtual ~SceneRenderer();
@@ -93,10 +102,10 @@ namespace Ry
 		Ry::ResourceSetDescription* PrimResDesc; // Per primitive resource description
 		Ry::ResourceSetDescription* MaterialDesc; // Per material resource description
 
-	private:
-
 		// A map of all scene primitives to their associated resources
 		Ry::Map<ScenePrimitive*, PrimitiveResources*> PrimResources;
+
+	private:
 
 		void OnPrimitiveAdded(ScenePrimitive* Prim);
 		void OnPrimitiveRemoved(ScenePrimitive* Prim);

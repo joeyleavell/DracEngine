@@ -100,7 +100,7 @@ namespace Ry
 	int32 GLShader::createShader(int32 type, const Ry::AssetRef& Reference)
 	{
 		// Load the text file asset
-		String ShaderSource = AssetMan->LoadAsset(Reference, ASSET_TYPE_TEXT)->As<TextFileAsset>()->GetContents();
+		String ShaderSource = AssetMan->LoadAsset<TextFileAsset>(Reference, ASSET_TYPE_TEXT)->GetContents();
 		AssetMan->UnloadAsset(Reference);
 
 		int32 handle = glCreateShader(type);

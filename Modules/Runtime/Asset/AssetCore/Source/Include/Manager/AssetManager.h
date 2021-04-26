@@ -21,9 +21,11 @@ namespace Ry
 		virtual void UnregisterFactory(const Ry::String& AssetType);
 		virtual bool UnloadAsset(const Ry::AssetRef& Reference);
 
-		virtual Asset* LoadAsset(const Ry::AssetRef& Reference, const Ry::String& AssetType);
-		virtual Asset* GetOrLoadAsset(const Ry::AssetRef& Reference, const Ry::String& AssetType);
-		virtual Asset* GetAsset(const Ry::AssetRef& Reference);
+	protected:
+		
+		Asset* LoadAssetInternal(const Ry::AssetRef& Reference, const Ry::String& AssetType) override;
+		Asset* GetOrLoadAssetInternal(const Ry::AssetRef& Reference, const Ry::String& AssetType) override;
+		Asset* GetAssetInternal(const Ry::AssetRef& Reference) override;
 
 
 	private:

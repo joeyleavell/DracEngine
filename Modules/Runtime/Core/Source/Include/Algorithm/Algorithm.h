@@ -22,14 +22,11 @@ namespace Ry
 
 	// Generic hash impl, must be implemented
 	template <typename T>
-	uint32 HashImpl(TypeTag<T>, const T& Object)
-	{
-		return 0; // Needs to be implemented for each type
-	}
-
+	uint32 HashImpl(TypeTag<T>, const T& Object);
+	
 	// Hash impl for pointer types
 	template <typename T>
-	inline uint32 HashImpl(TypeTag<T*>, const T& Object)
+	uint32 HashImpl(TypeTag<T>, const T* Object)
 	{
 		return reinterpret_cast<uint32>(Object);
 	}
@@ -63,6 +60,18 @@ namespace Ry
 		}
 
 		return hash_value;
+	}
+
+	template <typename T>
+	uint32 Hash(const T* Object)
+	{
+		return (uint32) (Object);
+	}
+
+	template <typename T>
+	uint32 Hash(T* Object)
+	{
+		return HashImpl<T>(TypeTag<T>{}, Object);
 	}
 
 	/**

@@ -112,7 +112,7 @@ namespace Ry
 						NewVirtual.Replace('\\', '/');
 
 						// Todo: Texture support needs to be re-added
-						Texture2* Result = Ry::AssetMan->LoadAsset(NewVirtual, "image")->As<TextureAsset>()->CreateRuntimeTexture();
+						Texture2* Result = Ry::AssetMan->LoadAsset<TextureAsset>(NewVirtual, "image")->CreateRuntimeTexture();
 						CurrentMaterial->DiffuseTexture = Result;
 					}
 

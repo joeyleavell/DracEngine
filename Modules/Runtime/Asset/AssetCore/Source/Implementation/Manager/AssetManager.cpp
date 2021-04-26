@@ -61,7 +61,7 @@ namespace Ry
 		}
 	}
 
-	Asset* AssetManager::LoadAsset(const Ry::AssetRef& Reference, const Ry::String& AssetType)
+	Asset* AssetManager::LoadAssetInternal(const Ry::AssetRef& Reference, const Ry::String& AssetType)
 	{
 		Ry::String Canon = AssetType.to_lower();
 		if (Factories.contains(Canon))
@@ -91,9 +91,9 @@ namespace Ry
 		return nullptr;
 	}
 
-	Asset* AssetManager::GetOrLoadAsset(const Ry::AssetRef& Reference, const Ry::String& AssetType)
+	Asset* AssetManager::GetOrLoadAssetInternal(const Ry::AssetRef& Reference, const Ry::String& AssetType)
 	{
-		Asset* Current = GetAsset(Reference);
+		Asset* Current = GetAssetInternal(Reference);
 
 		if (Current)
 		{
@@ -101,11 +101,11 @@ namespace Ry
 		}
 		else
 		{
-			return LoadAsset(Reference, AssetType);
+			return LoadAssetInternal(Reference, AssetType);
 		}
 	}
 
-	Asset* AssetManager::GetAsset(const Ry::AssetRef& Reference)
+	Asset* AssetManager::GetAssetInternal(const Ry::AssetRef& Reference)
 	{
 		if (LoadedAssets.contains(Reference))
 		{

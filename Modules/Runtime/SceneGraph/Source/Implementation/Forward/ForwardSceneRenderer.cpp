@@ -6,6 +6,8 @@
 #include "RenderingEngine.h"
 #include "Interface2/Pipeline.h"
 #include "Interface2/RenderCommand.h"
+#include "SceneGraph.h"
+#include "ScenePrimitive.h"
 
 namespace Ry
 {
@@ -39,6 +41,20 @@ namespace Ry
 
 	void ForwardSceneRenderer::Render()
 	{
+		// Update scene resources
+		SceneResources->SetMatConstant("Scene", "ViewProj", ViewProjectionMatrix);
+
+		// Update primitive resources
+		for(ScenePrimitive* Prim : TargetScene->GetPrimitives())
+		{
+			PrimitiveResources* AssocRes = *PrimResources.get(Prim);
+
+			// Set the primitive's world transform
+			AssocRes->GetPrimitiveSpecificResources()->SetMatConstant("Model", "Transform", Prim->GetWorldTransform().get_transform());
+
+			// TODO: do we need to set material specific resources on frame?
+		}
+		
 		// Record command buffers needed
 
 		// TODO: figure out best way to split command buffers up
@@ -86,7 +102,7 @@ namespace Ry
 			DeclPrimitive(Float3, "DiffuseColor"),
 			DeclPrimitive(Float3, "AmbientColor"),
 			DeclPrimitive(Float3, "SpecularColor")
-			});
+		});
 		MaterialDesc->AddTextureBinding(0, "Diffuse");
 		MaterialDesc->CreateDescription();
 
@@ -151,7 +167,11 @@ namespace Ry
 
 			// For each material in each primitive:
 			// Bind its associated resources, and call draw
-
+			for(ScenePrimitive* ScenePrim : TargetScene->GetPrimitives())
+			{
+				PrimitiveResources* PrimRes = *PrimResources.get(ScenePrim);
+				PrimRes->RecordDraw(StaticCmdBuffer);
+			}
 
 		}
 

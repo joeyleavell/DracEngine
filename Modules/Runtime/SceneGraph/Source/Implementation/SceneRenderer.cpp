@@ -60,6 +60,7 @@ namespace Ry
 			// Allocate resource for this primitive (renderer will have to set values)
 			PrimitiveResources* Resources = new PrimitiveResources;
 			Resources->SetPrimitiveSpecificResources(PrimitiveRes);
+			Resources->SetVertexArray(SMPrimitive->GetMesh()->GetVertexArray());
 
 			// Allocate resources for each mesh section
 			MeshData* Data = SMPrimitive->GetMesh()->GetMeshData();
@@ -95,8 +96,8 @@ namespace Ry
 
 				// Add all resource sets to the material
 				SectionResources->Resources.Add(SceneResources);
-				SectionResources->Resources.Add(LightResources);
 				SectionResources->Resources.Add(PrimitiveRes);
+				SectionResources->Resources.Add(LightResources);
 				SectionResources->Resources.Add(MatRes);
 
 				// Add resources to overall primitive
@@ -190,6 +191,16 @@ namespace Ry
 	ResourceSet* PrimitiveResources::GetPrimitiveSpecificResources()
 	{
 		return PrimSpecificResource;
+	}
+
+	void PrimitiveResources::SetVertexArray(VertexArray2* Verts)
+	{
+		this->VertArray = Verts;
+	}
+
+	VertexArray2* PrimitiveResources::GetVertexArray()
+	{
+		return VertArray;
 	}
 
 	void PrimitiveResources::RecordDraw(Ry::RenderingCommandBuffer2* DstBuffer)

@@ -50,5 +50,7 @@ namespace Ry
 
 	};
 
+	SCENEGRAPH_MODULE ScenePrimitive* CreatePrimitive(Mesh2* SM);
+
 
 }

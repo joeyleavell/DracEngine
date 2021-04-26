@@ -174,7 +174,7 @@ namespace Ry
 
 			Proj = Ry::perspective4(EditorMainWindow->GetWindowWidth() / (float)EditorMainWindow->GetWindowHeight(), 70.0f, 0.01f, 2500.0f);
 			// Load mesh
-			Ry::MeshAsset* Asset = dynamic_cast<MeshAsset*>(Ry::AssetMan->LoadAsset("/Engine/Mesh/Rbarn15.obj", "mesh/obj"));
+			Ry::MeshAsset* Asset = Ry::AssetMan->LoadAsset<MeshAsset>("/Engine/Mesh/Rbarn15.obj", "mesh/obj");
 			NewMesh = Asset->CreateRuntimeMesh();
 
 			// Setup scene resource description

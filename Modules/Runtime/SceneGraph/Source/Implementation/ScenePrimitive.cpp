@@ -53,3 +53,8 @@ Ry::Mesh2* Ry::StaticMeshPrimitive::GetMesh()
 {
 	return StaticMesh;
 }
+
+Ry::ScenePrimitive* Ry::CreatePrimitive(Mesh2* SM)
+{
+	return new StaticMeshPrimitive(SM);
+}

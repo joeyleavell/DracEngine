@@ -23,6 +23,8 @@ namespace Ry
 
 		SceneGraph();
 
+		Ry::ArrayList<ScenePrimitive*>& GetPrimitives();
+
 		void AddPrimitive(ScenePrimitive* Prim);
 		void RemovePrimitive(ScenePrimitive* Prim);
 

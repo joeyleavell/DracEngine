@@ -4,7 +4,7 @@
 
 namespace Ry
 {
-
+	
 	Matrix4 Camera::get_proj() const
 	{
 		return proj;
