@@ -1,4 +1,5 @@
 #include "Interface2/Shader2.h"
+#include "Language/ShaderReflector.h"
 
 namespace Ry
 {
@@ -49,4 +50,23 @@ namespace Ry
 			return "None";
 		}
 	}
+
+	Shader2::Shader2(const Ry::String& VSAsset, const Ry::String& FSAsset)
+	{
+		// Generate reflection data
+
+		ReflectShader(VSAsset, ShaderStage::Vertex, VertexReflectionData);
+		ReflectShader(FSAsset, ShaderStage::Fragment, FragmentReflectionData);
+	}
+
+	const Ry::ArrayList<ResourceSetDescription*>& Shader2::GetVertexReflectionData() const
+	{
+		return VertexReflectionData;
+	}
+
+	const Ry::ArrayList<ResourceSetDescription*>& Shader2::GetFragmentReflectionData() const
+	{
+		return FragmentReflectionData;
+	}
+	
 }

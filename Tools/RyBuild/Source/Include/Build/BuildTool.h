@@ -86,7 +86,7 @@ protected:
 	std::string GetModuleLibraryDir(const Module& Mod);
 	std::string GetModuleObjectDir(const Module& Mod);
 	
-	virtual bool CompileModule(Module& TheModule, std::string OutputDirectory, bool& bNeedsLink);
+	virtual bool CompileModule(Module& TheModule, std::string OutputDirectory, bool& bNeedsLink, bool& bNeedsFullRebuild);
 
 	virtual bool BuildSingleSource(const Module& TheModule, std::string OutputDirectory, std::string SourceFile, std::string& StdOut, std::string& StdErr) = 0;
 
@@ -107,7 +107,7 @@ protected:
 	 */
 	unsigned int CompileThreadCount;
 
-	void FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles);
+	void FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles, bool& bHeaderChanged);
 
 	std::string RootPath;
 

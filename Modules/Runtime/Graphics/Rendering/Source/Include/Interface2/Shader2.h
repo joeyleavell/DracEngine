@@ -6,6 +6,8 @@
 namespace Ry
 {
 
+	class ResourceSetDescription;
+
 	enum class ShaderStage
 	{
 		Vertex,
@@ -21,6 +23,8 @@ namespace Ry
 	 */
 	enum class ShaderPrimitiveDataType
 	{
+		None,
+		
 		/* 1 element types */
 		Float,
 
@@ -65,10 +69,7 @@ namespace Ry
 	{
 	public:
 
-		Shader2(const Ry::String& VSAsset, const Ry::String& FSAsset)
-		{
-
-		}
+		Shader2(const Ry::String& VSAsset, const Ry::String& FSAsset);
 		
 		virtual ~Shader2() = default;
 
@@ -80,7 +81,15 @@ namespace Ry
 		 * Deletes this shader from the rendering interface. Do not use shader after calling this.
 		 */
 		virtual void DestroyShader() = 0;
-		
+
+		const Ry::ArrayList<ResourceSetDescription*>& GetVertexReflectionData() const;
+		const Ry::ArrayList<ResourceSetDescription*>& GetFragmentReflectionData() const;
+
+	private:
+
+		Ry::ArrayList<ResourceSetDescription*> VertexReflectionData;
+		Ry::ArrayList<ResourceSetDescription*> FragmentReflectionData;
+
 	};
 
 

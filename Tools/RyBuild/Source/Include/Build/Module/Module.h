@@ -82,6 +82,8 @@ public:
 	// Whether this module built successfully without errors
 	bool bBuiltSuccessfully = true;
 
+	bool bNeededFullRebuild = false;
+
 	// Flag used when iterating through models
 	bool bVisisted = false;
 

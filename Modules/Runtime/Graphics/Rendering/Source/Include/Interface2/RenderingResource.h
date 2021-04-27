@@ -149,9 +149,19 @@ namespace Ry
 			this->Stages = Stages;
 		}
 
+		void AddConstantBuffer(ConstantBuffer* Buffer)
+		{
+			ConstantBuffers.Add(Buffer);
+		}
+		
 		void AddConstantBuffer(int32 Index, Ry::String Name, std::initializer_list<BufferMember*> Members)
 		{
 			ConstantBuffers.Add(new ConstantBuffer(Index, Name, Members));
+		}
+
+		void AddTextureBinding(TextureBinding* TexBinding)
+		{
+			TextureBindings.Add(TexBinding);
 		}
 
 		void AddTextureBinding(int32 Index, Ry::String Name)

@@ -1,16 +1,11 @@
 #include "Language/ShaderCompiler.h"
 #include "File/File.h"
 #include "Core/Globals.h"
+#include "Language/ShaderReflector.h"
 
 #ifndef RYBUILD_DISTRIBUTE
 	#include "ShaderConductor.hpp"
 #endif
-
-// Defined offsets for vulkan spirv
-#define C_BUFFER_OFFSET 0
-#define T_BUFFER_OFFSET 10
-#define S_BUFFER_OFFSET 20
-#define U_BUFFER_OFFSET 30
 
 namespace Ry
 {
@@ -368,6 +363,7 @@ namespace Ry
 	
 	bool CompileToGlsl(const Ry::String& ShaderLoc, Ry::String& OutSource, Ry::String& ErrWarnMsg, ShaderStage Stage)
 	{
+		
 		Ry::String GlslLocAbs = GetGlslLocAbs(ShaderLoc);
 #ifdef RYBUILD_DISTRIBUTE
 		// Cannot have a cache miss in a distributed build, error

@@ -123,8 +123,9 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 		}
 	}	
 
+	bool bNeedsFullRebuild = false; // Ignore this
 	std::vector<std::string> SourcesNeedingGeneration;
-	FindOutOfDateSourceFiles(TheModule, ObjectDirectory, SourcesNeedingGeneration);
+	FindOutOfDateSourceFiles(TheModule, ObjectDirectory, SourcesNeedingGeneration, bNeedsFullRebuild);
 
 	// Generate reflection data for source files
 	//Filesystem::recursive_directory_iterator HeaderItr(TheModule.GetSourceDir());
@@ -183,7 +184,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	return true;
 }
 
-void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles)
+void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles, bool& bHeaderChanged)
 {
 	// Determine whether this is executable or DLL
 	// Note: always rebuild on file error
@@ -198,7 +199,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 
 	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetSourceDir());
 
-	bool bHeaderWasOutOfDate = false;
+	//bHeaderChanged = false;
 
 	std::vector<std::string> AllSourceFiles;
 	std::vector<std::string> OutOfDateFiles;
@@ -259,7 +260,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 				if (bIsHeader)
 				{
 					// We're a header, mark EVERYTHING as out of date
-					bHeaderWasOutOfDate = true;
+					bHeaderChanged = true;
 					break;
 				}
 				else
@@ -278,7 +279,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 	}
 
 	// No point in doing this computation if we already know we need to rebuild all
-	if(!bHeaderWasOutOfDate)
+	if(!bHeaderChanged)
 	{
 		// Iterate through the check against list to see if a full recompilation is required
 		for (const std::string& CheckAgainstAllFile : CheckAgainstAllStamps)
@@ -287,14 +288,14 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 
 			if (LastWriteTime > EarliestChangedObj)
 			{
-				bHeaderWasOutOfDate = true;
+				bHeaderChanged = true;
 				break;
 			}
 		}
 	}
 
 	// Add either everything (header was out of date), or only out of date source files
-	std::vector<std::string>& VectorToUse = bHeaderWasOutOfDate ? AllSourceFiles : OutOfDateFiles;
+	std::vector<std::string>& VectorToUse = bHeaderChanged ? AllSourceFiles : OutOfDateFiles;
 	for (const std::string& SourceFile : VectorToUse)
 	{
 		OutFiles.push_back(SourceFile);
@@ -352,7 +353,7 @@ bool AbstractBuildTool::LinkModule(std::string ParentModuleName)
 	return LinkModule(*Modules[ParentModuleName]);
 }
 
-bool AbstractBuildTool::CompileModule(Module& TheModule, std::string OutputDirectory, bool& bNeedsLink)
+bool AbstractBuildTool::CompileModule(Module& TheModule, std::string OutputDirectory, bool& bNeedsLink, bool& bNeedsFullRebuild)
 {
 	// Make sure there's at least one cpp in this module
 	if(!TheModule.SourceCheck())
@@ -373,7 +374,7 @@ bool AbstractBuildTool::CompileModule(Module& TheModule, std::string OutputDirec
 	std::vector<std::thread*> ThreadPool;
 
 	// Locate source files that need to be built
-	FindOutOfDateSourceFiles(TheModule, OutputDirectory, *SourcesNeedingBuild);
+	FindOutOfDateSourceFiles(TheModule, OutputDirectory, *SourcesNeedingBuild, bNeedsFullRebuild);
 
 	if((*SourcesNeedingBuild).size() <= 0)
 	{
@@ -502,9 +503,9 @@ bool AbstractBuildTool::BuildModule(std::string ModuleName)
 	std::string ModuleObjectDir = GetModuleObjectDir(TheModule);
 	std::string ModuleLibraryDir = GetModuleLibraryDir(TheModule);
 
-
 	// We need to rebuild this module regardless if one of the dependencies was built due to needing updated linkage
 	bool bNeedsBuildDueToChild = false;
+	bool bNeedsFullRebuild = false;
 
 	// Check that module dependencies have been built and build if not
 	for (const std::string& Dep : TheModule.ModuleDependencies)
@@ -521,18 +522,30 @@ bool AbstractBuildTool::BuildModule(std::string ModuleName)
 
 			if (Mod)
 			{
-
 				// Only attempt to build the module if it hasn't already been visited
+
 				if (Mod->bVisisted)
 				{
 					if (!Mod->bBuiltSuccessfully)
 					{
 						return false;
 					}
+					else if (Mod->bNeededFullRebuild)
+					{
+						bNeedsFullRebuild = true;
+					}
 				}
-				else
+				else 
 				{
-					if (!BuildModule(Mod->Name))
+					if (BuildModule(Mod->Name))
+					{
+						// Check if the module needed a full rebuild
+						if(Mod->bNeededFullRebuild)
+						{
+							bNeedsFullRebuild = true;
+						}
+					}
+					else
 					{
 						return false;
 					}
@@ -574,10 +587,12 @@ bool AbstractBuildTool::BuildModule(std::string ModuleName)
 	Filesystem::create_directories(ModuleObjectDir); // Where object code goes
 
 	bool bNeedsLink; /* This indicates whether CompileModule() did any work */
-	if(!CompileModule(TheModule, GetModuleObjectDir(TheModule), bNeedsLink))
+	if(!CompileModule(TheModule, GetModuleObjectDir(TheModule), bNeedsLink, bNeedsFullRebuild))
 	{
 		return false;
 	}
+
+	TheModule.bNeededFullRebuild = bNeedsFullRebuild;
 	
 	if(bNeedsLink || bNeedsBuildDueToChild)
 	{
@@ -587,6 +602,7 @@ bool AbstractBuildTool::BuildModule(std::string ModuleName)
 	{
 		return true;
 	}
+
 	
 }
 
@@ -852,8 +868,11 @@ bool AbstractBuildTool::BuildAllStandalone()
 	for (auto& Mod : Modules)
 	{
 
-		bool bNeedsLink; // We can ignore this as we're always going to build the executable
-		if (!CompileModule(*Mod.second, StandaloneObjectDir, bNeedsLink))
+		// We can ignore both below as we're always going to build the executable
+		bool bNeedsLink = false;
+		bool bNeedsFullRebuild = false;
+		
+		if (!CompileModule(*Mod.second, StandaloneObjectDir, bNeedsLink, bNeedsFullRebuild))
 		{
 			bBuiltSuccessfully = false;
 		}
@@ -917,6 +936,8 @@ bool AbstractBuildTool::BuildAllModular(std::vector<std::string>& ModulesFailed)
 		
 		for (auto& Mod : Modules)
 		{
+			//bool bNeedsFullRebuild = false; // Ignore this, we're building top level modules
+
 			// Build the module by name (first in the pair)
 			if (!BuildModule(Mod.first))
 			{
