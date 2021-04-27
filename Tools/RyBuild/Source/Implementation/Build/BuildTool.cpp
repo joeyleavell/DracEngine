@@ -210,7 +210,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 
 	for (Filesystem::path File : DirectoryItr)
 	{
-		bool bIsCPP = File.extension() == ".cpp" || File.extension() == ".hpp";
+		bool bIsCPP = File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c";
 		bool bIsHeader = File.extension() == ".h";
 
 		if (bIsCPP || bIsHeader)

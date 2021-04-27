@@ -763,7 +763,7 @@ bool IsModuleOutOfDate(const Module& Module, std::string BinaryDir, BuildSetting
 
 	for (Filesystem::path File : DirectoryItr)
 	{
-		if (File.extension() == ".cpp" || File.extension() == ".h")
+		if (File.extension() == ".cpp" || File.extension() == ".h" || File.extension() == ".c" || File.extension() == ".hpp")
 		{
 			Filesystem::file_time_type LastSourceWriteTime = Filesystem::last_write_time(File, FileErrorCode);
 

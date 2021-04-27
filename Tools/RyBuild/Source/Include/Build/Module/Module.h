@@ -161,7 +161,7 @@ public:
 		for (Filesystem::path File : DirectoryItr)
 		{
 			// Detect if this file is a source file
-			if (File.extension() == ".cpp" || File.extension() == ".hpp")
+			if (File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c")
 			{
 				return true;
 			}
@@ -177,7 +177,7 @@ public:
 		for (Filesystem::path File : DirectoryItr)
 		{
 			// Detect if this file is a source file
-			if (File.extension() == ".cpp" || File.extension() == ".hpp")
+			if (File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c")
 			{
 				OutSource.push_back(Filesystem::absolute(File).string());
 			}
@@ -191,7 +191,7 @@ public:
 			for (Filesystem::path File : DirectoryItrThirdParty)
 			{
 				// Detect if this file is a source file
-				if (File.extension() == ".cpp" || File.extension() == ".hpp")
+				if (File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c")
 				{
 					OutSource.push_back(Filesystem::absolute(File).string());
 				}

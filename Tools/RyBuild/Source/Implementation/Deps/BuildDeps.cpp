@@ -775,7 +775,19 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Stb.GitPath = "https://github.com/joeyleavell/Stb.git";
 	Stb.LabelType = GitLabelType::None; // Todo: Make this a fork of stb with cmakelists
 
-	std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb};
+	Dependency SpirVReflect;
+	SpirVReflect.Name = "SpirVReflect";
+	//VulkanLoader.SharedLibNames = { "vulkan" };
+	//VulkanLoader.LibNames = { "vulkan" };
+	//VulkanLoader.LocatorMethod = ArtifactLocatorMethod::NameHint;
+	VulkanLoader.CMakeGenArgs = {
+		"VULKAN_SDK=" + Filesystem::absolute(VulkanHeadersPath).string()
+	};
+	SpirVReflect.GitPath = "https://github.com/KhronosGroup/SPIRV-Reflect.git";
+	SpirVReflect.LabelType = GitLabelType::None;
+	SpirVReflect.bRunCMakeInstall = true;
+
+	std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb, SpirVReflect};
 	std::vector<Dependency> Targets;
 
 	// Optionally select the target
