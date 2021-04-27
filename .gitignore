@@ -52,5 +52,5 @@ crashinfo--*
 Intermediate/
 
 # Shader intermediates
-/Glsl
-/SpirV
+Glsl/
+SpirV/
