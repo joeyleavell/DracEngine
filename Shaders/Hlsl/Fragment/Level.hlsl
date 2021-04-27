@@ -43,7 +43,7 @@ PixelOutput main(PixelInput In)
 	
 	//Out.PixelColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	//Out.PixelColor = DiffuseTexture.Sample(DiffuseSampler, In.VertUV);
+	Out.PixelColor = DiffuseTexture.Sample(DiffuseSampler, In.VertUV);
 	
 	return Out;
 }

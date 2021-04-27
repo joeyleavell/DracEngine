@@ -207,5 +207,8 @@ namespace Ry
 
 	MATH_MODULE Vector3 MakeRotation(const Vector3& ForwardVector);
 	
+	static Ry::Vector3 UpVector { 0.0f, 1.0f, 0.0f };
+	static Ry::Vector3 RightVector{ 1.0f, 0.0f, 0.0f };
+	static Ry::Vector3 ForwardVector{ 0.0f, 0.0f, -1.0f};
 
 }

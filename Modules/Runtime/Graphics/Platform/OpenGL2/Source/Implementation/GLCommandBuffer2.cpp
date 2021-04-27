@@ -88,6 +88,13 @@ namespace Ry
 			DrawVertexArrayIndexedCommand* Cmd = ExtractToken<DrawVertexArrayIndexedCommand>(Marker, Data);
 			GLDrawVertexArrayIndexed(Cmd);
 		}
+
+		if (NextOpCode == OP_COMMAND_BUFFER)
+		{
+			CommandBufferCommand* Cmd = ExtractToken<CommandBufferCommand>(Marker, Data);
+			GLCmdBufferCommand(Cmd);
+		}
+
 	}
 
 	void GLCommandBuffer2::GLBeginRenderPass(Ry::BeginRenderPassCommand* Cmd)
@@ -170,11 +177,50 @@ namespace Ry
 
 	void GLCommandBuffer2::GLBindState(BindPipelineCommand* Cmd)
 	{
+		GLState* State = dynamic_cast<GLState*>(Cmd->Pipeline);
+
 		// Todo: only change this state if needed
 		// This is the opengl state block - state changes should not occur outside of here
 
 		//glEnable(GL_SCISSOR_TEST);
-		glEnable(GL_DEPTH_TEST);
+		const PipelineCreateInfo& StateInfo = State->GetCreateInfo();
+
+		if(StateInfo.Depth.bEnableDepthTest)
+		{
+			glEnable(GL_DEPTH_TEST);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+		}
+
+		if(StateInfo.Blend.bEnabled)
+		{
+			static Ry::ArrayList<GLuint> MappedBlendFuncs = {GL_SRC_ALPHA,
+				GL_DST_ALPHA,
+				GL_ONE_MINUS_SRC_ALPHA,
+				GL_ONE_MINUS_DST_ALPHA,
+				GL_ONE, GL_ZERO
+			};
+
+			static Ry::ArrayList<GLuint> MappedBlendOps = { GL_FUNC_ADD
+			};
+			
+			glEnable(GL_BLEND);
+
+			GLuint SrcFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.SrcFactor)];
+			GLuint DstFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.DstFactor)];
+			GLuint SrcAlFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.SrcAlphaFactor)];
+			GLuint DstAlFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.DstAlphaFactor)];
+
+			glBlendFuncSeparate(SrcFactor, DstFactor, SrcAlFactor, DstAlFactor);
+			glBlendEquation(MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.Op)]);			
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
+		
 		glEnable(GL_TEXTURE_2D);
 
 		// Bind OpenGL shader
@@ -184,6 +230,15 @@ namespace Ry
 		// Todo: Set blend parameters
 
 		this->BoundState = dynamic_cast<GLState*>(Cmd->Pipeline);
+	}
+
+	void GLCommandBuffer2::GLCmdBufferCommand(CommandBufferCommand* Cmd)
+	{
+		GLCommandBuffer2* Secondary = dynamic_cast<GLCommandBuffer2*>(Cmd->CmdBuffer);
+
+		CORE_ASSERT(Secondary != nullptr);
+
+		Secondary->Submit();
 	}
 
 	// Todo: how do we want to handle setting render primitives across APIs?

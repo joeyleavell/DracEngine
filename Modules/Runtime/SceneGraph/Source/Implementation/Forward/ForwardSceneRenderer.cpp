@@ -79,7 +79,7 @@ namespace Ry
 		SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 0);
 		SceneResDesc->AddConstantBuffer(0, "Scene", {
 			DeclPrimitive(Float4x4, "ViewProj")
-			});
+		});
 		SceneResDesc->CreateDescription();
 
 		PrimResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);

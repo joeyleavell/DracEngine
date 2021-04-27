@@ -36,6 +36,7 @@ namespace Ry
 		void GLDrawVertexArray(DrawVertexArrayCommand* Cmd);
 		void GLDrawVertexArrayIndexed(DrawVertexArrayIndexedCommand* Cmd);
 		void GLBindState(BindPipelineCommand* Cmd);
+		void GLCmdBufferCommand(CommandBufferCommand* Cmd);
 
 		GLState* BoundState;
 
