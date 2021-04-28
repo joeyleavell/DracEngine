@@ -132,7 +132,7 @@ namespace Ry
 		// Todo: need to determine how big of a descriptor pool to allocate and keep allocations within this range
 		Ry::ArrayList<VkDescriptorPoolSize> PoolSizes;
 
-		int32 MaxValues = 30;
+		int32 MaxValues = 1000;
 
 		// todo: Figure out best max values
 		VkDescriptorPoolSize UniformPoolSize{};

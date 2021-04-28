@@ -35,6 +35,9 @@ namespace Ry
 		virtual ResourceSet* CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC) = 0;
 		virtual Texture2* CreateTexture() = 0;
 
+		virtual Pipeline2* CreatePipelineFromShader(const PipelineCreateInfo& CreateInfo, Shader2* Src);
+
+
 	};
 	
 }

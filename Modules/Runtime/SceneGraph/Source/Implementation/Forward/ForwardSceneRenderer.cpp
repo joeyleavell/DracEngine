@@ -75,6 +75,8 @@ namespace Ry
 	
 	void ForwardSceneRenderer::CreateResources()
 	{
+		// TODO: create resource set for shader reflection data
+		
 		// Create resource descriptions, and high level resources
 		SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 0);
 		SceneResDesc->AddConstantBuffer(0, "Scene", {
@@ -143,12 +145,12 @@ namespace Ry
 		CreateInfo.Depth.bEnableDepthTest = true;
 
 		// Add resource description to pipeline
-		CreateInfo.ResourceDescriptions.Add(SceneResDesc);
-		CreateInfo.ResourceDescriptions.Add(PrimResDesc);
-		CreateInfo.ResourceDescriptions.Add(LightResDesc);
-		CreateInfo.ResourceDescriptions.Add(MaterialDesc);
+		// CreateInfo.ResourceDescriptions.Add(SceneResDesc);
+		// CreateInfo.ResourceDescriptions.Add(PrimResDesc);
+		// CreateInfo.ResourceDescriptions.Add(LightResDesc);
+		// CreateInfo.ResourceDescriptions.Add(MaterialDesc);
 
-		Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
+		Pipeline = Ry::NewRenderAPI->CreatePipelineFromShader(CreateInfo, LvShader);
 		Pipeline->CreatePipeline();
 	}
 

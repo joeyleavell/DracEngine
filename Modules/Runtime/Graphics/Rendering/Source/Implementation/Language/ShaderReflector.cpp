@@ -239,6 +239,8 @@ namespace Ry
 
 			}
 
+			NewDesc->CreateDescription();
+
 			OutDesc.Add(NewDesc);
 		}
 

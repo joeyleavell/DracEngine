@@ -8,7 +8,7 @@
 namespace Ry
 {
 
-	constexpr uint32 MAX_COMMAND_BUFFER_SIZE = 1024 * 10;
+	constexpr uint32 MAX_COMMAND_BUFFER_SIZE = 1024 * 100;
 
 	// Use a single byte for the render opcode
 	constexpr uint8 OP_NONE = 0;

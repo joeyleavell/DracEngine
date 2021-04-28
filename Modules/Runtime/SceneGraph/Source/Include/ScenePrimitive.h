@@ -20,8 +20,8 @@ namespace Ry
 
 		bool IsStatic() const;
 		ScenePrimitive* GetParent();
-		Transform GetRelativeTransform();
 		Transform GetWorldTransform();
+		Transform& GetRelativeTransform();
 
 		void SetParent(ScenePrimitive* Parent);
 

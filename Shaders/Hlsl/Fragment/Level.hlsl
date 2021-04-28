@@ -40,10 +40,11 @@ PixelOutput main(PixelInput In)
 	float4 ActualColor = mul(UseDiffuseTexture, TexColor) + mul(1.0f - UseDiffuseTexture, float4(DiffuseColor, 1.0f));
 	
 	Out.PixelColor = float4(ActualColor.rgb * diffuse, ActualColor.a);
+	//Out.PixelColor = float4(ActualColor.rgb, ActualColor.a);
 	
 	//Out.PixelColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	Out.PixelColor = DiffuseTexture.Sample(DiffuseSampler, In.VertUV);
+	//Out.PixelColor = DiffuseTexture.Sample(DiffuseSampler, In.VertUV);
 	
 	return Out;
 }

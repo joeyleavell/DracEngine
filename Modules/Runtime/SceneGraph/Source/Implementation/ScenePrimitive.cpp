@@ -22,7 +22,7 @@ bool Ry::ScenePrimitive::IsStatic() const
 	return bStatic;
 }
 
-Ry::Transform Ry::ScenePrimitive::GetRelativeTransform()
+Ry::Transform& Ry::ScenePrimitive::GetRelativeTransform()
 {
 	return RelativeTransform;
 }
