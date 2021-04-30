@@ -66,7 +66,7 @@ namespace Ry
 	{
 	public:
 
-		GLResources2(ResourceSetDescription* CreateInfo, SwapChain* SC);
+		GLResources2(const ResourceSetDescription* CreateInfo, SwapChain* SC);
 
 		void CreateBuffer() override;
 		void DeleteBuffer() override;

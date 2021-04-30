@@ -8,6 +8,6 @@ namespace Ry
 	enum class ShaderStage;
 	class String;
 
-	void ReflectShader(Ry::String ShaderLoc, Ry::ShaderStage Stage, Ry::ArrayList<ResourceSetDescription*>& OutDesc);
+	void ReflectShader(Ry::String ShaderLoc, Ry::ShaderStage Stage, ShaderReflection& OutReflectionData);
 	
 }

@@ -32,7 +32,7 @@ namespace Ry
 		virtual Shader2* CreateShader(Ry::String VertexShaderLoc, Ry::String FragShaderLoc) = 0;
 		virtual Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo) = 0;
 		virtual ResourceSetDescription* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) = 0;
-		virtual ResourceSet* CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC) = 0;
+		virtual ResourceSet* CreateResourceSet(const ResourceSetDescription* Desc, SwapChain* SC) = 0;
 		virtual Texture2* CreateTexture() = 0;
 
 		virtual Pipeline2* CreatePipelineFromShader(const PipelineCreateInfo& CreateInfo, Shader2* Src);

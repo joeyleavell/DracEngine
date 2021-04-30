@@ -161,39 +161,34 @@ namespace Ry
 
 	struct RENDERING_MODULE VertexFormat
 	{
-		VertexAttrib* attributes = nullptr;
-		int32 attribute_count = 0;
-		int32 element_count = 0;
+		Ry::ArrayList<VertexAttrib> Attributes;
+		int32 ElementCount = 0;
 
-		VertexFormat():
-		VertexFormat(nullptr, 0)
+		VertexFormat()
 		{
-
+			
 		}
 
-		VertexFormat(VertexAttrib* attributes, int32 attrib_count) :
-			attributes(attributes),
-			attribute_count(attrib_count),
-			element_count(0)
+		VertexFormat(Ry::ArrayList<VertexAttrib> Attribs) :
+			Attributes(Attribs),
+			ElementCount(0)
 		{
-			for (int32 i = 0; i < attribute_count; i++)
+			for (int32 i = 0; i < Attribs.GetSize(); i++)
 			{
-				element_count += attributes[i].Size;
+				ElementCount += Attributes[i].Size;
 			}
 		}
 
 		VertexFormat(const VertexFormat& Ref)
 		{
-			this->attributes = Ref.attributes;
-			this->attribute_count = Ref.attribute_count;
-			this->element_count = Ref.element_count;
+			this->Attributes = Ref.Attributes;
+			this->ElementCount = Ref.ElementCount;
 		}
 
 		VertexFormat(VertexFormat&& Forward) noexcept
 		{
-			this->attributes = Forward.attributes;
-			this->attribute_count = Forward.attribute_count;
-			this->element_count = Forward.element_count;
+			this->Attributes = Forward.Attributes;
+			this->ElementCount = Forward.ElementCount;
 		}
 
 		VertexFormat& operator=(const VertexFormat& Ref)
@@ -201,9 +196,8 @@ namespace Ry
 			if (this == &Ref)
 				return *this;
 			
-			this->attributes = Ref.attributes;
-			this->attribute_count = Ref.attribute_count;
-			this->element_count = Ref.element_count;
+			this->Attributes = Ref.Attributes;
+			this->ElementCount = Ref.ElementCount;
 
 			return *this;
 		}
@@ -226,14 +220,14 @@ namespace Ry
 	extern RENDERING_MODULE VertexAttrib bitangent;
 
 	// position
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P[1];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P[1];
 	
 	// position, color
 	// position, uv
 	// position, normal
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C[2];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV[2];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N[2];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C[2];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV[2];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N[2];
 
 	// position, uv, color
 	// position, color, uv
@@ -241,12 +235,12 @@ namespace Ry
 	// position, normal, uv
 	// position, color, normal
 	// position, normal, color
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1C[3];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1UV[3];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1N[3];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1UV[3];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1N[3];
-	extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1C[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1C[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1UV[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1N[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1UV[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1N[3];
+	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1C[3];
 
 	extern RENDERING_MODULE VertexFormat VF1P;
 	extern RENDERING_MODULE VertexFormat VF1P1C;

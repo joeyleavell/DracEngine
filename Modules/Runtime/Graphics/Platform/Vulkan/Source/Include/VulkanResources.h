@@ -146,7 +146,7 @@ namespace Ry
 		void CreateDescription() override;
 		void DeleteDescription() override;
 
-		VkDescriptorSetLayout& GetVkLayout();
+		const VkDescriptorSetLayout& GetVkLayout() const;
 
 	private:
 		VkDescriptorSetLayout SetLayout;
@@ -159,7 +159,7 @@ namespace Ry
 
 		std::vector<VkDescriptorSet> DescriptorSets;
 
-		VulkanResourceSet(ResourceSetDescription* CreateInfo, SwapChain* SC);
+		VulkanResourceSet(const ResourceSetDescription* CreateInfo, SwapChain* SC);
 
 		void CreateBuffer() override;
 		void DeleteBuffer() override;
@@ -177,6 +177,8 @@ namespace Ry
 
 
 	private:
+
+		Ry::ArrayList<uint32> UniformDirtyFrames;
 
 		bool bDirtyThisFrame = false;
 		

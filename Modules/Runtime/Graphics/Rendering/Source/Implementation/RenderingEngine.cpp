@@ -145,6 +145,18 @@ namespace Ry
 	//	TextureBatcher->ResizeProjection(Width, Height);
 	}
 
+	Shader2* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment)
+	{
+		Shader2* Cur = GetShader(Name);
+
+		if(!Cur)
+		{
+			Cur = CompileShader(Name, Vertex, Fragment);
+		}
+
+		return Cur;
+	}
+
 	Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc)
 	{
 		Ry::Shader2* Result = Ry::NewRenderAPI->CreateShader(VertexLoc, FragmentLoc);

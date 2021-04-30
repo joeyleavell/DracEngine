@@ -542,7 +542,7 @@ namespace RyBuild
 							}
 							Output << "\t\t</ClInclude>" << std::endl;
 						}
-						else if (Filesystem::path(SourceFile).extension() == ".cpp" || Filesystem::path(SourceFile).extension() == ".hpp")
+						else if (Filesystem::path(SourceFile).extension() == ".cpp" || Filesystem::path(SourceFile).extension() == ".hpp" || Filesystem::path(SourceFile).extension() == ".c")
 						{
 							Output << std::string("\t\t<ClCompile Include=\"") + SourceFile + "\">" << std::endl;
 							{

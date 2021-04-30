@@ -2,6 +2,7 @@
 
 #include "Asset.h"
 #include "RenderingGen.h"
+#include "Data/Map.h"
 
 namespace Ry
 {
@@ -65,6 +66,32 @@ namespace Ry
 
 	Ry::String RENDERING_MODULE ToString(ShaderPrimitiveDataType DT);
 
+	struct ShaderInputVariable
+	{
+		Ry::String Name;
+		ShaderPrimitiveDataType Type;
+	};
+
+	class RENDERING_MODULE ShaderReflection
+	{
+	public:
+
+		void AddResourceDescription(ResourceSetDescription* Desc);
+		void AddInputVariable(ShaderInputVariable Var);
+
+		const Ry::ArrayList<ResourceSetDescription*>& GetResources() const;
+		const Ry::ArrayList<ShaderInputVariable>& GetInputVars() const;
+
+		const ResourceSetDescription* operator[] (int32 Index) const;
+
+		
+	private:
+
+		Ry::ArrayList<ResourceSetDescription*> Resources;
+		Ry::ArrayList<ShaderInputVariable> InputVars;
+		
+	};
+
 	class RENDERING_MODULE Shader2
 	{
 	public:
@@ -82,13 +109,16 @@ namespace Ry
 		 */
 		virtual void DestroyShader() = 0;
 
-		const Ry::ArrayList<ResourceSetDescription*>& GetVertexReflectionData() const;
-		const Ry::ArrayList<ResourceSetDescription*>& GetFragmentReflectionData() const;
+		const ShaderReflection& GetVertexReflectionData() const;
+		const ShaderReflection& GetFragmentReflectionData() const;
 
 	private:
 
-		Ry::ArrayList<ResourceSetDescription*> VertexReflectionData;
-		Ry::ArrayList<ResourceSetDescription*> FragmentReflectionData;
+		ShaderReflection VertReflectionData;
+		ShaderReflection FragReflectionData;
+
+		// Ry::ArrayList<ResourceSetDescription*> VertexReflectionData;
+		// Ry::ArrayList<ResourceSetDescription*> FragmentReflectionData;
 
 	};
 

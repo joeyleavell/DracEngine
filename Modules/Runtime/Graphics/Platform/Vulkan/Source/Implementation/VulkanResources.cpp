@@ -18,7 +18,7 @@ namespace Ry
 		}
 	}
 
-	VulkanResourceSet::VulkanResourceSet(ResourceSetDescription* CreateInfo, SwapChain* SC):
+	VulkanResourceSet::VulkanResourceSet(const ResourceSetDescription* CreateInfo, SwapChain* SC):
 	ResourceSet(CreateInfo, SC)
 	{
 		CreateBufferStorage();		
@@ -94,6 +94,14 @@ namespace Ry
 
 	void VulkanResourceSet::FlushBuffer(int32 Frame)
 	{
+		// Dirty the uniform frames
+		if (!UniformDirtyFrames.Contains(Frame))
+		{
+			return;
+		}
+		
+		UniformDirtyFrames.Remove(Frame);
+		
 		// Flush all constant buffers
 		for(const ConstantBuffer* ConstantBuffer : Info->ConstantBuffers)
 		{
@@ -183,6 +191,16 @@ namespace Ry
 
 		const BufferRef& Ref = *Buff->UniformRefs.get(Id);
 		MemCpy(Buff->HostDataBuffer + Ref.Offset, Ref.SlotSize, Data, Ref.SlotSize);
+
+		// Dirty the uniform frames
+		VulkanSwapChain* VkSwap = dynamic_cast<VulkanSwapChain*>(Swap);
+		for (int32 Frame = 0; Frame < VkSwap->SwapChainImages.size(); Frame++)
+		{
+			if (!UniformDirtyFrames.Contains(Frame))
+			{
+				UniformDirtyFrames.Add(Frame);
+			}
+		}
 	}
 
 	int32 SizeOf(const ShaderPrimitiveDataType& PrimData)
@@ -610,7 +628,7 @@ namespace Ry
 
 	void VulkanResourceSet::CreateDescriptorSets(VulkanSwapChain* SwapChain)
 	{
-		VulkanResourceSetDescription* VkResDesc = dynamic_cast<VulkanResourceSetDescription*>(Info);
+		const VulkanResourceSetDescription* VkResDesc = dynamic_cast<const VulkanResourceSetDescription*>(Info);
 		assert(VkResDesc != nullptr);
 		
 		// Use the same layout for each descriptor set
@@ -769,7 +787,7 @@ namespace Ry
 		vkDestroyDescriptorSetLayout(GVulkanContext->GetLogicalDevice(), SetLayout, nullptr);
 	}
 
-	VkDescriptorSetLayout& VulkanResourceSetDescription::GetVkLayout()
+	const VkDescriptorSetLayout& VulkanResourceSetDescription::GetVkLayout() const
 	{
 		return SetLayout;
 	}

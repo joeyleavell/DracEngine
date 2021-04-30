@@ -12,6 +12,7 @@ namespace Ry
 	class Pipeline2;
 	class RenderPass2;
 	class ScenePrimitive;
+	class Shader2;
 
 	class SCENEGRAPH_MODULE ForwardSceneRenderer : public SceneRenderer
 	{
@@ -23,6 +24,8 @@ namespace Ry
 		void Render() override;
 		RenderingCommandBuffer2* GetCmdBuffer() override;
 
+		void RecordStatic();
+		void RecordDynamic();
 
 	private:
 
@@ -32,13 +35,12 @@ namespace Ry
 
 		void CreatePipeline();
 
-		void RecordStatic();
-		void RecordDynamic();
 
 		// TODO: Since pipeline houses the shader,
 		// there will most likely end up being many of these
 		// For now, I've simplified it to just one pipeline
 		Ry::Pipeline2* Pipeline;
+		Ry::Shader2* Shader;
 
 		// The parent render pass 
 		//Ry::RenderPass2* ParentPass;

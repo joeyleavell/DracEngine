@@ -114,7 +114,7 @@ namespace Ry
 
 		float GetVertexElement(int32 Vertex, int32 Element)
 		{
-			return Vertices[(uint64) Format.element_count * Vertex + Element];
+			return Vertices[(uint64) Format.ElementCount * Vertex + Element];
 		}
 
 		/**
@@ -151,7 +151,7 @@ namespace Ry
 			float data[30];
 			Vertex->Pack(data);
 
-			for (int32 i = 0; i < Format.element_count; i++)
+			for (int32 i = 0; i < Format.ElementCount; i++)
 			{
 				Vertices.Add(data[i]);
 			}
@@ -163,9 +163,9 @@ namespace Ry
 		{
 			int32 data_index = 0;
 
-			for (int32 i = 0; i < Format.attribute_count; i++)
+			for (int32 i = 0; i < Format.Attributes.GetSize(); i++)
 			{
-				VertexAttrib& Attribute = Format.attributes[i];
+				VertexAttrib& Attribute = Format.Attributes[i];
 
 				for (int32 j = 0; j < Attribute.Size; j++)
 				{

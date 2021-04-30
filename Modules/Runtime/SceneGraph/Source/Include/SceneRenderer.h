@@ -97,10 +97,10 @@ namespace Ry
 		Ry::ResourceSet* LightResources; // todo: combine with above?
 
 		// Resource descriptions
-		Ry::ResourceSetDescription* SceneResDesc; // Per scene resource description
-		Ry::ResourceSetDescription* LightResDesc; // Per primitive resource description
-		Ry::ResourceSetDescription* PrimResDesc; // Per primitive resource description
-		Ry::ResourceSetDescription* MaterialDesc; // Per material resource description
+		const Ry::ResourceSetDescription* SceneResDesc; // Per scene resource description
+		const Ry::ResourceSetDescription* LightResDesc; // Per primitive resource description
+		const Ry::ResourceSetDescription* PrimResDesc; // Per primitive resource description
+		const Ry::ResourceSetDescription* MaterialDesc; // Per material resource description
 
 		// A map of all scene primitives to their associated resources
 		Ry::Map<ScenePrimitive*, PrimitiveResources*> PrimResources;

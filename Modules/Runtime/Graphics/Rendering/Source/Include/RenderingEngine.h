@@ -44,6 +44,8 @@ namespace Ry
 	// Shader management
 	class Shader2;
 	extern Map<String, Ry::Shader2*> CompiledShaders;
+
+	RENDERING_MODULE Shader2* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment);
 	RENDERING_MODULE Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc);
 	RENDERING_MODULE Shader2* GetShader(const String& Name);
 

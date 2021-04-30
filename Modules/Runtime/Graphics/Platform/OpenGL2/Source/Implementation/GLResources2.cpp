@@ -188,7 +188,7 @@ namespace Ry
 
 	}
 
-	GLResources2::GLResources2(ResourceSetDescription* CreateInfo, SwapChain* SC):
+	GLResources2::GLResources2(const ResourceSetDescription* CreateInfo, SwapChain* SC):
 	ResourceSet(CreateInfo, SC)
 	{
 		for (ConstantBuffer* ConstBuffer : Info->ConstantBuffers)

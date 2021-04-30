@@ -26,9 +26,9 @@ namespace Ry
 		glAttachShader(programHandle, vertHandle);
 		glAttachShader(programHandle, fragHandle);
 
-		for (int32 i = 0; i < format.attribute_count; i++)
+		for (int32 i = 0; i < format.Attributes.GetSize(); i++)
 		{
-			VertexAttrib attrib = format.attributes[i];
+			VertexAttrib attrib = format.Attributes[i];
 			String name = attrib.Name;
 			glBindAttribLocation(programHandle, i, *name);
 		}

@@ -8,6 +8,7 @@
 #include "Interface2/RenderCommand.h"
 #include "SceneGraph.h"
 #include "ScenePrimitive.h"
+#include "Interface2/Shader2.h"
 
 namespace Ry
 {
@@ -42,7 +43,7 @@ namespace Ry
 	void ForwardSceneRenderer::Render()
 	{
 		// Update scene resources
-		SceneResources->SetMatConstant("Scene", "ViewProj", ViewProjectionMatrix);
+		SceneResources->SetMatConstant("Scene", "ViewProjection", ViewProjectionMatrix);
 
 		// Update primitive resources
 		for(ScenePrimitive* Prim : TargetScene->GetPrimitives())
@@ -58,8 +59,8 @@ namespace Ry
 		// Record command buffers needed
 
 		// TODO: figure out best way to split command buffers up
-		RecordStatic();
-		RecordDynamic();
+		//RecordStatic();
+		//RecordDynamic();
 	}
 
 	RenderingCommandBuffer2* ForwardSceneRenderer::GetCmdBuffer()
@@ -75,82 +76,82 @@ namespace Ry
 	
 	void ForwardSceneRenderer::CreateResources()
 	{
-		// TODO: create resource set for shader reflection data
+		Shader = Ry::GetOrCompileShader("Level", "Vertex/Level", "Fragment/Level");
 		
 		// Create resource descriptions, and high level resources
-		SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 0);
-		SceneResDesc->AddConstantBuffer(0, "Scene", {
-			DeclPrimitive(Float4x4, "ViewProj")
-		});
-		SceneResDesc->CreateDescription();
+		SceneResDesc = Shader->GetVertexReflectionData()[0];
+		PrimResDesc = Shader->GetVertexReflectionData()[1];
+		LightResDesc = Shader->GetFragmentReflectionData()[2];
+		MaterialDesc = Shader->GetFragmentReflectionData()[3];
 
-		PrimResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
-		PrimResDesc->AddConstantBuffer(1, "Model", {
-			DeclPrimitive(Float4x4, "Transform")
-			});
-		PrimResDesc->CreateDescription();
-
-		LightResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 2);
-		LightResDesc->AddConstantBuffer(2, "Light", {
-			DeclPrimitive(Float, "Intensity"),
-			DeclPrimitive(Float3, "Color"),
-			DeclPrimitive(Float3, "Direction")
-		});
-		LightResDesc->CreateDescription();
-
-		MaterialDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 3);
-		MaterialDesc->AddConstantBuffer(3, "Mat", {
-			DeclPrimitive(Float, "UseDiffuseTexture"),
-			DeclPrimitive(Float3, "DiffuseColor"),
-			DeclPrimitive(Float3, "AmbientColor"),
-			DeclPrimitive(Float3, "SpecularColor")
-		});
-		MaterialDesc->AddTextureBinding(0, "Diffuse");
-		MaterialDesc->CreateDescription();
+		// Ry::ResourceSetDescription* SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
+		// SceneResDesc->AddConstantBuffer(1, "Scene", {
+		// 	DeclPrimitive(Float4x4, "ViewProjection")
+		// 	});
+		// SceneResDesc->CreateDescription();
+		// this->SceneResDesc = SceneResDesc;
+		//
+		//
+		// Ry::ResourceSetDescription* PrimResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
+		// PrimResDesc->AddConstantBuffer(1, "Model", {
+		// 	DeclPrimitive(Float4x4, "Transform")
+		// });
+		// PrimResDesc->CreateDescription();
+		// this->PrimResDesc = PrimResDesc;
+		//
+		// Ry::ResourceSetDescription* LightResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 2);
+		// LightResDesc->AddConstantBuffer(2, "Light", {
+		// 	DeclPrimitive(Float, "Intensity"),
+		// 	DeclPrimitive(Float3, "Color"),
+		// 	DeclPrimitive(Float3, "Direction")
+		// });
+		// LightResDesc->CreateDescription();
+		// this->LightResDesc = LightResDesc;
+		//
+		// Ry::ResourceSetDescription* MaterialDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 3);
+		// MaterialDesc->AddConstantBuffer(3, "Material", {
+		// 	DeclPrimitive(Float, "UseDiffuseTexture"),
+		// 	DeclPrimitive(Float3, "DiffuseColor"),
+		// 	DeclPrimitive(Float3, "AmbientColor"),
+		// 	DeclPrimitive(Float3, "SpecularColor")
+		// });
+		// MaterialDesc->AddTextureBinding(0, "DiffuseTexture");
+		// MaterialDesc->CreateDescription();
+		// this->MaterialDesc = MaterialDesc;
+		
 
 		SceneResources = Ry::NewRenderAPI->CreateResourceSet(SceneResDesc, Ry::app->GetSwapChain());
 		SceneResources->CreateBuffer();
 
 		LightResources = Ry::NewRenderAPI->CreateResourceSet(LightResDesc, Ry::app->GetSwapChain());
-		
-		Ry::Vector3 Dir = { -0.5f, -0.5f, 0.0f };
-		normalize(Dir);
-		
-		LightResources->SetFloatConstant("Light", "Intensity", 1.0f);
-		LightResources->SetMatConstant("Light", "Color", Ry::Vector3(1.0f, 1.0f, 1.0f));
-		LightResources->SetMatConstant("Light", "Direction", Dir);
-		
+		{
+			Ry::Vector3 Dir = { -0.5f, -0.5f, 0.0f };
+			normalize(Dir);
+
+			LightResources->SetFloatConstant("Light", "Intensity", 1.0f);
+			LightResources->SetMatConstant("Light", "Color", Ry::Vector3(1.0f, 1.0f, 1.0f));
+			LightResources->SetMatConstant("Light", "Direction", Dir);
+		}
 		LightResources->CreateBuffer();
+
 	}
 
 	void ForwardSceneRenderer::CreatePipeline()
 	{
 		// Create and manage all pipelines associated with this renderer
-		Ry::Shader2* LvShader = Ry::GetShader("Level");
-
-		if (!LvShader)
-		{
-			Ry::Log->Log("Compiling level shader for first time");
-			LvShader = Ry::CompileShader("Level", "Vertex/Level", "Fragment/Level");
-		}
+		Shader = Ry::GetOrCompileShader("Level", "Vertex/Level", "Fragment/Level");
 
 		// Create new pipeline
 		Ry::PipelineCreateInfo CreateInfo;
 		CreateInfo.ViewportWidth = Ry::app->GetSwapChain()->GetSwapChainWidth();
 		CreateInfo.ViewportHeight = Ry::app->GetSwapChain()->GetSwapChainHeight();
-		CreateInfo.PipelineShader = LvShader;
+		CreateInfo.PipelineShader = Shader;
 		CreateInfo.VertFormat = Ry::VF1P1UV1N;
 		CreateInfo.RenderPass = Ry::app->GetSwapChain()->GetDefaultRenderPass();
 		CreateInfo.Blend.bEnabled = true;
 		CreateInfo.Depth.bEnableDepthTest = true;
 
-		// Add resource description to pipeline
-		// CreateInfo.ResourceDescriptions.Add(SceneResDesc);
-		// CreateInfo.ResourceDescriptions.Add(PrimResDesc);
-		// CreateInfo.ResourceDescriptions.Add(LightResDesc);
-		// CreateInfo.ResourceDescriptions.Add(MaterialDesc);
-
-		Pipeline = Ry::NewRenderAPI->CreatePipelineFromShader(CreateInfo, LvShader);
+		Pipeline = Ry::NewRenderAPI->CreatePipelineFromShader(CreateInfo, Shader);
 		Pipeline->CreatePipeline();
 	}
 

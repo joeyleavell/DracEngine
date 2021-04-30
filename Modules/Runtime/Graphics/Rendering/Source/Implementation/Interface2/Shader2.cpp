@@ -51,22 +51,54 @@ namespace Ry
 		}
 	}
 
+	void ShaderReflection::AddResourceDescription(ResourceSetDescription* Desc)
+	{
+		Resources.Add(Desc);
+	}
+
+	void ShaderReflection::AddInputVariable(ShaderInputVariable Var)
+	{
+		InputVars.Add(Var);
+	}
+
+	const Ry::ArrayList<ResourceSetDescription*>& ShaderReflection::GetResources() const
+	{
+		return Resources;
+	}
+
+	const Ry::ArrayList<ShaderInputVariable>& ShaderReflection::GetInputVars() const
+	{
+		return InputVars;
+	}
+
+	const ResourceSetDescription* ShaderReflection::operator[](int32 Index) const
+	{
+		for(const ResourceSetDescription* Desc : Resources)
+		{
+			if(Desc->SetIndex == Index)
+			{
+				return Desc;
+			}
+		}
+		return nullptr;
+	}
+
 	Shader2::Shader2(const Ry::String& VSAsset, const Ry::String& FSAsset)
 	{
 		// Generate reflection data
-
-		ReflectShader(VSAsset, ShaderStage::Vertex, VertexReflectionData);
-		ReflectShader(FSAsset, ShaderStage::Fragment, FragmentReflectionData);
+		
+		ReflectShader(VSAsset, ShaderStage::Vertex, VertReflectionData);
+		ReflectShader(FSAsset, ShaderStage::Fragment, FragReflectionData);
 	}
 
-	const Ry::ArrayList<ResourceSetDescription*>& Shader2::GetVertexReflectionData() const
+	const ShaderReflection& Shader2::GetVertexReflectionData() const
 	{
-		return VertexReflectionData;
+		return VertReflectionData;
 	}
 
-	const Ry::ArrayList<ResourceSetDescription*>& Shader2::GetFragmentReflectionData() const
+	const ShaderReflection& Shader2::GetFragmentReflectionData() const
 	{
-		return FragmentReflectionData;
+		return FragReflectionData;
 	}
 	
 }

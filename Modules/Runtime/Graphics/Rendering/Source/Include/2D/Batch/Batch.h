@@ -115,7 +115,7 @@ namespace Ry
 			float VertData[30];
 			Vert->Pack(VertData);
 
-			for(int32 Element = 0; Element < Format.element_count; Element++)
+			for(int32 Element = 0; Element < Format.ElementCount; Element++)
 			{
 				Data.Add(VertData[Element]);
 			}

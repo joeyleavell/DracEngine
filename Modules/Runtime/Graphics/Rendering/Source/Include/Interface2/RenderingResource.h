@@ -178,7 +178,7 @@ namespace Ry
 	{
 	public:
 
-		ResourceSet(ResourceSetDescription* CreateInfo, SwapChain* SC) : Info(CreateInfo), Swap(SC) {};
+		ResourceSet(const ResourceSetDescription* CreateInfo, SwapChain* SC) : Info(CreateInfo), Swap(SC) {};
 		virtual ~ResourceSet() = default;
 
 		virtual void CreateBuffer() = 0;
@@ -209,7 +209,7 @@ namespace Ry
 		
 	protected:
 
-		ResourceSetDescription* Info;
+		const ResourceSetDescription* Info;
 		SwapChain* Swap;
 
 	};

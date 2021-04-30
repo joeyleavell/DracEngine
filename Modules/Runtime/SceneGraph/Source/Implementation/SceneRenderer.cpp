@@ -78,19 +78,19 @@ namespace Ry
 				{
 					if (Sec.Mat->DiffuseTexture)
 					{
-						MatRes->SetFloatConstant("Mat", "UseDiffuseTexture", 1.0f);
-						MatRes->BindTexture("Diffuse", Sec.Mat->DiffuseTexture);
+						MatRes->SetFloatConstant("Material", "UseDiffuseTexture", 1.0f);
+						MatRes->BindTexture("DiffuseTexture", Sec.Mat->DiffuseTexture);
 					}
 					else
 					{
 						// Don't use diffuse, bind default
-						MatRes->SetFloatConstant("Mat", "UseDiffuseTexture", 0.0f);
-						MatRes->BindTexture("Diffuse", Ry::DefaultTexture);
+						MatRes->SetFloatConstant("Material", "UseDiffuseTexture", 0.0f);
+						MatRes->BindTexture("DiffuseTexture", Ry::DefaultTexture);
 					}
 
-					MatRes->SetMatConstant("Mat", "DiffuseColor", Sec.Mat->Diffuse);
-					MatRes->SetMatConstant("Mat", "AmbientColor", Sec.Mat->Ambient);
-					MatRes->SetMatConstant("Mat", "SpecularColor", Sec.Mat->Specular);
+					MatRes->SetMatConstant("Material", "DiffuseColor", Sec.Mat->Diffuse);
+					MatRes->SetMatConstant("Material", "AmbientColor", Sec.Mat->Ambient);
+					MatRes->SetMatConstant("Material", "SpecularColor", Sec.Mat->Specular);
 				}
 				MatRes->CreateBuffer();
 

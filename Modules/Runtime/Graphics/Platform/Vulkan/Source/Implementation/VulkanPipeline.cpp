@@ -26,16 +26,16 @@ namespace Ry
 	bool VulkanPipeline::CreateVertInputBinding(VkPipelineVertexInputStateCreateInfo& OutVertexInputState, Ry::ArrayList<VkVertexInputBindingDescription>& BindingDescriptions)
 	{
 		// Setup attribute array
-		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[CreateInfo.VertFormat.attribute_count];
+		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[CreateInfo.VertFormat.Attributes.GetSize()];
 		
 		VkVertexInputBindingDescription BindingDesc;
 		BindingDesc.binding = 0;
 		BindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		int32 Offset = 0;
-		for (int32 AttributeDescIndex = 0; AttributeDescIndex < CreateInfo.VertFormat.attribute_count; AttributeDescIndex++)
+		for (int32 AttributeDescIndex = 0; AttributeDescIndex < CreateInfo.VertFormat.Attributes.GetSize(); AttributeDescIndex++)
 		{
-			const Ry::VertexAttrib& VertAttrib = CreateInfo.VertFormat.attributes[AttributeDescIndex];
+			const Ry::VertexAttrib& VertAttrib = CreateInfo.VertFormat.Attributes[AttributeDescIndex];
 
 			VkVertexInputAttributeDescription NewAttributeDesc;
 			NewAttributeDesc.binding = 0;
@@ -81,7 +81,7 @@ namespace Ry
 		OutVertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		OutVertexInputState.vertexBindingDescriptionCount = BindingDescriptions.GetSize();
 		OutVertexInputState.pVertexBindingDescriptions = BindingDescriptions.CopyData();
-		OutVertexInputState.vertexAttributeDescriptionCount = CreateInfo.VertFormat.attribute_count;
+		OutVertexInputState.vertexAttributeDescriptionCount = CreateInfo.VertFormat.Attributes.GetSize();
 		OutVertexInputState.pVertexAttributeDescriptions = VkAttributes;
 
 		return true;
@@ -279,7 +279,7 @@ namespace Ry
 		assert(VkRenderPass != nullptr);
 		assert(VkShader != nullptr);
 
-		if(CreateInfo.VertFormat.element_count <= 0)
+		if(CreateInfo.VertFormat.ElementCount <= 0)
 		{
 			Ry::Log->LogError("Vertex format element count is zero");
 			return false;

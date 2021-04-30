@@ -44,7 +44,7 @@ namespace Ry
 		return new GLResourceDescription2(Stages, SetIndex);
 	}
 
-	ResourceSet* GLRenderAPI::CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC)
+	ResourceSet* GLRenderAPI::CreateResourceSet(const ResourceSetDescription* Desc, SwapChain* SC)
 	{
 		return new GLResources2(Desc, SC);
 	}

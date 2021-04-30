@@ -49,7 +49,7 @@ namespace Ry
 		return ResSet;
 	}
 
-	ResourceSet* VulkanRenderAPI::CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC)
+	ResourceSet* VulkanRenderAPI::CreateResourceSet(const ResourceSetDescription* Desc, SwapChain* SC)
 	{
 		VulkanResourceSet* ResSet = new VulkanResourceSet(Desc, SC);
 		return ResSet;

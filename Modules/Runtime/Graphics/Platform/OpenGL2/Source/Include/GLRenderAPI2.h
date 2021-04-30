@@ -21,7 +21,7 @@ namespace Ry
 		Shader2* CreateShader(Ry::String VSAsset, Ry::String FSAsset);
 		Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo);
 		ResourceSetDescription* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0);
-		ResourceSet* CreateResourceSet(ResourceSetDescription* Desc, SwapChain* SC);
+		ResourceSet* CreateResourceSet(const ResourceSetDescription* Desc, SwapChain* SC);
 		Texture2* CreateTexture();
 
 	private:

@@ -19,6 +19,80 @@ namespace Ry
 		return true;
 	}
 
+	bool TryReflectInputVar(SpvReflectInterfaceVariable& Input, ShaderInputVariable& OutVar)
+	{
+		CORE_ASSERT(CheckSupport(Block));
+
+		SpvOp Type = Input.type_description->op;
+		Ry::String Name;
+
+		if(Input.name)
+		{
+			Name = Input.name;
+		}
+		
+		uint32 ArraySize = Input.array.dims_count > 0 ? Input.array.dims[0] : 1;
+
+		ShaderPrimitiveDataType DT = ShaderPrimitiveDataType::None;
+
+		if (Type == SpvOpTypeFloat)
+		{
+			DT = ShaderPrimitiveDataType::Float;
+		}
+
+		if (Type == SpvOpTypeVector)
+		{
+			if (Input.numeric.vector.component_count == 1)
+			{
+				DT = ShaderPrimitiveDataType::Float;
+			}
+			if (Input.numeric.vector.component_count == 2)
+			{
+				DT = ShaderPrimitiveDataType::Float2;
+			}
+			if (Input.numeric.vector.component_count == 3)
+			{
+				DT = ShaderPrimitiveDataType::Float3;
+			}
+			if (Input.numeric.vector.component_count == 4)
+			{
+				DT = ShaderPrimitiveDataType::Float4;
+			}
+		}
+
+		if (Type == SpvOpTypeMatrix)
+		{
+			ShaderPrimitiveDataType Mapped[] = {
+				ShaderPrimitiveDataType::Float1x2, ShaderPrimitiveDataType::Float1x2, ShaderPrimitiveDataType::Float1x3, ShaderPrimitiveDataType::Float1x4,
+				ShaderPrimitiveDataType::Float2x2, ShaderPrimitiveDataType::Float2x2, ShaderPrimitiveDataType::Float2x3, ShaderPrimitiveDataType::Float2x4,
+				ShaderPrimitiveDataType::Float3x2, ShaderPrimitiveDataType::Float3x2, ShaderPrimitiveDataType::Float3x3, ShaderPrimitiveDataType::Float3x4,
+				ShaderPrimitiveDataType::Float4x2, ShaderPrimitiveDataType::Float4x2, ShaderPrimitiveDataType::Float4x3, ShaderPrimitiveDataType::Float4x4,
+			};
+
+			int Index = (Input.numeric.matrix.row_count - 1) * 4 + (Input.numeric.matrix.column_count - 1);
+
+			if (Index < 16)
+			{
+				DT = Mapped[Index];
+			}
+			else
+			{
+				Ry::Log->LogErrorf("Unexpected matrix dims: %d, %d", Input.numeric.matrix.row_count, Input.numeric.matrix.column_count);
+			}
+		}
+
+		if (DT != ShaderPrimitiveDataType::None)
+		{
+			OutVar = ShaderInputVariable{Name, DT};
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
 	PrimitiveBufferMember* ReflectPrimitiveMember(SpvReflectBlockVariable& Block)
 	{
 		CORE_ASSERT(CheckSupport(Block));
@@ -77,7 +151,7 @@ namespace Ry
 
 		if (DT != ShaderPrimitiveDataType::None)
 		{
-			return new PrimitiveBufferMember(Name, ShaderPrimitiveDataType::Float, ArraySize);
+			return new PrimitiveBufferMember(Name, DT, ArraySize);
 		}
 		else
 		{
@@ -173,7 +247,7 @@ namespace Ry
 		return NewBuffer;
 	}
 	
-	void ReflectShader(Ry::String ShaderLoc, Ry::ShaderStage Stage, Ry::ArrayList<ResourceSetDescription*>& OutDesc)
+	void ReflectShader(Ry::String ShaderLoc, Ry::ShaderStage Stage, ShaderReflection& OutReflectionData)
 	{
 		uint8* OutSpirV;
 		int32 SpirVSize;
@@ -189,65 +263,100 @@ namespace Ry
 		SpvReflectResult Result = spvReflectCreateShaderModule(SpirVSize, OutSpirV, &Module);
 		CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
 
+		// Reflect descriptor sets
+
 		uint32 SetCount = 0;
 		SpvReflectDescriptorSet** Sets = nullptr;		
 		Result = spvReflectEnumerateDescriptorSets(&Module, &SetCount, nullptr);
 		CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
 
-		if(SetCount <= 0)
+		if(SetCount > 0)
 		{
-			delete[] Sets;
-			return;
+			Sets = new SpvReflectDescriptorSet * [SetCount];
+			Result = spvReflectEnumerateDescriptorSets(&Module, &SetCount, Sets);
+			CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
+
+			//Ry::ArrayList<Ry::ResourceSetDescription*> ReflectedDescriptions;
+
+			for (int32 SetIndex = 0; SetIndex < SetCount; SetIndex++)
+			{
+				SpvReflectDescriptorSet* Set = Sets[SetIndex];
+
+				// Create new resource set description
+				Ry::ResourceSetDescription* NewDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Stage }, Set->set);
+
+				// Generate bindings for the set
+				for (int32 BindingIndex = 0; BindingIndex < Set->binding_count; BindingIndex++)
+				{
+					SpvReflectDescriptorBinding& Binding = (*Set->bindings)[BindingIndex];
+
+					int32 Index = Binding.binding;
+					Ry::String Name = Binding.name;
+
+					if (Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+					{
+						// Reflect the constant buffer
+						ConstantBuffer* Reflect = ReflectConstantBuffer(Binding.block, Index, Name);
+
+						// Add the constant buffer to the resource set description
+						NewDesc->AddConstantBuffer(Reflect);
+					}
+					else if (Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE)
+					{
+						// Subtrace texture offset
+						TextureBinding* TexBinding = new TextureBinding(Index - T_BUFFER_OFFSET, Name);
+						NewDesc->AddTextureBinding(TexBinding);
+					}
+
+
+				}
+
+				NewDesc->CreateDescription();
+
+				OutReflectionData.AddResourceDescription(NewDesc);
+			}
 		}
 		
-		Sets = new SpvReflectDescriptorSet*[SetCount];
-		Result = spvReflectEnumerateDescriptorSets(&Module, &SetCount, Sets);
+
+		// Reflect inputs
+
+		uint32 InputVarCount = 0;
+		SpvReflectInterfaceVariable** InputVars = nullptr;
+		Result = spvReflectEnumerateInputVariables(&Module, &InputVarCount, nullptr);
 		CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
 
-		//Ry::ArrayList<Ry::ResourceSetDescription*> ReflectedDescriptions;
-
-		for(int32 SetIndex = 0; SetIndex < SetCount; SetIndex++)
+		if(InputVarCount > 0)
 		{
-			SpvReflectDescriptorSet* Set = Sets[SetIndex];
-
-			// Create new resource set description
-			Ry::ResourceSetDescription* NewDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Stage }, Set->set);
-			
-			// Generate bindings for the set
-			for(int32 BindingIndex = 0; BindingIndex < Set->binding_count; BindingIndex++)
+			InputVars = new SpvReflectInterfaceVariable*[InputVarCount];
+			Result = spvReflectEnumerateInputVariables(&Module, &InputVarCount, InputVars);
+			CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
+		
+			for(int32 InputVar = 0; InputVar < InputVarCount; InputVar++)
 			{
-				SpvReflectDescriptorBinding& Binding = (*Set->bindings)[BindingIndex];
+				SpvReflectInterfaceVariable* Var = InputVars[InputVar];
+				SpvReflectTypeDescription* Type = Var->type_description;
 
-				int32 Index = Binding.binding;
-				Ry::String Name = Binding.name;
-
-				if(Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+				if(Type->op != SpvOpTypeFloat && Type->op != SpvOpTypeVector)
 				{
-					// Reflect the constant buffer
-					ConstantBuffer* Reflect = ReflectConstantBuffer(Binding.block, Index, Name);
-
-					// Add the constant buffer to the resource set description
-					NewDesc->AddConstantBuffer(Reflect);
-				}
-				else if (Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || Binding.descriptor_type == SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE)
-				{
-					// Subtrace texture offset
-					TextureBinding* TexBinding = new TextureBinding(Index - T_BUFFER_OFFSET, Name);
-					NewDesc->AddTextureBinding(TexBinding);
+					Ry::Log->LogErrorf("Shader vertex input type not supported: %s", Type->type_name);
+					continue;
 				}
 
+				ShaderInputVariable RefInputVar;
+				if(TryReflectInputVar(*Var, RefInputVar))
+				{
+					OutReflectionData.AddInputVariable(RefInputVar);
+				}
 
 			}
-
-			NewDesc->CreateDescription();
-
-			OutDesc.Add(NewDesc);
 		}
-
+		
 		spvReflectDestroyShaderModule(&Module);
 
 		delete[] OutSpirV;
 		delete[] Sets;
+		delete[] InputVars;
+
 	}
 	
 }
