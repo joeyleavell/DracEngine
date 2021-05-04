@@ -351,7 +351,7 @@ namespace Ry
 		{
 			// Cache hit, load file
 			// Todo: make this not have a max size
-			uint32 Size = 1024 * 10;
+			uint32 Size = 1024 * 100;
 			OutSpirV = new uint8[Size];
 			OutSize = Ry::File::LoadFileBytes(SpirVLocAbs, OutSpirV, Size);
 

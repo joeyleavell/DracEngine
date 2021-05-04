@@ -23,22 +23,13 @@ namespace Ry
 		}
 
 		// Determine vertex format
-		const Ry::ArrayList<ShaderInputVariable>& InputVars = VertRef.GetInputVars();
+		const Ry::ArrayList<ShaderVariable>& InputVars = VertRef.GetInputVars();
 
 		Ry::ArrayList<VertexAttrib> Attribs;
 
 		if(InputVars.GetSize() > 0)
 		{
-			// VertexFormat Format;
-			// Format.attribute_count = InputVars.GetSize();
-			//
-			// for(int32 Index = 0; Index < InputVars.GetSize(); Index++)
-			// {
-			// 	const ShaderInputVariable& InputVar = InputVars[Index];
-			//
-			// 	Format.
-			// }
-
+			New.VertFormat = Src->GetVertexFormat();
 		}
 		else
 		{

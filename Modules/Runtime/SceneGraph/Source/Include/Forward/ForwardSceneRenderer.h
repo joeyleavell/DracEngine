@@ -29,6 +29,8 @@ namespace Ry
 
 	private:
 
+		Ry::Vector3 LightDir;
+
 		void OnSwapChainDirty();
 
 		void CreateResources() override;

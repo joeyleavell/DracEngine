@@ -1,5 +1,6 @@
 #include "Interface2/Shader2.h"
 #include "Language/ShaderReflector.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {
@@ -56,7 +57,7 @@ namespace Ry
 		Resources.Add(Desc);
 	}
 
-	void ShaderReflection::AddInputVariable(ShaderInputVariable Var)
+	void ShaderReflection::AddInputVariable(ShaderVariable Var)
 	{
 		InputVars.Add(Var);
 	}
@@ -66,7 +67,7 @@ namespace Ry
 		return Resources;
 	}
 
-	const Ry::ArrayList<ShaderInputVariable>& ShaderReflection::GetInputVars() const
+	const Ry::ArrayList<ShaderVariable>& ShaderReflection::GetInputVars() const
 	{
 		return InputVars;
 	}
@@ -89,6 +90,38 @@ namespace Ry
 		
 		ReflectShader(VSAsset, ShaderStage::Vertex, VertReflectionData);
 		ReflectShader(FSAsset, ShaderStage::Fragment, FragReflectionData);
+
+		// Create vertex format from vertex shader input variables
+		const Ry::ArrayList<ShaderVariable>& InputVars = VertReflectionData.GetInputVars();
+		for(int32 VertInputVar = 0; VertInputVar < InputVars.GetSize(); VertInputVar++)
+		{
+			const ShaderVariable& Var = InputVars[VertInputVar];
+
+			if(Var.ArraySize != 1)
+			{
+				Ry::Log->LogErrorf("Arrays not supported for vertex attributes: %s", *Var.Name);
+				return;
+			}
+
+			if(!Var.IsVectorType())
+			{
+				Ry::Log->LogErrorf("Vertex input data type not supported for input var: ", *Var.Name);
+				return;
+			}
+
+			// Add the variable to the format
+			VertexAttrib NewAttrib;
+			NewAttrib.Name = Var.Name;
+			NewAttrib.Size = Var.GetVectorElementCount();
+			
+			VertFormat.Attributes.Add(NewAttrib);
+			VertFormat.ElementCount += NewAttrib.Size;
+		}
+	}
+
+	const VertexFormat& Shader2::GetVertexFormat() const
+	{
+		return VertFormat;
 	}
 
 	const ShaderReflection& Shader2::GetVertexReflectionData() const

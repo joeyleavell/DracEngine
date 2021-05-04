@@ -45,6 +45,12 @@ namespace Ry
 		// Update scene resources
 		SceneResources->SetMatConstant("Scene", "ViewProjection", ViewProjectionMatrix);
 
+		// Set view position from inverse transform
+		LightResources->SetMatConstant("SceneLighting", "ViewPosition", ViewPos);
+
+		LightDir = LightDir.RotateVector(Ry::UpVector, 0.01f);
+		LightResources->SetMatConstant("SceneLighting", "PointLights[0].Position", LightDir);
+
 		// Update primitive resources
 		for(ScenePrimitive* Prim : TargetScene->GetPrimitives())
 		{
@@ -76,7 +82,7 @@ namespace Ry
 	
 	void ForwardSceneRenderer::CreateResources()
 	{
-		Shader = Ry::GetOrCompileShader("Level", "Vertex/Level", "Fragment/Level");
+		Shader = Ry::GetOrCompileShader("Level", "Vertex/BlinnPhong", "Fragment/BlinnPhong");
 		
 		// Create resource descriptions, and high level resources
 		SceneResDesc = Shader->GetVertexReflectionData()[0];
@@ -125,12 +131,17 @@ namespace Ry
 
 		LightResources = Ry::NewRenderAPI->CreateResourceSet(LightResDesc, Ry::app->GetSwapChain());
 		{
-			Ry::Vector3 Dir = { -0.5f, -0.5f, 0.0f };
-			normalize(Dir);
+			LightDir = { -0.5f, -0.5f, 0.0f };
+			normalize(LightDir);
 
-			LightResources->SetFloatConstant("Light", "Intensity", 1.0f);
-			LightResources->SetMatConstant("Light", "Color", Ry::Vector3(1.0f, 1.0f, 1.0f));
-			LightResources->SetMatConstant("Light", "Direction", Dir);
+			LightResources->SetFloatConstant("SceneLighting", "NumPointLights", 2.0f);
+
+			LightResources->SetMatConstant("SceneLighting", "PointLights[0].Position", LightDir);
+			LightResources->SetMatConstant("SceneLighting", "PointLights[0].Color", Ry::Vector3(1.0f, 1.0f, 1.0f));
+
+			LightResources->SetMatConstant("SceneLighting", "PointLights[1].Position", LightDir);
+			LightResources->SetMatConstant("SceneLighting", "PointLights[1].Color", Ry::Vector3(0.0f, 0.0f,1.0f));
+
 		}
 		LightResources->CreateBuffer();
 
@@ -139,14 +150,13 @@ namespace Ry
 	void ForwardSceneRenderer::CreatePipeline()
 	{
 		// Create and manage all pipelines associated with this renderer
-		Shader = Ry::GetOrCompileShader("Level", "Vertex/Level", "Fragment/Level");
+		Shader = Ry::GetOrCompileShader("Level", "Vertex/BlinnPhong", "Fragment/BlinnPhong");
 
 		// Create new pipeline
 		Ry::PipelineCreateInfo CreateInfo;
 		CreateInfo.ViewportWidth = Ry::app->GetSwapChain()->GetSwapChainWidth();
 		CreateInfo.ViewportHeight = Ry::app->GetSwapChain()->GetSwapChainHeight();
 		CreateInfo.PipelineShader = Shader;
-		CreateInfo.VertFormat = Ry::VF1P1UV1N;
 		CreateInfo.RenderPass = Ry::app->GetSwapChain()->GetDefaultRenderPass();
 		CreateInfo.Blend.bEnabled = true;
 		CreateInfo.Depth.bEnableDepthTest = true;

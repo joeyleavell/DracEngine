@@ -3,6 +3,7 @@
 #include "Asset.h"
 #include "RenderingGen.h"
 #include "Data/Map.h"
+#include "Vertex.h"
 
 namespace Ry
 {
@@ -66,21 +67,94 @@ namespace Ry
 
 	Ry::String RENDERING_MODULE ToString(ShaderPrimitiveDataType DT);
 
-	struct ShaderInputVariable
+	struct ShaderVariable
 	{
 		Ry::String Name;
-		ShaderPrimitiveDataType Type;
+		ShaderPrimitiveDataType Type = ShaderPrimitiveDataType::None;
+		int32 ArraySize = 1;
+
+		/**
+		 * Includes float type.
+		 */
+		bool IsVectorType() const
+		{
+			if (Type == ShaderPrimitiveDataType::Float)
+				return true;
+			if (Type == ShaderPrimitiveDataType::Float2)
+				return true;
+			if (Type == ShaderPrimitiveDataType::Float3)
+				return true;
+			if (Type == ShaderPrimitiveDataType::Float4)
+				return true;
+
+			return false;
+		}
+
+		int32 GetVectorElementCount() const
+		{
+			if (Type == ShaderPrimitiveDataType::Float)
+				return 1;
+			if (Type == ShaderPrimitiveDataType::Float2)
+				return 2;
+			if (Type == ShaderPrimitiveDataType::Float3)
+				return 3;
+			if (Type == ShaderPrimitiveDataType::Float4)
+				return 4;
+
+			return -1;
+		}
+
+
 	};
+
+	// struct ShaderInputVariable
+	// {
+	// 	Ry::String Name;
+	// 	ShaderPrimitiveDataType Type;
+	//
+	// 	/**
+	// 	 * Includes float type.
+	// 	 */
+	// 	bool IsVectorType() const
+	// 	{
+	// 		if (Type == ShaderPrimitiveDataType::Float)
+	// 			return true;
+	// 		if (Type == ShaderPrimitiveDataType::Float2)
+	// 			return true;
+	// 		if (Type == ShaderPrimitiveDataType::Float3)
+	// 			return true;
+	// 		if (Type == ShaderPrimitiveDataType::Float4)
+	// 			return true;
+	//
+	// 		return false;
+	// 	}
+	//
+	// 	int32 GetVectorElementCount() const
+	// 	{
+	// 		if (Type == ShaderPrimitiveDataType::Float)
+	// 			return 1;
+	// 		if (Type == ShaderPrimitiveDataType::Float2)
+	// 			return 2;
+	// 		if (Type == ShaderPrimitiveDataType::Float3)
+	// 			return 3;
+	// 		if (Type == ShaderPrimitiveDataType::Float4)
+	// 			return 4;
+	//
+	// 		return -1;
+	// 	}
+	//
+	// 	
+	// };
 
 	class RENDERING_MODULE ShaderReflection
 	{
 	public:
 
 		void AddResourceDescription(ResourceSetDescription* Desc);
-		void AddInputVariable(ShaderInputVariable Var);
+		void AddInputVariable(ShaderVariable Var);
 
 		const Ry::ArrayList<ResourceSetDescription*>& GetResources() const;
-		const Ry::ArrayList<ShaderInputVariable>& GetInputVars() const;
+		const Ry::ArrayList<ShaderVariable>& GetInputVars() const;
 
 		const ResourceSetDescription* operator[] (int32 Index) const;
 
@@ -88,7 +162,7 @@ namespace Ry
 	private:
 
 		Ry::ArrayList<ResourceSetDescription*> Resources;
-		Ry::ArrayList<ShaderInputVariable> InputVars;
+		Ry::ArrayList<ShaderVariable> InputVars;
 		
 	};
 
@@ -109,11 +183,13 @@ namespace Ry
 		 */
 		virtual void DestroyShader() = 0;
 
+		const VertexFormat& GetVertexFormat() const;
 		const ShaderReflection& GetVertexReflectionData() const;
 		const ShaderReflection& GetFragmentReflectionData() const;
 
 	private:
 
+		Ry::VertexFormat VertFormat;
 		ShaderReflection VertReflectionData;
 		ShaderReflection FragReflectionData;
 

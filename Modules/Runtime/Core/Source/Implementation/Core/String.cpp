@@ -612,8 +612,8 @@ namespace Ry
 
 	int32 String::find_last(const String& str, uint32 index) const
 	{
-		CORE_ASSERT(index >= 0, "find_last index must be greater than or equal to zero");
-		CORE_ASSERT(index < getSize(), "find_last index must be less than string size");
+		CORE_ASSERTF(index >= 0, "find_last index must be greater than or equal to zero");
+		CORE_ASSERTF(index < getSize(), "find_last index must be less than string size");
 
 		/************************************************************************/
 		/* Shortcuts                                                            */

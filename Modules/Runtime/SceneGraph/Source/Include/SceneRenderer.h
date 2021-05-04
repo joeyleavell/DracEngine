@@ -71,6 +71,7 @@ namespace Ry
 
 		// Combined view and projection matrix, usually the inverse of the camera matrix
 		Ry::Matrix4 ViewProjectionMatrix;
+		Ry::Vector3 ViewPos;
 
 		SceneRenderer(Ry::SceneGraph* TarScene);
 		virtual ~SceneRenderer();

@@ -222,7 +222,8 @@ namespace Ry
 		}
 		
 		glEnable(GL_TEXTURE_2D);
-
+		//glEnable(GL_FRAMEBUFFER_SRGB);
+		
 		// Bind OpenGL shader
 		const GLShader2* Shader = dynamic_cast<const GLShader2*>(Cmd->Pipeline->GetCreateInfo().PipelineShader);
 		glUseProgram(Shader->GetProgramHandle());
