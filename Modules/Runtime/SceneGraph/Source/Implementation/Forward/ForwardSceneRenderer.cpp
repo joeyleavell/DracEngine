@@ -134,13 +134,38 @@ namespace Ry
 			LightDir = { -0.5f, -0.5f, 0.0f };
 			normalize(LightDir);
 
-			LightResources->SetFloatConstant("SceneLighting", "NumPointLights", 2.0f);
+			LightResources->SetFloatConstant("SceneLighting", "NumPointLights", 7.0f);
 
-			LightResources->SetMatConstant("SceneLighting", "PointLights[0].Position", LightDir);
-			LightResources->SetMatConstant("SceneLighting", "PointLights[0].Color", Ry::Vector3(1.0f, 1.0f, 1.0f));
+			Ry::Vector3 Colors[] = {
+				Ry::Vector3(0.0f, 0.0f, 1.0f),
+				Ry::Vector3(0.0f, 1.0f, 0.0f),
+				Ry::Vector3(0.0f, 1.0f, 1.0f),
+				Ry::Vector3(1.0f, 0.0f, 0.0f),
+				Ry::Vector3(1.0f, 0.0f, 1.0f),
+				Ry::Vector3(1.0f, 1.0f, 0.0f),
+				Ry::Vector3(1.0f, 1.0f, 1.0f),
+			};
+			
+			for(int light = 0; light < 7; light++)
+			{
+				Float3 Forward = Ry::ForwardVector.RotatedVector(UpVector, 360.0f / 7 * light);
+				Forward.y = -0.2f;
 
-			LightResources->SetMatConstant("SceneLighting", "PointLights[1].Position", LightDir);
-			LightResources->SetMatConstant("SceneLighting", "PointLights[1].Color", Ry::Vector3(0.0f, 0.0f,1.0f));
+				Ry::String Light = "PointLights[" + Ry::to_string(light) + "]";
+				
+				LightResources->SetMatConstant("SceneLighting", Light + ".Position", Forward);
+				LightResources->SetMatConstant("SceneLighting", Light + ".Color", Colors[light]);
+			}
+
+
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[1].Position", LightDir);
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[1].Color", Ry::Vector3(0.0f, 0.0f,1.0f));
+			//
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[2].Position", Ry::Vector3(0.0f, 0.5f, 1.0f));
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[2].Color", Ry::Vector3(1.0f, 0.0f, 0.0f));
+			//
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[3].Position", Ry::Vector3(-0.5f, 0.5f, 1.0f));
+			// LightResources->SetMatConstant("SceneLighting", "PointLights[3].Color", Ry::Vector3(1.0f, 0.0f, 1.0f));
 
 		}
 		LightResources->CreateBuffer();

@@ -119,28 +119,6 @@ float3 CookTorranceBRDF(float3 SurfaceNormal, float3 ViewDir, float3 HalfwayDir,
 	return Kd * CookTorranceLambert + CookTorranceSpec; // Ks already accounted for in fresnel factor
 }
 
-// Calculate effects of light
-float3 CalcPointLightPhong(PointLight InLight, float3 FragPos, float3 SurfaceNormal, float3 Albedo)
-{
-	float3 LightDir = -normalize(InLight.Position);//normalize(InLight.Position - FragPos);
-	float3 ViewDir = normalize(ViewPosition - FragPos);
-	float3 HalfwayDir = normalize(LightDir + ViewDir);
-	
-	float Shiny = 32.0f;
-	
-	float Ambient = 0.03 * float3(1.0f, 1.0f, 1.0f);
-	float Diffuse = dot(SurfaceNormal, LightDir);
-	float Specular = pow(max(dot(SurfaceNormal, HalfwayDir), 0.0), Shiny);
-	
-	float Roughness = 0.8f;
-	float K = (Roughness + 1) * (Roughness + 1) / 8;
-	float Distribution = DistributionGGX(SurfaceNormal, HalfwayDir, Roughness);
-	float Geometry = GeometrySmith(SurfaceNormal, ViewDir, LightDir, K);
-	float3 Fresnel = FresnelSchlick(HalfwayDir, ViewDir, Albedo, 1.0);
-	
-	return Diffuse * Albedo * InLight.Color + Specular * InLight.Color;
-}
-
 float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNormal, float3 Albedo)
 {
 	float3 LightDir = -normalize(InLight.Position);//normalize(InLight.Position - FragPos);
@@ -151,7 +129,7 @@ float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNorma
 	float Metalness = 0.0f;
 	
 	float3 BRDF = CookTorranceBRDF(SurfaceNormal, ViewDir, HalfwayDir, LightDir, Albedo, Roughness, Metalness);
-	float NdotL = dot(LightDir, SurfaceNormal);
+	float NdotL = max(dot(LightDir, SurfaceNormal), 0.0);
 	
 	// Calculate the radiance of the point light
 	float3 Radiance = InLight.Color;
@@ -159,6 +137,28 @@ float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNorma
 	float3 Result = BRDF * Radiance * NdotL;
 	
 	return Result;
+}
+
+// Calculate effects of light
+float3 CalcPointLightPhong(PointLight InLight, float3 FragPos, float3 SurfaceNormal, float3 Albedo)
+{
+	float3 LightDir = -normalize(InLight.Position);//normalize(InLight.Position - FragPos);
+	float3 ViewDir = normalize(ViewPosition - FragPos);
+	float3 HalfwayDir = normalize(LightDir + ViewDir);
+	
+	float Shiny = 32.0f;
+	
+	float Ambient = 0.03 * float3(1.0f, 1.0f, 1.0f);
+	float Diffuse = max(dot(SurfaceNormal, LightDir), 0.0);
+	float Specular = pow(max(dot(SurfaceNormal, HalfwayDir), 0.0), Shiny);
+	
+	float Roughness = 0.8f;
+	float K = (Roughness + 1) * (Roughness + 1) / 8;
+	float Distribution = DistributionGGX(SurfaceNormal, HalfwayDir, Roughness);
+	float Geometry = GeometrySmith(SurfaceNormal, ViewDir, LightDir, K);
+	float3 Fresnel = FresnelSchlick(HalfwayDir, ViewDir, Albedo, 1.0);
+	
+	return Diffuse * Albedo * InLight.Color + Specular * InLight.Color;
 }
 
 PixelOutput main(PixelInput In)
@@ -177,8 +177,9 @@ PixelOutput main(PixelInput In)
 	for(int PointLightIndex = 0; PointLightIndex < PointLightsFloored; PointLightIndex++)
 	{
 		PointLight TheLight = PointLights[PointLightIndex];
-		
-		OutRadiance += float4(CalcPointLightPBR(TheLight, In.VertWorld, In.VertNormal, ActualColor), 0.0f);		
+
+		OutRadiance += CalcPointLightPBR(TheLight, In.VertWorld, In.VertNormal, ActualColor);		
+		//OutRadiance += CalcPointLightPhong(TheLight, In.VertWorld, In.VertNormal, ActualColor);
 	}
 	
 	// Contribute ambient occlusion to final result
@@ -188,9 +189,13 @@ PixelOutput main(PixelInput In)
 	
 	// Tone mapping/HDR
 	OutRadiance = OutRadiance / (OutRadiance + float3(1.0, 1.0, 1.0));
-	OutRadiance = pow(OutRadiance, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+	//OutRadiance = pow(OutRadiance, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
+
+	OutRadiance.r = min(OutRadiance.r, 1.0);
+	OutRadiance.g = min(OutRadiance.g, 1.0);
+	OutRadiance.b = min(OutRadiance.b, 1.0);
 	
 	Out.PixelColor = float4(OutRadiance, 1.0f);
-		
+			
 	return Out;
 }
