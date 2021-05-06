@@ -3,8 +3,8 @@
 #include "2D/Batch/Batch.h"
 #include "Core/Globals.h"
 #include <iostream>
-#include "Interface2/RenderAPI.h"
-#include "Interface2/Texture2.h"
+#include "Interface/RenderAPI.h"
+#include "Interface/Texture.h"
 
 namespace Ry
 {
@@ -72,7 +72,7 @@ namespace Ry
 		return nullptr;
 	}
 
-	Ry::Texture2* BitmapFont::GetAtlasTexture() const
+	Ry::Texture* BitmapFont::GetAtlasTexture() const
 	{
 		return AtlasTexture;
 	}
@@ -265,7 +265,7 @@ namespace Ry
 		const int32 LINE_HEIGHT = Ascent - Descent + LineGap;
 		auto* FontAtlas = new Ry::Bitmap(FONT_BITMAP_SIZE, FONT_BITMAP_SIZE, PixelStorage::RED8);
 		
-		AtlasTexture = Ry::NewRenderAPI->CreateTexture();
+		AtlasTexture = Ry::RendAPI->CreateTexture();
 
 		int32 X = 0;
 		int32 Y = 0;

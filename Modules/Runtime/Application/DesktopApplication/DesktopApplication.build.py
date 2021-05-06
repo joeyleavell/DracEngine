@@ -10,7 +10,7 @@ Modules = ["Core",
 "Scene", 
 "Automation", 
 "Input", 
-"OpenGL2", 
+"OpenGL", 
 "Vulkan",
 "Windowing"]
 

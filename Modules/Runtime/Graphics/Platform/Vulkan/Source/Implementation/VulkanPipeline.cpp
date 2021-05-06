@@ -13,7 +13,7 @@
 namespace Ry
 {
 	VulkanPipeline::VulkanPipeline(const Ry::PipelineCreateInfo& CreateInfo):
-	Pipeline2(CreateInfo)
+	Pipeline(CreateInfo)
 	{
 
 	}
@@ -244,7 +244,7 @@ namespace Ry
 
 		Ry::ArrayList<VkDescriptorSetLayout> Layouts;
 
-		for(ResourceSetDescription* SetDesc : CreateInfo.ResourceDescriptions)
+		for(ResourceLayout* SetDesc : CreateInfo.ResourceDescriptions)
 		{
 			// Create uniform layout information here
 			VulkanResourceSetDescription* VkResSetDesc = dynamic_cast<VulkanResourceSetDescription*>(SetDesc);

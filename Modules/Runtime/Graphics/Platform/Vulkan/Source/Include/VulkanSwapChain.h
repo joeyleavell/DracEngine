@@ -68,7 +68,7 @@ namespace Ry
 
 		int32 GetSwapChainWidth() const override;
 		int32 GetSwapChainHeight() const override;
-		RenderPass2* GetDefaultRenderPass() override;
+		RenderPass* GetDefaultRenderPass() override;
 
 		int32 GetSwapchainVersion();
 		void SubmitBuffer(const VkCommandBuffer& BufferToSubmit);

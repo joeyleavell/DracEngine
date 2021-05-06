@@ -7,7 +7,7 @@ namespace Ry
 {
 	
 	VulkanVertexArray::VulkanVertexArray(const VertexFormat& Format):
-	VertexArray2(Format)
+	VertexArray(Format)
 	{
 		this->Format = Format;
 

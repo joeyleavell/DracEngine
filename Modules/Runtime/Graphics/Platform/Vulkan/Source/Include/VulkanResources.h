@@ -2,11 +2,11 @@
 
 #include "Core/Core.h"
 #include "VulkanGen.h"
-#include "Interface2/Shader2.h"
+#include "Interface/Shader.h"
 #include "Data/Map.h"
 #include <cassert>
 #include "vulkan/vulkan.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderingResource.h"
 
 // Create offsets for Vulkan to be compatible with HLSL register locations
 #define C_BUFFER_OFFSET 0
@@ -132,12 +132,12 @@ namespace Ry
 		VkSampler Sampler;
 	};
 
-	class VULKAN_MODULE VulkanResourceSetDescription : public Ry::ResourceSetDescription
+	class VULKAN_MODULE VulkanResourceSetDescription : public Ry::ResourceLayout
 	{
 	public:
 
 		VulkanResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0):
-		ResourceSetDescription(Stages, SetIndex)
+		ResourceLayout(Stages, SetIndex)
 		{
 			
 		}
@@ -159,14 +159,14 @@ namespace Ry
 
 		std::vector<VkDescriptorSet> DescriptorSets;
 
-		VulkanResourceSet(const ResourceSetDescription* CreateInfo, SwapChain* SC);
+		VulkanResourceSet(const ResourceLayout* CreateInfo, SwapChain* SC);
 
 		void CreateBuffer() override;
 		void DeleteBuffer() override;
 		bool Update() override;
 		void FlushBuffer(int32 Frame) override;
 
-		void BindTexture(Ry::String TextureName, const Ry::Texture2* Resource) override;
+		void BindTexture(Ry::String TextureName, const Ry::Texture* Resource) override;
 		void SetConstant(Ry::String BufferName, Ry::String Id, const void* Data) override;
 
 		void CreateUniformBuffers(VulkanSwapChain* SwapChain);

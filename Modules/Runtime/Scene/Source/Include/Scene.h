@@ -23,7 +23,7 @@ namespace Ry
 	SCENE_MODULE SharedPtr<TransformComponent> MakeTransformComponent(const Transform& Initial);
 
 	SCENE_MODULE SharedPtr<MeshComponent> MakeMeshComponent();
-	SCENE_MODULE SharedPtr<MeshComponent> MakeMeshComponent(SharedPtr<Mesh2> RuntimeMesh);
+	SCENE_MODULE SharedPtr<MeshComponent> MakeMeshComponent(SharedPtr<Mesh> RuntimeMesh);
 
 	SCENE_MODULE SharedPtr<World> MakeWorld();
 	

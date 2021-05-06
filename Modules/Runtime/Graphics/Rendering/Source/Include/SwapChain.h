@@ -8,8 +8,8 @@ struct GLFWwindow;
 namespace Ry
 {
 
-	class RenderPass2;
-	class RenderingCommandBuffer2;
+	class RenderPass;
+	class CommandBuffer;
 
 	class RENDERING_MODULE SwapChain
 	{
@@ -28,7 +28,7 @@ namespace Ry
 		virtual int32 GetSwapChainWidth() const = 0;
 		virtual int32 GetSwapChainHeight() const = 0;
 
-		virtual RenderPass2* GetDefaultRenderPass() = 0;
+		virtual RenderPass* GetDefaultRenderPass() = 0;
 		
 	};
 	

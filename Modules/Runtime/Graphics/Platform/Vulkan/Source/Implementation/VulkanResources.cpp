@@ -18,7 +18,7 @@ namespace Ry
 		}
 	}
 
-	VulkanResourceSet::VulkanResourceSet(const ResourceSetDescription* CreateInfo, SwapChain* SC):
+	VulkanResourceSet::VulkanResourceSet(const ResourceLayout* CreateInfo, SwapChain* SC):
 	ResourceSet(CreateInfo, SC)
 	{
 		CreateBufferStorage();		
@@ -114,7 +114,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanResourceSet::BindTexture(Ry::String TextureName, const Ry::Texture2* Resource)
+	void VulkanResourceSet::BindTexture(Ry::String TextureName, const Ry::Texture* Resource)
 	{
 		const VulkanTexture* VkTexture = dynamic_cast<const VulkanTexture*>(Resource);
 		assert(VkTexture != nullptr);

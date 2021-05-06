@@ -3,9 +3,9 @@
 #include "RenderingPass.h"
 #include "RenderPipeline.h"
 #include "Asset.h"
-#include "Interface2/RenderAPI.h"
+#include "Interface/RenderAPI.h"
 #include "Bitmap.h"
-#include "Interface2/Texture2.h"
+#include "Interface/Texture.h"
 
 //#include "Core/Application/Application.h"
 
@@ -20,10 +20,10 @@ namespace Ry
 	RenderingPass* TextPass = nullptr;
 	UniquePtr<RenderPipeline> ObjectPipeline;
 
-	Ry::Texture2* DefaultTexture = nullptr;
+	Ry::Texture* DefaultTexture = nullptr;
 
 	// Shaders
-	Ry::Map<String, Ry::Shader2*> CompiledShaders;
+	Ry::Map<String, Ry::Shader*> CompiledShaders;
 
 	// Batchers
 	Batch* TextBatcher = nullptr;
@@ -116,7 +116,7 @@ namespace Ry
 		// Create 1x1 default texture
 		Ry::Bitmap DefaultTextureBmp (1, 1, PixelStorage::FOUR_BYTE_RGBA);
 		DefaultTextureBmp.SetPixel(0, 0, 0xFFFFFFFF);
-		DefaultTexture = Ry::NewRenderAPI->CreateTexture();
+		DefaultTexture = Ry::RendAPI->CreateTexture();
 		DefaultTexture->Data(&DefaultTextureBmp);
 	}
 
@@ -145,9 +145,9 @@ namespace Ry
 	//	TextureBatcher->ResizeProjection(Width, Height);
 	}
 
-	Shader2* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment)
+	Shader* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment)
 	{
-		Shader2* Cur = GetShader(Name);
+		Shader* Cur = GetShader(Name);
 
 		if(!Cur)
 		{
@@ -157,16 +157,16 @@ namespace Ry
 		return Cur;
 	}
 
-	Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc)
+	Shader* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc)
 	{
-		Ry::Shader2* Result = Ry::NewRenderAPI->CreateShader(VertexLoc, FragmentLoc);
-//		Shader2* Result = Ry::RenderAPI->make_shader(Format, );
+		Ry::Shader* Result = Ry::RendAPI->CreateShader(VertexLoc, FragmentLoc);
+//		Shader* Result = Ry::RenderAPI->make_shader(Format, );
 		CompiledShaders.insert(Name, Result);
 
 		return Result;
 	}
 
-	Shader2* GetShader(const String& Name)
+	Shader* GetShader(const String& Name)
 	{
 		if(CompiledShaders.contains(Name))
 		{

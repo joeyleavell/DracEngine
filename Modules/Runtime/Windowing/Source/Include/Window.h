@@ -12,7 +12,7 @@ struct GLFWmonitor;
 
 namespace Ry
 {
-	class RenderingCommandBuffer2;
+	class CommandBuffer;
 	class SwapChain;
 	class Context;
 

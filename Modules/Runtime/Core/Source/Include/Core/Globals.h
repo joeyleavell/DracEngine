@@ -15,7 +15,7 @@ namespace Ry
 	class Renderer;
 	class Logger;
 	class InputHandler;
-	class RenderAPI2;
+	class RenderAPI;
 	enum class RenderingPlatform;
 
 	
@@ -39,10 +39,8 @@ namespace Ry
 
 	/**
 	 * Rendering globals
-	 */
-	extern CORE_MODULE Renderer* RenderAPI;
-	
-	extern CORE_MODULE RenderAPI2* NewRenderAPI;
+	 */	
+	extern CORE_MODULE RenderAPI* RendAPI;
 
 	extern CORE_MODULE RenderingPlatform* rplatform;
 	

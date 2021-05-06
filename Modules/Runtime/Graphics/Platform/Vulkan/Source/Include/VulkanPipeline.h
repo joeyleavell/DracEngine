@@ -2,7 +2,7 @@
 
 #include "Core/Core.h"
 #include "VulkanCommon.h"
-#include "Interface2/Pipeline.h"
+#include "Interface/Pipeline.h"
 #include "VulkanGen.h"
 
 namespace Ry
@@ -41,10 +41,10 @@ namespace Ry
 	//
 	// private:
 	//
-	// 	Ry::Shader2* Shader;
+	// 	Ry::Shader* Shader;
 	// };
 
-	class VULKAN_MODULE VulkanPipeline : public Ry::Pipeline2
+	class VULKAN_MODULE VulkanPipeline : public Ry::Pipeline
 	{
 	public:
 		VulkanPipeline(const Ry::PipelineCreateInfo& CreateInfo);

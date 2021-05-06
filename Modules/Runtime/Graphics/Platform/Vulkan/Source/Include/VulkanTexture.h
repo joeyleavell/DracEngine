@@ -1,7 +1,7 @@
 #pragma once
 
 #include "VulkanGen.h"
-#include "Interface2/Texture2.h"
+#include "Interface/Texture.h"
 #include "vulkan/vulkan.h"
 
 namespace Ry
@@ -9,7 +9,7 @@ namespace Ry
 
 	class VulkanBuffer;
 
-	class VULKAN_MODULE VulkanTexture : public Ry::Texture2
+	class VULKAN_MODULE VulkanTexture : public Ry::Texture
 	{
 
 	public:

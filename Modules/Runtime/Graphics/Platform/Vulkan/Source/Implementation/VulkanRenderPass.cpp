@@ -67,7 +67,7 @@ namespace Ry
 			VkAttachmentDescriptions.Add(NewAttachment);
 		}
 
-		for(Subpass2* SubPass : SubPasses)
+		for(Subpass* SubPass : SubPasses)
 		{
 			Ry::ArrayList<VkAttachmentReference> ColorAttachmentRefs;
 			Ry::ArrayList<VkAttachmentReference> DepthStencilAttachmentRefs;

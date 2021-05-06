@@ -3,29 +3,27 @@
 #include "Core/Core.h"
 #include "Core/Globals.h"
 #include "Color.h"
-#include "Interface2/Shader2.h"
+#include "Interface/Shader.h"
 
 namespace Ry
 {
 
-	class FrameBuffer;
-
 	struct ColorSource
 	{
-		Ry::FrameBuffer* Buffer = nullptr;
+		// Ry::FrameBuffer* Buffer = nullptr;
 		int32 ColorAttachment = 0;
 		Ry::String UniformName = "ColorSource0";
 	};
 
 	struct DepthSource
 	{
-		Ry::FrameBuffer* Buffer = nullptr;
+		// Ry::FrameBuffer* Buffer = nullptr;
 		Ry::String UniformName = "DepthSource";
 	};
 
 	struct StencilSource
 	{
-		Ry::FrameBuffer* Buffer = nullptr;
+		// Ry::FrameBuffer* Buffer = nullptr;
 		Ry::String UniformName = "StencilSource";
 	};
 
@@ -145,25 +143,25 @@ namespace Ry
 			// delete ScreenSpaceMesh;
 		}
 
-		void SetImposeShader(Shader2* ImposeShader)
+		void SetImposeShader(Shader* ImposeShader)
 		{
 			//ScreenSpaceMesh->GetMeshData()->SetShaderAll(ImposeShader);
 			this->ImposeShader = ImposeShader;
 		}
 
-		void SetColorSource(FrameBuffer* FrameBuffer, int32 ColorAttachment)
-		{
-			// Unbind previous callback
-			if (Source.Buffer)
-			{
-			//	Source.Buffer->OnBufferResized.RemoveMemberFunction(this, &ImposePass::OnSourceBufferResize);
-			}
-
-			// Setup the source buffer
-			this->Source.Buffer = FrameBuffer;
-			//this->Source.Buffer->OnBufferResized.AddMemberFunction(this, &ImposePass::OnSourceBufferResize);
-			this->Source.ColorAttachment = ColorAttachment;
-		}
+		// void SetColorSource(FrameBuffer* FrameBuffer, int32 ColorAttachment)
+		// {
+		// 	// Unbind previous callback
+		// 	if (Source.Buffer)
+		// 	{
+		// 	//	Source.Buffer->OnBufferResized.RemoveMemberFunction(this, &ImposePass::OnSourceBufferResize);
+		// 	}
+		//
+		// 	// Setup the source buffer
+		// 	this->Source.Buffer = FrameBuffer;
+		// 	//this->Source.Buffer->OnBufferResized.AddMemberFunction(this, &ImposePass::OnSourceBufferResize);
+		// 	this->Source.ColorAttachment = ColorAttachment;
+		// }
 
 		void Impose()
 		{
@@ -187,7 +185,7 @@ namespace Ry
 	private:
 		ColorSource Source;
 		// Ry::Mesh* ScreenSpaceMesh;
-		Ry::Shader2* ImposeShader;
+		Ry::Shader* ImposeShader;
 	};
 
 	class RENDERING_MODULE OffScreenRenderingPass : public RenderingPass
@@ -248,13 +246,13 @@ namespace Ry
 		// 	Ry::RenderAPI->BindDefaultFramebuffer();
 		// }
 
-		FrameBuffer* GetOutputBuffer()
-		{
-			return Output;
-		}
+		// FrameBuffer* GetOutputBuffer()
+		// {
+		// 	return Output;
+		// }
 		
 	private:
-		FrameBuffer* Output;
+		// FrameBuffer* Output;
 		Ry::Color ClearColor;
 		bool AutomaticallyBlit;
 	};
@@ -271,39 +269,39 @@ namespace Ry
 			// ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
 		}
 
-		void SetPostProcessShader(Shader2* PostProcess)
+		void SetPostProcessShader(Shader* PostProcess)
 		{
 			//ScreenSpaceMesh->GetMeshData()->SetShaderAll(PostProcess);
 			this->PostProcessShader = PostProcess;
 		}
 
-		void AddColorSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
-		{
-			ColorSource Source;
-			Source.Buffer = SourceBuffer;
-			Source.ColorAttachment = ColorAttachment;
-			Source.UniformName = UniformName;
-
-			ColorSources.Add(Source);
-		}
-
-		void AddDepthSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
-		{
-			DepthSource Source;
-			Source.Buffer = SourceBuffer;
-			Source.UniformName = UniformName;
-
-			DepthSources.Add(Source);
-		}
-
-		void AddStencilSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
-		{
-			StencilSource Source;
-			Source.Buffer = SourceBuffer;
-			Source.UniformName = UniformName;
-
-			StencilSources.Add(Source);
-		}
+		// void AddColorSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
+		// {
+		// 	ColorSource Source;
+		// 	Source.Buffer = SourceBuffer;
+		// 	Source.ColorAttachment = ColorAttachment;
+		// 	Source.UniformName = UniformName;
+		//
+		// 	ColorSources.Add(Source);
+		// }
+		//
+		// void AddDepthSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
+		// {
+		// 	DepthSource Source;
+		// 	Source.Buffer = SourceBuffer;
+		// 	Source.UniformName = UniformName;
+		//
+		// 	DepthSources.Add(Source);
+		// }
+		//
+		// void AddStencilSource(Ry::FrameBuffer* SourceBuffer, int32 ColorAttachment, const Ry::String& UniformName)
+		// {
+		// 	StencilSource Source;
+		// 	Source.Buffer = SourceBuffer;
+		// 	Source.UniformName = UniformName;
+		//
+		// 	StencilSources.Add(Source);
+		// }
 
 		void Process()
 		{
@@ -338,7 +336,7 @@ namespace Ry
 
 	private:
 		// Ry::Mesh* ScreenSpaceMesh;
-		Ry::Shader2* PostProcessShader;
+		Ry::Shader* PostProcessShader;
 
 		// Texture sources
 		Ry::ArrayList<ColorSource> ColorSources;

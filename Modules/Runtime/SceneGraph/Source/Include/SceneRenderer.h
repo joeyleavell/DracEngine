@@ -7,14 +7,14 @@
 
 namespace Ry
 {
-	class RenderingCommandBuffer2;
+	class CommandBuffer;
 
-	class Pipeline2;
+	class Pipeline;
 	class ResourceSet;
-	class VertexArray2;
+	class VertexArray;
 	class ScenePrimitive;
 	class SceneGraph;
-	class ResourceSetDescription;
+	class ResourceLayout;
 
 	// Stores resources for a particular material in a primitive
 	struct SCENEGRAPH_MODULE MaterialResources
@@ -49,14 +49,14 @@ namespace Ry
 		void SetPrimitiveSpecificResources(ResourceSet* PrimSpec);
 		ResourceSet* GetPrimitiveSpecificResources();
 
-		void SetVertexArray(VertexArray2* Verts);
-		VertexArray2* GetVertexArray();
+		void SetVertexArray(VertexArray* Verts);
+		VertexArray* GetVertexArray();
 
-		void RecordDraw(Ry::RenderingCommandBuffer2* DstBuffer);
+		void RecordDraw(Ry::CommandBuffer* DstBuffer);
 
 	private:
 
-		Ry::VertexArray2* VertArray;
+		Ry::VertexArray* VertArray;
 		Ry::ResourceSet* PrimSpecificResource;
 		
 		Ry::ArrayList<MaterialResources*> MaterialRes;
@@ -78,7 +78,7 @@ namespace Ry
 
 		virtual void Init();
 		virtual void Render() = 0;
-		virtual RenderingCommandBuffer2* GetCmdBuffer() = 0;
+		virtual CommandBuffer* GetCmdBuffer() = 0;
 
 	protected:
 
@@ -87,7 +87,7 @@ namespace Ry
 		
 		// TODO: need some way of deciding which pipeline to use based on primitive
 		// i.e.: flat shading, pbr shading, etc.
-		Pipeline2* SelectPipelineForPrimitive();
+		Pipeline* SelectPipelineForPrimitive();
 
 		bool bDirty;
 
@@ -98,10 +98,10 @@ namespace Ry
 		Ry::ResourceSet* LightResources; // todo: combine with above?
 
 		// Resource descriptions
-		const Ry::ResourceSetDescription* SceneResDesc; // Per scene resource description
-		const Ry::ResourceSetDescription* LightResDesc; // Per primitive resource description
-		const Ry::ResourceSetDescription* PrimResDesc; // Per primitive resource description
-		const Ry::ResourceSetDescription* MaterialDesc; // Per material resource description
+		const Ry::ResourceLayout* SceneResDesc; // Per scene resource description
+		const Ry::ResourceLayout* LightResDesc; // Per primitive resource description
+		const Ry::ResourceLayout* PrimResDesc; // Per primitive resource description
+		const Ry::ResourceLayout* MaterialDesc; // Per material resource description
 
 		// A map of all scene primitives to their associated resources
 		Ry::Map<ScenePrimitive*, PrimitiveResources*> PrimResources;

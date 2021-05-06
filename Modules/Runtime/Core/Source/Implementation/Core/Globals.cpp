@@ -1,12 +1,10 @@
 #include "Core/Globals.h"
-//#include "Core/Application/DesktopApplication.h"
 #include <iostream>
 
 namespace Ry
 {
 	Ry::Logger* Log = nullptr;
-	Ry::Renderer* RenderAPI = nullptr;
-	RenderAPI2* NewRenderAPI = nullptr;
+	RenderAPI* RendAPI = nullptr;
 
 	Ry::String ResourcesDirectory = ".";
 	

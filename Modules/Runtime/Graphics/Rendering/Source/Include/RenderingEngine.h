@@ -12,7 +12,7 @@ namespace Ry
 {
 
 	class RenderPipeline;
-	class Texture2;
+	class Texture;
 
 	/**
 	 * Initializes rendering engine resources.
@@ -25,7 +25,7 @@ namespace Ry
 	 */
 	void HandleResize(int32 Width, int32 Height);
 
-	extern RENDERING_MODULE Ry::Texture2* DefaultTexture;
+	extern RENDERING_MODULE Ry::Texture* DefaultTexture;
 
 	// Standard rendering passes
 	extern RENDERING_MODULE class OffScreenRenderingPass* UIPass;
@@ -42,11 +42,11 @@ namespace Ry
 	extern RENDERING_MODULE class Batch* TextBatcher;
 
 	// Shader management
-	class Shader2;
-	extern Map<String, Ry::Shader2*> CompiledShaders;
+	class Shader;
+	extern Map<String, Ry::Shader*> CompiledShaders;
 
-	RENDERING_MODULE Shader2* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment);
-	RENDERING_MODULE Shader2* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc);
-	RENDERING_MODULE Shader2* GetShader(const String& Name);
+	RENDERING_MODULE Shader* GetOrCompileShader(const String& Name, Ry::String Vertex, Ry::String Fragment);
+	RENDERING_MODULE Shader* CompileShader(const String& Name, Ry::String VertexLoc, Ry::String FragmentLoc);
+	RENDERING_MODULE Shader* GetShader(const String& Name);
 
 }

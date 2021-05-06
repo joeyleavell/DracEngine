@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface2/RenderAPI.h"
+#include "Interface/RenderAPI.h"
 #include "VulkanGen.h"
 
 namespace Ry
@@ -8,20 +8,20 @@ namespace Ry
 
 	class Framebuffer2;
 	class SwapChain;
-	class Shader2;
+	class Shader;
 	class AssetRef;
 	
-	class VULKAN_MODULE VulkanRenderAPI : public Ry::RenderAPI2
+	class VULKAN_MODULE VulkanRenderAPI : public Ry::RenderAPI
 	{
 	public:
 
-		RenderingCommandBuffer2* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass2* ParentRenderPass = nullptr) override;
-		VertexArray2* CreateVertexArray(const Ry::VertexFormat& Format) override;
-		Shader2* CreateShader(Ry::String VertexLoc, Ry::String FragmentLoc) override;
-		Pipeline2* CreatePipeline(const PipelineCreateInfo& CreateInfo) override;
-		ResourceSetDescription* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) override;
-		ResourceSet* CreateResourceSet(const ResourceSetDescription* Desc, SwapChain* SC) override;
-		Texture2* CreateTexture() override;
+		CommandBuffer* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass* ParentRenderPass = nullptr) override;
+		VertexArray* CreateVertexArray(const Ry::VertexFormat& Format) override;
+		Shader* CreateShader(Ry::String VertexLoc, Ry::String FragmentLoc) override;
+		Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo) override;
+		ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) override;
+		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC) override;
+		Texture* CreateTexture() override;
 
 
 	};

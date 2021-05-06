@@ -1,5 +1,5 @@
 #include "ScenePrimitive.h"
-#include "Mesh2.h"
+#include "Mesh.h"
 
 Ry::ScenePrimitive::ScenePrimitive(bool bStatic)
 {
@@ -39,22 +39,22 @@ Ry::Transform Ry::ScenePrimitive::GetWorldTransform()
 	}
 }
 
-Ry::StaticMeshPrimitive::StaticMeshPrimitive(Mesh2* Mesh)
+Ry::StaticMeshPrimitive::StaticMeshPrimitive(Mesh* Mesh)
 {
 	this->StaticMesh = Mesh;
 }
 
-Ry::VertexArray2* Ry::StaticMeshPrimitive::GetVertexArray()
+Ry::VertexArray* Ry::StaticMeshPrimitive::GetVertexArray()
 {
 	return StaticMesh->GetVertexArray();
 }
 
-Ry::Mesh2* Ry::StaticMeshPrimitive::GetMesh()
+Ry::Mesh* Ry::StaticMeshPrimitive::GetMesh()
 {
 	return StaticMesh;
 }
 
-Ry::ScenePrimitive* Ry::CreatePrimitive(Mesh2* SM)
+Ry::ScenePrimitive* Ry::CreatePrimitive(Mesh* SM)
 {
 	return new StaticMeshPrimitive(SM);
 }

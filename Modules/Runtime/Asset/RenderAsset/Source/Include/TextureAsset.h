@@ -7,7 +7,7 @@ namespace Ry
 {
 	
 	class Bitmap;
-	class Texture2;
+	class Texture;
 	
 	class RENDERASSET_MODULE TextureAsset : public Asset
 	{
@@ -16,13 +16,13 @@ namespace Ry
 		TextureAsset(Bitmap* Resource);
 
 		void UnloadAsset() override;
-		Texture2* CreateRuntimeTexture();
+		Texture* CreateRuntimeTexture();
 
 		Ry::Bitmap* GetResource();
 		
 	private:
 		Ry::Bitmap* Resource;
-		Ry::ArrayList<Texture2*> RuntimeResources;
+		Ry::ArrayList<Texture*> RuntimeResources;
 		
 	};
 	

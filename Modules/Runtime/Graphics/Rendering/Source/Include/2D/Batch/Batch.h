@@ -8,7 +8,7 @@
 #include "Color.h"
 #include "Data/ArrayList.h"
 #include <cstdarg>
-#include "Mesh2.h"
+#include "Mesh.h"
 
 #define TEXT_VERT "/Engine/Shaders/Vertex/font.glv"
 #define TEXT_FRAG "/Engine/Shaders/Fragment/font.glf"
@@ -70,8 +70,8 @@ Mesh->GetMeshData()->AddTriangle(i0+2, i0+3, i0+0); \
 
 namespace Ry
 {
-	class RenderPass2;
-	class Texture2;
+	class RenderPass;
+	class Texture;
 	class Text;
 	class Color;
 	class Mesh;
@@ -79,12 +79,12 @@ namespace Ry
 	class Shader;
 	class Texture;
 	class BitmapFont;
-	class Pipeline2;
+	class Pipeline;
 	class SwapChain;
-	class Shader2;
+	class Shader;
 	class ResourceSet;
-	class ResourceSetDescription;
-	class RenderingCommandBuffer2;
+	class ResourceLayout;
+	class CommandBuffer;
 
 	struct RENDERING_MODULE BatchItem
 	{
@@ -191,7 +191,7 @@ namespace Ry
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, Ry::RenderPass2* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader2* Shad = nullptr, bool bTexture = false);
+		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader* Shad = nullptr, bool bTexture = false);
 		
 		void AddItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
@@ -204,43 +204,43 @@ namespace Ry
 		//void SetShader(const Ry::String& ShaderName);
 		void Camera(const Camera* Cam);
 		void Update();
-		void SetTexture(Texture2* Texture);
+		void SetTexture(Texture* Texture);
 		bool Render();
 
-		void SetRenderPass(RenderPass2* ParentRenderPass);
+		void SetRenderPass(RenderPass* ParentRenderPass);
 
-		Ry::RenderingCommandBuffer2* GetCommandBuffer();
+		Ry::CommandBuffer* GetCommandBuffer();
 		
 	private:
 
 		bool bNeedsRecord = false;
 
 		void CreateResources(SwapChain* Swap);
-		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad);
+		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad);
 
 		void RecordCommands();
 
 		//Shader* Shad;
-		Texture2* Tex;
+		Texture* Tex;
 		Matrix4 Projection;
 		Matrix4 View;
 
-		Mesh2* BatchMesh;
+		Mesh* BatchMesh;
 
 		int LastIndexCount = -1;
 		
-		Ry::RenderingCommandBuffer2* CommandBuffer;
-		Ry::RenderPass2* ParentPass;
+		Ry::CommandBuffer* CommandBuffer;
+		Ry::RenderPass* ParentPass;
 		
 		// Texture resources
-		Ry::ResourceSetDescription* TextureResDesc;
+		Ry::ResourceLayout* TextureResDesc;
 		Ry::ResourceSet* TextureRes;
 
 		// Scene resources
-		Ry::ResourceSetDescription* SceneResDesc;
+		Ry::ResourceLayout* SceneResDesc;
 		Ry::ResourceSet* SceneRes;
 
-		Ry::Pipeline2* Pipeline;
+		Ry::Pipeline* Pipeline;
 
 		Ry::ArrayList<ResourceSet*> ResourceSets;
 
@@ -255,7 +255,7 @@ namespace Ry
 	class RENDERING_MODULE TextBatch
 	{
 	public:
-		TextBatch(Ry::SwapChain* Target, Shader2* Shad = nullptr);
+		TextBatch(Ry::SwapChain* Target, Shader* Shad = nullptr);
 
 		void Begin();
 
@@ -270,7 +270,7 @@ namespace Ry
 	private:
 
 		void CreateResources(SwapChain* Swap);
-		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad);
+		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad);
 		void RecordCommands();
 
 		bool began;
@@ -278,21 +278,21 @@ namespace Ry
 		Ry::Vector3 Color;
 		//Shader* FontShader;
 		
-		Mesh2* FontMesh;
+		Mesh* FontMesh;
 
 		Ry::ResourceSet* Resources[2];
 
 		// Texture resources
-		Ry::ResourceSetDescription* TextureResDesc;
+		Ry::ResourceLayout* TextureResDesc;
 		Ry::ResourceSet* TextureRes;
 
 		// Scene resources
-		Ry::ResourceSetDescription* SceneResDesc;
+		Ry::ResourceLayout* SceneResDesc;
 		Ry::ResourceSet* SceneRes;
 
-		Ry::RenderingCommandBuffer2* CommandBuffer;
+		Ry::CommandBuffer* CommandBuffer;
 
-		Ry::Pipeline2* Pipeline;
+		Ry::Pipeline* Pipeline;
 
 
 	};

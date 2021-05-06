@@ -2,8 +2,8 @@
 #include "Language/spirv_reflect.h"
 #include "Language/ShaderCompiler.h"
 #include "2D/Batch/Batch.h"
-#include "Interface2/RenderAPI.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderAPI.h"
+#include "Interface/RenderingResource.h"
 
 namespace Ry
 {
@@ -365,14 +365,14 @@ namespace Ry
 			Result = spvReflectEnumerateDescriptorSets(&Module, &SetCount, Sets);
 			CORE_ASSERT(Result == SPV_REFLECT_RESULT_SUCCESS);
 
-			//Ry::ArrayList<Ry::ResourceSetDescription*> ReflectedDescriptions;
+			//Ry::ArrayList<Ry::ResourceLayout*> ReflectedDescriptions;
 
 			for (int32 SetIndex = 0; SetIndex < SetCount; SetIndex++)
 			{
 				SpvReflectDescriptorSet* Set = Sets[SetIndex];
 
 				// Create new resource set description
-				Ry::ResourceSetDescription* NewDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Stage }, Set->set);
+				Ry::ResourceLayout* NewDesc = Ry::RendAPI->CreateResourceSetDescription({ Stage }, Set->set);
 
 				// Generate bindings for the set
 				for (int32 BindingIndex = 0; BindingIndex < Set->binding_count; BindingIndex++)

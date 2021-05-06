@@ -11,7 +11,7 @@ namespace Ry
 		Ry::ScenePass->BeginPass();
 	}
 
-	void ForwardRenderer::RenderMesh(SharedPtr<Mesh2> Mesh, const Matrix4& Model, const Matrix4& ViewProj, const SceneLighting& Lighting)
+	void ForwardRenderer::RenderMesh(SharedPtr<Mesh> Mesh, const Matrix4& Model, const Matrix4& ViewProj, const SceneLighting& Lighting)
 	{
 		// todo: mesh doesn't render directly anymore
 		//Mesh->Render(Ry::Primitive::TRIANGLE, Model, ViewProj, &Lighting);

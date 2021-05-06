@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface2/Shader2.h"
+#include "Interface/Shader.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
 #include "Language/ShaderCompiler.h"
@@ -9,7 +9,7 @@
 namespace Ry
 {
 
-	class VULKAN_MODULE VulkanShader : public Ry::Shader2
+	class VULKAN_MODULE VulkanShader : public Ry::Shader
 	{
 	public:
 

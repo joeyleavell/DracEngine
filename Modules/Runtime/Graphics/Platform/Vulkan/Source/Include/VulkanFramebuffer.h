@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Interface2/FrameBuffer2.h"
+#include "Interface/FrameBuffer.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
 
 namespace Ry
 {
 
-	class VULKAN_MODULE VulkanFrameBuffer : public Ry::FrameBuffer2
+	class VULKAN_MODULE VulkanFrameBuffer : public Ry::FrameBuffer
 	{
 	public:
 

@@ -9,7 +9,7 @@ namespace Ry
 {
 	
 	VulkanTexture::VulkanTexture(TextureUsage InUsage):
-	Texture2(InUsage)
+	Texture(InUsage)
 	{
 		this->StagingMemory = nullptr;
 	}

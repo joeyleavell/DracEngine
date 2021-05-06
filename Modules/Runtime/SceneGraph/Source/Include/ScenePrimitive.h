@@ -5,9 +5,8 @@
 
 namespace Ry
 {
-	class Mesh2;
-
-	class VertexArray2;
+	class Mesh;
+	class VertexArray;
 
 	class SCENEGRAPH_MODULE ScenePrimitive
 	{
@@ -16,7 +15,7 @@ namespace Ry
 		ScenePrimitive(bool bStatic = false);
 		virtual ~ScenePrimitive() = default;
 
-		virtual VertexArray2* GetVertexArray() = 0;
+		virtual VertexArray* GetVertexArray() = 0;
 
 		bool IsStatic() const;
 		ScenePrimitive* GetParent();
@@ -38,19 +37,19 @@ namespace Ry
 	{
 	public:
 
-		StaticMeshPrimitive(Mesh2* Mesh);
+		StaticMeshPrimitive(Mesh* Mesh);
 		virtual ~StaticMeshPrimitive() = default;
 
-		VertexArray2* GetVertexArray() override;
-		Mesh2* GetMesh();
+		VertexArray* GetVertexArray() override;
+		Mesh* GetMesh();
 
 	private:
 
-		Mesh2* StaticMesh;
+		Mesh* StaticMesh;
 
 	};
 
-	SCENEGRAPH_MODULE ScenePrimitive* CreatePrimitive(Mesh2* SM);
+	SCENEGRAPH_MODULE ScenePrimitive* CreatePrimitive(Mesh* SM);
 
 
 }

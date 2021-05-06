@@ -5,9 +5,8 @@
 
 namespace Ry
 {
-	class Shader;
 	class MeshData;
-	class Mesh2;
+	class Mesh;
 
 	class RENDERASSET_MODULE MeshAsset : public Asset
 	{
@@ -17,11 +16,11 @@ namespace Ry
 		
 		void UnloadAsset() override;
 
-		Mesh2* CreateRuntimeMesh() const;
+		Mesh* CreateRuntimeMesh() const;
 
 	private:
 		Ry::MeshData* Data;
-		mutable Ry::ArrayList<Mesh2*> RuntimeMeshes;
+		mutable Ry::ArrayList<Mesh*> RuntimeMeshes;
 		
 	};
 }

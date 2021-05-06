@@ -1,11 +1,11 @@
 #include "SceneRenderer.h"
-#include "Interface2/RenderCommand.h"
+#include "Interface/RenderCommand.h"
 #include "SceneGraph.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderingResource.h"
 #include "ScenePrimitive.h"
-#include "Interface2/RenderAPI.h"
+#include "Interface/RenderAPI.h"
 #include "Application.h"
-#include "Mesh2.h"
+#include "Mesh.h"
 #include "Material.h"
 #include "RenderingEngine.h"
 
@@ -51,7 +51,7 @@ namespace Ry
 		if (SMPrimitive)
 		{
 			// Allocate resources for primitive
-			Ry::ResourceSet* PrimitiveRes = Ry::NewRenderAPI->CreateResourceSet(PrimResDesc, Ry::app->GetSwapChain());
+			Ry::ResourceSet* PrimitiveRes = Ry::RendAPI->CreateResourceSet(PrimResDesc, Ry::app->GetSwapChain());
 			{
 				PrimitiveRes->SetMatConstant("Model", "Transform", Ry::id4());
 			}
@@ -73,7 +73,7 @@ namespace Ry
 				SectionResources->IndexCount = Sec.Count;
 
 				// Bind resources for material
-				Ry::ResourceSet* MatRes = Ry::NewRenderAPI->CreateResourceSet(MaterialDesc, Ry::app->GetSwapChain());
+				Ry::ResourceSet* MatRes = Ry::RendAPI->CreateResourceSet(MaterialDesc, Ry::app->GetSwapChain());
 				SectionResources->MaterialSpecificResource = MatRes;
 				{
 					if (Sec.Mat->DiffuseTexture)
@@ -114,7 +114,7 @@ namespace Ry
 		return nullptr;
 	}
 
-	Pipeline2* SceneRenderer::SelectPipelineForPrimitive()
+	Pipeline* SceneRenderer::SelectPipelineForPrimitive()
 	{
 		return nullptr;
 	}
@@ -193,17 +193,17 @@ namespace Ry
 		return PrimSpecificResource;
 	}
 
-	void PrimitiveResources::SetVertexArray(VertexArray2* Verts)
+	void PrimitiveResources::SetVertexArray(VertexArray* Verts)
 	{
 		this->VertArray = Verts;
 	}
 
-	VertexArray2* PrimitiveResources::GetVertexArray()
+	VertexArray* PrimitiveResources::GetVertexArray()
 	{
 		return VertArray;
 	}
 
-	void PrimitiveResources::RecordDraw(Ry::RenderingCommandBuffer2* DstBuffer)
+	void PrimitiveResources::RecordDraw(Ry::CommandBuffer* DstBuffer)
 	{
 		// Draw each level piece
 		int32 MaterialResourceCount = MaterialRes.GetSize();

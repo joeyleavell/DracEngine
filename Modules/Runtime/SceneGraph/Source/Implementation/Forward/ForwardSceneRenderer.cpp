@@ -1,14 +1,14 @@
 #include "Forward/ForwardSceneRenderer.h"
 #include "Application.h"
-#include "Interface2/RenderAPI.h"
+#include "Interface/RenderAPI.h"
 #include "SwapChain.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderingResource.h"
 #include "RenderingEngine.h"
-#include "Interface2/Pipeline.h"
-#include "Interface2/RenderCommand.h"
+#include "Interface/Pipeline.h"
+#include "Interface/RenderCommand.h"
 #include "SceneGraph.h"
 #include "ScenePrimitive.h"
-#include "Interface2/Shader2.h"
+#include "Interface/Shader.h"
 
 namespace Ry
 {
@@ -29,8 +29,8 @@ namespace Ry
 
 		// Create command buffers
 		// TODO: use own render pass, not default render pass of screen
-		StaticCmdBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Ry::app->GetSwapChain(), Ry::app->GetSwapChain()->GetDefaultRenderPass());
-		DynamicCmdBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Ry::app->GetSwapChain(), Ry::app->GetSwapChain()->GetDefaultRenderPass());
+		StaticCmdBuffer = Ry::RendAPI->CreateCommandBuffer(Ry::app->GetSwapChain(), Ry::app->GetSwapChain()->GetDefaultRenderPass());
+		DynamicCmdBuffer = Ry::RendAPI->CreateCommandBuffer(Ry::app->GetSwapChain(), Ry::app->GetSwapChain()->GetDefaultRenderPass());
 
 		// Setup callback whenever swapchain gets recreated so we can update renderpass
 		Ry::app->GetSwapChain()->OnSwapChainDirty.AddMemberFunction(this, &ForwardSceneRenderer::OnSwapChainDirty);
@@ -69,7 +69,7 @@ namespace Ry
 		//RecordDynamic();
 	}
 
-	RenderingCommandBuffer2* ForwardSceneRenderer::GetCmdBuffer()
+	CommandBuffer* ForwardSceneRenderer::GetCmdBuffer()
 	{
 		return StaticCmdBuffer;
 	}
@@ -90,7 +90,7 @@ namespace Ry
 		LightResDesc = Shader->GetFragmentReflectionData()[2];
 		MaterialDesc = Shader->GetFragmentReflectionData()[3];
 
-		// Ry::ResourceSetDescription* SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
+		// Ry::ResourceLayout* SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
 		// SceneResDesc->AddConstantBuffer(1, "Scene", {
 		// 	DeclPrimitive(Float4x4, "ViewProjection")
 		// 	});
@@ -98,14 +98,14 @@ namespace Ry
 		// this->SceneResDesc = SceneResDesc;
 		//
 		//
-		// Ry::ResourceSetDescription* PrimResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
+		// Ry::ResourceLayout* PrimResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Vertex }, 1);
 		// PrimResDesc->AddConstantBuffer(1, "Model", {
 		// 	DeclPrimitive(Float4x4, "Transform")
 		// });
 		// PrimResDesc->CreateDescription();
 		// this->PrimResDesc = PrimResDesc;
 		//
-		// Ry::ResourceSetDescription* LightResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 2);
+		// Ry::ResourceLayout* LightResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 2);
 		// LightResDesc->AddConstantBuffer(2, "Light", {
 		// 	DeclPrimitive(Float, "Intensity"),
 		// 	DeclPrimitive(Float3, "Color"),
@@ -114,7 +114,7 @@ namespace Ry
 		// LightResDesc->CreateDescription();
 		// this->LightResDesc = LightResDesc;
 		//
-		// Ry::ResourceSetDescription* MaterialDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 3);
+		// Ry::ResourceLayout* MaterialDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ Ry::ShaderStage::Fragment }, 3);
 		// MaterialDesc->AddConstantBuffer(3, "Material", {
 		// 	DeclPrimitive(Float, "UseDiffuseTexture"),
 		// 	DeclPrimitive(Float3, "DiffuseColor"),
@@ -126,10 +126,10 @@ namespace Ry
 		// this->MaterialDesc = MaterialDesc;
 		
 
-		SceneResources = Ry::NewRenderAPI->CreateResourceSet(SceneResDesc, Ry::app->GetSwapChain());
+		SceneResources = Ry::RendAPI->CreateResourceSet(SceneResDesc, Ry::app->GetSwapChain());
 		SceneResources->CreateBuffer();
 
-		LightResources = Ry::NewRenderAPI->CreateResourceSet(LightResDesc, Ry::app->GetSwapChain());
+		LightResources = Ry::RendAPI->CreateResourceSet(LightResDesc, Ry::app->GetSwapChain());
 		{
 			LightDir = { -0.5f, -0.5f, 0.0f };
 			normalize(LightDir);
@@ -186,7 +186,7 @@ namespace Ry
 		CreateInfo.Blend.bEnabled = true;
 		CreateInfo.Depth.bEnableDepthTest = true;
 
-		Pipeline = Ry::NewRenderAPI->CreatePipelineFromShader(CreateInfo, Shader);
+		Pipeline = Ry::RendAPI->CreatePipelineFromShader(CreateInfo, Shader);
 		Pipeline->CreatePipeline();
 	}
 

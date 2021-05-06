@@ -21,7 +21,7 @@ namespace Ry
 			this->ComplexCollision = false;
 		}
 
-		void SetMesh(SharedPtr<Mesh2> Mesh)
+		void SetMesh(SharedPtr<Mesh> Mesh)
 		{
 			MeshComp->SetRuntimeMesh(Mesh);
 		}

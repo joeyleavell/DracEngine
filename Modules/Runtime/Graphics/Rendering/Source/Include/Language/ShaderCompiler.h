@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface2/Shader2.h"
+#include "Interface/Shader.h"
 #include "RenderingGen.h"
 
 namespace Ry

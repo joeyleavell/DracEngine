@@ -4,7 +4,7 @@
 #include "RenderingEngine.h"
 #include "glfw3.h"
 #include <set>
-#include "GLSwapChain2.h"
+#include "GLSwapChain.h"
 #include "VulkanContext.h"
 #include "VulkanSwapChain.h"
 #include "SwapChain.h"

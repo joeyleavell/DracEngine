@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface2/Texture2.h"
+#include "Interface/Texture.h"
 #include "RyMath.h"
 #include "RenderingGen.h"
 
@@ -13,6 +13,6 @@ namespace Ry
 		Vector3 Diffuse;
 		Vector3 Specular;
 
-		Ry::Texture2* DiffuseTexture = nullptr;
+		Ry::Texture* DiffuseTexture = nullptr;
 	};
 }

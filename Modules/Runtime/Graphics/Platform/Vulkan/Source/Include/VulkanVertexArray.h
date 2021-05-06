@@ -3,14 +3,14 @@
 #include "Core/Core.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
-#include "Interface2/VertexArray2.h"
+#include "Interface/VertexArray.h"
 
 namespace Ry
 {
 
 	class VulkanBuffer;
 
-	class VULKAN_MODULE VulkanVertexArray : public Ry::VertexArray2
+	class VULKAN_MODULE VulkanVertexArray : public Ry::VertexArray
 	{
 	public:
 

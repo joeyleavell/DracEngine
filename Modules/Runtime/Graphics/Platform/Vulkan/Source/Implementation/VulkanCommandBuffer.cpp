@@ -91,7 +91,7 @@ namespace Ry
 		vkCmdBindDescriptorSets(CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PipelineLayout, 0, 1, &DescSet, 0, nullptr);
 	}
 	
-	void VulkanCommandBuffer::BeginRenderPass(Ry::RenderPass2* RenderPass)
+	void VulkanCommandBuffer::BeginRenderPass(Ry::RenderPass* RenderPass)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 	
@@ -115,12 +115,12 @@ namespace Ry
 		vkCmdBeginRenderPass(CmdBuffer, &RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
 	
-	void VulkanCommandBuffer::EndRenderPass(Ry::RenderPass2* RenderPass)
+	void VulkanCommandBuffer::EndRenderPass(Ry::RenderPass* RenderPass)
 	{
 		vkCmdEndRenderPass(CmdBuffer);
 	}
 	
-	void VulkanCommandBuffer::BindPipeline(Ry::Pipeline2* Pipeline)
+	void VulkanCommandBuffer::BindPipeline(Ry::Pipeline* Pipeline)
 	{
 		Ry::VulkanPipeline* VPipline = dynamic_cast<Ry::VulkanPipeline*>(Pipeline);
 	
@@ -133,7 +133,7 @@ namespace Ry
 		vkCmdBindPipeline(CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VPipline->GraphicsPipeline);
 	}
 	
-	void VulkanCommandBuffer::DrawVertexArray(Ry::VertexArray2* VertexArray)
+	void VulkanCommandBuffer::DrawVertexArray(Ry::VertexArray* VertexArray)
 	{
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertexArray);
 	
@@ -190,7 +190,7 @@ namespace Ry
 	}
 
 	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo) :
-	RenderingCommandBuffer2(SC, SecondaryInfo)
+	CommandBuffer(SC, SecondaryInfo)
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -238,7 +238,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass, bool bUseSecondary)
+	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -277,7 +277,7 @@ namespace Ry
 		vkCmdEndRenderPass(CmdBuffer);
 	}
 
-	void VulkanCommandBuffer2::RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline2* Pipeline)
+	void VulkanCommandBuffer2::RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline)
 	{
 		Ry::VulkanPipeline* VPipeline = dynamic_cast<Ry::VulkanPipeline*>(Pipeline);
 
@@ -342,7 +342,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, uint32 FirstVertex, uint32 Count)
+	void VulkanCommandBuffer2::RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstVertex, uint32 Count)
 	{
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
 
@@ -355,7 +355,7 @@ namespace Ry
 		vkCmdDraw(CmdBuffer, VertexCount, 1, FirstVertex, 0);
 	}
 
-	void VulkanCommandBuffer2::RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, 
+	void VulkanCommandBuffer2::RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, 
 		uint32 FirstIndex, uint32 Count)
 	{
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
@@ -502,7 +502,7 @@ namespace Ry
 		if(SwapChainVersion != VkSC->GetSwapchainVersion())
 		{
 			// Force re-create all children
-			for(RenderingCommandBuffer2* Child : SecondaryBuffers)
+			for(CommandBuffer* Child : SecondaryBuffers)
 			{
 				VulkanCommandBuffer2* VkCmd = dynamic_cast<VulkanCommandBuffer2*>(Child);
 

@@ -2,7 +2,7 @@
 
 #include "Window.h"
 #include "RenderingEngine.h"
-#include "GLRenderAPI2.h"
+#include "GLRenderAPI.h"
 #include "Manager/AssetManager.h"
 #include "Factory/TextFileFactory.h"
 #include "Factory/ObjMeshFactory.h"
@@ -15,15 +15,15 @@
 #include "VulkanRenderAPI.h"
 #include "Widget/VerticalPanel.h"
 #include "Language/ShaderCompiler.h"
-#include "Interface2/RenderCommand.h"
-#include "Interface2/VertexArray2.h"
-#include "Interface2/Pipeline.h"
+#include "Interface/RenderCommand.h"
+#include "Interface/VertexArray.h"
+#include "Interface/Pipeline.h"
 #include <chrono>
-#include "Mesh2.h"
+#include "Mesh.h"
 #include "MeshAsset.h"
 #include "Transform.h"
 #include "Material.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderingResource.h"
 
 namespace Ry
 {
@@ -169,7 +169,7 @@ namespace Ry
 			// Create 1x1 white texture as a default diffuse map
 			Ry::Bitmap DefaultDiffuseBmp(1, 1, PixelStorage::FOUR_BYTE_RGBA);
 			DefaultDiffuseBmp.SetPixel(0, 0, 0xFFFFFFFF);
-			DefaultDiffuse = Ry::NewRenderAPI->CreateTexture();
+			DefaultDiffuse = Ry::RendAPI->CreateTexture();
 			DefaultDiffuse->Data(&DefaultDiffuseBmp);
 
 			Proj = Ry::perspective4(EditorMainWindow->GetWindowWidth() / (float)EditorMainWindow->GetWindowHeight(), 70.0f, 0.01f, 2500.0f);
@@ -178,14 +178,14 @@ namespace Ry
 			NewMesh = Asset->CreateRuntimeMesh();
 
 			// Setup scene resource description
-			SceneDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex, ShaderStage::Fragment }, 0);
+			SceneDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex, ShaderStage::Fragment }, 0);
 			SceneDesc->AddConstantBuffer(0, "Scene", {
 				DeclPrimitive(Float4x4, "ViewProj"),
 			});
 			SceneDesc->CreateDescription();
 
 			// Setup material description
-			MatDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex, ShaderStage::Fragment }, 1);
+			MatDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex, ShaderStage::Fragment }, 1);
 			MatDesc->AddConstantBuffer(1, "Material", {
 				DeclPrimitive(Float, "UseDiffuseTexture"),
 				DeclPrimitive(Float4x4, "DiffuseColor"),
@@ -195,7 +195,7 @@ namespace Ry
 			MatDesc->AddTextureBinding(0, "Diffuse");
 			MatDesc->CreateDescription();
 						
-			ResSet = Ry::NewRenderAPI->CreateResourceSet(SceneDesc, EditorMainWindow->GetSwapChain());
+			ResSet = Ry::RendAPI->CreateResourceSet(SceneDesc, EditorMainWindow->GetSwapChain());
 			ResSet->CreateBuffer();
 
 			MeshData* Data = new MeshData;
@@ -223,13 +223,13 @@ namespace Ry
 				0, 1, 2
 			});
 			
-			Triangle = new Mesh2(Data);
+			Triangle = new Mesh(Data);
 			
 			
 			// Find a texture
 			for(int32 MatIndex = 0; MatIndex < NewMesh->GetMeshData()->SectionCount; MatIndex++)
 			{
-				ResourceSet* MatSet = Ry::NewRenderAPI->CreateResourceSet(MatDesc, EditorMainWindow->GetSwapChain());
+				ResourceSet* MatSet = Ry::RendAPI->CreateResourceSet(MatDesc, EditorMainWindow->GetSwapChain());
 				Material* Mat = NewMesh->GetMeshData()->GetMaterial(MatIndex);
 				
 				if(Mat->DiffuseTexture)
@@ -253,7 +253,7 @@ namespace Ry
 			
 			}
 
-			Shader = Ry::NewRenderAPI->CreateShader("Vertex/Vulkan", "Fragment/Vulkan");
+			Shader = Ry::RendAPI->CreateShader("Vertex/Vulkan", "Fragment/Vulkan");
 
 			// Create new pipeline
 			Ry::PipelineCreateInfo CreateInfo;
@@ -264,10 +264,10 @@ namespace Ry
 			CreateInfo.RenderPass = EditorMainWindow->GetSwapChain()->GetDefaultRenderPass();
 			CreateInfo.ResourceDescriptions.Add(SceneDesc);
 			CreateInfo.ResourceDescriptions.Add(MatDesc);
-			Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
+			Pipeline = Ry::RendAPI->CreatePipeline(CreateInfo);
 			Pipeline->CreatePipeline();
 			
-			CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(EditorMainWindow->GetSwapChain());
+			CommandBuffer = Ry::RendAPI->CreateCommandBuffer(EditorMainWindow->GetSwapChain());
 			RecordCommands();
 			
 			// Initialize rendering engine
@@ -425,19 +425,19 @@ namespace Ry
 		Ry::Window* EditorMainWindow;
 		Ry::Batch* UIBatch;
 		Ry::UserInterface* UI;
-		Ry::Pipeline2* Pipeline;
-		Ry::RenderingCommandBuffer2* CommandBuffer;
-		Ry::Shader2* Shader;
-		Ry::Mesh2* NewMesh = nullptr;
-		Ry::Mesh2* Triangle = nullptr;
+		Ry::Pipeline* Pipeline;
+		Ry::CommandBuffer* CommandBuffer;
+		Ry::Shader* Shader;
+		Ry::Mesh* NewMesh = nullptr;
+		Ry::Mesh* Triangle = nullptr;
 
 		Ry::Map<Ry::String, ResourceSet**> ResourceSets;
 		Ry::Map<Ry::String, uint32> ResourceSetCount;
 
-		Ry::ResourceSetDescription* SceneDesc;
-		Ry::ResourceSetDescription* MatDesc;
+		Ry::ResourceLayout* SceneDesc;
+		Ry::ResourceLayout* MatDesc;
 
-		Ry::Texture2* DefaultDiffuse;
+		Ry::Texture* DefaultDiffuse;
 	};
 
 }

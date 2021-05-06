@@ -28,7 +28,7 @@ namespace Ry
 		return MakeMeshComponent(nullptr);
 	}
 
-	SharedPtr<MeshComponent> MakeMeshComponent(SharedPtr<Mesh2> RuntimeMesh)
+	SharedPtr<MeshComponent> MakeMeshComponent(SharedPtr<Mesh> RuntimeMesh)
 	{
 		SharedPtr<MeshComponent> NewComponent = MakeShared(new MeshComponent);
 		NewComponent->SetRuntimeMesh(RuntimeMesh);

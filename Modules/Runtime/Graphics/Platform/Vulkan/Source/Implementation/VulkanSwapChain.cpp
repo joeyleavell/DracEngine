@@ -476,7 +476,7 @@ namespace Ry
 		DefaultRenderPass->CreateRenderPass();		
 	}
 
-	RenderPass2* VulkanSwapChain::GetDefaultRenderPass()
+	RenderPass* VulkanSwapChain::GetDefaultRenderPass()
 	{
 		return DefaultRenderPass;
 	}

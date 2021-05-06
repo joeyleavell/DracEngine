@@ -6,13 +6,13 @@
 namespace Ry
 {
 
-	class RenderingCommandBuffer2;
-	class ResourceSetDescription;
+	class CommandBuffer;
+	class ResourceLayout;
 	class ResourceSet;
-	class Pipeline2;
-	class RenderPass2;
+	class Pipeline;
+	class RenderPass;
 	class ScenePrimitive;
-	class Shader2;
+	class Shader;
 
 	class SCENEGRAPH_MODULE ForwardSceneRenderer : public SceneRenderer
 	{
@@ -22,7 +22,7 @@ namespace Ry
 
 		void Init() override;
 		void Render() override;
-		RenderingCommandBuffer2* GetCmdBuffer() override;
+		CommandBuffer* GetCmdBuffer() override;
 
 		void RecordStatic();
 		void RecordDynamic();
@@ -41,14 +41,14 @@ namespace Ry
 		// TODO: Since pipeline houses the shader,
 		// there will most likely end up being many of these
 		// For now, I've simplified it to just one pipeline
-		Ry::Pipeline2* Pipeline;
-		Ry::Shader2* Shader;
+		Ry::Pipeline* Pipeline;
+		Ry::Shader* Shader;
 
 		// The parent render pass 
-		//Ry::RenderPass2* ParentPass;
+		//Ry::RenderPass* ParentPass;
 
-		Ry::RenderingCommandBuffer2* DynamicCmdBuffer;
-		Ry::RenderingCommandBuffer2* StaticCmdBuffer;
+		Ry::CommandBuffer* DynamicCmdBuffer;
+		Ry::CommandBuffer* StaticCmdBuffer;
 
 	};
 

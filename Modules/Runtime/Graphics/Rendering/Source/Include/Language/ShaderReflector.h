@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/String.h"
 #include "Data/ArrayList.h"
-#include "Interface2/RenderingResource.h"
+#include "Interface/RenderingResource.h"
 
 namespace Ry
 {

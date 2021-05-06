@@ -6,7 +6,7 @@ namespace Ry
 {
 
 	VulkanFrameBuffer::VulkanFrameBuffer(int32 Width, int32 Height) :
-	FrameBuffer2(Width, Height, 1)
+	FrameBuffer(Width, Height, 1)
 	{
 	}
 

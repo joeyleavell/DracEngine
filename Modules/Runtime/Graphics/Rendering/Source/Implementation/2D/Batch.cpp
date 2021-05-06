@@ -10,13 +10,13 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "Interface2/Pipeline.h"
+#include "Interface/Pipeline.h"
 #include "SwapChain.h"
-#include "Interface2/RenderAPI.h"
-#include "Interface2/RenderingResource.h"
-#include "Interface2/RenderCommand.h"
-#include "Interface2/VertexArray2.h"
-#include "Interface2/Texture2.h"
+#include "Interface/RenderAPI.h"
+#include "Interface/RenderingResource.h"
+#include "Interface/RenderCommand.h"
+#include "Interface/VertexArray.h"
+#include "Interface/Texture.h"
 
 namespace Ry
 {
@@ -324,14 +324,14 @@ namespace Ry
 		}
 	}
 	
-	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass2* ParentPass, const VertexFormat& Format, Ry::Shader2* Shad, bool bTexture)
+	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format, Ry::Shader* Shad, bool bTexture)
 	{
 		this->ParentPass = ParentPass;
 		
 		// Initialize dynamic mesh
-		BatchMesh = new Ry::Mesh2(Format);
+		BatchMesh = new Ry::Mesh(Format);
 		
-		Ry::Shader2* ShaderToUse = Shad;
+		Ry::Shader* ShaderToUse = Shad;
 		if(!ShaderToUse)
 		{
 			ShaderToUse = Ry::GetShader("Shape");
@@ -350,7 +350,7 @@ namespace Ry
 		CreatePipeline(Format, Target, ShaderToUse);
 
 		// Create command buffer
-		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target, ParentPass);
+		CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Target, ParentPass);
 		RecordCommands();
 
 		View = Ry::id4();
@@ -440,7 +440,7 @@ namespace Ry
 		}
 	}
 
-	void Batch::SetTexture(Ry::Texture2* Texture)
+	void Batch::SetTexture(Ry::Texture* Texture)
 	{
 		if(Texture != this->Tex)
 		{
@@ -488,19 +488,19 @@ namespace Ry
 		return bReturn;
 	}
 
-	void Batch::SetRenderPass(RenderPass2* ParentRenderPass)
+	void Batch::SetRenderPass(RenderPass* ParentRenderPass)
 	{
 		CommandBuffer->UpdateParentRenderPass(ParentRenderPass);
 	}
 
-	Ry::RenderingCommandBuffer2* Batch::GetCommandBuffer()
+	Ry::CommandBuffer* Batch::GetCommandBuffer()
 	{
 		return CommandBuffer;
 	}
 
 	void Batch::CreateResources(SwapChain* Swap)
 	{
-		SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex}, 0);
+		SceneResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex}, 0);
 		SceneResDesc->AddConstantBuffer(0, "Scene", {
 			DeclPrimitive(Float4x4, "ViewProj")
 		});
@@ -508,20 +508,20 @@ namespace Ry
 
 
 		// Create actual resource set now
-		SceneRes = Ry::NewRenderAPI->CreateResourceSet(SceneResDesc, Swap);
+		SceneRes = Ry::RendAPI->CreateResourceSet(SceneResDesc, Swap);
 		SceneRes->CreateBuffer();
 
 		ResourceSets.Add(SceneRes);
 
 		if (bUseTexture)
 		{
-			TextureResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
+			TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
 			TextureResDesc->AddTextureBinding(0, "BatchTexture");
 			TextureResDesc->CreateDescription();
 
 			// Create texture resources
 			// Bind the default texture to start with
-			TextureRes = Ry::NewRenderAPI->CreateResourceSet(TextureResDesc, Swap);
+			TextureRes = Ry::RendAPI->CreateResourceSet(TextureResDesc, Swap);
 			TextureRes->BindTexture("BatchTexture", DefaultTexture);
 			TextureRes->CreateBuffer();
 
@@ -533,7 +533,7 @@ namespace Ry
 
 	}
 
-	void Batch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad)
+	void Batch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad)
 	{
 		
 		// Create new pipeline
@@ -554,7 +554,7 @@ namespace Ry
 			CreateInfo.ResourceDescriptions.Add(TextureResDesc);
 		}
 
-		Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
+		Pipeline = Ry::RendAPI->CreatePipeline(CreateInfo);
 		Pipeline->CreatePipeline();
 	}
 
@@ -902,7 +902,7 @@ namespace Ry
 		view = cam->get_view();
 	}*/
 
-	TextBatch::TextBatch(Ry::SwapChain* Target, Shader2* Shad)
+	TextBatch::TextBatch(Ry::SwapChain* Target, Shader* Shad)
 	{
 		//this->FontShader = Ry::RenderAPI->make_shader(VF1P1UV, TEXT_VERT, TEXT_FRAG);
 
@@ -920,7 +920,7 @@ namespace Ry
 		CreatePipeline(VF1P1UV1C, Target, Shad ? Shad : GetShader("Font"));
 
 		// Create command buffer
-		CommandBuffer = Ry::NewRenderAPI->CreateCommandBuffer(Target);
+		CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Target);
 		
 	}
 
@@ -989,29 +989,29 @@ namespace Ry
 
 	void TextBatch::CreateResources(SwapChain* Swap)
 	{
-		SceneResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 0);
+		SceneResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 0);
 		SceneResDesc->AddConstantBuffer(0, "Scene", {
 			DeclPrimitive(Float4x4, "ViewProj")
 			});
 		SceneResDesc->CreateDescription();
 
-		TextureResDesc = Ry::NewRenderAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 1);
+		TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 1);
 		TextureResDesc->AddTextureBinding(0, "FontTexture");
 		TextureResDesc->CreateDescription();
 
 		// Create actual resource set now
-		SceneRes = Ry::NewRenderAPI->CreateResourceSet(SceneResDesc, Swap);
+		SceneRes = Ry::RendAPI->CreateResourceSet(SceneResDesc, Swap);
 		SceneRes->CreateBuffer();
 
 		// Create texture resources
-		TextureRes = Ry::NewRenderAPI->CreateResourceSet(TextureResDesc, Swap);
+		TextureRes = Ry::RendAPI->CreateResourceSet(TextureResDesc, Swap);
 		TextureRes->CreateBuffer();
 
 		Resources[0] = SceneRes;
 		Resources[1] = TextureRes;
 	}
 
-	void TextBatch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader2* Shad)
+	void TextBatch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad)
 	{
 		// Create new pipeline
 		Ry::PipelineCreateInfo CreateInfo;
@@ -1024,7 +1024,7 @@ namespace Ry
 		// Add resource description to pipeline
 		CreateInfo.ResourceDescriptions.Add(SceneResDesc);
 
-		Pipeline = Ry::NewRenderAPI->CreatePipeline(CreateInfo);
+		Pipeline = Ry::RendAPI->CreatePipeline(CreateInfo);
 		Pipeline->CreatePipeline();
 	}
 

@@ -42,7 +42,7 @@ namespace Ry
 	}
 
 	VulkanShader::VulkanShader(const Ry::String& VSAsset, const Ry::String& FSAsset):
-	Shader2(VSAsset, FSAsset)
+	Shader(VSAsset, FSAsset)
 	{
 		CreateSingleShader(VSAsset, ShaderStage::Vertex, VSShaderModule);
 		CreateSingleShader(FSAsset, ShaderStage::Fragment, FSShaderModule);

@@ -1,5 +1,5 @@
 #include "MeshAsset.h"
-#include "Mesh2.h"
+#include "Mesh.h"
 
 namespace Ry
 {
@@ -12,7 +12,7 @@ namespace Ry
 	{
 		// Destroy all runtime meshes
 
-		for(Mesh2* RuntimeMesh : RuntimeMeshes)
+		for(Mesh* RuntimeMesh : RuntimeMeshes)
 		{
 			RuntimeMesh->DeleteMesh();
 			delete RuntimeMesh;
@@ -20,9 +20,9 @@ namespace Ry
 		
 	}
 
-	Mesh2* MeshAsset::CreateRuntimeMesh() const
+	Mesh* MeshAsset::CreateRuntimeMesh() const
 	{
-		Mesh2* NewMesh = new Mesh2(Data);
+		Mesh* NewMesh = new Mesh(Data);
 
 		RuntimeMeshes.Add(NewMesh);
 

@@ -2,7 +2,7 @@
 
 #include "Core/Core.h"
 #include "VulkanCommon.h"
-#include "Interface2/RenderCommand.h"
+#include "Interface/RenderCommand.h"
 #include "VulkanGen.h"
 #include "VulkanSwapChain.h"
 #include "VulkanRenderPass.h"
@@ -12,7 +12,7 @@ namespace Ry
 {
 
 	class VulkanFrameBuffer;
-	class VertexArray2;
+	class VertexArray;
 	class VulkanRenderPass;
 	class VulkanPipeline;
 
@@ -33,21 +33,21 @@ namespace Ry
 	// 	
 	// };
 
-	class VULKAN_MODULE VulkanCommandBuffer2 : public Ry::RenderingCommandBuffer2
+	class VULKAN_MODULE VulkanCommandBuffer2 : public Ry::CommandBuffer
 	{
 	public:
 
 		VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {});
 		virtual ~VulkanCommandBuffer2();
 
-		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass2* RenderPass, bool bUseSecondary);
+		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary);
 		void RecordEndRenderPass(VkCommandBuffer CmdBuffer);
-		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline2* Pipeline);
+		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline);
 		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight);
 		void RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight);
 		void RecordBindResourceSet(VkCommandBuffer CmdBuffer, int32 CmdBufferIndex, BindResourcesCommand* Cmd);
-		void RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, uint32 FirstVertex, uint32 Count);
-		void RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray2* VertArray, uint32 FirstIndex, uint32 Count);
+		void RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstVertex, uint32 Count);
+		void RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstIndex, uint32 Count);
 		void RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer2* Secondary);
 
 
@@ -101,10 +101,10 @@ namespace Ry
 	
 		void BindDescriptorSet(VkPipelineLayout PipelineLayout, VkDescriptorSet DescSet);
 	
-		void BeginRenderPass(Ry::RenderPass2* RenderPass) override;
-		void EndRenderPass(Ry::RenderPass2* RenderPass) override;
-		void BindPipeline(Ry::Pipeline2* Pipeline) override;
-		void DrawVertexArray(Ry::VertexArray2* VertexArray) override;
+		void BeginRenderPass(Ry::RenderPass* RenderPass) override;
+		void EndRenderPass(Ry::RenderPass* RenderPass) override;
+		void BindPipeline(Ry::Pipeline* Pipeline) override;
+		void DrawVertexArray(Ry::VertexArray* VertexArray) override;
 	
 		void SubmitBuffer(bool bSynchronous, VkSemaphore* WaitSemaphore = nullptr, VkSemaphore* SignalSemaphore = nullptr);
 	
