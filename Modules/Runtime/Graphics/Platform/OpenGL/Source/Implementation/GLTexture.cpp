@@ -11,7 +11,7 @@ namespace Ry
 		// Todo: support different types of textures
 
 		this->Target = GL_TEXTURE_2D;
-		this->InternalFormat = GL_RGBA;
+		this->InternalFormat = GL_SRGB8_ALPHA8;
 		this->Handle = 0;
 
 		glGenTextures(1, &Handle);

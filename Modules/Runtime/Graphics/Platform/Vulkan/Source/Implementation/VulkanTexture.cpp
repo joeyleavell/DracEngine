@@ -63,7 +63,7 @@ namespace Ry
 		ImageInfo.extent.depth = 1;
 		ImageInfo.mipLevels = 1;
 		ImageInfo.arrayLayers = 1;
-		ImageInfo.format = VK_FORMAT_R8G8B8A8_SRGB; // Always upload the image in R8G8B8A8 format
+		ImageInfo.format = VK_FORMAT_R8G8B8A8_SRGB; // Always upload the image in R8G8B8A8 SRGB format
 		ImageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 		ImageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		ImageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;

@@ -186,7 +186,7 @@ PixelOutput main(PixelInput In)
 	float AmbientOcclusion = 0.0f;
 	float3 Ambient = float3(0.03, 0.03, 0.03) * ActualColor * AmbientOcclusion;
 	OutRadiance += float4(Ambient, 0.0f);
-	
+		
 	// Tone mapping/HDR
 	OutRadiance = OutRadiance / (OutRadiance + float3(1.0, 1.0, 1.0));
 	//OutRadiance = pow(OutRadiance, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
