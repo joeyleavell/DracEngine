@@ -6,7 +6,6 @@
 #include "RyMath.h"
 #include "RenderingEngine.h"
 #include "Color.h"
-#include "Mesh.h"
 #include "Data/ArrayList.h"
 #include <cstdarg>
 #include "Mesh2.h"

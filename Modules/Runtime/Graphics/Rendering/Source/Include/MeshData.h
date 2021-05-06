@@ -3,13 +3,11 @@
 #include "Core/Core.h"
 #include "Data/Map.h"
 #include "Data/ArrayList.h"
-#include <vector>
-#include "Interface2/Shader2.h"
 #include "RenderingGen.h"
+#include "Vertex.h"
 
 namespace Ry
 {
-	class Shader;
 	struct Material;
 	
 	struct RENDERING_MODULE MeshSection
@@ -32,9 +30,6 @@ namespace Ry
 
 		// Load materials for mesh
 		Material* Mat = nullptr;
-
-		// Load appropriate shader for mesh depending on attributes, materials, and provided parameters.
-		Shader2* Shad = nullptr;
 	};
 
 	class RENDERING_MODULE MeshData
@@ -96,34 +91,10 @@ namespace Ry
 			Sections.get(Slot)->Mat = Material;
 		}
 
-		Shader2* GetShader(int32 MeshSlot)
-		{
-			return Sections.get(MeshSlot)->Shad;
-		}
-
-		void SetShaderAll(Shader2* Shader)
-		{
-			KeyIterator<int32, MeshSection> KeyItr = Sections.CreateKeyIterator();
-
-			while (KeyItr)
-			{
-				Sections.get(**KeyItr)->Shad = Shader;
-				++KeyItr;
-			}
-		}
 
 		float GetVertexElement(int32 Vertex, int32 Element)
 		{
 			return Vertices[(uint64) Format.ElementCount * Vertex + Element];
-		}
-
-		/**
-		 * Sets the shader that is used to render this mesh.
-		 * @param shader The shader
-		 */
-		void SetShader(int32 Slot, Shader2* Shader)
-		{
-			Sections.get(Slot)->Shad = Shader;
 		}
 
 		int32 GetCurrentSectionIndex() const

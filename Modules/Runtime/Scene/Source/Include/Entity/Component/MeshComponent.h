@@ -2,12 +2,12 @@
 
 #include "Entity/Component/TransformComponent.h"
 #include "Entity/Component/CollisionComponent.h"
-#include "Mesh.h"
+#include "Mesh2.h"
 
 namespace Ry
 {
 
-	template class Ry::SharedPtr<Ry::Mesh>;
+	template class Ry::SharedPtr<Ry::Mesh2>;
 	
 	class SCENE_MODULE MeshComponent : public TransformComponent
 	{
@@ -27,18 +27,18 @@ namespace Ry
 
 		}
 
-		SharedPtr<Mesh> GetRuntimeMesh()
+		SharedPtr<Mesh2> GetRuntimeMesh()
 		{
 			return RuntimeMesh;
 		}
 
-		void SetRuntimeMesh(SharedPtr<Mesh> RTMesh)
+		void SetRuntimeMesh(SharedPtr<Mesh2> RTMesh)
 		{
 			this->RuntimeMesh = RTMesh;
 		}
 
 	private:
 
-		SharedPtr<Ry::Mesh> RuntimeMesh;
+		SharedPtr<Ry::Mesh2> RuntimeMesh;
 	};
 }

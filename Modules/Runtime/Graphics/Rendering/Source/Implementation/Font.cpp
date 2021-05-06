@@ -1,8 +1,6 @@
 #include "Font.h"
 #include "Bitmap.h"
 #include "2D/Batch/Batch.h"
-#include "Interface/Rendering.h"
-#include "Interface/Texture.h"
 #include "Core/Globals.h"
 #include <iostream>
 #include "Interface2/RenderAPI.h"

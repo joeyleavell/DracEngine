@@ -1,5 +1,4 @@
 #include "MeshAsset.h"
-#include "Mesh.h"
 #include "Mesh2.h"
 
 namespace Ry

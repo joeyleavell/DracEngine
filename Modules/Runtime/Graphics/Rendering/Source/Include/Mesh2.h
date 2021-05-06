@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface/Rendering.h"
 #include "MeshData.h"
 #include "Light.h"
+#include "Vertex.h"
+#include "Interface2/VertexArray2.h"
 
 namespace Ry
 {
+	struct VertexFormat;
 
 	struct VertexAttrib;
 	class VertexArray2;
@@ -67,7 +69,7 @@ namespace Ry
 		MeshData* Data;
 
 		VertexArray2* VertArray;
-		BufferHint Hint;
+		BufferHint2 Hint;
 
 		BoundingBox* StoredBoundingBox;
 	};

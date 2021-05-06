@@ -2,7 +2,6 @@
 
 #include "Core/Core.h"
 #include "Core/Globals.h"
-#include "Mesh.h"
 #include "Color.h"
 #include "Interface2/Shader2.h"
 
@@ -38,7 +37,7 @@ namespace Ry
 		{
 			this->Enabled = false;
 			this->DepthTestEnabled = true;
-			this->BlendingParameters.BlendingEnabled = false;
+			// this->BlendingParameters.BlendingEnabled = false;
 		}
 
 		virtual ~RenderingPass()
@@ -48,19 +47,19 @@ namespace Ry
 
 		virtual void BeginPass()
 		{	
-			Ry::RenderAPI->SetDepthTestEnabled(DepthTestEnabled);
-
-			if(BlendingParameters.BlendingEnabled)
-			{
-				Ry::RenderAPI->SetBlendState(BlendingParameters);
-			}
-
-			int32 ViewportWidth = Ry::GetViewportWidth();
-			int32 ViewportHeight = Ry::GetViewportHeight();
-
-			Ry::RenderAPI->SetViewport(0, 0, ViewportWidth, ViewportHeight);
-
-			Enabled = true;
+			// Ry::RenderAPI->SetDepthTestEnabled(DepthTestEnabled);
+			//
+			// if(BlendingParameters.BlendingEnabled)
+			// {
+			// 	Ry::RenderAPI->SetBlendState(BlendingParameters);
+			// }
+			//
+			// int32 ViewportWidth = Ry::GetViewportWidth();
+			// int32 ViewportHeight = Ry::GetViewportHeight();
+			//
+			// Ry::RenderAPI->SetViewport(0, 0, ViewportWidth, ViewportHeight);
+			//
+			// Enabled = true;
 		}
 		
 		virtual void EndPass()
@@ -78,10 +77,10 @@ namespace Ry
 			return DepthTestEnabled;
 		}
 
-		BlendParameters& GetBlendParameters()
-		{
-			return BlendingParameters;
-		}
+		// BlendParameters& GetBlendParameters()
+		// {
+		// 	return BlendingParameters;
+		// }
 
 		void SetDepthTestEnabled(bool DepthTestEnabled)
 		{
@@ -90,44 +89,44 @@ namespace Ry
 
 		void SetBlendingEnabled(bool BlendingEnabled)
 		{
-			this->BlendingParameters.BlendingEnabled = BlendingEnabled;
+			// this->BlendingParameters.BlendingEnabled = BlendingEnabled;
 		}
 
-		void SetBlendMode(BlendMode Mode)
-		{
-			this->BlendingParameters.Mode = Mode;
-		}
-
-		void SetSourceColorBlendFactor(BlendFactor SourceFactor)
-		{
-			this->BlendingParameters.SourceColorFactor = SourceFactor;
-		}
-
-		void SetDestinationColorBlendFactor(BlendFactor DestFactor)
-		{
-			this->BlendingParameters.DestColorFactor = DestFactor;
-		}
-
-		void SetSourceAlphaBlendFactor(BlendFactor SourceFactor)
-		{
-			this->BlendingParameters.SourceAlphaFactor = SourceFactor;
-		}
-
-		void SetDestinationAlphaBlendFactor(BlendFactor DestFactor)
-		{
-			this->BlendingParameters.DestAlphaFactor = DestFactor;
-		}
-
-		void SetBlendParameters(const BlendParameters& BlendingParameters)
-		{
-			this->BlendingParameters = BlendingParameters;
-		}
+		// void SetBlendMode(BlendMode Mode)
+		// {
+		// 	this->BlendingParameters.Mode = Mode;
+		// }
+		//
+		// void SetSourceColorBlendFactor(BlendFactor SourceFactor)
+		// {
+		// 	this->BlendingParameters.SourceColorFactor = SourceFactor;
+		// }
+		//
+		// void SetDestinationColorBlendFactor(BlendFactor DestFactor)
+		// {
+		// 	this->BlendingParameters.DestColorFactor = DestFactor;
+		// }
+		//
+		// void SetSourceAlphaBlendFactor(BlendFactor SourceFactor)
+		// {
+		// 	this->BlendingParameters.SourceAlphaFactor = SourceFactor;
+		// }
+		//
+		// void SetDestinationAlphaBlendFactor(BlendFactor DestFactor)
+		// {
+		// 	this->BlendingParameters.DestAlphaFactor = DestFactor;
+		// }
+		//
+		// void SetBlendParameters(const BlendParameters& BlendingParameters)
+		// {
+		// 	this->BlendingParameters = BlendingParameters;
+		// }
 
 	protected:
 		
 		bool Enabled;
 		bool DepthTestEnabled;
-		BlendParameters BlendingParameters;
+		// BlendParameters BlendingParameters;
 	};
 
 	class RENDERING_MODULE ImposePass : public RenderingPass
@@ -138,17 +137,17 @@ namespace Ry
 		RenderingPass(),
 		ImposeShader(nullptr)
 		{
-			ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
+			// ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
 		}
 		
 		virtual ~ImposePass()
 		{
-			delete ScreenSpaceMesh;
+			// delete ScreenSpaceMesh;
 		}
 
 		void SetImposeShader(Shader2* ImposeShader)
 		{
-			ScreenSpaceMesh->GetMeshData()->SetShaderAll(ImposeShader);
+			//ScreenSpaceMesh->GetMeshData()->SetShaderAll(ImposeShader);
 			this->ImposeShader = ImposeShader;
 		}
 
@@ -177,7 +176,7 @@ namespace Ry
 			//ImposeShader->uniform_float("ScreenWidth", (float) ViewportWidth);
 			//ImposeShader->uniform_float("ScreenHeight", (float) ViewportHeight);
 			//ImposeShader->uniform_int32("USamples", Source.Buffer->GetSamples());
-			Source.Buffer->GetColorAttachment(Source.ColorAttachment)->Bind();
+			// Source.Buffer->GetColorAttachment(Source.ColorAttachment)->Bind();
 
 			// todo: mesh doesn't render directly anymore
 			//ScreenSpaceMesh->Render(Ry::Primitive::TRIANGLE);
@@ -187,7 +186,7 @@ namespace Ry
 		
 	private:
 		ColorSource Source;
-		Ry::Mesh* ScreenSpaceMesh;
+		// Ry::Mesh* ScreenSpaceMesh;
 		Ry::Shader2* ImposeShader;
 	};
 
@@ -201,15 +200,15 @@ namespace Ry
 			this->AutomaticallyBlit = false;
 
 			// Enable a multisample color attachment for the frame buffer
-			Output = Ry::RenderAPI->make_framebuffer(Ry::GetViewportWidth(), Ry::GetViewportHeight(), Samples);
-			Output->CreateColorAttachment(0);
+			// Output = Ry::RenderAPI->make_framebuffer(Ry::GetViewportWidth(), Ry::GetViewportHeight(), Samples);
+			// Output->CreateColorAttachment(0);
 
 			SetClearColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 		}
 
 		virtual ~OffScreenRenderingPass()
 		{
-			delete Output;
+			// delete Output;
 		}
 
 		void SetClearColor(const Ry::Color& ClearColor)
@@ -217,37 +216,37 @@ namespace Ry
 			this->ClearColor = ClearColor;
 		}
 
-		void ResizeBuffer(int32 Width, int32 Height)
-		{
-			Output->ResizeBuffer(Width, Height);
-		}
-
-		void BeginPass() override
-		{
-			// Bind this frame buffer for off screen rendering
-
-			Output->Bind();
-			Output->ClearAll(ClearColor.Red, ClearColor.Green, ClearColor.Blue, ClearColor.Alpha);
-
-			RenderingPass::BeginPass();
-
-			Ry::RenderAPI->SetMSAAEnabled(Output->GetSamples() > 1);
-
-			Ry::RenderAPI->SetViewport(0, 0, Output->GetIntendedWidth(), Output->GetIntendedHeight());
-		}
-
-		void EndPass() override
-		{
-			RenderingPass::EndPass();
-
-			if (AutomaticallyBlit)
-			{
-				Output->BlitFramebuffer(nullptr, true, false, false, 0, 0);
-			}
-
-			// Go back to the default framebuffer
-			Ry::RenderAPI->BindDefaultFramebuffer();
-		}
+		// void ResizeBuffer(int32 Width, int32 Height)
+		// {
+		// 	Output->ResizeBuffer(Width, Height);
+		// }
+		//
+		// void BeginPass() override
+		// {
+		// 	// Bind this frame buffer for off screen rendering
+		//
+		// 	Output->Bind();
+		// 	Output->ClearAll(ClearColor.Red, ClearColor.Green, ClearColor.Blue, ClearColor.Alpha);
+		//
+		// 	RenderingPass::BeginPass();
+		//
+		// 	Ry::RenderAPI->SetMSAAEnabled(Output->GetSamples() > 1);
+		//
+		// 	Ry::RenderAPI->SetViewport(0, 0, Output->GetIntendedWidth(), Output->GetIntendedHeight());
+		// }
+		//
+		// void EndPass() override
+		// {
+		// 	RenderingPass::EndPass();
+		//
+		// 	if (AutomaticallyBlit)
+		// 	{
+		// 		Output->BlitFramebuffer(nullptr, true, false, false, 0, 0);
+		// 	}
+		//
+		// 	// Go back to the default framebuffer
+		// 	Ry::RenderAPI->BindDefaultFramebuffer();
+		// }
 
 		FrameBuffer* GetOutputBuffer()
 		{
@@ -266,15 +265,15 @@ namespace Ry
 
 		PostProcessPass():
 		OffScreenRenderingPass(0),
-		ScreenSpaceMesh(nullptr),
+		// ScreenSpaceMesh(nullptr),
 		PostProcessShader(nullptr)
 		{
-			ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
+			// ScreenSpaceMesh = Ry::BuildScreenSpaceMesh1P1UV(nullptr);
 		}
 
 		void SetPostProcessShader(Shader2* PostProcess)
 		{
-			ScreenSpaceMesh->GetMeshData()->SetShaderAll(PostProcess);
+			//ScreenSpaceMesh->GetMeshData()->SetShaderAll(PostProcess);
 			this->PostProcessShader = PostProcess;
 		}
 
@@ -314,19 +313,19 @@ namespace Ry
 
 			for(const ColorSource& ColorSource : ColorSources)
 			{
-				ColorSource.Buffer->GetColorAttachment(ColorSource.ColorAttachment)->Bind(TextureUnit);
+				// ColorSource.Buffer->GetColorAttachment(ColorSource.ColorAttachment)->Bind(TextureUnit);
 				TextureUnit++;
 			}
 
 			for (const DepthSource& DepthSource : DepthSources)
 			{
-				DepthSource.Buffer->GetDepthAttachment()->Bind(TextureUnit);
+				// DepthSource.Buffer->GetDepthAttachment()->Bind(TextureUnit);
 				TextureUnit++;
 			}
 
 			for (const StencilSource& StencilSource : StencilSources)
 			{
-				StencilSource.Buffer->GetStencilAttachment()->Bind(TextureUnit);
+				// StencilSource.Buffer->GetStencilAttachment()->Bind(TextureUnit);
 				TextureUnit++;
 			}
 
@@ -338,7 +337,7 @@ namespace Ry
 		}
 
 	private:
-		Ry::Mesh* ScreenSpaceMesh;
+		// Ry::Mesh* ScreenSpaceMesh;
 		Ry::Shader2* PostProcessShader;
 
 		// Texture sources
