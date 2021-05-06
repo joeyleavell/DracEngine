@@ -118,7 +118,7 @@ namespace Ry
 		float TotalDelete = 0.0f;
 
 		Ry::MeshData* MeshData = new Ry::MeshData;
-		MeshData->Format = Ry::VF1P1UV1N;
+		MeshData->SetVertFormat(Ry::VF1P1UV1N);
 
 		std::vector<Ry::Vector3> OBJVertices;
 		std::vector<Ry::Vector3> OBJNormals;

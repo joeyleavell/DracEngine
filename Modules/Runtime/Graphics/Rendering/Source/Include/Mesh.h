@@ -31,6 +31,7 @@ namespace Ry
 		 */
 		Mesh(const VertexFormat& Format = VF1P1UV1N);
 		Mesh(MeshData* Data);
+
 		virtual ~Mesh();
 
 		/**
@@ -58,6 +59,8 @@ namespace Ry
 		void Reset();
 
 		MeshData* GetMeshData();
+
+		MeshSection* GetSection(int32 Index);
 
 		VertexArray* GetVertexArray();
 

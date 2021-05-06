@@ -76,21 +76,26 @@ namespace Ry
 				Ry::ResourceSet* MatRes = Ry::RendAPI->CreateResourceSet(MaterialDesc, Ry::app->GetSwapChain());
 				SectionResources->MaterialSpecificResource = MatRes;
 				{
-					if (Sec.Mat->DiffuseTexture)
+					if (Sec.Mat->AlbedoMap)
 					{
-						MatRes->SetFloatConstant("Material", "UseDiffuseTexture", 1.0f);
-						MatRes->BindTexture("DiffuseTexture", Sec.Mat->DiffuseTexture);
+						MatRes->SetFloatConstant("Material", "UseAlbedoMap", 1.0f);
+						MatRes->BindTexture("AlbedoMap", Sec.Mat->AlbedoMap);
 					}
 					else
 					{
 						// Don't use diffuse, bind default
-						MatRes->SetFloatConstant("Material", "UseDiffuseTexture", 0.0f);
-						MatRes->BindTexture("DiffuseTexture", Ry::DefaultTexture);
+						MatRes->SetFloatConstant("Material", "UseAlbedoMap", 0.0f);
+						MatRes->BindTexture("AlbedoMap", Ry::DefaultTexture);
 					}
 
-					MatRes->SetMatConstant("Material", "DiffuseColor", Sec.Mat->Diffuse);
-					MatRes->SetMatConstant("Material", "AmbientColor", Sec.Mat->Ambient);
-					MatRes->SetMatConstant("Material", "SpecularColor", Sec.Mat->Specular);
+					MatRes->SetFloatConstant("Material", "UseNormalMap", 0.0f);
+					MatRes->SetFloatConstant("Material", "UseRoughnessMap", 0.0f);
+					MatRes->SetFloatConstant("Material", "UseMetallicMap", 0.0f);
+					MatRes->SetFloatConstant("Material", "UseAOMap", 0.0f);
+
+					MatRes->SetMatConstant("Material", "Albedo", Sec.Mat->Albedo);
+					MatRes->SetFloatConstant("Material", "Roughness", Sec.Mat->Roughness);
+					MatRes->SetFloatConstant("Material", "Metalness", Sec.Mat->Metallic);
 				}
 				MatRes->CreateBuffer();
 

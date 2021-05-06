@@ -79,21 +79,23 @@ namespace Ry
 				{
 					if (ValidTokens[0] == "Ka")
 					{
-						CurrentMaterial->Ambient.r = ValidTokens[1].to_float();
-						CurrentMaterial->Ambient.g = ValidTokens[2].to_float();
-						CurrentMaterial->Ambient.b = ValidTokens[3].to_float();
+						// TODO: what do we translate this to?
+						// CurrentMaterial->Albedo.r = ValidTokens[1].to_float();
+						// CurrentMaterial->Ambient.g = ValidTokens[2].to_float();
+						// CurrentMaterial->Ambient.b = ValidTokens[3].to_float();
 					}
 					if (ValidTokens[0] == "Kd")
 					{
-						CurrentMaterial->Diffuse.r = ValidTokens[1].to_float();
-						CurrentMaterial->Diffuse.g = ValidTokens[2].to_float();
-						CurrentMaterial->Diffuse.b = ValidTokens[3].to_float();
+						CurrentMaterial->Albedo.r = ValidTokens[1].to_float();
+						CurrentMaterial->Albedo.g = ValidTokens[2].to_float();
+						CurrentMaterial->Albedo.b = ValidTokens[3].to_float();
 					}
 					if (ValidTokens[0] == "Ks")
 					{
-						CurrentMaterial->Specular.r = ValidTokens[1].to_float();
-						CurrentMaterial->Specular.g = ValidTokens[2].to_float();
-						CurrentMaterial->Specular.b = ValidTokens[3].to_float();
+						// TODO: what do we translate this to?
+						// CurrentMaterial->Specular.r = ValidTokens[1].to_float();
+						// CurrentMaterial->Specular.g = ValidTokens[2].to_float();
+						// CurrentMaterial->Specular.b = ValidTokens[3].to_float();
 					}
 
 					// Ambient texture map
@@ -113,7 +115,7 @@ namespace Ry
 
 						// Todo: Texture support needs to be re-added
 						Texture* Result = Ry::AssetMan->LoadAsset<TextureAsset>(NewVirtual, "image")->CreateRuntimeTexture();
-						CurrentMaterial->DiffuseTexture = Result;
+						CurrentMaterial->AlbedoMap = Result;
 					}
 
 

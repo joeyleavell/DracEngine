@@ -32,10 +32,9 @@ namespace Ry
 		Material* Mat = nullptr;
 	};
 
-	class RENDERING_MODULE MeshData
+	class RENDERING_MODULE MeshVertexData
 	{
 	public:
-
 		/**
 		 * How many vertices are in this mesh.
 		 */
@@ -45,16 +44,6 @@ namespace Ry
 		 * How many indices are in this mesh/
 		 */
 		int32 IndexCount;
-
-		/**
-		 * How many sections are in this mesh.
-		 */
-		int32 SectionCount;
-
-		/**
-		 * A map of section IDs to their respective section.
-		 */
-		Map<int32, MeshSection> Sections;
 
 		/**
 		 * The format of vertices stored in this mesh.
@@ -71,45 +60,25 @@ namespace Ry
 		 */
 		Ry::ArrayList<uint32> Indices;
 
-		MeshData()
+		MeshVertexData()
 		{
 			this->VertexCount = 0;
 			this->IndexCount = 0;
-			this->SectionCount = 0;
-
-			// Create default mesh section
-			NewSection();
-		}
-
-		Material* GetMaterial(int32 Slot)
-		{
-			return Sections.get(Slot)->Mat;
-		}
-
-		void SetMaterial(int32 Slot, Material* Material)
-		{
-			Sections.get(Slot)->Mat = Material;
-		}
-
-
-		float GetVertexElement(int32 Vertex, int32 Element)
-		{
-			return Vertices[(uint64) Format.ElementCount * Vertex + Element];
-		}
-
-		int32 GetCurrentSectionIndex() const
-		{
-			return SectionCount - 1;
 		}
 
 		void AddVertex(std::initializer_list<float> Values)
 		{
-			for(float Val : Values)
+			for (float Val : Values)
 			{
 				Vertices.Add(Val);
 			}
 
 			VertexCount++;
+		}
+
+		float GetVertexElement(int32 Vertex, int32 Element)
+		{
+			return Vertices[(uint64)Format.ElementCount * Vertex + Element];
 		}
 
 		/**
@@ -155,72 +124,8 @@ namespace Ry
 			{
 				Vertices.Add(Data[Element]);
 			}
-			
+
 			VertexCount += Verts;
-		}
-
-		/**
-		 * Adds an index to this mesh. Once finished adding vertices and indices, make sure to call update()
-		 * @param uint32 The mesh index
-		 */
-		void AddIndex(uint32 Index)
-		{
-			Indices.Add(Index);
-
-			IndexCount++;
-			Sections.get(SectionCount - 1)->Count++;
-		}
-
-		void AddIndexData(std::initializer_list<uint32> Input)
-		{
-			for(uint32 Index : Input)
-			{
-				Indices.Add(Index);
-			}
-
-			IndexCount += Input.size();
-			Sections.get(SectionCount - 1)->Count += Input.size();
-		}
-
-		void AddIndexRaw(uint32* Buffer, uint32 Count, uint32 BaseIndex)
-		{
-			for(uint32 Index = 0; Index < Count; Index++)
-			{
-				Indices.Add(BaseIndex + Buffer[Index]);
-			}
-
-			IndexCount += Count;
-			Sections.get(SectionCount - 1)->Count += Count;
-		}
-
-		/**
-		 * Adds two indices to this mesh.
-		 * @paramuint32 The first mesh index
-		 * @param uint32 The second mesh index
-		 */
-		void AddLine(uint32 First, uint32 Second)
-		{
-			Indices.Add(First);
-			Indices.Add(Second);
-
-			IndexCount += 2;
-			Sections.get(SectionCount - 1)->Count += 2;
-		}
-
-		/**
-		 * Adds two indices to this mesh.
-		 * @param i1 The first mesh index
-		 * @param i2 The second mesh index
-		 * @param i3 The third mesh index
-		 */
-		void AddTriangle(uint32 First, uint32 Second, uint32 Third)
-		{
-			Indices.Add(First);
-			Indices.Add(Second);
-			Indices.Add(Third);
-
-			IndexCount += 3;
-			Sections.get(SectionCount - 1)->Count += 3;
 		}
 
 		/**
@@ -237,6 +142,187 @@ namespace Ry
 		uint32 GetIndexCount() const
 		{
 			return IndexCount;
+		}
+
+
+	};
+
+	class RENDERING_MODULE MeshData
+	{
+	public:
+
+		/**
+		 * How many sections are in this mesh.
+		 */
+		int32 SectionCount;
+
+		/**
+		 * A map of section IDs to their respective section.
+		 */
+		Map<int32, MeshSection> Sections;
+
+		MeshVertexData* VertData;
+
+		MeshData()
+		{
+			this->VertData = new MeshVertexData;
+			this->SectionCount = 0;
+
+			// Create default mesh section
+			NewSection();
+		}
+
+		MeshData(MeshData* Other)
+		{
+			// Soft copy vert data (pointer), deep copy section data
+			this->VertData = Other->VertData;
+
+			this->SectionCount = Other->SectionCount;
+			this->Sections = Other->Sections;
+		}
+
+		VertexFormat GetVertFormat()
+		{
+			return VertData->Format;
+		}
+
+		void SetVertFormat(const VertexFormat& Format)
+		{
+			VertData->Format = Format;
+		}
+
+		float* GetVertData()
+		{
+			return VertData->Vertices.GetData();
+		}
+
+		uint32* GetIndexData()
+		{
+			return VertData->Indices.GetData();
+		}
+
+		void AddVertex(std::initializer_list<float> Values)
+		{
+			VertData->AddVertex(Values);
+		}
+
+		float GetVertexElement(int32 Vertex, int32 Element)
+		{
+			return VertData->GetVertexElement(Vertex, Element);
+		}
+
+		/**
+		 * Adds a vertex to this mesh. Once finished adding vertices and indices, make sure to call update()
+		 * @param vertex The vertex
+		 */
+		void AddVertex(const Vertex* Vertex)
+		{
+			VertData->AddVertex(Vertex);
+		}
+
+		void AddVertex(float* Data)
+		{
+			VertData->AddVertex(Data);
+		}
+
+		void AddVertexRaw(float* Data, int32 DataSize, int32 Verts)
+		{
+			VertData->AddVertexRaw(Data, DataSize, Verts);
+		}
+
+		/**
+		 * @return uint32 The amount of vertices in this mesh
+		 */
+		uint32 GetVertexCount() const
+		{
+			return VertData->GetVertexCount();
+		}
+
+		/**
+		 * @return uint32 The amount of indices in this mesh
+		 */
+		uint32 GetIndexCount() const
+		{
+			return VertData->GetIndexCount();
+		}
+
+		/**
+		 * Adds an index to this mesh. Once finished adding vertices and indices, make sure to call update()
+		 * @param uint32 The mesh index
+		 */
+		void AddIndex(uint32 Index)
+		{
+			VertData->Indices.Add(Index);
+
+			VertData->IndexCount++;
+			Sections.get(SectionCount - 1)->Count++;
+		}
+
+		void AddIndexData(std::initializer_list<uint32> Input)
+		{
+			for (uint32 Index : Input)
+			{
+				VertData->Indices.Add(Index);
+			}
+
+			VertData->IndexCount += Input.size();
+			Sections.get(SectionCount - 1)->Count += Input.size();
+		}
+
+		void AddIndexRaw(uint32* Buffer, uint32 Count, uint32 BaseIndex)
+		{
+			for (uint32 Index = 0; Index < Count; Index++)
+			{
+				VertData->Indices.Add(BaseIndex + Buffer[Index]);
+			}
+
+			VertData->IndexCount += Count;
+			Sections.get(SectionCount - 1)->Count += Count;
+		}
+
+		/**
+		 * Adds two indices to this mesh.
+		 * @paramuint32 The first mesh index
+		 * @param uint32 The second mesh index
+		 */
+		void AddLine(uint32 First, uint32 Second)
+		{
+			VertData->Indices.Add(First);
+			VertData->Indices.Add(Second);
+
+			VertData->IndexCount += 2;
+			Sections.get(SectionCount - 1)->Count += 2;
+		}
+
+		/**
+		 * Adds two indices to this mesh.
+		 * @param i1 The first mesh index
+		 * @param i2 The second mesh index
+		 * @param i3 The third mesh index
+		 */
+		void AddTriangle(uint32 First, uint32 Second, uint32 Third)
+		{
+			VertData->Indices.Add(First);
+			VertData->Indices.Add(Second);
+			VertData->Indices.Add(Third);
+
+			VertData->IndexCount += 3;
+			Sections.get(SectionCount - 1)->Count += 3;
+		}
+
+		Material* GetMaterial(int32 Slot)
+		{
+			return Sections.get(Slot)->Mat;
+		}
+
+		void SetMaterial(int32 Slot, Material* Material)
+		{
+			Sections.get(Slot)->Mat = Material;
+		}
+
+		int32 GetCurrentSectionIndex() const
+		{
+			return SectionCount - 1;
 		}
 
 		void NewSection()

@@ -23,14 +23,22 @@ cbuffer SceneLighting : register(b2, space2)
 
 cbuffer Material : register(b3, space3)
 {
-	float UseDiffuseTexture : packoffset(c0.x);
-	float3 DiffuseColor : packoffset(c1.x);
-	float3 AmbientColor : packoffset(c2.x);
-	float3 SpecularColor : packoffset(c3.x);
+	// Whether to use the actual maps
+	float1 UseAlbedoMap;//    : packoffset(c0.x);
+	float1 UseNormalMap;//    : packoffset(c0.y);
+	float1 UseRoughnessMap;// : packoffset(c0.z);
+	float1 UseMetallicMap;//  : packoffset(c0.w);
+	float1 UseAOMap;//        : packoffset(c1.x);
+
+	// Constant values
+	float1 Roughness;//       : packoffset(c2.x);
+	float1 Metalness;//       : packoffset(c2.y);
+	float3 Albedo;//         : packoffset(c1.y);
+	
 }
 
-SamplerState DiffuseSampler : register(t0, space3);
-Texture2D <float4> DiffuseTexture : register(t0, space3);
+SamplerState AlbedoMapSampler : register(t0, space3);
+Texture2D <float4> AlbedoMap : register(t0, space3);
 
 struct PixelInput
 {
@@ -124,10 +132,8 @@ float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNorma
 	float3 LightDir = -normalize(InLight.Position);//normalize(InLight.Position - FragPos);
 	float3 ViewDir = normalize(ViewPosition - FragPos);
 	float3 HalfwayDir = normalize(LightDir + ViewDir);
-		
-	float Roughness = 0.2f;
-	float Metalness = 0.0f;
 	
+	// This will use the roughness and metallness from the material
 	float3 BRDF = CookTorranceBRDF(SurfaceNormal, ViewDir, HalfwayDir, LightDir, Albedo, Roughness, Metalness);
 	float NdotL = max(dot(LightDir, SurfaceNormal), 0.0);
 	
@@ -169,8 +175,8 @@ PixelOutput main(PixelInput In)
 	float Scale = max(1.0f - Dist / 50.0f, 0.05f);
 	
 	// Select between using constant diffuse color and texture diffuse color
-	float4 TexColor = DiffuseTexture.Sample(DiffuseSampler, In.VertUV);
-	float4 ActualColor = mul(UseDiffuseTexture, TexColor) + mul(1.0f - UseDiffuseTexture, float4(DiffuseColor, 1.0f));
+	float4 AlbedoMapValue = AlbedoMap.Sample(AlbedoMapSampler, In.VertUV);
+	float4 AlbedoColor = mul(UseAlbedoMap, AlbedoMapValue) + mul(1.0f - UseAlbedoMap, float4(Albedo, 1.0f));
 	
 	float3 OutRadiance = float3(0.0f, 0.0f, 0.0f);
 	int PointLightsFloored = floor(NumPointLights);
@@ -178,13 +184,13 @@ PixelOutput main(PixelInput In)
 	{
 		PointLight TheLight = PointLights[PointLightIndex];
 
-		OutRadiance += CalcPointLightPBR(TheLight, In.VertWorld, In.VertNormal, ActualColor);		
-		//OutRadiance += CalcPointLightPhong(TheLight, In.VertWorld, In.VertNormal, ActualColor);
+		OutRadiance += CalcPointLightPBR(TheLight, In.VertWorld, In.VertNormal, AlbedoColor);		
+		//OutRadiance += CalcPointLightPhong(TheLight, In.VertWorld, In.VertNormal, AlbedoColor);
 	}
 	
 	// Contribute ambient occlusion to final result
 	float AmbientOcclusion = 0.0f;
-	float3 Ambient = float3(0.03, 0.03, 0.03) * ActualColor * AmbientOcclusion;
+	float3 Ambient = float3(0.03, 0.03, 0.03) * AlbedoColor * AmbientOcclusion;
 	OutRadiance += float4(Ambient, 0.0f);
 		
 	// Tone mapping/HDR
@@ -194,6 +200,8 @@ PixelOutput main(PixelInput In)
 	OutRadiance.r = min(OutRadiance.r, 1.0);
 	OutRadiance.g = min(OutRadiance.g, 1.0);
 	OutRadiance.b = min(OutRadiance.b, 1.0);
+	
+	//OutRadiance = AlbedoMapValue;
 	
 	Out.PixelColor = float4(OutRadiance, 1.0f);
 			

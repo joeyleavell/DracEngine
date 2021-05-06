@@ -199,7 +199,7 @@ namespace Ry
 			ResSet->CreateBuffer();
 
 			MeshData* Data = new MeshData;
-			Data->Format = VF1P1UV1N;
+			Data->SetVertFormat(VF1P1UV1N);
 			
 			Data->AddVertex({
 				-0.5, -0.5f, 0.0f,
@@ -232,17 +232,17 @@ namespace Ry
 				ResourceSet* MatSet = Ry::RendAPI->CreateResourceSet(MatDesc, EditorMainWindow->GetSwapChain());
 				Material* Mat = NewMesh->GetMeshData()->GetMaterial(MatIndex);
 				
-				if(Mat->DiffuseTexture)
+				if(Mat->AlbedoMap)
 				{
 					MatSet->SetFloatConstant("Material", "UseDiffuseTexture", 1.0f);
-					MatSet->BindTexture("Diffuse", Mat->DiffuseTexture);
+					MatSet->BindTexture("Diffuse", Mat->AlbedoMap);
 				}
 				else
 				{
 					MatSet->SetFloatConstant("Material", "UseDiffuseTexture", 0.0f);
-					MatSet->SetMatConstant("Material", "DiffuseColor", Mat->Diffuse);
-					MatSet->SetMatConstant("Material", "AmbientColor", Mat->Ambient);
-					MatSet->SetMatConstant("Material", "SpecularColor", Mat->Diffuse);
+					MatSet->SetMatConstant("Material", "DiffuseColor", Mat->Albedo);
+					MatSet->SetMatConstant("Material", "AmbientColor", Mat->Albedo);
+					MatSet->SetMatConstant("Material", "SpecularColor", Mat->Albedo);
 					MatSet->BindTexture("Diffuse", DefaultDiffuse);
 				}
 			

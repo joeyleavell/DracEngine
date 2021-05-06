@@ -9,10 +9,27 @@ namespace Ry
 	struct RENDERING_MODULE Material
 	{
 		Ry::String Name;
-		Vector3 Ambient;
-		Vector3 Diffuse;
-		Vector3 Specular;
 
-		Ry::Texture* DiffuseTexture = nullptr;
+		/**
+		 * If the albedo map is null, this value is used instead.
+		 */
+		Vector3 Albedo = Vector3(1.0f, 1.0f, 1.0f);
+
+		/**
+		 * If the roughness map is null, this value is used instead.
+		 */
+		float Roughness = 0.01f;
+
+		/**
+		 * If the metallic map is null, this value is used instead.
+		 */
+		float Metallic = 0.0f;
+
+		Ry::Texture* AlbedoMap    = nullptr;
+		Ry::Texture* NormalMap    = nullptr;
+		Ry::Texture* RoughnessMap = nullptr;
+		Ry::Texture* MetallicMap  = nullptr;
+		Ry::Texture* AOMap        = nullptr;
+
 	};
 }

@@ -16,14 +16,14 @@ namespace Ry
 		this->Hint = Hint;
 		this->VertArray = RendAPI->CreateVertexArray(Format);
 		this->Data = new MeshData;
-		this->Data->Format = Format;
+		this->Data->SetVertFormat(Format);
 		this->StoredBoundingBox = nullptr;
 	}
 
 	Mesh::Mesh(MeshData* Data)
 	{
 		this->Data = Data;
-		this->VertArray = RendAPI->CreateVertexArray(Data->Format);
+		this->VertArray = RendAPI->CreateVertexArray(Data->GetVertFormat());
 		this->StoredBoundingBox = nullptr;
 
 		Update();
@@ -42,8 +42,8 @@ namespace Ry
 	
 	void Mesh::Update()
 	{
-		VertArray->PushVertexData(Data->Vertices.GetData(), Data->VertexCount);
-		VertArray->PushIndexData(Data->Indices.GetData(), Data->IndexCount);
+		VertArray->PushVertexData(Data->GetVertData(), Data->GetVertexCount());
+		VertArray->PushIndexData(Data->GetIndexData(), Data->GetIndexCount());
 	}
 	
 	// void Mesh::Render(Primitive prim)
@@ -107,11 +107,11 @@ namespace Ry
 	void Mesh::Reset()
 	{
 		// TODO: Performance: could probably be better here, do not erase elements but stomp over them instead maintaining the greatest allocated size
-		Data->Vertices.Clear();
-		Data->Indices.Clear();
+		Data->VertData->Vertices.Clear();
+		Data->VertData->Indices.Clear();
 
-		Data->VertexCount = 0;
-		Data->IndexCount = 0;
+		Data->VertData->VertexCount = 0;
+		Data->VertData->IndexCount = 0;
 
 		// Erase mesh section count/start index information.
 		KeyIterator<int32, MeshSection> KeyItr = Data->Sections.CreateKeyIterator();
@@ -127,6 +127,11 @@ namespace Ry
 	MeshData* Mesh::GetMeshData()
 	{
 		return Data;
+	}
+
+	MeshSection* Mesh::GetSection(int32 Index)
+	{
+		return Data->Sections.get(Index);
 	}
 
 	VertexArray* Mesh::GetVertexArray()
