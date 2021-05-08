@@ -48,7 +48,7 @@ namespace Ry
 		// Set view position from inverse transform
 		LightResources->SetMatConstant("SceneLighting", "ViewPosition", ViewPos);
 
-		LightDir = LightDir.RotateVector(Ry::UpVector, 0.01f);
+		LightDir = LightDir.RotateVector(Ry::UpVector, 0.05f);
 		LightResources->SetMatConstant("SceneLighting", "PointLights[0].Position", LightDir);
 
 		// Update primitive resources
@@ -137,7 +137,7 @@ namespace Ry
 			LightResources->SetFloatConstant("SceneLighting", "NumPointLights", 7.0f);
 
 			Ry::Vector3 Colors[] = {
-				Ry::Vector3(0.0f, 0.0f, 1.0f),
+				Ry::Vector3(1.0f, 1.0f, 1.0f),
 				Ry::Vector3(0.0f, 1.0f, 0.0f),
 				Ry::Vector3(0.0f, 1.0f, 1.0f),
 				Ry::Vector3(1.0f, 0.0f, 0.0f),

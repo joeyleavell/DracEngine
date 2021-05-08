@@ -1,6 +1,0 @@
-{
-	"Name": "RenderAsset",
-	"Type": "Runtime",
-	"Extern": ["Stb"],
-	"Modules": ["Core", "Math", "AssetCore", "Rendering", "Profiling"]
-}

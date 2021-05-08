@@ -15,6 +15,8 @@ namespace Ry
 		 */
 		Vector3 Albedo = Vector3(1.0f, 1.0f, 1.0f);
 
+		Vector3 Emissive = Vector3(0.0f, 0.0f, 0.0f);
+
 		/**
 		 * If the roughness map is null, this value is used instead.
 		 */
@@ -30,6 +32,7 @@ namespace Ry
 		Ry::Texture* RoughnessMap = nullptr;
 		Ry::Texture* MetallicMap  = nullptr;
 		Ry::Texture* AOMap        = nullptr;
+		Ry::Texture* EmissiveMap  = nullptr;
 
 	};
 }

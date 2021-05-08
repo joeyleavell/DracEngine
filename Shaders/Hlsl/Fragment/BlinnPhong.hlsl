@@ -29,16 +29,33 @@ cbuffer Material : register(b3, space3)
 	float1 UseRoughnessMap;// : packoffset(c0.z);
 	float1 UseMetallicMap;//  : packoffset(c0.w);
 	float1 UseAOMap;//        : packoffset(c1.x);
+	float1 UseEmissiveMap;//  : packoffset(c1.x);
 
 	// Constant values
 	float1 Roughness;//       : packoffset(c2.x);
 	float1 Metalness;//       : packoffset(c2.y);
 	float3 Albedo;//         : packoffset(c1.y);
+	float3 Emissive;//         : packoffset(c1.y);
 	
 }
 
 SamplerState AlbedoMapSampler : register(t0, space3);
 Texture2D <float4> AlbedoMap : register(t0, space3);
+
+SamplerState NormalMapSampler : register(t1, space3);
+Texture2D <float4> NormalMap : register(t1, space3);
+
+SamplerState RoughnessMapSampler : register(t2, space3);
+Texture2D <float4> RoughnessMap : register(t2, space3);
+
+SamplerState MetallicMapSampler : register(t3, space3);
+Texture2D <float4> MetallicMap : register(t3, space3);
+
+SamplerState AOMapSampler : register(t4, space3);
+Texture2D <float4> AOMap : register(t4, space3);
+
+SamplerState EmissiveMapSampler : register(t5, space3);
+Texture2D <float4> EmissiveMap : register(t5, space3);
 
 struct PixelInput
 {
@@ -127,14 +144,14 @@ float3 CookTorranceBRDF(float3 SurfaceNormal, float3 ViewDir, float3 HalfwayDir,
 	return Kd * CookTorranceLambert + CookTorranceSpec; // Ks already accounted for in fresnel factor
 }
 
-float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNormal, float3 Albedo)
+float3 CalcPointLightPBR(PointLight InLight, float3 FragPos, float3 SurfaceNormal, float3 Albedo, float Rough, float Metal)
 {
 	float3 LightDir = -normalize(InLight.Position);//normalize(InLight.Position - FragPos);
 	float3 ViewDir = normalize(ViewPosition - FragPos);
 	float3 HalfwayDir = normalize(LightDir + ViewDir);
 	
 	// This will use the roughness and metallness from the material
-	float3 BRDF = CookTorranceBRDF(SurfaceNormal, ViewDir, HalfwayDir, LightDir, Albedo, Roughness, Metalness);
+	float3 BRDF = CookTorranceBRDF(SurfaceNormal, ViewDir, HalfwayDir, LightDir, Albedo, Rough, Metal);
 	float NdotL = max(dot(LightDir, SurfaceNormal), 0.0);
 	
 	// Calculate the radiance of the point light
@@ -176,33 +193,54 @@ PixelOutput main(PixelInput In)
 	
 	// Select between using constant diffuse color and texture diffuse color
 	float4 AlbedoMapValue = AlbedoMap.Sample(AlbedoMapSampler, In.VertUV);
-	float4 AlbedoColor = mul(UseAlbedoMap, AlbedoMapValue) + mul(1.0f - UseAlbedoMap, float4(Albedo, 1.0f));
+	float4 AlbedoColor = UseAlbedoMap * AlbedoMapValue + mul(1.0f - UseAlbedoMap, float4(Albedo, 1.0f));
 	
-	float3 OutRadiance = float3(0.0f, 0.0f, 0.0f);
+	float4 NormalMapValue = NormalMap.Sample(NormalMapSampler, In.VertUV);
+	float4 NormalColor = mul(UseNormalMap, NormalMapValue) + (1.0f - UseNormalMap) * float4(0.0f, 0.0f, 1.0f, 1.0f);
+	float3 RelativeNormal = NormalColor.rgb;
+	
+	float RoughMapValue = RoughnessMap.Sample(RoughnessMapSampler, In.VertUV).r;
+	float RoughnessValue = UseRoughnessMap * RoughMapValue + (1.0f - UseRoughnessMap) * Roughness;
+	
+	float MetallicMapValue = MetallicMap.Sample(MetallicMapSampler, In.VertUV).r;
+	float MetallicValue = UseMetallicMap * MetallicMapValue + (1.0f - UseMetallicMap) * Metalness;
+	
+	float AOMapValue = AOMap.Sample(AOMapSampler, In.VertUV).r;
+	float AOValue = UseAOMap * AOMapValue + (1.0f - UseAOMap) * 1.0f;
+	
+	float4 EmissiveMapValue = EmissiveMap.Sample(EmissiveMapSampler, In.VertUV).r;
+	float4 EmissiveValue = UseEmissiveMap * EmissiveMapValue + (1.0f - UseEmissiveMap) * float4(Emissive, 1.0f);
+	float3 EmissiveColor = EmissiveValue.rgb;
+	
+	float3 OutRadiance = EmissiveColor;
+	
 	int PointLightsFloored = floor(NumPointLights);
 	for(int PointLightIndex = 0; PointLightIndex < PointLightsFloored; PointLightIndex++)
 	{
 		PointLight TheLight = PointLights[PointLightIndex];
 
-		OutRadiance += CalcPointLightPBR(TheLight, In.VertWorld, In.VertNormal, AlbedoColor);		
+		OutRadiance += CalcPointLightPBR(
+			TheLight, 
+			In.VertWorld, 
+			In.VertNormal, 
+			AlbedoColor,
+			RoughnessValue,
+			MetallicValue
+		);	
+		
 		//OutRadiance += CalcPointLightPhong(TheLight, In.VertWorld, In.VertNormal, AlbedoColor);
 	}
 	
 	// Contribute ambient occlusion to final result
-	float AmbientOcclusion = 0.0f;
-	float3 Ambient = float3(0.03, 0.03, 0.03) * AlbedoColor * AmbientOcclusion;
+	float3 Ambient = float3(0.03, 0.03, 0.03) * AlbedoColor * AOValue;
 	OutRadiance += float4(Ambient, 0.0f);
 		
 	// Tone mapping/HDR
 	OutRadiance = OutRadiance / (OutRadiance + float3(1.0, 1.0, 1.0));
 	//OutRadiance = pow(OutRadiance, float3(1.0/2.2, 1.0/2.2, 1.0/2.2)); 
-
-	OutRadiance.r = min(OutRadiance.r, 1.0);
-	OutRadiance.g = min(OutRadiance.g, 1.0);
-	OutRadiance.b = min(OutRadiance.b, 1.0);
 	
-	//OutRadiance = AlbedoMapValue;
-	
+	//OutRadiance = AlbedoColor.rgb;
+		
 	Out.PixelColor = float4(OutRadiance, 1.0f);
 			
 	return Out;

@@ -2,6 +2,7 @@
 #include "TextureAsset.h"
 #include "Bitmap.h"
 #include <iostream>
+#include "Core/Globals.h"
 #include "stb_image.h"
 
 namespace Ry
@@ -20,7 +21,30 @@ namespace Ry
 		{
 			Bitmap* Result = nullptr;
 
-			if (Channels == 3)
+			uint8* UsedData = PixelData;
+
+			if(Channels == 1)
+			{
+				// TODO: this is temp, create grayscale images in rendering API
+				// make grayscale rgb triplett
+
+				UsedData = new uint8[Width * Height * 3];
+				for(int X = 0; X < Width; X++)
+				{
+					for(int Y = 0; Y < Height; Y++)
+					{
+						int32 Index = X + Y * Width;
+						UsedData[Index * 3 + 0] = PixelData[Index];
+						UsedData[Index * 3 + 1] = PixelData[Index];
+						UsedData[Index * 3 + 2] = PixelData[Index];
+					}
+				}
+				
+				Result = new Bitmap(Width, Height, PixelStorage::THREE_BYTE_RGB);
+
+				delete[] PixelData;
+			}
+			else if (Channels == 3)
 			{
 				Result = new Bitmap(Width, Height, PixelStorage::THREE_BYTE_RGB);
 			}
@@ -29,12 +53,21 @@ namespace Ry
 				Result = new Bitmap(Width, Height, PixelStorage::FOUR_BYTE_RGBA);
 			}
 
-			Result->SetData(PixelData);
+			if(Result)
+			{
+				Result->SetData(UsedData);
 
-			// Flip data
-			Result->FlipY();
+				// Flip data
+				Result->FlipY();
 
-			AssetDst.push_back(new TextureAsset(Result));
+				AssetDst.push_back(new TextureAsset(Result));
+			}
+			else
+			{
+//				Ry::Log->LogErrorf("Unsupported ")
+			}
+
+
 		}
 	}
 

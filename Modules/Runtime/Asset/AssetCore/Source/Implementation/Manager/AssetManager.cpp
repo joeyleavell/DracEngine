@@ -73,10 +73,17 @@ namespace Ry
 				std::vector<Asset*> Results;
 				(*Factory)->LoadAssets(Reference, Results);
 
-				// Put the asset in the loaded assets directory
-				LoadedAssets.insert(Reference, Results.at(0));
+				if(Results.size() > 0)
+				{
+					// Put the asset in the loaded assets directory
+					LoadedAssets.insert(Reference, Results.at(0));
 
-				return Results.at(0);
+					return Results.at(0);
+				}
+				else
+				{
+					return nullptr;
+				}
 			}
 			else
 			{

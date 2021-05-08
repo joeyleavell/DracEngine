@@ -88,12 +88,68 @@ namespace Ry
 						MatRes->BindTexture("AlbedoMap", Ry::DefaultTexture);
 					}
 
-					MatRes->SetFloatConstant("Material", "UseNormalMap", 0.0f);
-					MatRes->SetFloatConstant("Material", "UseRoughnessMap", 0.0f);
-					MatRes->SetFloatConstant("Material", "UseMetallicMap", 0.0f);
-					MatRes->SetFloatConstant("Material", "UseAOMap", 0.0f);
+					if (Sec.Mat->NormalMap)
+					{
+						MatRes->SetFloatConstant("Material", "UseNormalMap", 1.0f);
+						MatRes->BindTexture("NormalMap", Sec.Mat->NormalMap);
+					}
+					else
+					{
+						// Don't use diffuse, bind default
+						MatRes->SetFloatConstant("Material", "UseNormalMap", 0.0f);
+						MatRes->BindTexture("NormalMap", Ry::DefaultTexture);
+					}
+
+					if (Sec.Mat->RoughnessMap)
+					{
+						MatRes->SetFloatConstant("Material", "UseRoughnessMap", 1.0f);
+						MatRes->BindTexture("RoughnessMap", Sec.Mat->RoughnessMap);
+					}
+					else
+					{
+						// Don't use diffuse, bind default
+						MatRes->SetFloatConstant("Material", "UseRoughnessMap", 0.0f);
+						MatRes->BindTexture("RoughnessMap", Ry::DefaultTexture);
+					}
+
+					if (Sec.Mat->MetallicMap)
+					{
+						MatRes->SetFloatConstant("Material", "UseMetallicMap", 1.0f);
+						MatRes->BindTexture("MetallicMap", Sec.Mat->MetallicMap);
+					}
+					else
+					{
+						// Don't use diffuse, bind default
+						MatRes->SetFloatConstant("Material", "UseMetallicMap", 0.0f);
+						MatRes->BindTexture("MetallicMap", Ry::DefaultTexture);
+					}
+
+					if (Sec.Mat->AOMap)
+					{
+						MatRes->SetFloatConstant("Material", "UseAOMap", 1.0f);
+						MatRes->BindTexture("AOMap", Sec.Mat->AOMap);
+					}
+					else
+					{
+						// Don't use diffuse, bind default
+						MatRes->SetFloatConstant("Material", "UseAOMap", 0.0f);
+						MatRes->BindTexture("AOMap", Ry::DefaultTexture);
+					}
+
+					if (Sec.Mat->EmissiveMap)
+					{
+						MatRes->SetFloatConstant("Material", "UseEmissiveMap", 1.0f);
+						MatRes->BindTexture("EmissiveMap", Sec.Mat->EmissiveMap);
+					}
+					else
+					{
+						// Don't use diffuse, bind default
+						MatRes->SetFloatConstant("Material", "UseEmissiveMap", 0.0f);
+						MatRes->BindTexture("EmissiveMap", Ry::DefaultTexture);
+					}
 
 					MatRes->SetMatConstant("Material", "Albedo", Sec.Mat->Albedo);
+					MatRes->SetMatConstant("Material", "Emissive", Sec.Mat->Emissive);
 					MatRes->SetFloatConstant("Material", "Roughness", Sec.Mat->Roughness);
 					MatRes->SetFloatConstant("Material", "Metalness", Sec.Mat->Metallic);
 				}

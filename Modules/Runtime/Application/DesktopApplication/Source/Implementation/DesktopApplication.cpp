@@ -26,6 +26,7 @@
 // Json
 #include "nlohmann/json.hpp"
 #include "Core/PlatformProcess.h"
+#include "Factory/FbxFactory.h"
 typedef nlohmann::json Json;
 
 namespace Ry
@@ -319,6 +320,7 @@ namespace Ry
 		// TODO: these should be moved
 		AssetMan->RegisterFactory("text", new Ry::TextFileFactory);
 		AssetMan->RegisterFactory("mesh/obj", new ObjMeshFactory);
+		AssetMan->RegisterFactory("mesh/fbx", new FbxFactory);
 		AssetMan->RegisterFactory("font/truetype", new TrueTypeFontFactory);
 		AssetMan->RegisterFactory("image", new TextureFactory);
 		AssetMan->RegisterFactory("sound", new AudioFactory);
