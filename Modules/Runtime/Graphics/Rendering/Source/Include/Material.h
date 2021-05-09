@@ -20,7 +20,7 @@ namespace Ry
 		/**
 		 * If the roughness map is null, this value is used instead.
 		 */
-		float Roughness = 0.01f;
+		float Roughness = 0.4f;
 
 		/**
 		 * If the metallic map is null, this value is used instead.

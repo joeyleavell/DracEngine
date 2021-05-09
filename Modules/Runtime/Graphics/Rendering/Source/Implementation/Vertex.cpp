@@ -20,7 +20,8 @@ namespace Ry
 	VertexFormat VF1P1C1UV = VertexFormat({pos, color, uv});
 	VertexFormat VF1P1C1N = VertexFormat({pos, color, normal});
 	VertexFormat VF1P1N1C = VertexFormat({pos, normal, color});
-
+	VertexFormat VF_P_UV_N_T_Bi = VertexFormat({pos, uv, normal, tangent, bitangent});
+	
 	bool VertexAttrib::operator==(const VertexAttrib& other)
 	{
 		return Name == other.Name && Size == other.Size;

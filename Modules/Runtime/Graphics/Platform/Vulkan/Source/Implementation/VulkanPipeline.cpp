@@ -26,16 +26,16 @@ namespace Ry
 	bool VulkanPipeline::CreateVertInputBinding(VkPipelineVertexInputStateCreateInfo& OutVertexInputState, Ry::ArrayList<VkVertexInputBindingDescription>& BindingDescriptions)
 	{
 		// Setup attribute array
-		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[CreateInfo.VertFormat.Attributes.GetSize()];
+		VkVertexInputAttributeDescription* VkAttributes = new VkVertexInputAttributeDescription[CreateInfo.VertFormat.NumAttributes()];
 		
 		VkVertexInputBindingDescription BindingDesc;
 		BindingDesc.binding = 0;
 		BindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
 		int32 Offset = 0;
-		for (int32 AttributeDescIndex = 0; AttributeDescIndex < CreateInfo.VertFormat.Attributes.GetSize(); AttributeDescIndex++)
+		for (int32 AttributeDescIndex = 0; AttributeDescIndex < CreateInfo.VertFormat.NumAttributes(); AttributeDescIndex++)
 		{
-			const Ry::VertexAttrib& VertAttrib = CreateInfo.VertFormat.Attributes[AttributeDescIndex];
+			const Ry::VertexAttrib& VertAttrib = CreateInfo.VertFormat.GetAttrib(AttributeDescIndex);
 
 			VkVertexInputAttributeDescription NewAttributeDesc;
 			NewAttributeDesc.binding = 0;
@@ -81,7 +81,7 @@ namespace Ry
 		OutVertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		OutVertexInputState.vertexBindingDescriptionCount = BindingDescriptions.GetSize();
 		OutVertexInputState.pVertexBindingDescriptions = BindingDescriptions.CopyData();
-		OutVertexInputState.vertexAttributeDescriptionCount = CreateInfo.VertFormat.Attributes.GetSize();
+		OutVertexInputState.vertexAttributeDescriptionCount = CreateInfo.VertFormat.NumAttributes();
 		OutVertexInputState.pVertexAttributeDescriptions = VkAttributes;
 
 		return true;

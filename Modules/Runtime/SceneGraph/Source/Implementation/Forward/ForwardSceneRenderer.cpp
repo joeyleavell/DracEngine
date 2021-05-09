@@ -146,7 +146,7 @@ namespace Ry
 				Ry::Vector3(1.0f, 1.0f, 1.0f),
 			};
 			
-			for(int light = 0; light < 7; light++)
+			for(int light = 0; light < 1; light++)
 			{
 				Float3 Forward = Ry::ForwardVector.RotatedVector(UpVector, 360.0f / 7 * light);
 				Forward.y = -0.2f;

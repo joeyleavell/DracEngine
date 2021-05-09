@@ -118,7 +118,7 @@ namespace Ry
 		float TotalDelete = 0.0f;
 
 		Ry::MeshData* MeshData = new Ry::MeshData;
-		MeshData->SetVertFormat(Ry::VF1P1UV1N);
+		MeshData->SetVertFormat(Ry::VF_P_UV_N_T_Bi);
 
 		std::vector<Ry::Vector3> OBJVertices;
 		std::vector<Ry::Vector3> OBJNormals;
@@ -389,6 +389,9 @@ namespace Ry
 		//std::cout << "generate%=" << (GenerateProf.get_duration_ms() / LoadTime) << " loadstring%=" << (LoadString.get_duration_ms() / LoadTime) << std::endl;
 		//std::cout << "delete%=" << (TotalDelete / LoadTime) << " loadstring%=" << (LoadString.get_duration_ms() / LoadTime) << std::endl;
 
+		// Calculate tangents at end
+		MeshData->CalculateTangents();
+		
 		AssetDst.push_back(new MeshAsset(MeshData));
 	}
 

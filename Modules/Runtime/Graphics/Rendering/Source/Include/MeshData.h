@@ -5,6 +5,7 @@
 #include "Data/ArrayList.h"
 #include "RenderingGen.h"
 #include "Vertex.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {
@@ -76,6 +77,11 @@ namespace Ry
 			VertexCount++;
 		}
 
+		void SetVertexElement(int32 Vertex, int32 Element, float Value)
+		{
+			Vertices[(uint64)Format.ElementCount * Vertex + Element] = Value;
+		}
+
 		float GetVertexElement(int32 Vertex, int32 Element)
 		{
 			return Vertices[(uint64)Format.ElementCount * Vertex + Element];
@@ -103,9 +109,9 @@ namespace Ry
 		{
 			int32 data_index = 0;
 
-			for (int32 i = 0; i < Format.Attributes.GetSize(); i++)
+			for (int32 i = 0; i < Format.NumAttributes(); i++)
 			{
-				VertexAttrib& Attribute = Format.Attributes[i];
+				const VertexAttrib& Attribute = Format.GetAttrib(i);
 
 				for (int32 j = 0; j < Attribute.Size; j++)
 				{
@@ -336,5 +342,177 @@ namespace Ry
 			SectionCount++;
 		}
 
+		void CalcTangent(int32 Index0, int32 Index1, int32 Index2, Ry::Vector3& OutTangent, Ry::Vector3& OutBiTangent)
+		{
+
+			Ry::Vector3 Pos0 = {
+				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 0),
+				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 1),
+				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 2)
+			};
+
+			Ry::Vector3 Pos1 = {
+				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 0),
+				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 1),
+				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 2)
+			};
+
+			Ry::Vector3 Pos2 = {
+				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 0),
+				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 1),
+				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 2)
+			};
+
+			Ry::Vector2 UV0 = {
+			VertData->GetVertexElement(Index0, VertData->Format.UVOffset + 0),
+			VertData->GetVertexElement(Index0, VertData->Format.UVOffset + 1)
+			};
+
+			Ry::Vector2 UV1 = {
+				VertData->GetVertexElement(Index1, VertData->Format.UVOffset + 0),
+				VertData->GetVertexElement(Index1, VertData->Format.UVOffset + 1)
+			};
+
+			Ry::Vector2 UV2 = {
+				VertData->GetVertexElement(Index2, VertData->Format.UVOffset + 0),
+				VertData->GetVertexElement(Index2, VertData->Format.UVOffset + 1)
+			};
+
+			Vector3 Edge1 = Pos1 - Pos0;
+			Vector3 Edge2 = Pos2 - Pos0;
+			Vector2 DeltaUV1 = UV1 - UV0;
+			Vector2 DeltaUV2 = UV2 - UV0;
+
+			float Det = 1.0f / (DeltaUV1.x * DeltaUV2.y - DeltaUV2.x * DeltaUV1.y);
+
+			OutTangent = {
+				Det * (DeltaUV2.y * Edge1.x - DeltaUV1.y * Edge2.x),
+				Det * (DeltaUV2.y * Edge1.y - DeltaUV1.y * Edge2.y),
+				Det * (DeltaUV2.y * Edge1.z - DeltaUV1.y * Edge2.z)
+			};
+
+			OutBiTangent = {
+				Det * (-DeltaUV2.x * Edge1.x + DeltaUV1.x * Edge2.x),
+				Det * (-DeltaUV2.x * Edge1.y + DeltaUV1.x * Edge2.y),
+				Det * (-DeltaUV2.x * Edge1.z + DeltaUV1.x * Edge2.z)
+			};
+
+		}
+
+		/**
+		 * Calculates tangents and bitangents for mesh.
+		 */
+		void CalculateTangents()
+		{
+			// Determine where tangent/bitangent/uv/normal offsets are
+			if(VertData->Format.PosOffset < 0)
+			{
+				Ry::Log->LogError("MeshData did not have position attribute when calculating tangents");
+				return;
+			}
+
+			if (VertData->Format.UVOffset < 0)
+			{
+				Ry::Log->LogError("MeshData did not have UV attribute when calculating tangents");
+				return;
+			}
+
+			if (VertData->Format.TangentOffset < 0)
+			{
+				Ry::Log->LogError("MeshData did not have tangent attribute when calculating tangents");
+				return;
+			}
+
+			if (VertData->Format.BiTangentOffset < 0)
+			{
+				Ry::Log->LogError("MeshData did not have bitangent attribute when calculating tangents");
+				return;
+			}
+
+			if(VertData->IndexCount % 3 != 0)
+			{
+				Ry::Log->LogError("MeshData indices was not a multiple of 3, can't generate tangents");
+				return;
+			}
+
+			// Maintain each verts tangents and bitangents so we can average them at the end
+			Ry::Map<int32, Ry::ArrayList<Vector3>> Tangents;
+			Ry::Map<int32, Ry::ArrayList<Vector3>> BiTangents;
+
+			for(int32 Triangle = 0; Triangle < VertData->IndexCount; Triangle += 3)
+			{
+				int Index0 = VertData->Indices[Triangle + 0];
+				int Index1 = VertData->Indices[Triangle + 1];
+				int Index2 = VertData->Indices[Triangle + 2];
+
+				// Calculate all three tangents
+				Ry::Vector3 Tangent0, BiTangent0;
+				Ry::Vector3 Tangent1, BiTangent1;
+				Ry::Vector3 Tangent2, BiTangent2;
+
+				CalcTangent(Index0, Index1, Index2, Tangent0, BiTangent0);
+				CalcTangent(Index1, Index0, Index2, Tangent1, BiTangent1);
+				CalcTangent(Index2, Index0, Index1, Tangent2, BiTangent2);
+
+				// Add the tangents/bi-tangents to the map
+				if (!Tangents.contains(Index0))
+					Tangents.insert(Index0, Ry::ArrayList<Vector3>());
+				if (!Tangents.contains(Index1))
+					Tangents.insert(Index1, Ry::ArrayList<Vector3>());
+				if (!Tangents.contains(Index2))
+					Tangents.insert(Index2, Ry::ArrayList<Vector3>());
+
+				if (!BiTangents.contains(Index0))
+					BiTangents.insert(Index0, Ry::ArrayList<Vector3>());
+				if (!BiTangents.contains(Index1))
+					BiTangents.insert(Index1, Ry::ArrayList<Vector3>());
+				if (!BiTangents.contains(Index2))
+					BiTangents.insert(Index2, Ry::ArrayList<Vector3>());
+
+				Tangents.get(Index0)->Add(Tangent0);
+				Tangents.get(Index1)->Add(Tangent1);
+				Tangents.get(Index2)->Add(Tangent2);
+
+				BiTangents.get(Index0)->Add(BiTangent0);
+				BiTangents.get(Index1)->Add(BiTangent1);
+				BiTangents.get(Index2)->Add(BiTangent2);
+
+			}
+
+			// Average out tangents/bitangents now
+			int32 VertCount = VertData->VertexCount;
+			for(int32 Vert = 0; Vert < VertCount; Vert++)
+			{
+				Ry::ArrayList<Vector3> TangentArray = *Tangents.get(Vert);
+				Ry::ArrayList<Vector3> BiTangentArray = *BiTangents.get(Vert);
+
+				Vector3 AvgTangent, AvgBiTangent;
+
+				for(const Vector3& Tangent : TangentArray)
+				{
+					AvgTangent += Tangent;
+				}
+
+				for (const Vector3& BiTangent : BiTangentArray)
+				{
+					AvgBiTangent += BiTangent;
+				}
+
+				AvgTangent   *= 1.0f / TangentArray.GetSize();
+				AvgBiTangent *= 1.0f / BiTangentArray.GetSize();
+
+				// Set the vert tangent and bi-tangent elements
+				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 0, AvgTangent.x);
+				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 1, AvgTangent.y);
+				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 2, AvgTangent.z);
+
+				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 0, AvgBiTangent.x);
+				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 1, AvgBiTangent.y);
+				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 2, AvgBiTangent.z);
+			}
+			
+		}
+
 	};
+
 }

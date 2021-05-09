@@ -63,6 +63,9 @@ struct PixelInput
 	float2 VertUV : TEXCOORD;
 	float3 VertNormal : NORMAL;	
 	float4 VertWorld : POSITION;
+	float3x3 TBN : TANGENT;
+	float3 Tangent : TANGENT1;
+	float3 BiTan : BINORMAL;
 };
 
 struct PixelOutput
@@ -195,9 +198,10 @@ PixelOutput main(PixelInput In)
 	float4 AlbedoMapValue = AlbedoMap.Sample(AlbedoMapSampler, In.VertUV);
 	float4 AlbedoColor = UseAlbedoMap * AlbedoMapValue + mul(1.0f - UseAlbedoMap, float4(Albedo, 1.0f));
 	
-	float4 NormalMapValue = NormalMap.Sample(NormalMapSampler, In.VertUV);
-	float4 NormalColor = mul(UseNormalMap, NormalMapValue) + (1.0f - UseNormalMap) * float4(0.0f, 0.0f, 1.0f, 1.0f);
-	float3 RelativeNormal = NormalColor.rgb;
+	float4 NormalMapColor = NormalMap.Sample(NormalMapSampler, In.VertUV);
+	float3 TangentSpaceNormal = NormalMapColor.rgb * 2.0f - 1.0f;
+	float3 NormalMapWorld = normalize(mul(In.TBN, TangentSpaceNormal));
+	float3 WorldNormal = UseNormalMap * NormalMapWorld + (1.0f - UseNormalMap) * float4(In.VertNormal, 0.0f);
 	
 	float RoughMapValue = RoughnessMap.Sample(RoughnessMapSampler, In.VertUV).r;
 	float RoughnessValue = UseRoughnessMap * RoughMapValue + (1.0f - UseRoughnessMap) * Roughness;
@@ -222,7 +226,7 @@ PixelOutput main(PixelInput In)
 		OutRadiance += CalcPointLightPBR(
 			TheLight, 
 			In.VertWorld, 
-			In.VertNormal, 
+			WorldNormal, 
 			AlbedoColor,
 			RoughnessValue,
 			MetallicValue
@@ -242,6 +246,10 @@ PixelOutput main(PixelInput In)
 	//OutRadiance = AlbedoColor.rgb;
 		
 	Out.PixelColor = float4(OutRadiance, 1.0f);
-			
+	
+	//Out.PixelColor.r = max(WorldNormal.r, 0.0f);
+	//Out.PixelColor.g = max(WorldNormal.g, 0.0f);
+	//Out.PixelColor.b = max(WorldNormal.b, 0.0f);
+					
 	return Out;
 }

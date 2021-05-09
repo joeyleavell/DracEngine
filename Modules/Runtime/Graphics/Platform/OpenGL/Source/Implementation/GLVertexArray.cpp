@@ -7,7 +7,7 @@ namespace Ry
 	GLVertexArray::GLVertexArray(const VertexFormat& Format):
 	VertexArray(Format)
 	{
-		this->Attributes = new VertexAttribPtr[Format.Attributes.GetSize()];
+		this->Attributes = new VertexAttribPtr[Format.NumAttributes()];
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -21,9 +21,9 @@ namespace Ry
 
 			int32 offset = 0;
 
-			for (int attrib_index = 0; attrib_index < Format.Attributes.GetSize(); attrib_index++)
+			for (int attrib_index = 0; attrib_index < Format.NumAttributes(); attrib_index++)
 			{
-				VertexAttrib& attribute = Format.Attributes[attrib_index];
+				const VertexAttrib& attribute = Format.GetAttrib(attrib_index);
 
 				VertexAttribPtr attribute_ptr;
 				attribute_ptr.attrib = attribute;
@@ -42,7 +42,7 @@ namespace Ry
 			}
 
 			// Set the stride for all vertex attributes.
-			for (int32 i = 0; i <= Format.Attributes.GetSize(); i++)
+			for (int32 i = 0; i <= Format.NumAttributes(); i++)
 			{
 				glBindVertexBuffer(i, vbo, 0, offset);
 			}
