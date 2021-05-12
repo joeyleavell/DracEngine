@@ -6,8 +6,8 @@
 namespace Ry
 {
 
-	class UI_MODULE VerticalLayout : public PanelWidget
-	{		
+	class UI_MODULE HorizontalLayout : public PanelWidget
+	{
 	public:
 
 		struct Slot
@@ -18,20 +18,9 @@ namespace Ry
 			float TopMargin;
 			float BottomMargin;
 		};
-
-		void AppendSlot(Ry::Widget& Widget) override
-		{
-			PanelWidget::AppendSlot(Widget);
-
-			// Create widget
-			Slot PanelSlot;
-			PanelSlot.Widget = &Widget;
-
-			ChildrenSlots.Add(PanelSlot);
-		}
 		
 		/**
-		 * Arrange widgets vertically.
+		 * Arrange widgets horizontally.
 		 */
 		virtual void Arrange() override
 		{
@@ -47,7 +36,7 @@ namespace Ry
 				// Set the widget's relative position
 				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(CurrentY));
 
-				CurrentY += static_cast<int32>(ContentSize.Height + SlotMargin);
+				CurrentX += static_cast<int32>(ContentSize.Width + SlotMargin);
 			}
 		}
 
@@ -57,33 +46,45 @@ namespace Ry
 			Result.Width = 0;
 			Result.Height = 0;
 
-			// Width is 2 * Margin + MaxChildWidth
+			// Height is 2 * Margin + MaxChildHeight
 
 			if (!ChildrenSlots.IsEmpty())
 			{
 				// Initial margins
-				Result.Width = static_cast<int32>(2 * SlotMargin);
-				Result.Height = static_cast<int32>(SlotMargin);
+				Result.Width = static_cast<int32>(SlotMargin);
+				Result.Height = static_cast<int32>(2 * SlotMargin);
 
-				int32 MaxChildWidth = 0;
+				int32 MaxChildHeight = 0;
 
 				for (const Slot& Slot : ChildrenSlots)
 				{
 					SizeType WidgetSize = Slot.Widget->ComputeSize();
 
-					if (WidgetSize.Width > MaxChildWidth)
+					if (WidgetSize.Height > MaxChildHeight)
 					{
-						MaxChildWidth = WidgetSize.Width;
+						MaxChildHeight = WidgetSize.Height;
 					}
 
-					Result.Height += static_cast<int32>(WidgetSize.Height + SlotMargin);
+					Result.Width += static_cast<int32>(WidgetSize.Width + SlotMargin);
 				}
 
-				Result.Width += MaxChildWidth;
+				Result.Height += MaxChildHeight;
 			}
 
 			return Result;
 		}
+
+		void AppendSlot(Ry::Widget& Widget) override
+		{
+			PanelWidget::AppendSlot(Widget);
+
+			// Create widget
+			Slot PanelSlot;
+			PanelSlot.Widget = &Widget;
+
+			ChildrenSlots.Add(PanelSlot);
+		}
+
 	private:
 
 		Ry::ArrayList<Slot> ChildrenSlots;

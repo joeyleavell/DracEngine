@@ -38,8 +38,8 @@ namespace Ry
 	extern RENDERING_MODULE UniquePtr<RenderPipeline> ObjectPipeline;
 
 	// Standard batchers
-	extern RENDERING_MODULE class Batch* ShapeBatcher;
-	extern RENDERING_MODULE class Batch* TextBatcher;
+	// extern RENDERING_MODULE class Batch* ShapeBatcher;
+	// extern RENDERING_MODULE class Batch* TextBatcher;
 
 	// Shader management
 	class Shader;

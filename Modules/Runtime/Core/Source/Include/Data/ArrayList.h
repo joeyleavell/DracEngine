@@ -185,12 +185,12 @@ namespace Ry
 			Size++;
 		}
 
-		bool Contains(const T& Item)
+		bool Contains(const T& Item) const
 		{
 			return IndexOf(Item) >= 0;
 		}
 
-		int32 IndexOf(const T& Item)
+		int32 IndexOf(const T& Item) const
 		{
 			// Search for the item
 			for (int32 Index = 0; Index < Size; Index++)

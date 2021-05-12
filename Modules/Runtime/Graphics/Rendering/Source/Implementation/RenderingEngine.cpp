@@ -26,8 +26,8 @@ namespace Ry
 	Ry::Map<String, Ry::Shader*> CompiledShaders;
 
 	// Batchers
-	Batch* TextBatcher = nullptr;
-	Batch* ShapeBatcher = nullptr;
+	//Batch* TextBatcher = nullptr;
+	//Batch* ShapeBatcher = nullptr;
 	//TextureBatch* TextureBatcher = nullptr;
 	//ShapeBatch* ShapeBatcher = nullptr;
 	
@@ -125,8 +125,8 @@ namespace Ry
 		DefaultTexture->DeleteTexture();
 		delete DefaultTexture;
 		
-		delete ShapeBatcher;
-		delete TextBatcher;
+		// delete ShapeBatcher;
+		// delete TextBatcher;
 		//delete ShapeBatcher;
 		//delete TextureBatcher;
 	}

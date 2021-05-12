@@ -28,12 +28,26 @@ namespace Ry
 			return this;
 		}
 
+		void SetTextBatch(Batch* Text)
+		{
+			this->TextBatch = Text;
+		}
+
+		void SetShapeBatch(Batch* Shape)
+		{
+			this->ShapeBatch = Shape;
+		}
+
 		/**
 		 * Adds a widget to the root-level of this user interface.
 		 */
 		void AddRoot(Ry::Widget& Widget)
 		{
 			RootWidgets.Add(&Widget);
+
+			// Set the widget's batches
+			Widget.SetShapeBatch(ShapeBatch);
+			Widget.SetTextBatch(TextBatch);
 
 			Widget.Show();
 			
@@ -46,17 +60,20 @@ namespace Ry
 		void Render()
 		{
 			// Render the UI to the screen
-			Ry::ShapeBatcher->Render();
-
-			Ry::TextPass->BeginPass();
-			{
-				Ry::TextBatcher->Render();
-			}
-			Ry::TextPass->EndPass();
+			// Ry::ShapeBatcher->Render();
+			//
+			// Ry::TextPass->BeginPass();
+			// {
+			// 	Ry::TextBatcher->Render();
+			// }
+			// Ry::TextPass->EndPass();
 
 		}
 
 	private:
+
+		Ry::Batch* ShapeBatch;
+		Ry::Batch* TextBatch;
 
 		void ReDraw()
 		{
@@ -69,8 +86,8 @@ namespace Ry
 				RootWidget->Draw();
 			}
 
-			ShapeBatcher->Update();
-			TextBatcher->Update();
+			ShapeBatch->Update();
+			TextBatch->Update();
 		}
 
 		Ry::ArrayList<Ry::Widget*> RootWidgets;

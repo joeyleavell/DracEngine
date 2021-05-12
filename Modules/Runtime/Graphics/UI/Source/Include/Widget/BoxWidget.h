@@ -342,6 +342,43 @@ namespace Ry
 			return *this;
 		}
 
+		void SetShapeBatch(Batch* Shape) override
+		{
+			Widget::SetShapeBatch(Shape);
+
+			if(Child)
+			{
+				Child->SetShapeBatch(Shape);
+			}
+
+			if(Style.Default.IsValid())
+			{
+				Style.Default->ShapeBatch = Shape;
+			}
+
+			if(Style.Hovered.IsValid())
+			{
+				Style.Hovered->ShapeBatch = Shape;
+			}
+
+			if(Style.Pressed.IsValid())
+			{
+				Style.Pressed->ShapeBatch = Shape;
+			}
+
+		}
+
+		void SetTextBatch(Batch* Text) override
+		{
+			Widget::SetTextBatch(Text);
+
+			if(Child)
+			{
+				Child->SetTextBatch(Text);
+			}
+
+		}
+
 	private:
 
 		VAlign ContentVAlign;

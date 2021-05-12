@@ -8,16 +8,6 @@
 namespace Ry
 {
 
-	struct Slot
-	{
-		Ry::Widget* Widget;
-		float LeftMargin;
-		float RightMargin;
-		float TopMargin;
-		float BottomMargin;
-
-	};
-
 	class UI_MODULE PanelWidget : public Widget
 	{
 	public:
@@ -48,76 +38,38 @@ namespace Ry
 			return *this;
 		}
 
-		SizeType ComputeSize() const override
+		virtual void AppendSlot(Ry::Widget& Widget)
 		{
-			SizeType Result;
-			Result.Width = 0;
-			Result.Height = 0;
-
-			// Width is 2 * Margin + MaxChildWidth
-
-			if (!PanelSlots.IsEmpty())
-			{
-				// Initial margins
-				Result.Width = static_cast<int32>(2 * SlotMargin);
-				Result.Height = static_cast<int32>(SlotMargin);
-
-				int32 MaxChildWidth = 0;
-
-				for (const Slot& Slot : PanelSlots)
-				{
-					SizeType WidgetSize = Slot.Widget->ComputeSize();
-
-					if (WidgetSize.Width > MaxChildWidth)
-					{
-						MaxChildWidth = WidgetSize.Width;
-					}
-
-					Result.Height += static_cast<int32>(WidgetSize.Height + SlotMargin);
-				}
-
-				Result.Width += MaxChildWidth;
-			}
-
-			return Result;
-		}
-
-		void AppendSlot(Ry::Widget& Widget)
-		{
-			// Create widget
-			Slot PanelSlot;
-			PanelSlot.Widget = &Widget;
-
 			// Listen for size changes
 			Widget.SizeDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
 
-			PanelSlots.Add(PanelSlot);
+			Children.Add(&Widget);
 
 			// Set the widget's parent
 			Widget.SetParent(this);
 		}
 
-		void Show() override
+		virtual void Show() override
 		{
-			for (const Slot& Slot : PanelSlots)
+			for (Widget* Child : Children)
 			{
-				Slot.Widget->Show();
+				Child->Show();
 			}
 		}
 
-		void Hide() override
+		virtual void Hide() override
 		{
-			for (const Slot& Slot : PanelSlots)
+			for (Widget* Child : Children)
 			{
-				Slot.Widget->Hide();
+				Child->Hide();
 			}
 		}
 
-		void Draw() override
+		virtual void Draw() override
 		{
-			for (const Slot& Slot : PanelSlots)
+			for (Widget* Child : Children)
 			{
-				Slot.Widget->Draw();
+				Child->Draw();
 			}
 		}
 
@@ -128,9 +80,29 @@ namespace Ry
 			return *this;
 		}
 
+		void SetShapeBatch(Batch* Shape) override
+		{
+			Widget::SetShapeBatch(Shape);
+
+			for(Widget* Sl : Children)
+			{
+				Sl->SetShapeBatch(Shape);
+			}
+		}
+
+		void SetTextBatch(Batch* Text) override
+		{
+			Widget::SetTextBatch(Text);
+
+			for (Widget* Sl : Children)
+			{
+				Sl->SetTextBatch(Text);
+			}
+		}
+
 	protected:
 
-		Ry::ArrayList<Slot> PanelSlots;
+		Ry::ArrayList<Widget*> Children;
 	};
 
 }

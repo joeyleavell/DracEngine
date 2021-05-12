@@ -54,12 +54,12 @@ namespace Ry
 
 		void Show() override
 		{
-			TextBatcher->AddItemSet(ItemSet);
+			TextBatch->AddItemSet(ItemSet);
 		}
 
 		void Hide() override
 		{
-			TextBatcher->RemoveItemSet(ItemSet);
+			TextBatch->RemoveItemSet(ItemSet);
 		}
 
 		void Draw() override
@@ -67,7 +67,7 @@ namespace Ry
 			Point Abs = GetAbsolutePosition();
 			Ry::BatchText(ItemSet, Style.TextColor, Style.Font, Text, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
 
-			TextBatcher->SetTexture(Style.Font->GetAtlasTexture());
+			TextBatch->SetTexture(Style.Font->GetAtlasTexture());
 		}
 
 	private:

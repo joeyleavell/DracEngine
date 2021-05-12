@@ -9,6 +9,8 @@
 
 namespace Ry
 {
+
+	class Batch;
 	
 	struct UI_MODULE SizeType
 	{
@@ -71,7 +73,14 @@ namespace Ry
 		 */
 		MulticastDelegate<> SizeDirty;
 
-		Widget() : RelativePosition{ 0, 0 }, MaxSize{0, 0}, Parent(nullptr) {};
+		Widget() :
+		RelativePosition{ 0, 0 },
+		MaxSize{0, 0},
+		Parent(nullptr),
+		ShapeBatch(nullptr),
+		TextBatch(nullptr)
+		{};
+		
 		virtual ~Widget() = default;
 
 		Point GetRelativePosition() const
@@ -117,6 +126,16 @@ namespace Ry
 			return *this;
 		}
 
+		virtual void SetShapeBatch(Batch* Shape)
+		{
+			this->ShapeBatch = Shape;
+		}
+
+		virtual void SetTextBatch(Batch* Text)
+		{
+			this->TextBatch = Text;
+		}
+
 		virtual void Arrange()
 		{
 
@@ -132,6 +151,9 @@ namespace Ry
 		SizeType CachedSize;
 		Widget* Parent;
 		SizeType MaxSize;
+
+		Batch* ShapeBatch;
+		Batch* TextBatch;
 
 	private:
 		Point RelativePosition;

@@ -81,5 +81,34 @@ namespace Ry
 		}
 	};
 
+	class UI_MODULE StyleSet
+	{
+	public:
+
+		StyleSet();
+		virtual ~StyleSet();
+
+		void AddTextStyle(Ry::String Name, const TextStyle& TextStyle);
+		void AddBoxStyle(Ry::String Name, const BoxStyle& BoxStyle);
+
+		void RemoveTextStyle(Ry::String Name);
+		void RemoveBoxStyle(Ry::String Name);
+
+		TextStyle& GetTextStyle(Ry::String Name);
+		BoxStyle& GetBoxStyle(Ry::String Name);
+
+	private:
+
+		Ry::Map<Ry::String, TextStyle> TextStyles;
+		Ry::Map<Ry::String, BoxStyle> BoxStyles;
+
+	};
+
+	extern UI_MODULE Map<Ry::String, StyleSet*> RegisteredStyles;
+
+	void RegisterStyle(Ry::String Name, StyleSet* Set);
+	void UnregisterStyle(Ry::String Name);
+
+	StyleSet* GetStyle(Ry::String Name);
 	
 }

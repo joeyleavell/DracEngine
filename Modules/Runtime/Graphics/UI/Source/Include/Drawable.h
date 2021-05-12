@@ -12,6 +12,8 @@ namespace Ry
 	{
 	public:
 
+		Batch* ShapeBatch = nullptr;
+
 		Drawable() = default;
 		virtual ~Drawable() = default;
 
@@ -63,12 +65,12 @@ namespace Ry
 
 		void Show() override
 		{
-			ShapeBatcher->AddItemSet(ItemSet);
+			ShapeBatch->AddItemSet(ItemSet);
 		}
 
 		void Hide() override
 		{
-			ShapeBatcher->RemoveItemSet(ItemSet);
+			ShapeBatch->RemoveItemSet(ItemSet);
 		}
 
 		void Draw(float X, float Y, float Width, float Height) override

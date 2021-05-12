@@ -458,7 +458,7 @@ namespace Ry
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);		
 		int32 FrameIndex = VkSC->GetCurrentImageIndex();
 
-		CORE_ASSERT(FrameIndex >= 0);
+		//CORE_ASSERT(FrameIndex >= 0);
 
 		if (DirtyImages.Contains(FrameIndex))
 		{
