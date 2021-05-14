@@ -4,12 +4,12 @@ namespace Ry
 {
 
 	// todo: make a macro for these?
-	VertexAttrib pos = VertexAttrib("a_pos", 3);
-	VertexAttrib color = VertexAttrib("a_color", 4);
-	VertexAttrib uv = VertexAttrib("a_tex_coord", 2); 
-	VertexAttrib normal = VertexAttrib("a_normal", 3);
-	VertexAttrib tangent = VertexAttrib("a_tangent", 3);
-	VertexAttrib bitangent = VertexAttrib("a_bitangent", 3);
+	VertexAttrib pos = VertexAttrib("VertPos", 3);
+	VertexAttrib color = VertexAttrib("VertColor", 4);
+	VertexAttrib uv = VertexAttrib("VertUV", 2); 
+	VertexAttrib normal = VertexAttrib("VertNormal", 3);
+	VertexAttrib tangent = VertexAttrib("VertTangent", 3);
+	VertexAttrib bitangent = VertexAttrib("VertBiTangent", 3);
 
 	VertexFormat VF1P = VertexFormat({pos});
 	VertexFormat VF1P1C = VertexFormat({pos, color});

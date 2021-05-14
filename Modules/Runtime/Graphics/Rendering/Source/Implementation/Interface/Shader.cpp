@@ -115,7 +115,7 @@ namespace Ry
 			NewAttrib.Size = Var.GetVectorElementCount();
 			
 			VertFormat.AddAttribute(NewAttrib);
-			VertFormat.ElementCount += NewAttrib.Size;
+			//VertFormat.GetElementCount() += NewAttrib.Size;
 		}
 	}
 

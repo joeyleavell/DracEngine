@@ -114,7 +114,7 @@ namespace Ry
 			float VertData[30];
 			Vert->Pack(VertData);
 
-			for(int32 Element = 0; Element < Format.ElementCount; Element++)
+			for(int32 Element = 0; Element < Format.GetElementCount(); Element++)
 			{
 				Data.Add(VertData[Element]);
 			}
@@ -213,7 +213,7 @@ namespace Ry
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader* Shad = nullptr, bool bTexture = false);
+		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, Ry::Shader* Shad = nullptr, bool bTexture = false);
 		
 		void AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Texture = nullptr, int32 Layer = 0);
 		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Texture* Texture = nullptr, int32 Layer = 0);

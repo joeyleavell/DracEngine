@@ -77,7 +77,7 @@ namespace Ry
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			{
-				glBufferData(GL_ARRAY_BUFFER, 4 * Verts * VFormat.ElementCount, VertData, HintToGL(DataHint));
+				glBufferData(GL_ARRAY_BUFFER, 4 * Verts * VFormat.GetElementCount(), VertData, HintToGL(DataHint));
 			}
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}

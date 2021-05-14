@@ -79,12 +79,12 @@ namespace Ry
 
 		void SetVertexElement(int32 Vertex, int32 Element, float Value)
 		{
-			Vertices[(uint64)Format.ElementCount * Vertex + Element] = Value;
+			Vertices[(uint64)Format.GetElementCount() * Vertex + Element] = Value;
 		}
 
 		float GetVertexElement(int32 Vertex, int32 Element)
 		{
-			return Vertices[(uint64)Format.ElementCount * Vertex + Element];
+			return Vertices[(uint64)Format.GetElementCount() * Vertex + Element];
 		}
 
 		/**
@@ -97,7 +97,7 @@ namespace Ry
 			float data[30];
 			Vertex->Pack(data);
 
-			for (int32 i = 0; i < Format.ElementCount; i++)
+			for (int32 i = 0; i < Format.GetElementCount(); i++)
 			{
 				Vertices.Add(data[i]);
 			}
@@ -344,38 +344,40 @@ namespace Ry
 
 		void CalcTangent(int32 Index0, int32 Index1, int32 Index2, Ry::Vector3& OutTangent, Ry::Vector3& OutBiTangent)
 		{
+			int32 PosOffset = VertData->Format.GetPosOffset();
+			int32 UVOffset  = VertData->Format.GetUVOffset();
 
 			Ry::Vector3 Pos0 = {
-				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 0),
-				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 1),
-				VertData->GetVertexElement(Index0, VertData->Format.PosOffset + 2)
+				VertData->GetVertexElement(Index0, PosOffset + 0),
+				VertData->GetVertexElement(Index0, PosOffset + 1),
+				VertData->GetVertexElement(Index0, PosOffset + 2)
 			};
 
 			Ry::Vector3 Pos1 = {
-				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 0),
-				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 1),
-				VertData->GetVertexElement(Index1, VertData->Format.PosOffset + 2)
+				VertData->GetVertexElement(Index1, PosOffset + 0),
+				VertData->GetVertexElement(Index1, PosOffset + 1),
+				VertData->GetVertexElement(Index1, PosOffset + 2)
 			};
 
 			Ry::Vector3 Pos2 = {
-				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 0),
-				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 1),
-				VertData->GetVertexElement(Index2, VertData->Format.PosOffset + 2)
+				VertData->GetVertexElement(Index2, PosOffset + 0),
+				VertData->GetVertexElement(Index2, PosOffset + 1),
+				VertData->GetVertexElement(Index2, PosOffset + 2)
 			};
 
 			Ry::Vector2 UV0 = {
-			VertData->GetVertexElement(Index0, VertData->Format.UVOffset + 0),
-			VertData->GetVertexElement(Index0, VertData->Format.UVOffset + 1)
+			VertData->GetVertexElement(Index0, UVOffset + 0),
+			VertData->GetVertexElement(Index0, UVOffset + 1)
 			};
 
 			Ry::Vector2 UV1 = {
-				VertData->GetVertexElement(Index1, VertData->Format.UVOffset + 0),
-				VertData->GetVertexElement(Index1, VertData->Format.UVOffset + 1)
+				VertData->GetVertexElement(Index1, UVOffset + 0),
+				VertData->GetVertexElement(Index1, UVOffset + 1)
 			};
 
 			Ry::Vector2 UV2 = {
-				VertData->GetVertexElement(Index2, VertData->Format.UVOffset + 0),
-				VertData->GetVertexElement(Index2, VertData->Format.UVOffset + 1)
+				VertData->GetVertexElement(Index2, UVOffset + 0),
+				VertData->GetVertexElement(Index2, UVOffset + 1)
 			};
 
 			Vector3 Edge1 = Pos1 - Pos0;
@@ -404,26 +406,31 @@ namespace Ry
 		 */
 		void CalculateTangents()
 		{
+			int32 PosOffset = VertData->Format.GetPosOffset();
+			int32 UVOffset = VertData->Format.GetUVOffset();
+			int32 TangentOffset = VertData->Format.GetTangentOffset();
+			int32 BiTangentOffset = VertData->Format.GetBiTangentOffset();
+
 			// Determine where tangent/bitangent/uv/normal offsets are
-			if(VertData->Format.PosOffset < 0)
+			if(PosOffset < 0)
 			{
 				Ry::Log->LogError("MeshData did not have position attribute when calculating tangents");
 				return;
 			}
 
-			if (VertData->Format.UVOffset < 0)
+			if (UVOffset < 0)
 			{
 				Ry::Log->LogError("MeshData did not have UV attribute when calculating tangents");
 				return;
 			}
 
-			if (VertData->Format.TangentOffset < 0)
+			if (TangentOffset < 0)
 			{
 				Ry::Log->LogError("MeshData did not have tangent attribute when calculating tangents");
 				return;
 			}
 
-			if (VertData->Format.BiTangentOffset < 0)
+			if (BiTangentOffset < 0)
 			{
 				Ry::Log->LogError("MeshData did not have bitangent attribute when calculating tangents");
 				return;
@@ -502,13 +509,13 @@ namespace Ry
 				AvgBiTangent *= 1.0f / BiTangentArray.GetSize();
 
 				// Set the vert tangent and bi-tangent elements
-				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 0, AvgTangent.x);
-				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 1, AvgTangent.y);
-				VertData->SetVertexElement(Vert, VertData->Format.TangentOffset + 2, AvgTangent.z);
+				VertData->SetVertexElement(Vert, TangentOffset + 0, AvgTangent.x);
+				VertData->SetVertexElement(Vert, TangentOffset + 1, AvgTangent.y);
+				VertData->SetVertexElement(Vert, TangentOffset + 2, AvgTangent.z);
 
-				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 0, AvgBiTangent.x);
-				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 1, AvgBiTangent.y);
-				VertData->SetVertexElement(Vert, VertData->Format.BiTangentOffset + 2, AvgBiTangent.z);
+				VertData->SetVertexElement(Vert, BiTangentOffset + 0, AvgBiTangent.x);
+				VertData->SetVertexElement(Vert, BiTangentOffset + 1, AvgBiTangent.y);
+				VertData->SetVertexElement(Vert, BiTangentOffset + 2, AvgBiTangent.z);
 			}
 			
 		}

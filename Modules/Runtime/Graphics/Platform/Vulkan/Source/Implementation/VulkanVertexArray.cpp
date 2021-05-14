@@ -22,7 +22,7 @@ namespace Ry
 	void VulkanVertexArray::PushVertexData(float* Data, uint32 Vertices)
 	{
 		// The amount of data that's trying to be inserted
-		uint32 Size = Vertices * Format.ElementCount * sizeof(float);
+		uint32 Size = Vertices * Format.GetElementCount() * sizeof(float);
 
 		if(StagingVertexBuffer && Size > StagingVertexBuffer->GetBufferSize())
 		{
@@ -44,7 +44,7 @@ namespace Ry
 		if(StagingVertexBuffer && DeviceVertexBuffer)
 		{
 			// Map the memory to the staging buffer
-			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.ElementCount);
+			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.GetElementCount());
 
 			TransferStagedToDevice(Size, StagingVertexBuffer->GetBufferObject(), DeviceVertexBuffer->GetBufferObject());
 		}

@@ -199,14 +199,6 @@ namespace Ry
 	{
 	public:
 
-		int32 ElementCount    = 0;
-		int32 PosOffset       = -1;
-		int32 UVOffset        = -1;
-		int32 NormalOffset    = -1;
-		int32 TangentOffset   = -1;
-		int32 BiTangentOffset = -1;
-		int32 ColorOffset     = -1;
-
 		VertexFormat()
 		{
 		}
@@ -240,6 +232,41 @@ namespace Ry
 			this->TangentOffset = Forward.TangentOffset;
 			this->BiTangentOffset = Forward.BiTangentOffset;
 			this->ColorOffset = Forward.ColorOffset;
+		}
+
+		int32 GetElementCount()
+		{
+			return ElementCount;
+		}
+
+		int32 GetPosOffset()
+		{
+			return PosOffset;
+		}
+
+		int32 GetColorOffset()
+		{
+			return ColorOffset;
+		}
+
+		int32 GetNormalOffset()
+		{
+			return NormalOffset;
+		}
+
+		int32 GetUVOffset()
+		{
+			return UVOffset;
+		}
+
+		int32 GetTangentOffset()
+		{
+			return TangentOffset;
+		}
+
+		int32 GetBiTangentOffset()
+		{
+			return BiTangentOffset;
 		}
 
 		int32 NumAttributes() const
@@ -282,6 +309,15 @@ namespace Ry
 		}
 
 	private:
+
+		int32 ElementCount = 0;
+		int32 PosOffset = -1;
+		int32 UVOffset = -1;
+		int32 NormalOffset = -1;
+		int32 TangentOffset = -1;
+		int32 BiTangentOffset = -1;
+		int32 ColorOffset = -1;
+
 
 		Ry::ArrayList<VertexAttrib> Attributes;
 
@@ -351,7 +387,7 @@ namespace Ry
 					ColorOffset = ElementCount;
 				}
 
-				ElementCount += Attributes[i].Size;
+				ElementCount += Attrib.Size;
 			}
 		}
 

@@ -129,9 +129,9 @@ namespace Ry
 			InitLogger();
 			InitFileSystem();
 			InitWindowing();
+			InitWindow();
 			InitRenderAPI();
 			InitAssetSystem();
-			InitWindow();
 
 			TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
 			Texture* Tex = Asset->CreateRuntimeTexture();
@@ -150,9 +150,9 @@ namespace Ry
 			Shader* UIText = GetShader("Font");
 			Shader* UITexture = GetShader("Texture");
 
-			ShapeBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1C, UIShader, false);
-			TextBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UIText, true);
-			TextureBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UITexture, true);
+			ShapeBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), UIShader, false);
+			TextBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), UIText, true);
+			TextureBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), UITexture, true);
 
 			TextureBatch->AddItem(TextureItem, Tex);
 			TextureBatch->Update();
@@ -182,7 +182,7 @@ namespace Ry
 			];
 
 
-			for(int32 Slot = 0; Slot < 1; Slot ++)
+			for(int32 Slot = 0; Slot < 100; Slot ++)
 			{				
 				Grid->AppendSlot(
 					NewWidget(Ry::BoxWidget)

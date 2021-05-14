@@ -432,6 +432,12 @@ namespace Ry
 				}
 
 				ShaderVariable RefInputVar;
+
+				if(Var->name)
+				{
+					RefInputVar.Name = Var->name;
+				}
+				
 				if(TryReflectTypeDesc(Var->type_description, RefInputVar))
 				{
 					OutReflectionData.AddInputVariable(RefInputVar);

@@ -279,7 +279,7 @@ namespace Ry
 		assert(VkRenderPass != nullptr);
 		assert(VkShader != nullptr);
 
-		if(CreateInfo.VertFormat.ElementCount <= 0)
+		if(CreateInfo.VertFormat.GetElementCount() <= 0)
 		{
 			Ry::Log->LogError("Vertex format element count is zero");
 			return false;

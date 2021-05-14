@@ -324,7 +324,7 @@ namespace Ry
 		}
 	}
 	
-	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format, Ry::Shader* Shad, bool bTexture)
+	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, Ry::Shader* Shad, bool bTexture)
 	{
 		this->ParentPass = ParentPass;
 		
@@ -623,7 +623,7 @@ namespace Ry
 		{
 			for (BatchGroup* Group : Layer->Groups)
 			{
-				if (Group->Text = Text)
+				if (Group->Text == Text)
 				{
 					return Group;
 				}
