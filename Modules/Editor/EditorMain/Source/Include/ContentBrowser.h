@@ -107,8 +107,6 @@ namespace Ry
 				}
 			}
 
-			Ry::InitRenderingEngine();
-
 		}
 
 		void ShutdownRenderAPI()
@@ -129,8 +127,9 @@ namespace Ry
 			InitLogger();
 			InitFileSystem();
 			InitWindowing();
-			InitWindow();
 			InitRenderAPI();
+			InitWindow();
+			Ry::InitRenderingEngine();
 			InitAssetSystem();
 
 			TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
@@ -154,14 +153,15 @@ namespace Ry
 			TextBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), UIText, true);
 			TextureBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), UITexture, true);
 
-			TextureBatch->AddItem(TextureItem, Tex);
-			TextureBatch->Update();
-			TextureBatch->Render();
+			//TextureBatch->AddItem(TextureItem, Tex);
+			//TextureBatch->Update();
+			//TextureBatch->Render();
 
 			// Create UI
 			UI = new UserInterface;
 			UI->SetShapeBatch(ShapeBatch);
 			UI->SetTextBatch(TextBatch);
+			UI->SetTextureBatch(TextureBatch);
 
 			Ry::BoxWidget* Canvas;
 
@@ -187,13 +187,15 @@ namespace Ry
 				Grid->AppendSlot(
 					NewWidget(Ry::BoxWidget)
 					.Padding(20.0f, 20.0f)
-					.DefaultBox(RED, RED, 5, 0)
+					.DefaultImage(Tex)
 				);
 			}
 
 			UI->AddRoot(*Canvas);
 
 			ShapeBatch->Render();
+			TextureBatch->Render();
+			TextBatch->Render();
 
 			Cmd = Ry::RendAPI->CreateCommandBuffer(Wnd->GetSwapChain());
 			Cmd->BeginCmd();

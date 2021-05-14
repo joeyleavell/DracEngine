@@ -78,7 +78,8 @@ namespace Ry
 		MaxSize{0, 0},
 		Parent(nullptr),
 		ShapeBatch(nullptr),
-		TextBatch(nullptr)
+		TextBatch(nullptr),
+		TextureBatch(nullptr)
 		{};
 		
 		virtual ~Widget() = default;
@@ -136,6 +137,12 @@ namespace Ry
 			this->TextBatch = Text;
 		}
 
+		virtual void SetTextureBatch(Batch* Text)
+		{
+			this->TextureBatch = Text;
+		}
+
+
 		virtual void Arrange()
 		{
 
@@ -154,6 +161,7 @@ namespace Ry
 
 		Batch* ShapeBatch;
 		Batch* TextBatch;
+		Batch* TextureBatch;
 
 	private:
 		Point RelativePosition;

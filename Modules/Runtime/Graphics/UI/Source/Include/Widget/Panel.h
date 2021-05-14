@@ -100,6 +100,16 @@ namespace Ry
 			}
 		}
 
+		void SetTextureBatch(Batch* Text) override
+		{
+			Widget::SetTextureBatch(Text);
+
+			for (Widget* Sl : Children)
+			{
+				Sl->SetTextureBatch(Text);
+			}
+		}
+
 	protected:
 
 		Ry::ArrayList<Widget*> Children;

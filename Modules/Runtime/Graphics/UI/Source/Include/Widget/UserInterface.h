@@ -38,6 +38,11 @@ namespace Ry
 			this->ShapeBatch = Shape;
 		}
 
+		void SetTextureBatch(Batch* Shape)
+		{
+			this->TextureBatch = Shape;
+		}
+
 		/**
 		 * Adds a widget to the root-level of this user interface.
 		 */
@@ -48,6 +53,7 @@ namespace Ry
 			// Set the widget's batches
 			Widget.SetShapeBatch(ShapeBatch);
 			Widget.SetTextBatch(TextBatch);
+			Widget.SetTextureBatch(TextureBatch);
 
 			Widget.Show();
 			
@@ -74,6 +80,7 @@ namespace Ry
 
 		Ry::Batch* ShapeBatch;
 		Ry::Batch* TextBatch;
+		Ry::Batch* TextureBatch;
 
 		void ReDraw()
 		{
@@ -88,6 +95,7 @@ namespace Ry
 
 			ShapeBatch->Update();
 			TextBatch->Update();
+			TextureBatch->Update();
 		}
 
 		Ry::ArrayList<Ry::Widget*> RootWidgets;

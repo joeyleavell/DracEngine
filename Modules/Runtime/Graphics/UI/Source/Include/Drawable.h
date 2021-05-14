@@ -12,7 +12,8 @@ namespace Ry
 	{
 	public:
 
-		Batch* ShapeBatch = nullptr;
+		Batch* ShapeBatch   = nullptr;
+		Batch* TextureBatch = nullptr;
 
 		Drawable() = default;
 		virtual ~Drawable() = default;
@@ -22,12 +23,67 @@ namespace Ry
 		virtual void Draw(float X, float Y, float Width, float Height) = 0;
 	};
 
+	class UI_MODULE ImageDrawable : public Drawable
+	{
+	public:
+		ImageDrawable()
+		{
+			this->Item = Ry::MakeItem();
+			this->ImageTint = Ry::WHITE;
+			this->ParentTexture = nullptr;
+		}
+
+		ImageDrawable& SetTexture(Texture* Text)
+		{
+			this->ParentTexture = Text;
+
+			return *this;
+		}
+
+		ImageDrawable& SetImageTint(const Color& Tint)
+		{
+			this->ImageTint = Tint;
+
+			return *this;
+		}
+
+		void Show() override
+		{
+			TextureBatch->AddItem(Item, ParentTexture);
+		}
+
+		void Hide() override
+		{
+			TextureBatch->RemoveItem(Item);
+		}
+
+		// todo: make use this texture regions
+		void Draw(float X, float Y, float Width, float Height) override
+		{
+			Ry::BatchTexture(Item, ImageTint,
+				X, Y,
+				0.0f, 0.0f,
+				1.0f, 1.0f,
+				0.5f, 0.5f,
+				Width, Height,
+				0.0f
+			);
+			
+		}
+
+	private:
+
+		Color ImageTint;
+		Ry::SharedPtr<BatchItem> Item;
+		Texture* ParentTexture;
+
+	};
+
 	class UI_MODULE BoxDrawable : public Drawable
 	{
 	public:
 		BoxDrawable()
 		{
-			this->BackgroundColor = Ry::WHITE.ScaleRGB(0.8f);
 			this->BorderRadius = 0;
 			this->BorderSize = 0;
 			this->BackgroundColor = Ry::WHITE.ScaleRGB(0.4f);

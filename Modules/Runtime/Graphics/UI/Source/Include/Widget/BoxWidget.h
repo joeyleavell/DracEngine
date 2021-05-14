@@ -28,12 +28,32 @@ namespace Ry
 			this->VerticalAlign = VAlign::TOP;
 			this->HorizontalAlign = HAlign::LEFT;
 		}
+		
 
 		BoxWidget& Box(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
 		{
 			return DefaultBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).HoveredBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).PressedBox(BackgroundColor, BorderColor, BorderRadius, BorderSize);
 		}
 
+		BoxWidget& DefaultImage(Texture* Image)
+		{
+			Style.DefaultBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			return *this;
+		}
+
+		BoxWidget& HoveredImage(Texture* Image)
+		{
+			Style.HoveredBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			return *this;
+		}
+		
+		BoxWidget& PressedImage(Texture* Image)
+		{
+			Style.PressedBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			return *this;
+		}
+
+		
 		BoxWidget& DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
 		{
 			Style.DefaultBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
@@ -377,6 +397,31 @@ namespace Ry
 				Child->SetTextBatch(Text);
 			}
 
+		}
+
+		void SetTextureBatch(Batch* Text) override
+		{
+			Widget::SetTextureBatch(Text);
+
+			if (Child)
+			{
+				Child->SetTextureBatch(Text);
+			}
+
+			if (Style.Default.IsValid())
+			{
+				Style.Default->TextureBatch = Text;
+			}
+
+			if (Style.Hovered.IsValid())
+			{
+				Style.Hovered->TextureBatch = Text;
+			}
+
+			if (Style.Pressed.IsValid())
+			{
+				Style.Pressed->TextureBatch = Text;
+			}
 		}
 
 	private:

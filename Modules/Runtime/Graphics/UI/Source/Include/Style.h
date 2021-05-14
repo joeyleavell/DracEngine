@@ -44,6 +44,42 @@ namespace Ry
 		Ry::SharedPtr<Drawable> Hovered;
 		Ry::SharedPtr<Drawable> Pressed;
 
+		ImageDrawable& DefaultBoxImage()
+		{
+			ImageDrawable* Existing = dynamic_cast<ImageDrawable*>(Default.Get());
+
+			if (!Existing)
+			{
+				Default.Reset(Existing = new ImageDrawable);
+			}
+
+			return *Existing;
+		}
+
+		ImageDrawable& HoveredBoxImage()
+		{
+			ImageDrawable* Existing = dynamic_cast<ImageDrawable*>(Hovered.Get());
+
+			if (!Existing)
+			{
+				Hovered.Reset(Existing = new ImageDrawable);
+			}
+
+			return *Existing;
+		}
+		
+		ImageDrawable& PressedBoxImage()
+		{
+			ImageDrawable* Existing = dynamic_cast<ImageDrawable*>(Pressed.Get());
+
+			if (!Existing)
+			{
+				Pressed.Reset(Existing = new ImageDrawable);
+			}
+
+			return *Existing;
+		}
+
 		BoxDrawable& DefaultBox()
 		{
 			BoxDrawable* Existing = dynamic_cast<BoxDrawable*>(Default.Get());
