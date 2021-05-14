@@ -196,6 +196,17 @@ namespace Ry
 		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
 		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
+		int LastIndexCount = -1;
+
+	};
+
+	struct RENDERING_MODULE BatchLayer
+	{
+		int32 Depth = 0;
+		Ry::CommandBuffer* CommandBuffer = nullptr;		
+		Ry::ArrayList<BatchGroup*> Groups;
+
+		bool bNeedsRecord = false;
 	};
 
 	class RENDERING_MODULE Batch
@@ -204,8 +215,8 @@ namespace Ry
 
 		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader* Shad = nullptr, bool bTexture = false);
 		
-		void AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Texture = nullptr);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Texture* Texture = nullptr);
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Texture = nullptr, int32 Layer = 0);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Texture* Texture = nullptr, int32 Layer = 0);
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
@@ -221,32 +232,30 @@ namespace Ry
 
 		void SetRenderPass(RenderPass* ParentRenderPass);
 
-		Ry::CommandBuffer* GetCommandBuffer();
+		Ry::CommandBuffer* GetCommandBuffer(int32 Layer);
 		
 	private:
 
 		// Finds a batch group for given state information
-		BatchGroup* FindOrCreateBatchGroup(Texture* Text);
-		BatchGroup* FindBatchGroup(Texture* Text);
+		BatchGroup* FindOrCreateBatchGroup(Texture* Text, int32 Layer);
+		BatchGroup* FindBatchGroup(Texture* Text, int32& OutLayer);
 
-		bool bNeedsRecord = false;
+	//	bool bNeedsRecord = false;
 
 		void CreateResources(SwapChain* Swap);
 		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad);
 
-		void RecordCommands();
+		void RecordCommands(int32 Layer);
 
 		//Shader* Shad;
-		Texture* Tex;
 		Matrix4 Projection;
 		Matrix4 View;
 
 		VertexFormat Format;
-
-		int LastIndexCount = -1;
 		
-		Ry::CommandBuffer* CommandBuffer;
 		Ry::RenderPass* ParentPass;
+
+		Ry::SwapChain* Swap = nullptr;
 		
 		// Resource layouts
 		const Ry::ResourceLayout* SceneResDesc;
@@ -262,9 +271,9 @@ namespace Ry
 		//Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
 		// Map texture to the list of batch items 
-		Ry::ArrayList<BatchGroup*> Groups;
-		
-		bool bUseTexture;
+	//	Ry::ArrayList<BatchGroup*> Groups;
+
+		Ry::ArrayList<BatchLayer*> Layers;
 	};
 
 

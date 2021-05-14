@@ -138,7 +138,7 @@ namespace Ry
 
 			TextureItem = MakeItem();
 			BatchTexture(TextureItem, WHITE, 
-				150.0f, 150.0f,
+				350.0f, 350.0f,
 				0.0f, 0.0f, 
 				1.0f, 1.0f, 
 				0.5f, 0.5f, 
@@ -152,7 +152,7 @@ namespace Ry
 
 			ShapeBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1C, UIShader, false);
 			TextBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UIText, true);
-			TextureBatch= new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UITexture, true);
+			TextureBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UITexture, true);
 
 			TextureBatch->AddItem(TextureItem, Tex);
 			TextureBatch->Update();
@@ -182,7 +182,7 @@ namespace Ry
 			];
 
 
-			for(int32 Slot = 0; Slot < 24; Slot ++)
+			for(int32 Slot = 0; Slot < 1; Slot ++)
 			{				
 				Grid->AppendSlot(
 					NewWidget(Ry::BoxWidget)
@@ -200,9 +200,30 @@ namespace Ry
 			{
 				Cmd->BeginRenderPass(Wnd->GetSwapChain()->GetDefaultRenderPass());
 				{
-					Cmd->DrawCommandBuffer(ShapeBatch->GetCommandBuffer());
-					Cmd->DrawCommandBuffer(TextBatch->GetCommandBuffer());
-					Cmd->DrawCommandBuffer(TextureBatch->GetCommandBuffer());
+
+					// Only draw first 10 layers
+					for(int32 Layer = 0; Layer < 10; Layer++)
+					{
+						CommandBuffer* Shape = ShapeBatch->GetCommandBuffer(Layer);
+						CommandBuffer* Text = TextBatch->GetCommandBuffer(Layer);
+						CommandBuffer* Texture = TextureBatch->GetCommandBuffer(Layer);
+
+						if(Shape)
+						{
+							Cmd->DrawCommandBuffer(Shape);
+						}
+
+						if(Text)
+						{
+							Cmd->DrawCommandBuffer(Text);
+						}
+
+						if(Texture)
+						{
+							Cmd->DrawCommandBuffer(Texture);
+						}
+					}
+					
 				}
 				Cmd->EndRenderPass();
 			}
@@ -249,6 +270,7 @@ namespace Ry
 		Ry::Window* Wnd;
 
 		UserInterface* UI;
+
 	};
 	
 }

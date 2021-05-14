@@ -337,11 +337,11 @@ namespace Ry
 			ShaderToUse = Ry::GetShader("Shape");
 		}
 
-		this->bUseTexture = bTexture;
-		this->Tex = nullptr;
+		// this->Tex = nullptr;
 		this->SceneResDesc = ShaderToUse->GetVertexReflectionData()[0];
 		this->TextureResDesc = ShaderToUse->GetFragmentReflectionData()[1];
 		this->Format = ShaderToUse->GetVertexFormat();
+		this->Swap = Target;
 
 		//BatchMesh->GetMeshData()->SetShaderAll(ShaderToUse);
 
@@ -351,35 +351,33 @@ namespace Ry
 		// Initialize pipeline
 		CreatePipeline(Format, Target, ShaderToUse);
 
-		// Create command buffer
-		CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Target, ParentPass);
-		RecordCommands();
-
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
 
 		// Create rendering pipeline
 	}
 
-	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Text)
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Group = FindOrCreateBatchGroup(Text);
+		BatchGroup* Group = FindOrCreateBatchGroup(Text, Layer);
 
 		if(Group)
 		{
 			Group->Items.Add(Item);
-			bNeedsRecord = true;
+
+			Layers[Layer]->bNeedsRecord = true;
 		}
 
 	}
 
-	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Texture* Text)
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Group = FindOrCreateBatchGroup(Text);
+		BatchGroup* Group = FindOrCreateBatchGroup(Text, Layer);
 		if(Group)
 		{
 			Group->ItemSets.Add(Item);
-			bNeedsRecord = true;
+
+			Layers[Layer]->bNeedsRecord = true;
 		}
 
 	}
@@ -387,22 +385,29 @@ namespace Ry
 	void Batch::RemoveItem(Ry::SharedPtr<BatchItem> Item)
 	{
 		// Try remove item from all batch groups (todo: make more efficient, probably by using hash sets)
-		for(BatchGroup* Group : Groups)
+		for(BatchLayer* Layer : Layers)
 		{
-			Group->Items.Remove(Item);
-		}
+			for (BatchGroup* Group : Layer->Groups)
+			{
+				Group->Items.Remove(Item);
+			}
 
-		bNeedsRecord = true;
+			Layer->bNeedsRecord = true;
+		}
 	}
 
 	void Batch::RemoveItemSet(Ry::SharedPtr<BatchItemSet> Item)
 	{
-		for (BatchGroup* Group : Groups)
+		for (BatchLayer* Layer : Layers)
 		{
-			Group->ItemSets.Remove(Item);
+			for (BatchGroup* Group : Layer->Groups)
+			{
+				Group->ItemSets.Remove(Item);
+			}
+
+			Layer->bNeedsRecord = true;
 		}
 
-		bNeedsRecord = true;
 	}
 
 	void Batch::SetView(const Matrix4& View)
@@ -414,7 +419,11 @@ namespace Ry
 	{
 		Projection = Ry::ortho4(0, (float) Width, (float)Height, 0, -1, 1);
 
-		bNeedsRecord = true;
+		// Mark all layers as needing recording
+		for(BatchLayer* Layer : Layers)
+		{
+			Layer->bNeedsRecord = true;
+		}
 	}
 
 	void Batch::SetProjection(const Matrix4& Proj)
@@ -440,35 +449,38 @@ namespace Ry
 		};
 
 		// Reset/create meshes
-		for(BatchGroup* Group : Groups)
+		for (BatchLayer* Layer : Layers)
 		{
-			if(Group->BatchMesh)
+			for (BatchGroup* Group : Layer->Groups)
 			{
-				Group->BatchMesh->Reset();
-			}
+				if (Group->BatchMesh)
+				{
+					Group->BatchMesh->Reset();
+				}
 
-			// Rebuild the mesh
-			for(SharedPtr<BatchItem> Item : Group->Items)
-			{
-				AddItem(Item, Group->BatchMesh);
-			}
-
-			for (SharedPtr<BatchItemSet> ItemSet : Group->ItemSets)
-			{
-				for (SharedPtr<BatchItem> Item : ItemSet->Items)
+				// Rebuild the mesh
+				for (SharedPtr<BatchItem> Item : Group->Items)
 				{
 					AddItem(Item, Group->BatchMesh);
 				}
-			}
 
-			Group->BatchMesh->Update();
+				for (SharedPtr<BatchItemSet> ItemSet : Group->ItemSets)
+				{
+					for (SharedPtr<BatchItem> Item : ItemSet->Items)
+					{
+						AddItem(Item, Group->BatchMesh);
+					}
+				}
 
-			// See if the amount of indices in this mesh has changed
-			int CurrentIndexCount = Group->BatchMesh->GetVertexArray()->GetIndexCount();
-			if (LastIndexCount < 0 || LastIndexCount != CurrentIndexCount)
-			{
-				bNeedsRecord = true;
-				LastIndexCount = CurrentIndexCount;
+				Group->BatchMesh->Update();
+
+				// See if the amount of indices in this mesh has changed
+				int CurrentIndexCount = Group->BatchMesh->GetVertexArray()->GetIndexCount();
+				if (Group->LastIndexCount < 0 || Group->LastIndexCount != CurrentIndexCount)
+				{
+					Layer->bNeedsRecord = true;
+					Group->LastIndexCount = CurrentIndexCount;
+				}
 			}
 		}
 
@@ -495,31 +507,37 @@ namespace Ry
 		// Todo: change this to a push constant and only change it if needed
 		SceneRes->SetMatConstant("Scene", "ViewProjection", Projection * View);
 
+		bool bReturn = false;
+		
 		// Update resource resets and re-record command buffers if needed
-		for(const BatchGroup* Group : Groups)
+		for (BatchLayer* Layer : Layers)
 		{
-			for (ResourceSet* Set : Group->ResourceSets)
+			for (const BatchGroup* Group : Layer->Groups)
 			{
-				if (Set->Update())
+				for (ResourceSet* Set : Group->ResourceSets)
 				{
-					bNeedsRecord = true;
+					if (Set->Update())
+					{
+						Layer->bNeedsRecord = true;
+					}
 				}
 			}
-		}
 
-		bool bWasDirty = CommandBuffer->CheckDirty();
-		bool bReturn = bWasDirty || bNeedsRecord;
+			bool bWasDirty = Layer->CommandBuffer->CheckDirty();
+			bReturn |= bWasDirty || Layer->bNeedsRecord;
 
-		// Check dirty will see if the command buffer needs to be re-recorded
-		if (bNeedsRecord)
-		{
-			if(!bWasDirty)
+			// Check dirty will see if the command buffer needs to be re-recorded
+			if (Layer->bNeedsRecord)
 			{
-				// Re-record commands
-				RecordCommands();
-			}
+				if (!bWasDirty)
+				{
+					// Re-record commands
+					RecordCommands(Layer->Depth);
+				}
 
-			bNeedsRecord = false;
+				Layer->bNeedsRecord = false;
+			}
+			
 		}
 
 		return bReturn;
@@ -527,20 +545,48 @@ namespace Ry
 
 	void Batch::SetRenderPass(RenderPass* ParentRenderPass)
 	{
-		CommandBuffer->UpdateParentRenderPass(ParentRenderPass);
+		for (BatchLayer* Layer : Layers)
+		{
+			Layer->CommandBuffer->UpdateParentRenderPass(ParentRenderPass);
+		}
 	}
 
-	Ry::CommandBuffer* Batch::GetCommandBuffer()
+	Ry::CommandBuffer* Batch::GetCommandBuffer(int32 Layer)
 	{
-		return CommandBuffer;
+		if(Layer < Layers.GetSize())
+		{
+			BatchLayer* BatLayer = Layers[Layer];
+			return BatLayer->CommandBuffer;
+		}
+
+		return nullptr;
 	}
 
-	BatchGroup* Batch::FindOrCreateBatchGroup(Texture* Text)
+	BatchGroup* Batch::FindOrCreateBatchGroup(Texture* Text, int32 Layer)
 	{
-		BatchGroup* Existing = FindBatchGroup(Text);
+		BatchGroup* Existing = FindBatchGroup(Text, Layer);
 
 		if(!Existing)
 		{
+			// Create layers as needed
+			while(Layer >= Layers.GetSize())
+			{
+				Layers.Add(new BatchLayer);
+			}
+
+			BatchLayer* AtLayer = Layers[Layer];
+
+			// Create batch layer command buffer if needed
+			if(!AtLayer->CommandBuffer)
+			{
+				// Init depth
+				AtLayer->Depth = Layer;
+				AtLayer->CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Swap, ParentPass);
+				AtLayer->bNeedsRecord = true;
+
+				RecordCommands(Layer);
+			}
+			
 			BatchGroup* NewGroup = new BatchGroup;
 			NewGroup->Text = Text;
 			
@@ -549,7 +595,7 @@ namespace Ry
 			// Create a new texture resource if needed
 			if(Text)
 			{
-				ResourceSet* TextureResources = Ry::RendAPI->CreateResourceSet(TextureResDesc, CommandBuffer->GetSwapChain());
+				ResourceSet* TextureResources = Ry::RendAPI->CreateResourceSet(TextureResDesc, AtLayer->CommandBuffer->GetSwapChain());
 				TextureResources->BindTexture("BatchTexture", Text);
 				TextureResources->CreateBuffer();
 
@@ -559,7 +605,8 @@ namespace Ry
 			// Create group mesh
 			NewGroup->BatchMesh = new Mesh(Format);
 
-			Groups.Add(NewGroup);
+			// Add this group to the layer
+			AtLayer->Groups.Add(NewGroup);
 
 			return NewGroup;
 		}
@@ -570,13 +617,16 @@ namespace Ry
 
 	}
 
-	BatchGroup* Batch::FindBatchGroup(Texture* Text)
+	BatchGroup* Batch::FindBatchGroup(Texture* Text, int32& OutLayer)
 	{
-		for(BatchGroup* Group : Groups)
+		for(BatchLayer* Layer : Layers)
 		{
-			if(Group->Text = Text)
+			for (BatchGroup* Group : Layer->Groups)
 			{
-				return Group;
+				if (Group->Text = Text)
+				{
+					return Group;
+				}
 			}
 		}
 
@@ -597,7 +647,7 @@ namespace Ry
 
 		// ResourceSets.Add(SceneRes);
 
-		if (bUseTexture)
+		// if (bUseTexture)
 		{
 			// TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
 			// TextureResDesc->AddTextureBinding(0, "BatchTexture");
@@ -633,30 +683,32 @@ namespace Ry
 		Pipeline->CreatePipeline();
 	}
 
-	void Batch::RecordCommands()
+	void Batch::RecordCommands(int32 Layer)
 	{
-		CommandBuffer->Reset();
+		BatchLayer* AtLayer = Layers[Layer];
 		
-		CommandBuffer->BeginCmd();
+		AtLayer->CommandBuffer->Reset();
+		
+		AtLayer->CommandBuffer->BeginCmd();
 		{
-			CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
-			CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+			AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+			AtLayer->CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
 
 			// Bind pipeline
-			CommandBuffer->BindPipeline(Pipeline);
+			AtLayer->CommandBuffer->BindPipeline(Pipeline);
 
-			for (const BatchGroup* Group : Groups)
+			for (const BatchGroup* Group : AtLayer->Groups)
 			{
 				// Bind resources
-				CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
+				AtLayer->CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
 
 				// Draw the mesh
 				MeshSection& Section = *Group->BatchMesh->GetMeshData()->Sections.get(0);
-				CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
+				AtLayer->CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
 			}
 
 		}
-		CommandBuffer->EndCmd();
+		AtLayer->CommandBuffer->EndCmd();
 	}
 
 	/*
