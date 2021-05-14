@@ -187,15 +187,27 @@ namespace Ry
 	RENDERING_MODULE void BatchTexture(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, float X, float Y, float U, float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth);
 	RENDERING_MODULE void BatchText(Ry::SharedPtr<BatchItemSet> Item, const Ry::Color& Color, BitmapFont* Font, const Ry::String& Text, float XPosition, float YPosition, float LineWidth);
 
+	struct RENDERING_MODULE BatchGroup
+	{
+		Texture* Text = nullptr;
+		Mesh* BatchMesh = nullptr;
+		Ry::ArrayList<ResourceSet*> ResourceSets;
+		
+		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
+		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
+
+	};
+
 	class RENDERING_MODULE Batch
 	{
 	public:
 
 		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, const VertexFormat& Format = VF1P1C, Ry::Shader* Shad = nullptr, bool bTexture = false);
 		
-		void AddItem(Ry::SharedPtr<BatchItem> Item);
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Texture = nullptr);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Texture* Texture = nullptr);
+		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
 		
 		void SetView(const Matrix4& View);
@@ -204,7 +216,7 @@ namespace Ry
 		//void SetShader(const Ry::String& ShaderName);
 		void Camera(const Camera* Cam);
 		void Update();
-		void SetTexture(Texture* Texture);
+		//void SetTexture(Texture* Texture);
 		bool Render();
 
 		void SetRenderPass(RenderPass* ParentRenderPass);
@@ -212,6 +224,10 @@ namespace Ry
 		Ry::CommandBuffer* GetCommandBuffer();
 		
 	private:
+
+		// Finds a batch group for given state information
+		BatchGroup* FindOrCreateBatchGroup(Texture* Text);
+		BatchGroup* FindBatchGroup(Texture* Text);
 
 		bool bNeedsRecord = false;
 
@@ -225,29 +241,29 @@ namespace Ry
 		Matrix4 Projection;
 		Matrix4 View;
 
-		Mesh* BatchMesh;
+		VertexFormat Format;
 
 		int LastIndexCount = -1;
 		
 		Ry::CommandBuffer* CommandBuffer;
 		Ry::RenderPass* ParentPass;
 		
-		// Texture resources
-		Ry::ResourceLayout* TextureResDesc;
-		Ry::ResourceSet* TextureRes;
+		// Resource layouts
+		const Ry::ResourceLayout* SceneResDesc;
+		const Ry::ResourceLayout* TextureResDesc;
 
 		// Scene resources
-		Ry::ResourceLayout* SceneResDesc;
 		Ry::ResourceSet* SceneRes;
 
 		Ry::Pipeline* Pipeline;
 
-		Ry::ArrayList<ResourceSet*> ResourceSets;
-
 		// Maps depth to a list of items
-		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
-		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
+		//Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
+		//Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
+		// Map texture to the list of batch items 
+		Ry::ArrayList<BatchGroup*> Groups;
+		
 		bool bUseTexture;
 	};
 

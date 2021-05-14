@@ -58,7 +58,7 @@ namespace Ry
 		 */
 		void Reset();
 
-		MeshData* GetMeshData();
+		MeshData* GetMeshData() const;
 
 		MeshSection* GetSection(int32 Index);
 

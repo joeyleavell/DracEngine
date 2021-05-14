@@ -124,7 +124,7 @@ namespace Ry
 		}
 	}
 
-	MeshData* Mesh::GetMeshData()
+	MeshData* Mesh::GetMeshData() const
 	{
 		return Data;
 	}

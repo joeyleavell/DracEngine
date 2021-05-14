@@ -235,6 +235,11 @@ namespace Ry
 		virtual void BeginCmd() = 0;
 		virtual void EndCmd() = 0;
 
+		SwapChain* GetSwapChain() const
+		{
+			return Swap;
+		}
+
 	protected:
 
 		Ry::ArrayList<CommandBuffer*> SecondaryBuffers;

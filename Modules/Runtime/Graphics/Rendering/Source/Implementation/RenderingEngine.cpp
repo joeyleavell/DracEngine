@@ -38,8 +38,8 @@ namespace Ry
 		{
 			CompileShader("Impose", "/Engine/Shaders/Vertex/Impose.glv", "/Engine/Shaders/Fragment/Impose.glf");
 			CompileShader("PhongDirectional", "/Engine/Shaders/Vertex/Phong.glv", "/Engine/Shaders/Fragment/PhongDirectional.glf");
-			CompileShader("Texture2D", "/Engine/Shaders/Vertex/base.glv", "/Engine/Shaders/Fragment/texture_tint.glf");
 
+			CompileShader("Texture", "Vertex/Texture", "Fragment/Texture");
 			CompileShader("Shape", "Vertex/Shape", "Fragment/Shape");
 			CompileShader("Font", "Vertex/Font", "Fragment/Font");
 

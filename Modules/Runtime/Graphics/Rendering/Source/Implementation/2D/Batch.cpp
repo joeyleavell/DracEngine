@@ -329,7 +329,7 @@ namespace Ry
 		this->ParentPass = ParentPass;
 		
 		// Initialize dynamic mesh
-		BatchMesh = new Ry::Mesh(Format);
+		//BatchMesh = new Ry::Mesh(Format);
 		
 		Ry::Shader* ShaderToUse = Shad;
 		if(!ShaderToUse)
@@ -339,7 +339,9 @@ namespace Ry
 
 		this->bUseTexture = bTexture;
 		this->Tex = nullptr;
-
+		this->SceneResDesc = ShaderToUse->GetVertexReflectionData()[0];
+		this->TextureResDesc = ShaderToUse->GetFragmentReflectionData()[1];
+		this->Format = ShaderToUse->GetVertexFormat();
 
 		//BatchMesh->GetMeshData()->SetShaderAll(ShaderToUse);
 
@@ -359,30 +361,46 @@ namespace Ry
 		// Create rendering pipeline
 	}
 
-	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item)
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Text)
 	{
-		Items.Add(Item);
+		BatchGroup* Group = FindOrCreateBatchGroup(Text);
 
-		bNeedsRecord = true;
+		if(Group)
+		{
+			Group->Items.Add(Item);
+			bNeedsRecord = true;
+		}
+
+	}
+
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Texture* Text)
+	{
+		BatchGroup* Group = FindOrCreateBatchGroup(Text);
+		if(Group)
+		{
+			Group->ItemSets.Add(Item);
+			bNeedsRecord = true;
+		}
+
 	}
 
 	void Batch::RemoveItem(Ry::SharedPtr<BatchItem> Item)
 	{
-		Items.Remove(Item);
-
-		bNeedsRecord = true;
-	}
-
-	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item)
-	{
-		ItemSets.Add(Item);
+		// Try remove item from all batch groups (todo: make more efficient, probably by using hash sets)
+		for(BatchGroup* Group : Groups)
+		{
+			Group->Items.Remove(Item);
+		}
 
 		bNeedsRecord = true;
 	}
 
 	void Batch::RemoveItemSet(Ry::SharedPtr<BatchItemSet> Item)
 	{
-		ItemSets.Remove(Item);
+		for (BatchGroup* Group : Groups)
+		{
+			Group->ItemSets.Remove(Item);
+		}
 
 		bNeedsRecord = true;
 	}
@@ -412,9 +430,7 @@ namespace Ry
 
 	void Batch::Update()
 	{
-		BatchMesh->Reset();
-
-		auto AddItem = [this](Ry::SharedPtr<BatchItem> Item)
+		auto AddItem = [this](Ry::SharedPtr<BatchItem> Item, Mesh* BatchMesh)
 		{
 			uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
 
@@ -423,50 +439,71 @@ namespace Ry
 			BatchMesh->GetMeshData()->AddIndexRaw(Item->Indices.GetData(), (int32)Item->Indices.GetSize(), BaseIndex);
 		};
 
-		// Rebuild the mesh
-		std::for_each(Items.begin(), Items.end(), AddItem);
-		std::for_each(ItemSets.begin(), ItemSets.end(), [AddItem](Ry::SharedPtr<BatchItemSet> ItemSet)
+		// Reset/create meshes
+		for(BatchGroup* Group : Groups)
+		{
+			if(Group->BatchMesh)
 			{
-				std::for_each(ItemSet->Items.begin(), ItemSet->Items.end(), AddItem);
-			});
+				Group->BatchMesh->Reset();
+			}
 
-		BatchMesh->Update();
+			// Rebuild the mesh
+			for(SharedPtr<BatchItem> Item : Group->Items)
+			{
+				AddItem(Item, Group->BatchMesh);
+			}
 
-		int CurrentIndexCount = BatchMesh->GetVertexArray()->GetIndexCount();
-		if (LastIndexCount < 0 || LastIndexCount != CurrentIndexCount)
-		{
-			bNeedsRecord = true;
-			LastIndexCount = CurrentIndexCount;
+			for (SharedPtr<BatchItemSet> ItemSet : Group->ItemSets)
+			{
+				for (SharedPtr<BatchItem> Item : ItemSet->Items)
+				{
+					AddItem(Item, Group->BatchMesh);
+				}
+			}
+
+			Group->BatchMesh->Update();
+
+			// See if the amount of indices in this mesh has changed
+			int CurrentIndexCount = Group->BatchMesh->GetVertexArray()->GetIndexCount();
+			if (LastIndexCount < 0 || LastIndexCount != CurrentIndexCount)
+			{
+				bNeedsRecord = true;
+				LastIndexCount = CurrentIndexCount;
+			}
 		}
+
 	}
-
-	void Batch::SetTexture(Ry::Texture* Texture)
-	{
-		if(Texture != this->Tex)
-		{
-			this->Tex = Texture;
-
-			// Bind the texture to texture resources
-			TextureRes->BindTexture("BatchTexture", Texture);
-
-			// Need to re-record buffer since we updated descriptor set
-			bNeedsRecord = true;
-		}
-		
-	}
+	//
+	// void Batch::SetTexture(Ry::Texture* Texture)
+	// {
+	// 	if(Texture != this->Tex)
+	// 	{
+	// 		this->Tex = Texture;
+	//
+	// 		// Bind the texture to texture resources
+	// 		TextureRes->BindTexture("BatchTexture", Texture);
+	//
+	// 		// Need to re-record buffer since we updated descriptor set
+	// 		bNeedsRecord = true;
+	// 	}
+	// 	
+	// }
 
 	bool Batch::Render()
 	{
 		// Update uniform
 		// Todo: change this to a push constant and only change it if needed
-		SceneRes->SetMatConstant("Scene", "ViewProj", Projection * View);
+		SceneRes->SetMatConstant("Scene", "ViewProjection", Projection * View);
 
 		// Update resource resets and re-record command buffers if needed
-		for(ResourceSet* Set : ResourceSets)
+		for(const BatchGroup* Group : Groups)
 		{
-			if(Set->Update())
+			for (ResourceSet* Set : Group->ResourceSets)
 			{
-				bNeedsRecord = true;
+				if (Set->Update())
+				{
+					bNeedsRecord = true;
+				}
 			}
 		}
 
@@ -498,36 +535,83 @@ namespace Ry
 		return CommandBuffer;
 	}
 
+	BatchGroup* Batch::FindOrCreateBatchGroup(Texture* Text)
+	{
+		BatchGroup* Existing = FindBatchGroup(Text);
+
+		if(!Existing)
+		{
+			BatchGroup* NewGroup = new BatchGroup;
+			NewGroup->Text = Text;
+			
+			NewGroup->ResourceSets.Add(SceneRes);
+
+			// Create a new texture resource if needed
+			if(Text)
+			{
+				ResourceSet* TextureResources = Ry::RendAPI->CreateResourceSet(TextureResDesc, CommandBuffer->GetSwapChain());
+				TextureResources->BindTexture("BatchTexture", Text);
+				TextureResources->CreateBuffer();
+
+				NewGroup->ResourceSets.Add(TextureResources);
+			}
+
+			// Create group mesh
+			NewGroup->BatchMesh = new Mesh(Format);
+
+			Groups.Add(NewGroup);
+
+			return NewGroup;
+		}
+		else
+		{
+			return Existing;
+		}
+
+	}
+
+	BatchGroup* Batch::FindBatchGroup(Texture* Text)
+	{
+		for(BatchGroup* Group : Groups)
+		{
+			if(Group->Text = Text)
+			{
+				return Group;
+			}
+		}
+
+		return nullptr;
+	}
+
 	void Batch::CreateResources(SwapChain* Swap)
 	{
-		SceneResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex}, 0);
-		SceneResDesc->AddConstantBuffer(0, "Scene", {
-			DeclPrimitive(Float4x4, "ViewProj")
-		});
-		SceneResDesc->CreateDescription();
-
+		// SceneResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex}, 0);
+		// SceneResDesc->AddConstantBuffer(0, "Scene", {
+		// 	DeclPrimitive(Float4x4, "ViewProj")
+		// });
+		// SceneResDesc->CreateDescription();
 
 		// Create actual resource set now
 		SceneRes = Ry::RendAPI->CreateResourceSet(SceneResDesc, Swap);
 		SceneRes->CreateBuffer();
 
-		ResourceSets.Add(SceneRes);
+		// ResourceSets.Add(SceneRes);
 
 		if (bUseTexture)
 		{
-			TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
-			TextureResDesc->AddTextureBinding(0, "BatchTexture");
-			TextureResDesc->CreateDescription();
+			// TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Fragment }, 1);
+			// TextureResDesc->AddTextureBinding(0, "BatchTexture");
+			// TextureResDesc->CreateDescription();
 
 			// Create texture resources
 			// Bind the default texture to start with
-			TextureRes = Ry::RendAPI->CreateResourceSet(TextureResDesc, Swap);
-			TextureRes->BindTexture("BatchTexture", DefaultTexture);
-			TextureRes->CreateBuffer();
+			// TextureRes = Ry::RendAPI->CreateResourceSet(TextureResDesc, Swap);
+			// TextureRes->BindTexture("BatchTexture", DefaultTexture);
+			// TextureRes->CreateBuffer();
 
-			ResourceSets.Add(TextureRes);
+			// ResourceSets.Add(TextureRes);
 
-			this->Tex = DefaultTexture;
+			// this->Tex = DefaultTexture;
 
 		}
 
@@ -541,20 +625,11 @@ namespace Ry
 		CreateInfo.ViewportWidth = SwapChain->GetSwapChainWidth();
 		CreateInfo.ViewportHeight = SwapChain->GetSwapChainHeight();
 		CreateInfo.PipelineShader = Shad;
-		CreateInfo.VertFormat = Format;
 		CreateInfo.RenderPass = SwapChain->GetDefaultRenderPass();
 		CreateInfo.Depth.bEnableDepthTest = false; // Turn off depth test
 		CreateInfo.Blend.bEnabled = true; // Enable blending
 
-		// Add resource description to pipeline
-		CreateInfo.ResourceDescriptions.Add(SceneResDesc);
-
-		if(bUseTexture)
-		{
-			CreateInfo.ResourceDescriptions.Add(TextureResDesc);
-		}
-
-		Pipeline = Ry::RendAPI->CreatePipeline(CreateInfo);
+		Pipeline = Ry::RendAPI->CreatePipelineFromShader(CreateInfo, Shad);
 		Pipeline->CreatePipeline();
 	}
 
@@ -570,11 +645,16 @@ namespace Ry
 			// Bind pipeline
 			CommandBuffer->BindPipeline(Pipeline);
 
-			// Bind resources
-			CommandBuffer->BindResources(ResourceSets.GetData(), ResourceSets.GetSize());
+			for (const BatchGroup* Group : Groups)
+			{
+				// Bind resources
+				CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
 
-			// Draw the mesh
-			CommandBuffer->DrawVertexArrayIndexed(BatchMesh->GetVertexArray(), BatchMesh->GetMeshData()->Sections.get(0)->StartIndex, BatchMesh->GetMeshData()->Sections.get(0)->Count);
+				// Draw the mesh
+				MeshSection& Section = *Group->BatchMesh->GetMeshData()->Sections.get(0);
+				CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
+			}
+
 		}
 		CommandBuffer->EndCmd();
 	}

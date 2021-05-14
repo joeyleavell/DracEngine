@@ -15,6 +15,7 @@
 #include "Core/Globals.h"
 #include "Widget/HorizontalPanel.h"
 #include "Widget/GridLayout.h"
+#include "TextureAsset.h"
 
 namespace Ry
 {
@@ -132,11 +133,30 @@ namespace Ry
 			InitAssetSystem();
 			InitWindow();
 
+			TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
+			Texture* Tex = Asset->CreateRuntimeTexture();
+
+			TextureItem = MakeItem();
+			BatchTexture(TextureItem, WHITE, 
+				150.0f, 150.0f,
+				0.0f, 0.0f, 
+				1.0f, 1.0f, 
+				0.5f, 0.5f, 
+				100.0f, 100.0f, 
+				0.0f
+			);
+
 			Shader* UIShader = GetShader("Shape");
 			Shader* UIText = GetShader("Font");
+			Shader* UITexture = GetShader("Texture");
 
 			ShapeBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1C, UIShader, false);
 			TextBatch = new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UIText, true);
+			TextureBatch= new Batch(Wnd->GetSwapChain(), Wnd->GetSwapChain()->GetDefaultRenderPass(), VF1P1UV1C, UITexture, true);
+
+			TextureBatch->AddItem(TextureItem, Tex);
+			TextureBatch->Update();
+			TextureBatch->Render();
 
 			// Create UI
 			UI = new UserInterface;
@@ -182,6 +202,7 @@ namespace Ry
 				{
 					Cmd->DrawCommandBuffer(ShapeBatch->GetCommandBuffer());
 					Cmd->DrawCommandBuffer(TextBatch->GetCommandBuffer());
+					Cmd->DrawCommandBuffer(TextureBatch->GetCommandBuffer());
 				}
 				Cmd->EndRenderPass();
 			}
@@ -217,10 +238,13 @@ namespace Ry
 
 	private:
 
+		SharedPtr<BatchItem> TextureItem;
+
 		Ry::CommandBuffer* Cmd;
 
 		Ry::Batch* ShapeBatch;
 		Ry::Batch* TextBatch;
+		Ry::Batch* TextureBatch;
 
 		Ry::Window* Wnd;
 
