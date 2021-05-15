@@ -1,6 +1,6 @@
 // Sampler/texture combo for font texture
-SamplerState FontSampler : register(t0, space1);
-Texture2D <float4> FontTexture : register(t0, space1);
+SamplerState BatchTextureSampler : register(t0, space1);
+Texture2D <float4> BatchTexture : register(t0, space1);
 
 struct PixelOutput
 {
@@ -17,7 +17,7 @@ PixelOutput main(PixelInput In)
 {
 	PixelOutput Out;
 
-	float Value = FontTexture.Sample(FontSampler, In.VertTexCoord).r;
+	float Value = BatchTexture.Sample(BatchTextureSampler, In.VertTexCoord).r;
 	Out.PixelColor = In.VertColor * Value;
 	Out.PixelColor.a = Value;
 		

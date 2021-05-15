@@ -3,12 +3,14 @@
 #include "Core/Core.h"
 #include "Core/Delegate.h"
 #include "UIGen.h"
+#include "Event.h"
 
 #define NewWidgetAssign(AssignTo, Type) (*( (AssignTo) = new (Type){}))
 #define NewWidget(Type) (*(new (Type)))
 
 namespace Ry
 {
+	struct Event;
 
 	class Batch;
 	
@@ -79,10 +81,29 @@ namespace Ry
 		Parent(nullptr),
 		ShapeBatch(nullptr),
 		TextBatch(nullptr),
-		TextureBatch(nullptr)
-		{};
+		TextureBatch(nullptr),
+		bPressed(false),
+		bHovered(false)
+		{
+			
+		};
 		
 		virtual ~Widget() = default;
+
+		bool IsHovered()
+		{
+			return bHovered;
+		}
+
+		bool IsPressed()
+		{
+			return bPressed;
+		}
+
+		bool IsVisible()
+		{
+			return bVisible;
+		}
 
 		Point GetRelativePosition() const
 		{
@@ -148,10 +169,72 @@ namespace Ry
 
 		}
 
-		virtual void Show() = 0;
-		virtual void Hide() = 0;
+		virtual void OnHovered(const MouseEvent& MouseEv)
+		{
+
+		}
+
+		virtual void OnUnhovered(const MouseEvent& MouseEv)
+		{
+
+		}
+
+		virtual bool OnPressed(const MouseButtonEvent& MouseEv)
+		{
+			return false;
+		}
+
+		virtual bool OnReleased(const MouseButtonEvent& MouseEv)
+		{
+			return false;
+		}
+
+		virtual bool OnMouseEvent(const MouseEvent& MouseEv);
+		virtual bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv);
+		
+		virtual bool OnEvent(const Event& Ev)
+		{
+			if (Ev.Type == EVENT_MOUSE)
+			{
+				const MouseEvent& Mouse = static_cast<const MouseEvent&>(Ev);
+
+				return OnMouseEvent(Mouse);
+			}
+			else if (Ev.Type == EVENT_MOUSE_BUTTON)
+			{
+				const MouseButtonEvent& MouseButton = static_cast<const MouseButtonEvent&>(Ev);
+
+				return OnMouseButtonEvent(MouseButton);
+			}
+
+			return false;
+		}
+
+		virtual void SetVisible(bool bVisibility, bool bPropagate)
+		{
+
+			if(bVisibility != bVisible)
+			{
+				this->bVisible = bVisibility;
+
+				if (bVisibility)
+				{
+					OnShow();
+				}
+				else
+				{
+					OnHide();
+				}
+
+			}
+		
+		}
+		
 		virtual void Draw() = 0;
 		virtual SizeType ComputeSize() const = 0;
+
+		virtual void OnShow() = 0;
+		virtual void OnHide() = 0;
 
 	protected:
 		
@@ -164,7 +247,12 @@ namespace Ry
 		Batch* TextureBatch;
 
 	private:
+		
 		Point RelativePosition;
+
+		bool bHovered;
+		bool bPressed;
+		bool bVisible;
 
 	};
 

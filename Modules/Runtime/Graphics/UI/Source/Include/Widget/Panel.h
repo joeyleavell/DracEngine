@@ -49,20 +49,20 @@ namespace Ry
 			Widget.SetParent(this);
 		}
 
-		virtual void Show() override
+		virtual void OnShow() override
 		{
-			for (Widget* Child : Children)
-			{
-				Child->Show();
-			}
+			// for (Widget* Child : Children)
+			// {
+			// 	Child->Show();
+			// }
 		}
 
-		virtual void Hide() override
+		virtual void OnHide() override
 		{
-			for (Widget* Child : Children)
-			{
-				Child->Hide();
-			}
+			// for (Widget* Child : Children)
+			// {
+			// 	Child->Hide();
+			// }
 		}
 
 		virtual void Draw() override
@@ -108,6 +108,45 @@ namespace Ry
 			{
 				Sl->SetTextureBatch(Text);
 			}
+		}
+
+		void SetVisible(bool bVisibility, bool bPropagate) override
+		{
+			Widget::SetVisible(bVisibility, bPropagate);
+
+			if (bPropagate)
+			{
+				for (Widget* Child : Children)
+				{
+					Child->SetVisible(bVisibility, bPropagate);
+				}
+			}
+		}
+
+
+		bool OnMouseEvent(const MouseEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseEvent(MouseEv);
+
+			// This means we're hovering, pass to children
+			for(Widget* Child : Children)
+			{
+				Child->OnMouseEvent(MouseEv);
+			}
+
+			return bHandled;
+		}
+
+		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseButtonEvent(MouseEv);
+
+			for (Widget* Child : Children)
+			{
+				bHandled |= Child->OnMouseButtonEvent(MouseEv);
+			}
+
+			return bHandled;
 		}
 
 	protected:

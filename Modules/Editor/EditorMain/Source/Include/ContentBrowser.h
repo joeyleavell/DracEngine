@@ -16,6 +16,9 @@
 #include "Widget/HorizontalPanel.h"
 #include "Widget/GridLayout.h"
 #include "TextureAsset.h"
+#include "Input.h"
+#include "Widget/Label.h"
+#include "VectorFontAsset.h"
 
 namespace Ry
 {
@@ -132,6 +135,17 @@ namespace Ry
 			Ry::InitRenderingEngine();
 			InitAssetSystem();
 
+			Delegate<void, int32, int32> Resized;
+			Resized.BindMemberFunction(this, &ContentBrowser::Resize);
+			Wnd->AddWindowResizedDelegate(Resized);
+			//OnWindowResize.AddMemberFunction();
+
+			// Init input
+			Ry::input_handler = new Ry::InputHandler;
+
+			VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
+			BitmapFont* RTFont = Font->GenerateBitmapFont(15);
+			
 			TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
 			Texture* Tex = Asset->CreateRuntimeTexture();
 
@@ -164,39 +178,86 @@ namespace Ry
 			UI->SetTextureBatch(TextureBatch);
 
 			Ry::BoxWidget* Canvas;
-
-			Ry::GridLayout* Grid;
 			
 			NewWidgetAssign(Canvas, BoxWidget)
-			.FillX(1.0f)
-			.FillY(1.0f)
-			.SetHAlign(HAlign::CENTER)
-			.SetVAlign(VAlign::CENTER)
-			[
-				NewWidget(Ry::BoxWidget)
-				.Padding(10.0f, 10.0f)
-				.DefaultBox(GREEN, GREEN, 5, 0)
+				.FillX(1.0f)
+				.FillY(1.0f)
+				.SetHAlign(HAlign::CENTER)
+				.SetVAlign(VAlign::BOTTOM)
 				[
-					NewWidgetAssign(Grid, Ry::GridLayout)
-				]
+					NewWidget(Ry::BoxWidget)
+					.Padding(10.0f, 10.0f)
+					.FillX(1.0f)
+					.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+					.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
+					[
+						NewWidgetAssign(Grid, Ry::GridLayout)
+						.SetCellSize(150.0f)
+					]
 			];
 
 
-			for(int32 Slot = 0; Slot < 100; Slot ++)
+			for(int32 Slot = 0; Slot < 5; Slot ++)
 			{				
 				Grid->AppendSlot(
+					NewWidget(Ry::VerticalLayout)
+					+
 					NewWidget(Ry::BoxWidget)
 					.Padding(20.0f, 20.0f)
 					.DefaultImage(Tex)
+					.HoveredImage(Tex, WHITE.ScaleRGB(0.5f))
+					// +
+					// NewWidget(Ry::Label)
+					// .SetText("Test")
+					// .SetStyle(RTFont, WHITE)
 				);
 			}
 
 			UI->AddRoot(*Canvas);
 
-			ShapeBatch->Render();
-			TextureBatch->Render();
-			TextBatch->Render();
+			//Wnd->GetSwapChain()->OnSwapChainDirty.AddMemberFunction(this, &ContentBrowser::SwapChainDirty);
+		}
 
+		void Resize(int32 Width, int32 Height)
+		{
+			// todo: cant re record primary command buffer here unless we explicitly re-record secondary buffers
+			// the below just marks the secondaries for needing recording
+
+			ShapeBatch->SetRenderPass(Wnd->GetSwapChain()->GetDefaultRenderPass());
+			TextureBatch->SetRenderPass(Wnd->GetSwapChain()->GetDefaultRenderPass());
+			TextBatch->SetRenderPass(Wnd->GetSwapChain()->GetDefaultRenderPass());
+
+			ShapeBatch->Resize(Width, Height);
+			TextureBatch->Resize(Width, Height);
+			TextBatch->Resize(Width, Height);
+
+			UI->Draw();
+
+
+			// ShapeBatch->Render();
+			// TextureBatch->Render();
+			// TextBatch->Render();
+
+			//RecordCmds();
+		}
+
+		void Update()
+		{
+			Ry::input_handler->setMouse(Wnd->GetCursorX(), Wnd->GetCursorY());
+			
+			MouseEvent Ev;
+			Ev.Type = EVENT_MOUSE;
+			Ev.MouseX = Ry::input_handler->getX();
+			Ev.MouseY = Ry::input_handler->getY();
+			Ev.MouseDeltaX = Ry::input_handler->getDx();
+			Ev.MouseDeltaY = Ry::input_handler->getDy();
+
+			UI->OnEvent(Ev);
+
+		}
+
+		void RecordCmds()
+		{
 			Cmd = Ry::RendAPI->CreateCommandBuffer(Wnd->GetSwapChain());
 			Cmd->BeginCmd();
 			{
@@ -204,43 +265,44 @@ namespace Ry
 				{
 
 					// Only draw first 10 layers
-					for(int32 Layer = 0; Layer < 10; Layer++)
+					for (int32 Layer = 0; Layer < 10; Layer++)
 					{
 						CommandBuffer* Shape = ShapeBatch->GetCommandBuffer(Layer);
 						CommandBuffer* Text = TextBatch->GetCommandBuffer(Layer);
 						CommandBuffer* Texture = TextureBatch->GetCommandBuffer(Layer);
 
-						if(Shape)
+						if (Shape)
 						{
 							Cmd->DrawCommandBuffer(Shape);
 						}
 
-						if(Text)
-						{
-							Cmd->DrawCommandBuffer(Text);
-						}
-
-						if(Texture)
+						if (Texture)
 						{
 							Cmd->DrawCommandBuffer(Texture);
 						}
+
+						if (Text)
+						{
+							Cmd->DrawCommandBuffer(Text);
+						}
 					}
-					
+
 				}
 				Cmd->EndRenderPass();
 			}
 			Cmd->EndCmd();
 		}
 
-		void Update()
-		{
-			
-		}
-
 		void Render()
 		{
 			Wnd->Update();
 
+			ShapeBatch->Render();
+			TextureBatch->Render();
+			TextBatch->Render();
+
+			RecordCmds();
+			
 			Wnd->BeginFrame();
 			{
 				Cmd->Submit();
@@ -260,6 +322,7 @@ namespace Ry
 		}
 
 	private:
+		Ry::GridLayout* Grid;
 
 		SharedPtr<BatchItem> TextureItem;
 

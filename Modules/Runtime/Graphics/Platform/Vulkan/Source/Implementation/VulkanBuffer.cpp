@@ -55,6 +55,8 @@ namespace Ry
 
 	VulkanBuffer::~VulkanBuffer()
 	{
+		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+		
 		if(BufferSize > 0)
 		{
 			vkDestroyBuffer(GVulkanContext->GetLogicalDevice(), BufferObject, nullptr);

@@ -6,6 +6,7 @@
 #include "2D/Batch/Batch.h"
 #include <vector>
 #include "UIGen.h"
+#include "Event.h"
 
 namespace Ry
 {
@@ -26,6 +27,19 @@ namespace Ry
 			AddRoot(Root);
 
 			return this;
+		}
+
+		bool OnEvent(const Event& Ev)
+		{
+			for(Widget* Root : RootWidgets)
+			{
+				if(Root->OnEvent(Ev))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		void SetTextBatch(Batch* Text)
@@ -55,9 +69,9 @@ namespace Ry
 			Widget.SetTextBatch(TextBatch);
 			Widget.SetTextureBatch(TextureBatch);
 
-			Widget.Show();
+			Widget.SetVisible(true, true);
 			
-			ReDraw();
+			Draw();
 		}
 
 		/**
@@ -76,15 +90,9 @@ namespace Ry
 
 		}
 
-	private:
-
-		Ry::Batch* ShapeBatch;
-		Ry::Batch* TextBatch;
-		Ry::Batch* TextureBatch;
-
-		void ReDraw()
+		void Draw()
 		{
-			for(Widget* RootWidget : RootWidgets)
+			for (Widget* RootWidget : RootWidgets)
 			{
 				// Arrange the root widget so it is correctly placed
 				RootWidget->Arrange();
@@ -97,6 +105,12 @@ namespace Ry
 			TextBatch->Update();
 			TextureBatch->Update();
 		}
+
+	private:
+
+		Ry::Batch* ShapeBatch;
+		Ry::Batch* TextBatch;
+		Ry::Batch* TextureBatch;
 
 		Ry::ArrayList<Ry::Widget*> RootWidgets;
 

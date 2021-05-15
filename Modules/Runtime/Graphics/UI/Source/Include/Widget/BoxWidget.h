@@ -19,8 +19,6 @@ namespace Ry
 			this->Child = nullptr;
 
 			this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = 0;
-			this->Pressed = false;
-			this->Hovered = false;
 
 			this->WidthMode = SizeMode::AUTO;
 			this->HeightMode = SizeMode::AUTO;
@@ -35,21 +33,21 @@ namespace Ry
 			return DefaultBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).HoveredBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).PressedBox(BackgroundColor, BorderColor, BorderRadius, BorderSize);
 		}
 
-		BoxWidget& DefaultImage(Texture* Image)
+		BoxWidget& DefaultImage(Texture* Image, Color ImageTint = WHITE)
 		{
-			Style.DefaultBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			Style.DefaultBoxImage().SetImageTint(ImageTint).SetTexture(Image);
 			return *this;
 		}
 
-		BoxWidget& HoveredImage(Texture* Image)
+		BoxWidget& HoveredImage(Texture* Image, Color ImageTint = WHITE)
 		{
-			Style.HoveredBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			Style.HoveredBoxImage().SetImageTint(ImageTint).SetTexture(Image);
 			return *this;
 		}
 		
-		BoxWidget& PressedImage(Texture* Image)
+		BoxWidget& PressedImage(Texture* Image, Color ImageTint = WHITE)
 		{
-			Style.PressedBoxImage().SetImageTint(WHITE).SetTexture(Image);
+			Style.PressedBoxImage().SetImageTint(ImageTint).SetTexture(Image);
 			return *this;
 		}
 
@@ -62,13 +60,13 @@ namespace Ry
 
 		BoxWidget& HoveredBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
 		{
-			Style.PressedBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
+			Style.HoveredBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
 			return *this;
 		}
 
 		BoxWidget& PressedBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
 		{
-			Style.HoveredBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
+			Style.PressedBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
 			return *this;
 		}
 
@@ -156,29 +154,20 @@ namespace Ry
 			return *this;
 		}
 
-		bool IsHovered()
-		{
-			return Hovered;
-		}
-
-		bool IsPressed()
-		{
-			return Pressed;
-		}
-
 		SizeType ComputeSize() const override
 		{
 			SizeType ParentSize;
 			SizeType ChildSize;
 			SizeType Result;
 
-			// Compute child size
-			if(Child)
+			// Compute child size, only if needed otherwise we'd enter infinite recursion
+			if(Child && (WidthMode == SizeMode::AUTO || HeightMode == SizeMode::AUTO))
 			{
 				ChildSize = Child->ComputeSize();
 			}
 
 			// Compute parent size
+			// todo: why the added &&? 
 			if(Parent && (WidthMode == SizeMode::PERCENTAGE || HeightMode == SizeMode::PERCENTAGE))
 			{
 				ParentSize = Parent->ComputeSize();
@@ -210,11 +199,21 @@ namespace Ry
 			return Result;
 		}
 
-		void Show() override
+		void SetVisible(bool bVisibility, bool bPropagate) override
 		{
-			if(Hovered)
+			Widget::SetVisible(bVisibility, bPropagate);
+
+			if(bPropagate && Child)
 			{
-				if (Pressed)
+				Child->SetVisible(bVisibility, bPropagate);
+			}
+		}
+
+		void OnShow() override
+		{
+			if(IsHovered())
+			{
+				if (IsPressed())
 				{
 					if(Style.Pressed)
 					{
@@ -226,6 +225,10 @@ namespace Ry
 					if(Style.Hovered)
 					{
 						Style.Hovered->Show();
+					}
+					else if(Style.Default)
+					{
+						Style.Default->Show();
 					}
 				}
 			}
@@ -239,11 +242,11 @@ namespace Ry
 
 			if(Child)
 			{
-				Child->Show();
+				Child->OnShow();
 			}
 		}
 		
-		void Hide() override
+		void OnHide() override
 		{
 			if(Style.Default)
 			{
@@ -266,9 +269,9 @@ namespace Ry
 			Point Abs = GetAbsolutePosition();
 			SizeType ComputedSize = ComputeSize();
 
-			if(Hovered)
+			if(IsHovered())
 			{
-				if(Pressed && Style.Pressed)
+				if(IsPressed() && Style.Pressed)
 				{
 					Style.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float) ComputedSize.Height);
 				}
@@ -355,6 +358,30 @@ namespace Ry
 			SizeDirty.Broadcast();
 		}
 
+		bool OnMouseEvent(const MouseEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseEvent(MouseEv);
+
+			if(Child)
+			{
+				Child->OnMouseEvent(MouseEv);
+			}
+
+			return bHandled;
+		}
+
+		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseButtonEvent(MouseEv);
+
+			if(Child)
+			{
+				bHandled |= Child->OnMouseButtonEvent(MouseEv);
+			}
+
+			return bHandled;			
+		}
+
 		Widget& operator[](Ry::Widget& Child) override
 		{
 			SetChild(Child);
@@ -424,6 +451,69 @@ namespace Ry
 			}
 		}
 
+		void OnHovered(const MouseEvent& MouseEv) override
+		{
+			Widget::OnHovered(MouseEv);
+
+			OnHide();
+			OnShow();
+
+			Draw();
+
+			// TODO: have some sort of dirty event that gets called
+			ShapeBatch->Update();
+			TextBatch->Update();
+			TextureBatch->Update();
+
+		}
+
+		void OnUnhovered(const MouseEvent& MouseEv) override
+		{
+			Widget::OnUnhovered(MouseEv);
+
+			OnHide();
+			OnShow();
+
+			Draw();
+
+			ShapeBatch->Update();
+			TextBatch->Update();
+			TextureBatch->Update();
+		}
+
+		bool OnPressed(const MouseButtonEvent& MouseEv) override
+		{
+			Widget::OnPressed(MouseEv);
+
+			OnHide();
+			OnShow();
+
+			Draw();
+
+			ShapeBatch->Update();
+			TextBatch->Update();
+			TextureBatch->Update();
+
+			return true;
+		}
+
+		bool OnReleased(const MouseButtonEvent& MouseEv) override
+		{
+			Widget::OnReleased(MouseEv);
+
+			OnHide();
+			OnShow();
+
+			Draw();
+
+			ShapeBatch->Update();
+			TextBatch->Update();
+			TextureBatch->Update();
+
+			return true;
+
+		}
+
 	private:
 
 		VAlign ContentVAlign;
@@ -450,15 +540,6 @@ namespace Ry
 		 */
 		BoxStyle Style;
 
-		/**
-		 * Whether this box element is currently hovered over.
-		 */
-		bool Hovered;
-
-		/**
-		 * Whether this box element is currently pressed.
-		 */
-		bool Pressed;
 
 		VAlign VerticalAlign;
 		HAlign HorizontalAlign;

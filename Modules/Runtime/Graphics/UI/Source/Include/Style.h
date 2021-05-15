@@ -98,7 +98,7 @@ namespace Ry
 
 			if (!Existing)
 			{
-				Default.Reset(Existing = new BoxDrawable);
+				Hovered.Reset(Existing = new BoxDrawable);
 			}
 
 			return *Existing;
@@ -110,7 +110,7 @@ namespace Ry
 
 			if (!Existing)
 			{
-				Default.Reset(Existing = new BoxDrawable);
+				Pressed.Reset(Existing = new BoxDrawable);
 			}
 
 			return *Existing;

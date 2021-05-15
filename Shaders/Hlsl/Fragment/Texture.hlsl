@@ -18,11 +18,9 @@ PixelOutput main(PixelInput In)
 	PixelOutput Res;
 
 	float4 TextureColor = BatchTexture.Sample(BatchTextureSampler, In.VertUV);
-		
-	Res.PixelColor = In.VertColor * float4(TextureColor.r, 
-	TextureColor.g, 
-	TextureColor.b, 
-	TextureColor.a);
+				
+	Res.PixelColor = In.VertColor * float4(TextureColor.r, TextureColor.g, TextureColor.b, TextureColor.a);
+	//Res.PixelColor = float4(TextureColor.a, TextureColor.a, TextureColor.a, 1.0f);
 	
 	return Res;
 }

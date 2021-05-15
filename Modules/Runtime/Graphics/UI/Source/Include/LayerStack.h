@@ -1,0 +1,35 @@
+#pragma once
+
+#include "Core/Core.h"
+#include "UIGen.h"
+
+namespace Ry
+{
+
+	class Layer;
+	struct Event;
+
+	class UI_MODULE LayerStack
+	{
+	public:
+
+		LayerStack();
+		virtual ~LayerStack();
+
+		void PushLayer(Layer* Lay);
+		void RemoveLayer(Layer* Lay);
+
+		void Update(float Delta);
+		void Render();
+
+		void OnEvent(const Event& Ev);
+		
+
+	private:
+
+		// Acts like a stack
+		Ry::ArrayList<Layer*> Layers;
+		
+	};
+	
+}

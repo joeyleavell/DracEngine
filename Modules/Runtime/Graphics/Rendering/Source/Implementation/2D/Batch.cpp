@@ -200,10 +200,13 @@ namespace Ry
 	{
 		Item->Clear();
 
-		Item->AddVertex1P1UV1C(0 - OriginX + X, 0 - OriginY + Y, Depth, U, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C(Width - OriginX + X, 0 - OriginY + Y, Depth, U + UVWidth, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C(Width - OriginX + X, -Height - OriginY + Y, Depth, U + UVWidth, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C(0 - OriginX + X, -Height - OriginY + Y, Depth, U, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		float OriginXModel = OriginX * Width;
+		float OriginYModel = OriginY * Height;
+
+		Item->AddVertex1P1UV1C(0 - OriginXModel + X, 0 + OriginYModel + Y, Depth, U, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C(Width - OriginXModel + X, 0 + OriginYModel + Y, Depth, U + UVWidth, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C(Width - OriginXModel + X, -Height + OriginYModel + Y, Depth, U + UVWidth, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C(0 - OriginXModel + X, -Height + OriginYModel + Y, Depth, U, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
 
 		Item->AddTriangle(0, 1, 2);
 		Item->AddTriangle(2, 3, 0);

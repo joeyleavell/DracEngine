@@ -52,12 +52,12 @@ namespace Ry
 			return *this;
 		}
 
-		void Show() override
+		void OnShow() override
 		{
 			TextBatch->AddItemSet(ItemSet, Style.Font->GetAtlasTexture());
 		}
 
-		void Hide() override
+		void OnHide() override
 		{
 			TextBatch->RemoveItemSet(ItemSet);
 		}

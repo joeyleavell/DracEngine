@@ -119,7 +119,7 @@ namespace Ry
 
 		if (Success)
 		{
-			Ry::Log->Log("Engine initialized");
+			Ry::Log->Log("Engine initiinitialized");
 			Running = true;
 
 			// init subsystems here

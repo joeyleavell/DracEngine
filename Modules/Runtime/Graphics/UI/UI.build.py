@@ -1,3 +1,3 @@
 Type = "Runtime"
 
-Modules = ["Core", "Math", "AssetCore", "Rendering"]
+Modules = ["Core", "Math", "AssetCore", "Rendering", "Input"]
