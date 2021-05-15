@@ -19,6 +19,7 @@
 #include "Input.h"
 #include "Widget/Label.h"
 #include "VectorFontAsset.h"
+#include "Interface/RenderCommand.h"
 
 namespace Ry
 {
@@ -190,8 +191,8 @@ namespace Ry
 				NewWidget(Ry::BoxWidget)
 				.Padding(10.0f, 10.0f)
 				.FillX(1.0f)
-	//			.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-//				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
+				.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
 				[
 					NewWidgetAssign(Grid, Ry::GridLayout)
 					.SetCellSize(100.0f)

@@ -2,6 +2,7 @@
 
 #include "Event.h"
 #include "UIGen.h"
+#include "SwapChain.h"
 
 namespace Ry
 {
@@ -10,9 +11,17 @@ namespace Ry
 	{
 	public:
 
-		void Update(float Delta) {};
-		void Render() {};
-		bool OnEvent(const Event& Ev) { return false; };
+		Layer(SwapChain* Parent);
+
+		virtual void Update(float Delta) {};
+		virtual void Render() {};
+		virtual bool OnEvent(const Event& Ev) { return false; };
+
+		virtual void OnResize(int32 Width, int32 Height){};
+
+	protected:
+
+		SwapChain* ParentSC;
 		
 	};
 	

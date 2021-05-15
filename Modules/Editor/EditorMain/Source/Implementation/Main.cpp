@@ -8,7 +8,7 @@
 #include "EditorMain.h"
 #include "CommandUtils.h"
 #include "Language/ShaderCompiler.h"
-#include "ContentBrowser.h"
+#include "Editor.h"
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
@@ -191,7 +191,7 @@ int main(int ArgC, char** ArgV)
 		else
 		{
 			// Todo: project launcher
-			Ry::ContentBrowser* Ed = new Ry::ContentBrowser(Plat);
+			Ry::Editor* Ed = new Ry::Editor(Plat);
 			Ed->Run();
 		}
 	}

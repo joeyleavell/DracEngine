@@ -83,7 +83,8 @@ namespace Ry
 		TextBatch(nullptr),
 		TextureBatch(nullptr),
 		bPressed(false),
-		bHovered(false)
+		bHovered(false),
+		bVisible(false)
 		{
 			
 		};

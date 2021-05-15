@@ -27,14 +27,14 @@
 
 namespace Ry
 {
-	class Editor
+	class Editor2
 	{
 	public:
 
 		ResourceSet* ResSet = nullptr;
 		Ry::Float4x4 Proj;
 		
-		Editor(Ry::RenderingPlatform Platform)
+		Editor2(Ry::RenderingPlatform Platform)
 		{
 			Ry::rplatform = new Ry::RenderingPlatform(Platform);
 		}
@@ -87,8 +87,8 @@ namespace Ry
 				Ry::Log->Log("Window created");
 			}
 
-			Ry::ViewportWidthDel.BindMemberFunction(this, &Editor::GetViewportWidth);
-			Ry::ViewportHeightDel.BindMemberFunction(this, &Editor::GetViewportHeight);
+			Ry::ViewportWidthDel.BindMemberFunction(this, &Editor2::GetViewportWidth);
+			Ry::ViewportHeightDel.BindMemberFunction(this, &Editor2::GetViewportHeight);
 			
 		}
 
@@ -164,7 +164,7 @@ namespace Ry
 			InitAssetSystem();
 			InitWindow();
 
-			EditorMainWindow->GetSwapChain()->OnSwapChainDirty.AddMemberFunction(this, &Editor::OnResize);
+			EditorMainWindow->GetSwapChain()->OnSwapChainDirty.AddMemberFunction(this, &Editor2::OnResize);
 
 			// Create 1x1 white texture as a default diffuse map
 			Ry::Bitmap DefaultDiffuseBmp(1, 1, PixelStorage::FOUR_BYTE_RGBA);

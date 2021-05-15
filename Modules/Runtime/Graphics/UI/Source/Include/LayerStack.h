@@ -23,7 +23,7 @@ namespace Ry
 		void Render();
 
 		void OnEvent(const Event& Ev);
-		
+		void OnResize(int32 NewWidth, int32 NewHeight);		
 
 	private:
 

@@ -61,5 +61,13 @@ namespace Ry
 		}
 
 	}
-	
+
+	void LayerStack::OnResize(int32 NewWidth, int32 NewHeight)
+	{
+		for (int32 LayerIndex = Layers.GetSize() - 1; LayerIndex >= 0; LayerIndex--)
+		{
+			Layer* Lay = Layers[LayerIndex];
+			Lay->OnResize(NewWidth, NewHeight);
+		}
+	}
 }
