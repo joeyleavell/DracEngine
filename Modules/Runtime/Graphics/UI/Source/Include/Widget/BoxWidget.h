@@ -239,11 +239,6 @@ namespace Ry
 					Style.Default->Show();
 				}
 			}
-
-			if(Child)
-			{
-				Child->OnShow();
-			}
 		}
 		
 		void OnHide() override
@@ -293,6 +288,11 @@ namespace Ry
 			{
 				Child->Draw();
 			}
+		}
+
+		bool HasVisual()
+		{
+			return Style.Default || Style.Hovered || Style.Pressed;
 		}
 
 		void Arrange() override
@@ -455,15 +455,18 @@ namespace Ry
 		{
 			Widget::OnHovered(MouseEv);
 
-			OnHide();
-			OnShow();
+//			if(HasVisual())
+			{
+				OnHide();
+				OnShow();
 
-			Draw();
+				Draw();
 
-			// TODO: have some sort of dirty event that gets called
-			ShapeBatch->Update();
-			TextBatch->Update();
-			TextureBatch->Update();
+				// TODO: have some sort of dirty event that gets called
+				ShapeBatch->Update();
+				TextBatch->Update();
+				TextureBatch->Update();
+			}
 
 		}
 
@@ -471,14 +474,18 @@ namespace Ry
 		{
 			Widget::OnUnhovered(MouseEv);
 
-			OnHide();
-			OnShow();
+//			if(HasVisual())
+			{
+				OnHide();
+				OnShow();
 
-			Draw();
+				Draw();
 
-			ShapeBatch->Update();
-			TextBatch->Update();
-			TextureBatch->Update();
+				ShapeBatch->Update();
+				TextBatch->Update();
+				TextureBatch->Update();
+			}
+
 		}
 
 		bool OnPressed(const MouseButtonEvent& MouseEv) override

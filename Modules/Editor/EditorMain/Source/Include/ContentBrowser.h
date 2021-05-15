@@ -135,6 +135,8 @@ namespace Ry
 			Ry::InitRenderingEngine();
 			InitAssetSystem();
 
+			Cmd = Ry::RendAPI->CreateCommandBuffer(Wnd->GetSwapChain());
+
 			Delegate<void, int32, int32> Resized;
 			Resized.BindMemberFunction(this, &ContentBrowser::Resize);
 			Wnd->AddWindowResizedDelegate(Resized);
@@ -180,28 +182,28 @@ namespace Ry
 			Ry::BoxWidget* Canvas;
 			
 			NewWidgetAssign(Canvas, BoxWidget)
+			.FillX(1.0f)
+			.FillY(1.0f)
+			.SetHAlign(HAlign::CENTER)
+			.SetVAlign(VAlign::BOTTOM)
+			[
+				NewWidget(Ry::BoxWidget)
+				.Padding(10.0f, 10.0f)
 				.FillX(1.0f)
-				.FillY(1.0f)
-				.SetHAlign(HAlign::CENTER)
-				.SetVAlign(VAlign::BOTTOM)
+				.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
 				[
-					NewWidget(Ry::BoxWidget)
-					.Padding(10.0f, 10.0f)
-					.FillX(1.0f)
-					.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-					.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
-					[
-						NewWidgetAssign(Grid, Ry::GridLayout)
-						.SetCellSize(150.0f)
-					]
+					NewWidgetAssign(Grid, Ry::GridLayout)
+					.SetCellSize(55.0f)
+				]
 			];
 
 
-			for(int32 Slot = 0; Slot < 5; Slot ++)
+			for(int32 Slot = 0; Slot < 16; Slot ++)
 			{				
 				Grid->AppendSlot(
-					NewWidget(Ry::VerticalLayout)
-					+
+					//NewWidget(Ry::VerticalLayout)
+					//+
 					NewWidget(Ry::BoxWidget)
 					.Padding(20.0f, 20.0f)
 					.DefaultImage(Tex)
@@ -233,12 +235,11 @@ namespace Ry
 
 			UI->Draw();
 
+			ShapeBatch->Render();
+			TextureBatch->Render();
+			TextBatch->Render();
 
-			// ShapeBatch->Render();
-			// TextureBatch->Render();
-			// TextBatch->Render();
-
-			//RecordCmds();
+			RecordCmds();
 		}
 
 		void Update()
@@ -258,7 +259,6 @@ namespace Ry
 
 		void RecordCmds()
 		{
-			Cmd = Ry::RendAPI->CreateCommandBuffer(Wnd->GetSwapChain());
 			Cmd->BeginCmd();
 			{
 				Cmd->BeginRenderPass(Wnd->GetSwapChain()->GetDefaultRenderPass());
@@ -275,12 +275,12 @@ namespace Ry
 						{
 							Cmd->DrawCommandBuffer(Shape);
 						}
-
+						
 						if (Texture)
 						{
 							Cmd->DrawCommandBuffer(Texture);
 						}
-
+						
 						if (Text)
 						{
 							Cmd->DrawCommandBuffer(Text);
