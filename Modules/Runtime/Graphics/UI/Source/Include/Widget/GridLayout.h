@@ -142,6 +142,7 @@ namespace Ry
 
 							// Set the widget's relative position
 							Widget->SetRelativePosition(static_cast<float>(WidgetX), static_cast<float>(WidgetY));
+							Widget->Arrange();
 						}
 
 						bRowExists = true;

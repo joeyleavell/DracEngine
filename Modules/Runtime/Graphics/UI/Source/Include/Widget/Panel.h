@@ -23,6 +23,11 @@ namespace Ry
 		// 	}
 		// }
 
+		PanelWidget()
+		{
+			this->SlotMargin = 0.0f;
+		}
+		
 		void OnChildSizeDirty()
 		{
 			// Rearrange all widgets with respect to the panel

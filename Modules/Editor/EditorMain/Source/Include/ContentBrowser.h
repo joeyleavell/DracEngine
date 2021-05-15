@@ -146,7 +146,7 @@ namespace Ry
 			Ry::input_handler = new Ry::InputHandler;
 
 			VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-			BitmapFont* RTFont = Font->GenerateBitmapFont(15);
+			BitmapFont* RTFont = Font->GenerateBitmapFont(30);
 			
 			TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
 			Texture* Tex = Asset->CreateRuntimeTexture();
@@ -190,11 +190,11 @@ namespace Ry
 				NewWidget(Ry::BoxWidget)
 				.Padding(10.0f, 10.0f)
 				.FillX(1.0f)
-				.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
+	//			.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+//				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
 				[
 					NewWidgetAssign(Grid, Ry::GridLayout)
-					.SetCellSize(55.0f)
+					.SetCellSize(100.0f)
 				]
 			];
 
@@ -202,16 +202,16 @@ namespace Ry
 			for(int32 Slot = 0; Slot < 16; Slot ++)
 			{				
 				Grid->AppendSlot(
-					//NewWidget(Ry::VerticalLayout)
-					//+
+					NewWidget(Ry::VerticalLayout)
+					+
 					NewWidget(Ry::BoxWidget)
-					.Padding(20.0f, 20.0f)
+					.Padding(30.0f, 30.0f)
 					.DefaultImage(Tex)
 					.HoveredImage(Tex, WHITE.ScaleRGB(0.5f))
-					// +
-					// NewWidget(Ry::Label)
-					// .SetText("Test")
-					// .SetStyle(RTFont, WHITE)
+					+
+					NewWidget(Ry::Label)
+					.SetText("Test")
+					.SetStyle(RTFont, WHITE)
 				);
 			}
 

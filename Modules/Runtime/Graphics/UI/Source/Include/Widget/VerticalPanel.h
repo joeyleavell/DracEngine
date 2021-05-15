@@ -13,10 +13,10 @@ namespace Ry
 		struct Slot
 		{
 			Ry::Widget* Widget;
-			float LeftMargin;
-			float RightMargin;
-			float TopMargin;
-			float BottomMargin;
+			// float LeftMargin;
+			// float RightMargin;
+			// float TopMargin;
+			// float BottomMargin;
 		};
 
 		void AppendSlot(Ry::Widget& Widget) override
@@ -46,7 +46,8 @@ namespace Ry
 
 				// Set the widget's relative position
 				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(CurrentY));
-
+				Widget->Arrange();
+				
 				CurrentY += static_cast<int32>(ContentSize.Height + SlotMargin);
 			}
 		}

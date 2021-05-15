@@ -35,6 +35,7 @@ namespace Ry
 
 				// Set the widget's relative position
 				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(CurrentY));
+				Widget->Arrange();
 
 				CurrentX += static_cast<int32>(ContentSize.Width + SlotMargin);
 			}
