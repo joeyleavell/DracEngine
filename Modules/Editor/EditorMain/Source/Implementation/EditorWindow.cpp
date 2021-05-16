@@ -58,7 +58,23 @@ namespace Ry
 		Resized.BindMemberFunction(this, &EditorWindow::Resize);
 		EdWindow->AddWindowResizedDelegate(Resized);
 		//OnWindowResize.AddMemberFunction();
-		
+
+
+		Ry::Delegate<void, int, bool> ButtonPressedDelegate;
+		ButtonPressedDelegate.BindMemberFunction(this, &EditorWindow::OnButtonPressed);
+		EdWindow->AddMouseButtonDelegate(ButtonPressedDelegate);
+
+		Ry::Delegate<void, uint32> KeyCharDelegate;
+		KeyCharDelegate.BindMemberFunction(this, &EditorWindow::OnKeyChar);
+		EdWindow->AddKeyCharDelegate(KeyCharDelegate);
+
+		Ry::Delegate<void, int32, bool> KeyPressDelegate;
+		KeyPressDelegate.BindMemberFunction(this, &EditorWindow::OnKeyPressed);
+		EdWindow->AddKeyPressDelegate(KeyPressDelegate);
+
+		Ry::Delegate<void, double, double> ScrollDelegate;
+		ScrollDelegate.BindMemberFunction(this, &EditorWindow::OnScroll);
+		EdWindow->AddScrollDelegate(ScrollDelegate);
 	}
 
 	void EditorWindow::Update()
@@ -82,6 +98,26 @@ namespace Ry
 			EdLayers.OnEvent(Ev);
 		}
 
+	}
+
+	void EditorWindow::OnButtonPressed(int32 Button, bool bPressed)
+	{
+		
+	}
+
+	void EditorWindow::OnKeyPressed(int32 Key, bool bPressed)
+	{
+		
+	}
+
+	void EditorWindow::OnKeyChar(uint32 Codepoint)
+	{
+		
+	}
+
+	void EditorWindow::OnScroll(double ScrollX, double ScrollY)
+	{
+		
 	}
 
 	void EditorWindow::Render()

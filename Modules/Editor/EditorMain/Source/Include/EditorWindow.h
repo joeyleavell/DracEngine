@@ -28,6 +28,11 @@ namespace Ry
 
 	private:
 
+		void OnButtonPressed(int32 Button, bool bPressed);
+		void OnKeyPressed(int32 Key, bool bPressed);
+		void OnKeyChar(uint32 Codepoint);
+		void OnScroll(double ScrollX, double ScrollY);
+
 		// Layers that get drawn to the 
 		LayerStack EdLayers;
 
@@ -35,5 +40,4 @@ namespace Ry
 
 	};
 
-	
 }
