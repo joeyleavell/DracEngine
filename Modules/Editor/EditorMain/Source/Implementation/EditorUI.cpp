@@ -1,7 +1,7 @@
 #include "EditorUI.h"
 #include "Interface/RenderAPI.h"
 #include "Widget/UserInterface.h"
-#include "Widget/BoxWidget.h"
+#include "Widget/BorderWidget.h"
 #include "VectorFontAsset.h"
 #include "Manager/AssetManager.h"
 #include "TextureAsset.h"
@@ -51,23 +51,23 @@ namespace Ry
 		UI->SetTextBatch(TextBatch);
 		UI->SetTextureBatch(TextureBatch);
 
-		Ry::BoxWidget* Canvas;
+		Ry::BorderWidget* Canvas;
 
-		NewWidgetAssign(Canvas, BoxWidget)
+		NewWidgetAssign(Canvas, BorderWidget)
 			.FillX(1.0f)
 			.FillY(1.0f)
 			.SetHAlign(HAlign::CENTER)
 			.SetVAlign(VAlign::BOTTOM)
 			[
-				NewWidget(Ry::BoxWidget)
+				NewWidget(Ry::BorderWidget)
+				.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
 				.Padding(10.0f, 10.0f)
-			.FillX(1.0f)
-			.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-			.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
-			[
-				NewWidgetAssign(Grid, Ry::GridLayout)
-				.SetCellSize(100.0f)
-			]
+				.FillX(1.0f)
+				[
+					NewWidgetAssign(Grid, Ry::GridLayout)
+					.SetCellSize(100.0f)
+				]
 			];
 
 
@@ -76,10 +76,10 @@ namespace Ry
 			Grid->AppendSlot(
 				NewWidget(Ry::VerticalLayout)
 				+
-				NewWidget(Ry::BoxWidget)
-				.Padding(30.0f, 30.0f)
+				NewWidget(Ry::BorderWidget)
 				.DefaultImage(Tex)
 				.HoveredImage(Tex, WHITE.ScaleRGB(0.5f))
+				.Padding(30.0f, 30.0f)
 				+
 				NewWidget(Ry::Label)
 				.SetText("Test")

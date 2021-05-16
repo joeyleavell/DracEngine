@@ -59,7 +59,6 @@ namespace Ry
 		EdWindow->AddWindowResizedDelegate(Resized);
 		//OnWindowResize.AddMemberFunction();
 
-
 		Ry::Delegate<void, int, bool> ButtonPressedDelegate;
 		ButtonPressedDelegate.BindMemberFunction(this, &EditorWindow::OnButtonPressed);
 		EdWindow->AddMouseButtonDelegate(ButtonPressedDelegate);

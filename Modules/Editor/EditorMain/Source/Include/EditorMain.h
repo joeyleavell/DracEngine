@@ -11,7 +11,7 @@
 #include "Factory/TrueTypeFontFactory.h"
 #include "2D/Batch/Batch.h"
 #include "Widget/UserInterface.h"
-#include "Widget/BoxWidget.h"
+#include "Widget/BorderWidget.h"
 #include "VulkanRenderAPI.h"
 #include "Widget/VerticalPanel.h"
 #include "Language/ShaderCompiler.h"
@@ -137,16 +137,16 @@ namespace Ry
 			{
 				UI = new UserInterface;
 
-				Ry::BoxWidget* Canvas;
-				NewWidgetAssign(Canvas, BoxWidget)
+				Ry::BorderWidget* Canvas;
+				NewWidgetAssign(Canvas, BorderWidget)
 				.FillX(1.0f)
 				.FillY(1.0f)
 				.SetHAlign(HAlign::CENTER)
 				.SetVAlign(VAlign::BOTTOM)
 				[
-					NewWidget(Ry::BoxWidget)
+					NewWidget(Ry::BorderWidget)
+					.DefaultBox(GREEN, GREEN, 0, 0)\
 					.Padding(100.0f, 100.0f)
-					.DefaultBox(GREEN, GREEN, 0, 0)
 				];
 
 

@@ -15,7 +15,7 @@
 #include "SwapChain.h"
 #include "Widget/UserInterface.h"
 #include "Factory/TextFileFactory.h"
-#include "Widget/BoxWidget.h"
+#include "Widget/BorderWidget.h"
 #include "Widget/GridLayout.h"
 #include "Widget/VerticalPanel.h"
 #include "Input.h"
