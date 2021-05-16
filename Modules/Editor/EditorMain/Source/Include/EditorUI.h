@@ -3,6 +3,7 @@
 #include "2D/Batch/Batch.h"
 #include "Widget/UserInterface.h"
 #include "Widget/GridLayout.h"
+#include "ContentBrowser/ContentBrowser.h"
 
 namespace Ry
 {
@@ -32,9 +33,8 @@ namespace Ry
 
 		UserInterface* UI;
 
-		Ry::GridLayout* Grid;
-
-		SharedPtr<BatchItem> TextureItem;
+		// Editor utility classes
+		ContentBrowser* ContentBrowse;
 
 	};
 	

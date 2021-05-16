@@ -77,7 +77,7 @@ namespace Ry
 
 		Widget() :
 		RelativePosition{ 0, 0 },
-		MaxSize{0, 0},
+		MaxSize{-1, -1},
 		Parent(nullptr),
 		ShapeBatch(nullptr),
 		TextBatch(nullptr),
@@ -231,11 +231,11 @@ namespace Ry
 		
 		}
 		
-		virtual void Draw() = 0;
-		virtual SizeType ComputeSize() const = 0;
+		virtual void Draw() {};
+		virtual SizeType ComputeSize() const { return SizeType{}; };
 
-		virtual void OnShow() = 0;
-		virtual void OnHide() = 0;
+		virtual void OnShow() {}
+		virtual void OnHide() {};
 
 	protected:
 		

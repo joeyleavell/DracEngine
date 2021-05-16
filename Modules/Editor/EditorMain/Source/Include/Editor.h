@@ -19,8 +19,10 @@
 #include "Widget/GridLayout.h"
 #include "Widget/VerticalPanel.h"
 #include "Input.h"
-#include "ContentBrowser.h"
 #include "EditorWindow.h"
+#include "File/File.h"
+#include "VulkanRenderAPI.h"
+#include "Core/PlatformProcess.h"
 
 namespace Ry
 {

@@ -8,6 +8,7 @@
 #include "Widget/VerticalPanel.h"
 #include "Widget/Label.h"
 #include "Interface/RenderCommand.h"
+#include "ContentBrowser/ContentBrowserWidget.h"
 
 namespace Ry
 {
@@ -16,22 +17,6 @@ namespace Ry
 	{
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
-
-		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		BitmapFont* RTFont = Font->GenerateBitmapFont(30);
-
-		TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
-		Texture* Tex = Asset->CreateRuntimeTexture();
-
-		TextureItem = MakeItem();
-		BatchTexture(TextureItem, WHITE,
-			350.0f, 350.0f,
-			0.0f, 0.0f,
-			1.0f, 1.0f,
-			0.5f, 0.5f,
-			100.0f, 100.0f,
-			0.0f
-		);
 
 		Shader* UIShader = GetShader("Shape");
 		Shader* UIText = GetShader("Font");
@@ -51,45 +36,30 @@ namespace Ry
 		UI->SetTextBatch(TextBatch);
 		UI->SetTextureBatch(TextureBatch);
 
-		Ry::BorderWidget* Canvas;
+		Ry::SlotWidget* Root;
+		Ry::ContentBrowserWidget* BrowserWidget;
 
-		NewWidgetAssign(Canvas, BorderWidget)
+		// Build editor UI
+		NewWidgetAssign(Root, BorderWidget)
+		.FillX(1.0f)
+		.FillY(1.0f)
+		.SetHAlign(HAlign::CENTER)
+		.SetVAlign(VAlign::BOTTOM)
+		[
+			NewWidget(Ry::BorderWidget)
+			.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
+			.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
+			.Padding(10.0f, 10.0f)
 			.FillX(1.0f)
-			.FillY(1.0f)
-			.SetHAlign(HAlign::CENTER)
-			.SetVAlign(VAlign::BOTTOM)
 			[
-				NewWidget(Ry::BorderWidget)
-				.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-				.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
-				.Padding(10.0f, 10.0f)
-				.FillX(1.0f)
-				[
-					NewWidgetAssign(Grid, Ry::GridLayout)
-					.SetCellSize(100.0f)
-				]
-			];
+				NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
+			]
+		];
 
+		// Create the content browser utility
+		ContentBrowse = new ContentBrowser(BrowserWidget);
 
-		for (int32 Slot = 0; Slot < 16; Slot++)
-		{
-			Grid->AppendSlot(
-				NewWidget(Ry::VerticalLayout)
-				+
-				NewWidget(Ry::BorderWidget)
-				.DefaultImage(Tex)
-				.HoveredImage(Tex, WHITE.ScaleRGB(0.5f))
-				.Padding(30.0f, 30.0f)
-				+
-				NewWidget(Ry::Label)
-				.SetText("Test")
-				.SetStyle(RTFont, WHITE)
-			);
-		}
-
-		UI->AddRoot(*Canvas);
-
-
+		UI->AddRoot(*Root);
 	}
 
 	void EditorUI::Update(float Delta)

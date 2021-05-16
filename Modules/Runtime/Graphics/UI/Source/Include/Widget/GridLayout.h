@@ -113,7 +113,7 @@ namespace Ry
 
 				int32 CurrentX = static_cast<int32>(SlotMargin);
 
-				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellSize + SlotMargin)
+				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth + SlotMargin)
 				{
 					if(IsSlotOccupied(MaxRow, Col))
 					{
@@ -132,12 +132,15 @@ namespace Ry
 							Ry::Widget* Widget = FoundSlot->Widget;
 							SizeType ContentSize = Widget->ComputeSize();
 
-							int32 CellMX = CurrentX + (int32)(CellSize / 2.0f);
-							int32 CellMY = CurrentY + (int32)(CellSize / 2.0f);
+							//int32 CellMX = CurrentX + (int32)(CellSize / 2.0f);
+							//int32 CellMY = CurrentY + (int32)(CellSize / 2.0f);
 
-							int32 WidgetX = CellMX - (int32)(ContentSize.Width / 2);
-							int32 WidgetY = CellMY - (int32)(ContentSize.Height / 2);
+							//int32 WidgetX = CellMX - (int32)(ContentSize.Width / 2);
+							//int32 WidgetY = CellMY - (int32)(ContentSize.Height / 2);
 
+							int32 WidgetX = CurrentX;
+							int32 WidgetY = CurrentY;
+							
 							// Place the widget in the middle of the cell
 
 							// Set the widget's relative position
@@ -150,7 +153,7 @@ namespace Ry
 
 				}
 
-				CurrentY += CellSize + SlotMargin;
+				CurrentY += CellHeight + SlotMargin;
 				
 				MaxRow++;
 			}
@@ -160,7 +163,7 @@ namespace Ry
 		SizeType ComputeSize() const override
 		{
 			// Default margin: 5px
-			int32 SizeX = static_cast<int32>(2 * SlotMargin + MaxCols * CellSize);
+			int32 SizeX = static_cast<int32>(2 * SlotMargin + MaxCols * CellWidth);
 			int32 SizeY = static_cast<int32>(SlotMargin);
 
 			// Find max row/col
@@ -173,7 +176,7 @@ namespace Ry
 
 				int32 CurrentX = static_cast<int32>(SlotMargin);
 
-				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellSize + SlotMargin)
+				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth + SlotMargin)
 				{
 					if (IsSlotOccupied(MaxRow, Col))
 					{
@@ -183,7 +186,7 @@ namespace Ry
 
 				if(bRowExists)
 				{
-					SizeY += CellSize + SlotMargin;
+					SizeY += CellHeight + SlotMargin;
 				}
 
 				MaxRow++;
@@ -199,17 +202,27 @@ namespace Ry
 			return *this;
 		}
 
-		GridLayout& SetCellSize(float Size)
+		GridLayout& SetCellWidth(float Size)
 		{
-			this->CellSize = Size;
+			this->CellWidth = Size;
 
 			return *this;
 		}
+
+		GridLayout& SetCellHeight(float Size)
+		{
+			this->CellHeight = Size;
+
+			return *this;
+		}
+
 		
 	private:
 
 		int32 MaxCols = 5;
-		float CellSize = 50.0f;
+
+		float CellWidth= 50.0f;
+		float CellHeight = 50.0f;
 
 		Ry::ArrayList<Slot> ChildrenSlots;
 
