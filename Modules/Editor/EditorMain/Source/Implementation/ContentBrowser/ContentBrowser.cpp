@@ -12,12 +12,18 @@ namespace Ry
 
 		// Initialize content browser to a directory (virtual)
 		// The virtual path will be translated to an absolute path for crawling
-		SetDirectory("/Engine/Mesh/");
+		SetDirectory("/Engine/");
 	}
 
 	void ContentBrowser::SetDirectory(Ry::String Virtual)
 	{
+		// Clear out nodes and widgets
+		Nodes.Clear();
+		Browser->ClearChildren();
+		
 		this->CurrentDirectory = Virtual;
+
+		Browser->SetCurrentDirectory(Virtual);
 
 		// Crawl files in this directory
 		Ry::String Absolute = Ry::File::VirtualToAbsolute(Virtual);
@@ -27,18 +33,48 @@ namespace Ry
 		// Iterate paths in directory
 		for(auto& Path : CurDirItr)
 		{
-			// Get name of item
-			Ry::String Item = Path.path().stem().string().c_str();
+			// Create a browser node for this
+			BrowserNode Node;
+			Node.Name = Path.path().stem().string().c_str();
+			Node.bDirectory = Filesystem::is_directory(Path);
 
-			if(Filesystem::is_directory(Path))
+			if(Node.bDirectory)
 			{
-				Browser->AddDirectory(Item);
+				Node.Widget = Browser->AddDirectory(Node.Name);
 			}
 			else
 			{
-				Browser->AddFile(Item);
+				Node.Widget = Browser->AddFile(Node.Name);
+			}
+
+			if(Node.Widget)
+			{
+				Node.Widget->OnDoubleClick.AddMemberFunction(this, &ContentBrowser::OpenNode);
+				Nodes.insert(Node.Widget.Get(), Node);
 			}
 		}
+
+		Browser->MarkDirty();
 		
 	}
+
+	void ContentBrowser::OpenNode(ContentBrowserItem* Item)
+	{
+		if(Nodes.contains(Item))
+		{
+			BrowserNode& Node = *Nodes.get(Item);
+
+			if(Node.bDirectory)
+			{
+				// Concat paths, Go into directory
+				Ry::String NewVirtual = CurrentDirectory + "/" + Node.Name + "/";
+				SetDirectory(NewVirtual);
+			}
+			else
+			{
+				// Asset open action
+			}
+		}
+	}
+	
 }

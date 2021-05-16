@@ -216,6 +216,14 @@ namespace Ry
 			return *this;
 		}
 
+		void ClearChildren() override
+		{
+			PanelWidget::ClearChildren();
+			
+			Occupied.Clear();
+			ChildrenSlots.Clear();
+		}
+
 		
 	private:
 

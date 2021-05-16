@@ -85,6 +85,14 @@ namespace Ry
 
 			return Result;
 		}
+
+		void ClearChildren() override
+		{
+			PanelWidget::ClearChildren();
+
+			ChildrenSlots.Clear();
+		}
+		
 	private:
 
 		Ry::ArrayList<Slot> ChildrenSlots;

@@ -64,4 +64,14 @@ namespace Ry
 		return bHandled;
 	}
 
+	bool Widget::OnMouseClicked(const MouseClickEvent& MouseEv)
+	{
+		return false;
+	}
+
+	bool Widget::OnMouseDragged(const MouseDragEvent& MouseEv)
+	{
+		return false;
+	}
+	
 }

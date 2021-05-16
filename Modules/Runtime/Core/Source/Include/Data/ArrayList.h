@@ -236,6 +236,7 @@ namespace Ry
 
 		void Clear()
 		{
+			// todo: delete data, needed for shared ptrs etc
 			Size = 0;
 		}
 

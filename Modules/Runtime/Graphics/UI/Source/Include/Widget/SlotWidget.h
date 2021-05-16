@@ -221,20 +221,40 @@ namespace Ry
 			}
 		}
 
+		void ChildStateDirty()
+		{
+			Arrange();
+
+			MarkDirty();
+		}
+
 		void SetChild(Ry::Widget& Child)
 		{
 			// TODO: if there is an existing child, remove the parent/child links
 
+			// If existing child, hide it
+			if (this->Child)
+			{
+				this->Child->SetVisible(false, true);
+			}
+
+			// Set existing batches
+			// TODO: this should just be a pointer back up to user interface
+			Child.SetShapeBatch(ShapeBatch);
+			Child.SetTextureBatch(TextureBatch);
+			Child.SetTextBatch(TextBatch);
+			
 			// Setup the parent/child relationship
 			this->Child = &Child;
 			Child.SetParent(this);
-			Child.SizeDirty.AddMemberFunction(this, &SlotWidget::Arrange);
+			Child.SetVisible(IsVisible(), true); // Child matches our visibility
+			Child.RenderStateDirty.AddMemberFunction(this, &SlotWidget::ChildStateDirty);
 
 			// Automatically rearrange
 			Arrange();
 
 			// Recompute cached size
-			SizeDirty.Broadcast();
+			MarkDirty();
 		}
 
 		bool OnMouseEvent(const MouseEvent& MouseEv) override
@@ -259,6 +279,26 @@ namespace Ry
 			}
 
 			return bHandled;
+		}
+
+		bool OnMouseClicked(const MouseClickEvent& MouseEv) override
+		{
+			if(Child)
+			{
+				return Child->OnMouseClicked(MouseEv);
+			}
+
+			return false;
+		}
+
+		bool OnMouseDragged(const MouseDragEvent& MouseEv) override
+		{
+			if (Child)
+			{
+				return Child->OnMouseDragged(MouseEv);
+			}
+
+			return false;
 		}
 
 		Widget& operator[](Ry::Widget& Child) override

@@ -32,7 +32,7 @@ namespace Ry
 		{
 			this->Text = Text;
 
-			SizeDirty.Broadcast();
+			RenderStateDirty.Broadcast();
 			
 			return *this;
 		}
@@ -48,7 +48,7 @@ namespace Ry
 		{
 			Style.SetFont(Font);
 			
-			SizeDirty.Broadcast();
+			RenderStateDirty.Broadcast();
 			return *this;
 		}
 

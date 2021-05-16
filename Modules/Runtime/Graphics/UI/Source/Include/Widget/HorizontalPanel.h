@@ -86,6 +86,13 @@ namespace Ry
 			ChildrenSlots.Add(PanelSlot);
 		}
 
+		void ClearChildren() override
+		{
+			PanelWidget::ClearChildren();
+
+			ChildrenSlots.Clear();
+		}
+
 	private:
 
 		Ry::ArrayList<Slot> ChildrenSlots;

@@ -126,14 +126,59 @@ namespace Ry
 		{
 			Init();
 
+			// LastFps = std::chrono::high_resolution_clock::now();
+			// while (!EditorMainWindow->ShouldClose())
+			// {
+			// 	FPS++;
+			// 	UpdateEditor();
+			// 	RenderEditor();
+			//
+			// 	std::chrono::duration<double> Delta = std::chrono::high_resolution_clock::now() - LastFps;
+			// 	if (std::chrono::duration_cast<std::chrono::seconds>(Delta).count() >= 1.0)
+			// 	{
+			// 		LastFps = std::chrono::high_resolution_clock::now();
+			// 		Ry::Log->Logf("FPS: %d", FPS);
+			// 		FPS = 0;
+			// 	}
+			// }
+
+
 			while (!PrimaryWindow->WantsClose())
 			{
-				PrimaryWindow->Update();
+				// Get current frame time point
+				auto CurFrame = std::chrono::high_resolution_clock::now();
+
+				// Calculate delta
+				std::chrono::duration<double> Delta = CurFrame - LastFrame;
+				float DeltaSeconds = static_cast<float>(std::chrono::duration_cast<std::chrono::nanoseconds>(Delta).count() / 1e9);
+
+				// Reset last frame time point
+				LastFrame = CurFrame;
+
+				// Update and render primary editor window
+				PrimaryWindow->Update(DeltaSeconds);
 				PrimaryWindow->Render();
+
+				// todo: secondary editor windows (dock)?
+
+				std::chrono::duration<double> DeltaLastFPS = CurFrame - LastFPS;
+				if(std::chrono::duration_cast<std::chrono::seconds>(DeltaLastFPS).count() >= 1)
+				{
+					std::cout << FPS << std::endl;
+					FPS = 0;
+					LastFPS = CurFrame;
+				}
+
+				FPS++;
 			}
 		}
 
 	private:
+
+		int32 FPS = 0;
+
+		std::chrono::high_resolution_clock::time_point LastFrame = std::chrono::high_resolution_clock::now();
+		std::chrono::high_resolution_clock::time_point LastFPS = std::chrono::high_resolution_clock::now();
 
 		EditorWindow* PrimaryWindow;
 

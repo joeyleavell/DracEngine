@@ -8,7 +8,8 @@ namespace Ry
 
 	constexpr uint32 EVENT_MOUSE        = 0;
 	constexpr uint32 EVENT_MOUSE_BUTTON = 1;
-	constexpr uint32 EVENT_RESIZE       = 2;
+	constexpr uint32 EVENT_MOUSE_CLICK  = 2;
+	constexpr uint32 EVENT_MOUSE_DRAG   = 3;
 
 	struct UI_MODULE Event
 	{
@@ -23,11 +24,19 @@ namespace Ry
 		float MouseDeltaY = 0.0f;
 	};
 
-	struct UI_MODULE ResizeEvent : public Event
+	struct UI_MODULE MouseClickEvent : public Event
 	{
-		int32 NewWidth;
-		int32 NewHeight;
+		int32 ButtonID = 0;
+		bool bDoubleClick = false;
 	};
+
+	struct UI_MODULE MouseDragEvent : public Event
+	{
+		int32 ButtonID = 0;
+		float MouseX = 0.0f;
+		float MouseY = 0.0f;
+	};
+
 
 	struct UI_MODULE MouseButtonEvent : public Event
 	{

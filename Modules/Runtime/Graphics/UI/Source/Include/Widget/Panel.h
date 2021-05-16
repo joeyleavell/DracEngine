@@ -33,7 +33,7 @@ namespace Ry
 			// Rearrange all widgets with respect to the panel
 			Arrange();
 
-			SizeDirty.Broadcast();
+			MarkDirty();
 		}
 
 		PanelWidget& SetMargins(float Margins)
@@ -46,12 +46,21 @@ namespace Ry
 		virtual void AppendSlot(Ry::Widget& Widget)
 		{
 			// Listen for size changes
-			Widget.SizeDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
+			Widget.RenderStateDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
 
 			Children.Add(&Widget);
 
+			// Set existing batches
+			// TODO: this should just be a pointer back up to user interface
+			Widget.SetShapeBatch(ShapeBatch);
+			Widget.SetTextureBatch(TextureBatch);
+			Widget.SetTextBatch(TextBatch);
+
 			// Set the widget's parent
 			Widget.SetParent(this);
+			Widget.SetVisible(IsVisible(), true); // Child matches our visibility
+
+			MarkDirty();
 		}
 
 		virtual void OnShow() override
@@ -152,6 +161,40 @@ namespace Ry
 			}
 
 			return bHandled;
+		}
+
+		bool OnMouseClicked(const MouseClickEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseClicked(MouseEv);
+
+			for (Widget* Child : Children)
+			{
+				bHandled |= Child->OnMouseClicked(MouseEv);
+			}
+
+			return bHandled;
+		}
+
+		bool OnMouseDragged(const MouseDragEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseDragged(MouseEv);
+
+			for (Widget* Child : Children)
+			{
+				bHandled |= Child->OnMouseDragged(MouseEv);
+			}
+
+			return bHandled;
+		}
+
+		virtual void ClearChildren()
+		{
+			for(Widget* Child : Children)
+			{
+				Child->SetVisible(false, true);
+			}
+			
+			Children.Clear();
 		}
 
 	protected:

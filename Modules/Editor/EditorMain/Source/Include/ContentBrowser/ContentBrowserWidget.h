@@ -2,9 +2,29 @@
 
 #include "Widget/SlotWidget.h"
 #include "Widget/GridLayout.h"
+#include "Widget/Label.h"
+#include "Widget/BorderWidget.h"
 
 namespace Ry
 {
+
+	class ContentBrowserItem : public SlotWidget
+	{
+	public:
+
+		MulticastDelegate<ContentBrowserItem*> OnDoubleClick;
+
+		ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name);
+		virtual ~ContentBrowserItem();
+
+		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
+
+	private:
+		
+		BorderWidget* Icon;
+
+	};
+
 
 	class ContentBrowserWidget : public SlotWidget
 	{
@@ -13,10 +33,15 @@ namespace Ry
 		ContentBrowserWidget();
 		virtual ~ContentBrowserWidget();
 
-		void AddDirectory(Ry::String Name);
-		void AddFile(Ry::String Name);
+		void SetCurrentDirectory(Ry::String Dir);
+		ContentBrowserItem* AddDirectory(Ry::String Name);
+		ContentBrowserItem* AddFile(Ry::String Name);
+
+		void ClearChildren();
 
 	private:
+
+		Label* CurDirLabel;
 
 		BitmapFont* TextFont;
 		Texture* DirectoryTexture;

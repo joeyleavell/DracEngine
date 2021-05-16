@@ -73,7 +73,7 @@ namespace Ry
 		/**
 		 * Delegates
 		 */
-		MulticastDelegate<> SizeDirty;
+		MulticastDelegate<> RenderStateDirty;
 
 		Widget() :
 		RelativePosition{ 0, 0 },
@@ -90,6 +90,11 @@ namespace Ry
 		};
 		
 		virtual ~Widget() = default;
+
+		void MarkDirty()
+		{
+			RenderStateDirty.Broadcast();
+		}
 
 		bool IsHovered()
 		{
@@ -192,7 +197,9 @@ namespace Ry
 
 		virtual bool OnMouseEvent(const MouseEvent& MouseEv);
 		virtual bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv);
-		
+		virtual bool OnMouseClicked(const MouseClickEvent& MouseEv);
+		virtual bool OnMouseDragged(const MouseDragEvent& MouseEv);
+
 		virtual bool OnEvent(const Event& Ev)
 		{
 			if (Ev.Type == EVENT_MOUSE)
@@ -206,6 +213,16 @@ namespace Ry
 				const MouseButtonEvent& MouseButton = static_cast<const MouseButtonEvent&>(Ev);
 
 				return OnMouseButtonEvent(MouseButton);
+			}
+			else if(Ev.Type == EVENT_MOUSE_CLICK)
+			{
+				const MouseClickEvent& MouseClick = static_cast<const MouseClickEvent&>(Ev);
+				return OnMouseClicked(MouseClick);
+			}
+			else if(Ev.Type == EVENT_MOUSE_DRAG)
+			{
+				const MouseDragEvent& MouseDrag = static_cast<const MouseDragEvent&>(Ev);
+				return OnMouseDragged(MouseDrag);
 			}
 
 			return false;

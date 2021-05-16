@@ -5,21 +5,69 @@
 #include "TextureAsset.h"
 #include "Manager/AssetManager.h"
 #include "VectorFontAsset.h"
+#include "Widget/HorizontalPanel.h"
 
 namespace Ry
 {
+	ContentBrowserItem::ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name)
+	{
+		SetChild(
+			NewWidget(Ry::VerticalLayout)
+			+
+			NewWidgetAssign(Icon, Ry::BorderWidget)
+			.DefaultImage(Texture)
+			.HoveredImage(Texture, WHITE.ScaleRGB(0.5f))
+			.Padding(30.0f, 30.0f)
+			+
+			NewWidget(Ry::Label)
+			.SetText(Name)
+			.SetStyle(Font, WHITE)
+		);
+	}
+
+	ContentBrowserItem::~ContentBrowserItem()
+	{
+		
+	}
+
+	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
+	{
+		if(MouseEv.bDoubleClick && Icon->IsHovered())
+		{
+			OnDoubleClick.Broadcast(this);
+
+			return true;
+		}
+
+		return false;
+	}
 
 	ContentBrowserWidget::ContentBrowserWidget()
 	{
+		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
+		TextFont = Font->GenerateBitmapFont(20);
+
 		// Create directory grid
 		SetChild(
-			NewWidgetAssign(Grid, GridLayout)
+			NewWidget(VerticalLayout)
+			.SetMargins(10.0f)
+			+NewWidget(BorderWidget)
+			[
+				NewWidget(HorizontalLayout)
+				+
+				// Up directory
+				NewWidget(BorderWidget)
+
+				// Current Directory
+				+
+				NewWidgetAssign(CurDirLabel, Label)
+				.SetStyle(TextFont, WHITE)
+			]
+
+			+ NewWidgetAssign(Grid, GridLayout)
 			.SetCellWidth(200.0f)
 			.SetCellHeight(100.0f)
 		);
-
-		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		TextFont = Font->GenerateBitmapFont(20);
 
 		TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
 		DirectoryTexture = Asset->CreateRuntimeTexture();
@@ -34,37 +82,30 @@ namespace Ry
 		
 	}
 
-	void ContentBrowserWidget::AddDirectory(Ry::String Name)
+	void ContentBrowserWidget::SetCurrentDirectory(Ry::String Dir)
 	{
-		Grid->AppendSlot(
-			NewWidget(Ry::VerticalLayout)
-			+
-			NewWidget(Ry::BorderWidget)
-			.DefaultImage(DirectoryTexture)
-			.HoveredImage(DirectoryTexture, WHITE.ScaleRGB(0.5f))
-			.Padding(30.0f, 30.0f)
-			+
-			NewWidget(Ry::Label)
-			.SetText(Name)
-			.SetStyle(TextFont, WHITE)
-		);
-
+		CurDirLabel->SetText(Dir);
 	}
 
-	void ContentBrowserWidget::AddFile(Ry::String Name)
+	ContentBrowserItem* ContentBrowserWidget::AddDirectory(Ry::String Name)
 	{
-		Grid->AppendSlot(
-			NewWidget(Ry::VerticalLayout)
-			+
-			NewWidget(Ry::BorderWidget)
-			.DefaultImage(FileTexture)
-			.HoveredImage(FileTexture, WHITE.ScaleRGB(0.5f))
-			.Padding(30.0f, 30.0f)
-			+
-			NewWidget(Ry::Label)
-			.SetText(Name)
-			.SetStyle(TextFont, WHITE)
-		);
+		ContentBrowserItem* NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);		
+		Grid->AppendSlot(*NewItem);
+
+		return NewItem;
+	}
+
+	ContentBrowserItem* ContentBrowserWidget::AddFile(Ry::String Name)
+	{
+		ContentBrowserItem* NewItem = new ContentBrowserItem(FileTexture, TextFont, Name);
+		Grid->AppendSlot(*NewItem);
+
+		return NewItem;
+	}
+
+	void ContentBrowserWidget::ClearChildren()
+	{
+		Grid->ClearChildren();
 	}
 	
 }

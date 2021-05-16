@@ -70,6 +70,8 @@ namespace Ry
 			Widget.SetTextureBatch(TextureBatch);
 
 			Widget.SetVisible(true, true);
+
+			Widget.RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 			
 			Draw();
 		}
@@ -107,6 +109,11 @@ namespace Ry
 		}
 
 	private:
+
+		void RenderStateDirty()
+		{
+			Draw();
+		}
 
 		Ry::Batch* ShapeBatch;
 		Ry::Batch* TextBatch;

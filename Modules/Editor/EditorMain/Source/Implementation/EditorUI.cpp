@@ -79,7 +79,7 @@ namespace Ry
 	}
 
 	bool EditorUI::OnEvent(const Event& Ev)
-	{
+	{		
 		return UI->OnEvent(Ev);
 	}
 
@@ -107,6 +107,8 @@ namespace Ry
 
 	void EditorUI::RecordCmds()
 	{
+		Cmd->Reset();
+		
 		Cmd->BeginCmd();
 		{
 			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass());
