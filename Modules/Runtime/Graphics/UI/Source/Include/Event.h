@@ -24,6 +24,14 @@ namespace Ry
 		float MouseDeltaY = 0.0f;
 	};
 
+	struct UI_MODULE MouseButtonEvent : public Event
+	{
+		int32 ButtonID = 0;
+		bool bPressed = false;
+		float MouseX = 0.0f;
+		float MouseY = 0.0f;
+	};
+
 	struct UI_MODULE MouseClickEvent : public Event
 	{
 		int32 ButtonID = 0;
@@ -35,13 +43,6 @@ namespace Ry
 		int32 ButtonID = 0;
 		float MouseX = 0.0f;
 		float MouseY = 0.0f;
-	};
-
-
-	struct UI_MODULE MouseButtonEvent : public Event
-	{
-		int32 ButtonID;
-		bool bPressed;
 	};
 
 	

@@ -8,11 +8,26 @@ namespace Ry
 	{
 		this->Browser = Widget;
 
+		Widget->UpArrow->OnButtonReleased.AddMemberFunction(this, &ContentBrowser::UpDirectory);
+
 		// Add grid
 
 		// Initialize content browser to a directory (virtual)
 		// The virtual path will be translated to an absolute path for crawling
 		SetDirectory("/Engine/");
+	}
+
+	void ContentBrowser::UpDirectory()
+	{
+		Ry::String Abs = Filesystem::canonical(*Ry::File::VirtualToAbsolute(CurrentDirectory)).string().c_str();
+		Ry::String Parent = Filesystem::path(*Abs).parent_path().string().c_str();
+
+		if(Ry::File::IsAbsPathUnderVirtual("Engine", Parent))
+		{
+			Ry::String ParentVirtual = Ry::File::AbsoluteToVirtual(Parent);
+
+			SetDirectory(ParentVirtual);
+		}
 	}
 
 	void ContentBrowser::SetDirectory(Ry::String Virtual)
@@ -33,6 +48,7 @@ namespace Ry
 		// Iterate paths in directory
 		for(auto& Path : CurDirItr)
 		{
+			
 			// Create a browser node for this
 			BrowserNode Node;
 			Node.Name = Path.path().stem().string().c_str();
@@ -52,6 +68,7 @@ namespace Ry
 				Node.Widget->OnDoubleClick.AddMemberFunction(this, &ContentBrowser::OpenNode);
 				Nodes.insert(Node.Widget.Get(), Node);
 			}
+
 		}
 
 		Browser->MarkDirty();

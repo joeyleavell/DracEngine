@@ -97,6 +97,30 @@ namespace Ry
 			MountPoints.insert(MountPoint, Ry::File::ConvertToAbsolute(Path));
 		}
 
+		bool IsAbsPathUnderVirtual(Ry::String Mount, String Abs)
+		{
+			Filesystem::path AbsPathOriginal = Filesystem::path(*Abs);
+			Filesystem::path AbsPath = AbsPathOriginal;
+			Filesystem::path MountPoint = *VirtualToAbsolute(Mount);
+
+			bool bIsUnderVirtual = false;
+
+			AbsPath = AbsPathOriginal;
+			while (AbsPath.has_parent_path())
+			{
+				// Check if paths equal
+
+				if (AbsPath == MountPoint)
+				{
+					bIsUnderVirtual = true;
+				}
+
+				AbsPath = AbsPath.parent_path();
+			}
+
+			return bIsUnderVirtual;
+		}
+
 		String VirtualToAbsolute(String Virtual)
 		{
 			int32 FirstSep = Virtual.find_first("/", 0);
@@ -134,7 +158,14 @@ namespace Ry
 
 			if(MountPoints.contains(MountPoint))
 			{
-				return Ry::File::ConvertToAbsolute(*MountPoints.get(MountPoint) + Virtual.substring(MountEnd));
+				Ry::String Path = *MountPoints.get(MountPoint);
+
+				if(MountEnd != Virtual.getSize())
+				{
+					Path += Virtual.substring(MountEnd);
+				}
+				
+				return Ry::File::ConvertToAbsolute(Path);
 			}
 			else
 			{
@@ -177,23 +208,26 @@ namespace Ry
 					// Build virtual path
 					AbsPath = AbsPathOriginal;
 
-					do
+					if (MountPoint != AbsPath)
 					{
-						if(AbsPath.has_filename())
+						do
 						{
-							if(VirtualPath.IsEmpty())
+							if (AbsPath.has_filename())
 							{
-								VirtualPath += AbsPath.filename().string().c_str();
+								if (VirtualPath.IsEmpty())
+								{
+									VirtualPath += AbsPath.filename().string().c_str();
+								}
+								else
+								{
+									VirtualPath = AbsPath.filename().string().c_str() + ("/" + VirtualPath);
+								}
 							}
-							else
-							{
-								VirtualPath = AbsPath.filename().string().c_str() + ("/" + VirtualPath);
-							}
-						}
 
-						AbsPath = AbsPath.parent_path();
+							AbsPath = AbsPath.parent_path();
 
-					} while (MountPoint != AbsPath);
+						} while (MountPoint != AbsPath);
+					}
 
 					// Finally, append the mount point
 					return *MountItr.Key() + "/" + VirtualPath;

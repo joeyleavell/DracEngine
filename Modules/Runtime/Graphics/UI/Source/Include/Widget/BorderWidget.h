@@ -69,6 +69,14 @@ namespace Ry
 					{
 						Style.Pressed->Show();
 					}
+					else if(Style.Hovered)
+					{
+						Style.Hovered->Show();
+					}
+					else if(Style.Default)
+					{
+						Style.Default->Show();
+					}
 				}
 				else
 				{

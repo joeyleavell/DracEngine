@@ -42,8 +42,15 @@ namespace Ry
 	
 	void Mesh::Update()
 	{
-		VertArray->PushVertexData(Data->GetVertData(), Data->GetVertexCount());
-		VertArray->PushIndexData(Data->GetIndexData(), Data->GetIndexCount());
+		if(Data->VertData->VertexCount > 0)
+		{
+			VertArray->PushVertexData(Data->GetVertData(), Data->GetVertexCount());
+		}
+
+		if (Data->VertData->IndexCount > 0)
+		{
+			VertArray->PushIndexData(Data->GetIndexData(), Data->GetIndexCount());
+		}
 	}
 	
 	// void Mesh::Render(Primitive prim)

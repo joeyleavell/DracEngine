@@ -236,6 +236,9 @@ namespace Ry
 
 		void Clear()
 		{
+			// Deletes all elements
+			Resize(AllocatedSize);
+			
 			// todo: delete data, needed for shared ptrs etc
 			Size = 0;
 		}

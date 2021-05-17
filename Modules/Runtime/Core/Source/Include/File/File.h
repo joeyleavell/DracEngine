@@ -61,6 +61,9 @@ namespace Ry
 
 		CORE_MODULE void MountDirectory(String Path, String MountPoint);
 
+		CORE_MODULE bool IsAbsPathUnderVirtual(Ry::String Mount, String Abs);
+
+
 		/**
 		 * Translates a virtual path to an absolute path using mount points.
 		 */

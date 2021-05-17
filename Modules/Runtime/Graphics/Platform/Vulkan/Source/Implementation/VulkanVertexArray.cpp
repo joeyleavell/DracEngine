@@ -43,6 +43,11 @@ namespace Ry
 
 		if(StagingVertexBuffer && DeviceVertexBuffer)
 		{
+			if(Vertices == 0)
+			{
+				std::cout << "verts: " << Vertices << " elements: " << Format.GetElementCount() << std::endl;
+			}
+			
 			// Map the memory to the staging buffer
 			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.GetElementCount());
 

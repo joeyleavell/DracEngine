@@ -59,6 +59,7 @@ namespace Ry
 		void FireClick(int32 Button, double XPos, double YPos);
 		void FireDoubleClick(int32 Button, double XPos, double YPos);
 		void FireDragEvent(int32 Button, float XPos, float YPos);
+		void FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed);
 
 		// Layers that get drawn to the 
 		LayerStack EdLayers;

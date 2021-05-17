@@ -388,8 +388,9 @@ namespace Ry
 	void Batch::RemoveItem(Ry::SharedPtr<BatchItem> Item)
 	{
 		// Try remove item from all batch groups (todo: make more efficient, probably by using hash sets)
+
 		for(BatchLayer* Layer : Layers)
-		{
+		{			
 			for (BatchGroup* Group : Layer->Groups)
 			{
 				Group->Items.Remove(Item);
@@ -484,6 +485,7 @@ namespace Ry
 					Layer->bNeedsRecord = true;
 					Group->LastIndexCount = CurrentIndexCount;
 				}
+
 			}
 		}
 
@@ -598,11 +600,15 @@ namespace Ry
 			// Create a new texture resource if needed
 			if(Text)
 			{
-				ResourceSet* TextureResources = Ry::RendAPI->CreateResourceSet(TextureResDesc, AtLayer->CommandBuffer->GetSwapChain());
-				TextureResources->BindTexture("BatchTexture", Text);
-				TextureResources->CreateBuffer();
+				NewGroup->TextureResources = Ry::RendAPI->CreateResourceSet(TextureResDesc, AtLayer->CommandBuffer->GetSwapChain());
+				NewGroup->TextureResources->BindTexture("BatchTexture", Text);
+				NewGroup->TextureResources->CreateBuffer();
 
-				NewGroup->ResourceSets.Add(TextureResources);
+				NewGroup->ResourceSets.Add(NewGroup->TextureResources);
+			}
+			else
+			{
+				NewGroup->TextureResources = nullptr;
 			}
 
 			// Create group mesh
@@ -634,6 +640,44 @@ namespace Ry
 		}
 
 		return nullptr;
+	}
+
+	void Batch::DeleteEmptyGroups()
+	{
+		Ry::ArrayList<BatchLayer*> LayersToRemove;
+
+		for(BatchLayer* Layer : Layers)
+		{
+			Ry::ArrayList<BatchGroup*> GroupsToRemove;
+
+			for(BatchGroup* Group : Layer->Groups)
+			{
+				if(Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
+				{
+					GroupsToRemove.Add(Group);
+				}
+			}
+
+			for(BatchGroup* RemoveGroup : GroupsToRemove)
+			{
+				// Delete group batch mesh
+				RemoveGroup->BatchMesh->DeleteMesh();
+				delete RemoveGroup->BatchMesh;
+				RemoveGroup->BatchMesh = nullptr;
+
+				// Delete group resources
+				if(RemoveGroup->TextureResources)
+				{
+					RemoveGroup->TextureResources->DeleteBuffer();
+					delete RemoveGroup->TextureResources;
+					RemoveGroup->TextureResources = nullptr;
+				}
+
+				Layer->Groups.Remove(RemoveGroup);
+				delete RemoveGroup;
+			}
+			
+		}
 	}
 
 	void Batch::CreateResources(SwapChain* Swap)
@@ -702,12 +746,16 @@ namespace Ry
 
 			for (const BatchGroup* Group : AtLayer->Groups)
 			{
-				// Bind resources
-				AtLayer->CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
+				if(Group->Items.GetSize() > 0 || Group->ItemSets.GetSize() > 0)
+				{
+					// Bind resources
+					AtLayer->CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
 
-				// Draw the mesh
-				MeshSection& Section = *Group->BatchMesh->GetMeshData()->Sections.get(0);
-				AtLayer->CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
+					// Draw the mesh
+					MeshSection& Section = *Group->BatchMesh->GetMeshData()->Sections.get(0);
+					AtLayer->CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
+
+				}				
 			}
 
 		}

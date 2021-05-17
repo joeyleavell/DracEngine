@@ -155,7 +155,7 @@ namespace Ry
 		/**
 		 * Dereferences the underlying pointer
 		 */
-		Class* operator->()
+		Class* operator->() const
 		{
 			return Value;
 		}

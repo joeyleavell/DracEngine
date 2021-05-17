@@ -2,6 +2,7 @@
 
 #include "Widget/Panel.h"
 #include "UIGen.h"
+#include <chrono>
 
 namespace Ry
 {
@@ -64,7 +65,7 @@ namespace Ry
 
 		struct Slot
 		{
-			Ry::Widget* Widget;
+			SharedPtr<Ry::Widget> Widget;
 			int32 Row;
 			int32 Column;
 			
@@ -129,7 +130,7 @@ namespace Ry
 
 						if(FoundSlot)
 						{
-							Ry::Widget* Widget = FoundSlot->Widget;
+							SharedPtr<Ry::Widget> Widget = FoundSlot->Widget;
 							SizeType ContentSize = Widget->ComputeSize();
 
 							//int32 CellMX = CurrentX + (int32)(CellSize / 2.0f);

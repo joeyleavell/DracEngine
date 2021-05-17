@@ -4,6 +4,7 @@
 #include "Widget/GridLayout.h"
 #include "Widget/Label.h"
 #include "Widget/BorderWidget.h"
+#include "Widget/Button.h"
 
 namespace Ry
 {
@@ -30,6 +31,9 @@ namespace Ry
 	{
 	public:
 
+		Label* CurDirLabel;
+		Button* UpArrow;
+
 		ContentBrowserWidget();
 		virtual ~ContentBrowserWidget();
 
@@ -41,11 +45,10 @@ namespace Ry
 
 	private:
 
-		Label* CurDirLabel;
-
 		BitmapFont* TextFont;
 		Texture* DirectoryTexture;
 		Texture* FileTexture;
+		Texture* UpArrowTexture;
 
 		GridLayout* Grid;
 

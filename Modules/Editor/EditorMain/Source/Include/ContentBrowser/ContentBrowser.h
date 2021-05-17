@@ -22,6 +22,8 @@ namespace Ry
 
 		void SetDirectory(Ry::String Virtual);
 
+		void UpDirectory();
+
 	private:
 
 		void OpenNode(ContentBrowserItem* Item);
@@ -34,5 +36,5 @@ namespace Ry
 
 		Ry::Map<ContentBrowserItem*, BrowserNode> Nodes;
 	};
-	
+
 }

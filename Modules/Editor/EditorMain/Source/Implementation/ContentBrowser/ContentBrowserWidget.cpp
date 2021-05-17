@@ -6,6 +6,8 @@
 #include "Manager/AssetManager.h"
 #include "VectorFontAsset.h"
 #include "Widget/HorizontalPanel.h"
+#include <chrono>
+#include "Widget/Button.h"
 
 namespace Ry
 {
@@ -47,16 +49,26 @@ namespace Ry
 		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
 		TextFont = Font->GenerateBitmapFont(20);
 
+		TextureAsset* UpArrowAsset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/up-arrow.png", "image");
+		UpArrowTexture = UpArrowAsset->CreateRuntimeTexture();
+
 		// Create directory grid
 		SetChild(
 			NewWidget(VerticalLayout)
 			.SetMargins(10.0f)
-			+NewWidget(BorderWidget)
+			+ NewWidget(BorderWidget)
 			[
 				NewWidget(HorizontalLayout)
 				+
 				// Up directory
-				NewWidget(BorderWidget)
+				NewWidgetAssign(UpArrow, Button)
+				[
+					NewWidget(BorderWidget)
+					.DefaultImage(UpArrowTexture, WHITE)
+					.HoveredImage(UpArrowTexture, WHITE.ScaleRGB(0.8f))
+					.PressedImage(UpArrowTexture, WHITE.ScaleRGB(0.6f))
+					.Padding(10.0f)
+				]
 
 				// Current Directory
 				+
@@ -74,7 +86,7 @@ namespace Ry
 
 		TextureAsset* FileAsset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/file.png", "image");
 		FileTexture = FileAsset->CreateRuntimeTexture();
-		
+
 	}
 
 	ContentBrowserWidget::~ContentBrowserWidget()
@@ -89,7 +101,7 @@ namespace Ry
 
 	ContentBrowserItem* ContentBrowserWidget::AddDirectory(Ry::String Name)
 	{
-		ContentBrowserItem* NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);		
+		ContentBrowserItem* NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);
 		Grid->AppendSlot(*NewItem);
 
 		return NewItem;

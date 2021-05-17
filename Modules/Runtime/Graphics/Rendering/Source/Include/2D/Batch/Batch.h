@@ -196,6 +196,9 @@ namespace Ry
 		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
 		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
+		// Batch group specific resources
+		ResourceSet* TextureResources;
+
 		int LastIndexCount = -1;
 
 	};
@@ -233,12 +236,16 @@ namespace Ry
 		void SetRenderPass(RenderPass* ParentRenderPass);
 
 		Ry::CommandBuffer* GetCommandBuffer(int32 Layer);
+
+		// TODO: this function may be needed if memory usage gets too high
+		void DeleteEmptyGroups();
 		
 	private:
 
 		// Finds a batch group for given state information
 		BatchGroup* FindOrCreateBatchGroup(Texture* Text, int32 Layer);
 		BatchGroup* FindBatchGroup(Texture* Text, int32& OutLayer);
+
 
 	//	bool bNeedsRecord = false;
 

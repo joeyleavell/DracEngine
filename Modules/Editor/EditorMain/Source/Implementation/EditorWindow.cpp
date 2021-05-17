@@ -179,7 +179,7 @@ namespace Ry
 		}
 
 		// TODO: Fire raw mouse pressed/released event
-		
+		FireButtonEvent(Button, CurX, CurY, bPressed);
 	}
 
 	void EditorWindow::OnKeyPressed(int32 Key, bool bPressed)
@@ -228,6 +228,18 @@ namespace Ry
 		DragEvent.MouseY = YPos;
 
 		EdLayers.OnEvent(DragEvent);
+	}
+
+	void EditorWindow::FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed)
+	{
+		MouseButtonEvent ButtonEvent{};
+		ButtonEvent.Type = EVENT_MOUSE_BUTTON;
+		ButtonEvent.ButtonID = Button;
+		ButtonEvent.MouseX = XPos;
+		ButtonEvent.MouseY = YPos;
+		ButtonEvent.bPressed = bPressed;
+
+		EdLayers.OnEvent(ButtonEvent);
 	}
 
 	void EditorWindow::Render()

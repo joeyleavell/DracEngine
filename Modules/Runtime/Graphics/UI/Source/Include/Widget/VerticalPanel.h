@@ -12,7 +12,7 @@ namespace Ry
 
 		struct Slot
 		{
-			Ry::Widget* Widget;
+			SharedPtr<Ry::Widget> Widget;
 			// float LeftMargin;
 			// float RightMargin;
 			// float TopMargin;
@@ -41,7 +41,7 @@ namespace Ry
 
 			for (const Slot& Slot : ChildrenSlots)
 			{
-				Ry::Widget* Widget = Slot.Widget;
+				SharedPtr<Ry::Widget> Widget = Slot.Widget;
 				SizeType ContentSize = Widget->ComputeSize();
 
 				// Set the widget's relative position

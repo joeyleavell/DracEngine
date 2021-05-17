@@ -60,7 +60,7 @@ namespace Ry
 			Widget.SetParent(this);
 			Widget.SetVisible(IsVisible(), true); // Child matches our visibility
 
-			MarkDirty();
+			//MarkDirty();
 		}
 
 		virtual void OnShow() override
@@ -81,7 +81,7 @@ namespace Ry
 
 		virtual void Draw() override
 		{
-			for (Widget* Child : Children)
+			for (SharedPtr<Widget> Child : Children)
 			{
 				Child->Draw();
 			}
@@ -98,7 +98,7 @@ namespace Ry
 		{
 			Widget::SetShapeBatch(Shape);
 
-			for(Widget* Sl : Children)
+			for(SharedPtr<Widget> Sl : Children)
 			{
 				Sl->SetShapeBatch(Shape);
 			}
@@ -108,7 +108,7 @@ namespace Ry
 		{
 			Widget::SetTextBatch(Text);
 
-			for (Widget* Sl : Children)
+			for (SharedPtr<Widget> Sl : Children)
 			{
 				Sl->SetTextBatch(Text);
 			}
@@ -118,7 +118,7 @@ namespace Ry
 		{
 			Widget::SetTextureBatch(Text);
 
-			for (Widget* Sl : Children)
+			for (SharedPtr<Widget> Sl : Children)
 			{
 				Sl->SetTextureBatch(Text);
 			}
@@ -130,7 +130,7 @@ namespace Ry
 
 			if (bPropagate)
 			{
-				for (Widget* Child : Children)
+				for (SharedPtr<Widget> Child : Children)
 				{
 					Child->SetVisible(bVisibility, bPropagate);
 				}
@@ -143,7 +143,7 @@ namespace Ry
 			bool bHandled = Widget::OnMouseEvent(MouseEv);
 
 			// This means we're hovering, pass to children
-			for(Widget* Child : Children)
+			for(SharedPtr<Widget> Child : Children)
 			{
 				Child->OnMouseEvent(MouseEv);
 			}
@@ -155,7 +155,7 @@ namespace Ry
 		{
 			bool bHandled = Widget::OnMouseButtonEvent(MouseEv);
 
-			for (Widget* Child : Children)
+			for (SharedPtr<Widget> Child : Children)
 			{
 				bHandled |= Child->OnMouseButtonEvent(MouseEv);
 			}
@@ -167,7 +167,7 @@ namespace Ry
 		{
 			bool bHandled = Widget::OnMouseClicked(MouseEv);
 
-			for (Widget* Child : Children)
+			for (SharedPtr<Widget> Child : Children)
 			{
 				bHandled |= Child->OnMouseClicked(MouseEv);
 			}
@@ -179,7 +179,7 @@ namespace Ry
 		{
 			bool bHandled = Widget::OnMouseDragged(MouseEv);
 
-			for (Widget* Child : Children)
+			for (SharedPtr<Widget> Child : Children)
 			{
 				bHandled |= Child->OnMouseDragged(MouseEv);
 			}
@@ -189,7 +189,7 @@ namespace Ry
 
 		virtual void ClearChildren()
 		{
-			for(Widget* Child : Children)
+			for(SharedPtr<Widget> Child : Children)
 			{
 				Child->SetVisible(false, true);
 			}
@@ -199,7 +199,7 @@ namespace Ry
 
 	protected:
 
-		Ry::ArrayList<Widget*> Children;
+		Ry::ArrayList<SharedPtr<Widget>> Children;
 	};
 
 }

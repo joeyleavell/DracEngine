@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Widget/Panel.h"
+#include "Core/Core.h"
 #include "UIGen.h"
 
 namespace Ry
@@ -12,7 +13,7 @@ namespace Ry
 
 		struct Slot
 		{
-			Ry::Widget* Widget;
+			SharedPtr<Ry::Widget> Wid;
 			float LeftMargin;
 			float RightMargin;
 			float TopMargin;
@@ -30,7 +31,7 @@ namespace Ry
 
 			for (const Slot& Slot : ChildrenSlots)
 			{
-				Ry::Widget* Widget = Slot.Widget;
+				SharedPtr<Ry::Widget> Widget = Slot.Wid;
 				SizeType ContentSize = Widget->ComputeSize();
 
 				// Set the widget's relative position
@@ -56,10 +57,9 @@ namespace Ry
 				Result.Height = static_cast<int32>(2 * SlotMargin);
 
 				int32 MaxChildHeight = 0;
-
 				for (const Slot& Slot : ChildrenSlots)
 				{
-					SizeType WidgetSize = Slot.Widget->ComputeSize();
+					SizeType WidgetSize = Slot.Wid->ComputeSize();
 
 					if (WidgetSize.Height > MaxChildHeight)
 					{
@@ -81,7 +81,7 @@ namespace Ry
 
 			// Create widget
 			Slot PanelSlot;
-			PanelSlot.Widget = &Widget;
+			PanelSlot.Wid = &Widget;
 
 			ChildrenSlots.Add(PanelSlot);
 		}
