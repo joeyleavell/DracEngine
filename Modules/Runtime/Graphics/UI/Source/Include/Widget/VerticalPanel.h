@@ -10,22 +10,42 @@ namespace Ry
 	{		
 	public:
 
-		struct Slot
+		struct Slot : public PanelWidget::Slot
 		{
-			SharedPtr<Ry::Widget> Widget;
 			// float LeftMargin;
 			// float RightMargin;
 			// float TopMargin;
 			// float BottomMargin;
+			Slot& operator[](SharedPtr<Ry::Widget> Child)
+			{
+				this->Widget = Child;
+				return *this;
+			}
+
 		};
 
-		void AppendSlot(Ry::Widget& Widget) override
+		WidgetBeginArgsSlot(VerticalLayout)
+			WidgetProp(float, SlotMargin)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
+		static VerticalLayout::Slot MakeSlot()
+		{
+			Slot NewSlot;
+			return NewSlot;
+		}
+
+		void AppendSlot(Ry::SharedPtr<Ry::Widget>& Widget) override
 		{
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
-			Slot PanelSlot;
-			PanelSlot.Widget = &Widget;
+			SharedPtr<Slot> PanelSlot = new Slot;
+			PanelSlot->Widget = Widget;
 
 			ChildrenSlots.Add(PanelSlot);
 		}
@@ -39,9 +59,9 @@ namespace Ry
 			int32 CurrentX = static_cast<int32>(SlotMargin);
 			int32 CurrentY = static_cast<int32>(SlotMargin);
 
-			for (const Slot& Slot : ChildrenSlots)
+			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 			{
-				SharedPtr<Ry::Widget> Widget = Slot.Widget;
+				SharedPtr<Ry::Widget> Widget = ChildSlot->Widget;
 				SizeType ContentSize = Widget->ComputeSize();
 
 				// Set the widget's relative position
@@ -68,9 +88,9 @@ namespace Ry
 
 				int32 MaxChildWidth = 0;
 
-				for (const Slot& Slot : ChildrenSlots)
+				for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 				{
-					SizeType WidgetSize = Slot.Widget->ComputeSize();
+					SizeType WidgetSize = ChildSlot->Widget->ComputeSize();
 
 					if (WidgetSize.Width > MaxChildWidth)
 					{
@@ -95,7 +115,7 @@ namespace Ry
 		
 	private:
 
-		Ry::ArrayList<Slot> ChildrenSlots;
+		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
 	};
 

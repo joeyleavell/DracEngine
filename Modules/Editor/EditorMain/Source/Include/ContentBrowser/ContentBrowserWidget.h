@@ -21,8 +21,9 @@ namespace Ry
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
 
 	private:
-		
-		BorderWidget* Icon;
+		int32 kills = 0;
+
+		Ry::SharedPtr<BorderWidget> Icon;
 
 	};
 
@@ -31,15 +32,15 @@ namespace Ry
 	{
 	public:
 
-		Label* CurDirLabel;
-		Button* UpArrow;
+		Ry::SharedPtr<Label> CurDirLabel;
+		Ry::SharedPtr<Button> UpArrow;
 
 		ContentBrowserWidget();
 		virtual ~ContentBrowserWidget();
 
 		void SetCurrentDirectory(Ry::String Dir);
-		ContentBrowserItem* AddDirectory(Ry::String Name);
-		ContentBrowserItem* AddFile(Ry::String Name);
+		Ry::SharedPtr<ContentBrowserItem> AddDirectory(Ry::String Name);
+		Ry::SharedPtr<ContentBrowserItem> AddFile(Ry::String Name);
 
 		void ClearChildren();
 
@@ -50,7 +51,7 @@ namespace Ry
 		Texture* FileTexture;
 		Texture* UpArrowTexture;
 
-		GridLayout* Grid;
+		Ry::SharedPtr<GridLayout> Grid;
 
 	};
 

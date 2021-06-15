@@ -22,7 +22,7 @@ namespace Ry
 		
 		~UserInterface() = default;
 
-		UserInterface* operator[](Widget& Root)
+		UserInterface* operator[](Ry::SharedPtr<Widget>& Root)
 		{
 			AddRoot(Root);
 
@@ -31,7 +31,7 @@ namespace Ry
 
 		bool OnEvent(const Event& Ev)
 		{
-			for(Widget* Root : RootWidgets)
+			for(Ry::SharedPtr<Widget>& Root : RootWidgets)
 			{
 				if(Root->OnEvent(Ev))
 				{
@@ -60,18 +60,18 @@ namespace Ry
 		/**
 		 * Adds a widget to the root-level of this user interface.
 		 */
-		void AddRoot(Ry::Widget& Widget)
+		void AddRoot(Ry::SharedPtr<Ry::Widget>& Widget)
 		{
-			RootWidgets.Add(&Widget);
+			RootWidgets.Add(Widget);
 
 			// Set the widget's batches
-			Widget.SetShapeBatch(ShapeBatch);
-			Widget.SetTextBatch(TextBatch);
-			Widget.SetTextureBatch(TextureBatch);
+			Widget->SetShapeBatch(ShapeBatch);
+			Widget->SetTextBatch(TextBatch);
+			Widget->SetTextureBatch(TextureBatch);
 
-			Widget.SetVisible(true, true);
+			Widget->SetVisible(true, true);
 
-			Widget.RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
+			Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 			
 			Draw();
 		}
@@ -94,7 +94,7 @@ namespace Ry
 
 		void Draw()
 		{
-			for (Widget* RootWidget : RootWidgets)
+			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
 				// Arrange the root widget so it is correctly placed
 				RootWidget->Arrange();
@@ -119,7 +119,7 @@ namespace Ry
 		Ry::Batch* TextBatch;
 		Ry::Batch* TextureBatch;
 
-		Ry::ArrayList<Ry::Widget*> RootWidgets;
+		Ry::ArrayList<Ry::SharedPtr<Ry::Widget>> RootWidgets;
 
 		Ry::Widget* KeyboardFocus;
 	};

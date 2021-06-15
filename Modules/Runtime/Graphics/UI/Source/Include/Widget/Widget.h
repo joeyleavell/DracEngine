@@ -5,14 +5,58 @@
 #include "UIGen.h"
 #include "Event.h"
 
-#define NewWidgetAssign(AssignTo, Type) (*( (AssignTo) = new (Type){}))
-#define NewWidget(Type) (*(new (Type)))
+#define WidgetBeginArgsSlot(ClassName) \
+public: \
+struct Args \
+{ \
+	typedef ClassName::Args WidgetArgsType; \
+	Ry::ArrayList<SharedPtr<Widget>> Children; \
+	Ry::ArrayList<ClassName::Slot> Slots; \
+	WidgetArgsType& operator [] (Ry::SharedPtr<Widget> Wid) \
+	{ \
+		Children.Add(Wid); \
+		return *this; \
+	} \
+	WidgetArgsType& operator+(const ClassName::Slot WidgetSlot) \
+	{ \
+		Slots.Add(WidgetSlot); \
+		return *this; \
+	}
+
+#define WidgetBeginArgs(ClassName) \
+public: \
+struct Args \
+{ \
+	typedef ClassName::Args WidgetArgsType; \
+	Ry::ArrayList<SharedPtr<Widget>> Children; \
+	WidgetArgsType& operator [] (Ry::SharedPtr<Widget> Wid) \
+	{ \
+		Children.Add(Wid); \
+		return *this; \
+	} \
+
+#define WidgetProp(Type, Name) \
+Type m##Name; \
+WidgetArgsType& Name(Type InAttrib) \
+{ \
+	m##Name = InAttrib; \
+	return *this; \
+}
+
+#define WidgetEndArgs(ClassName) \
+};
+
+#define NewWidgetAssign(AssignTo, Type) Ry::WidgetDecl<Type>(AssignTo) << Type::Args()
+//#define NewWidget(Type) (*(new (Type)))
+
+#define NewWidget(Type) Ry::WidgetDecl<Type>() << Type::Args()
 
 namespace Ry
 {
 	struct Event;
 
 	class Batch;
+
 	
 	struct UI_MODULE SizeType
 	{
@@ -149,7 +193,7 @@ namespace Ry
 			this->Parent = Parent;
 		}
 
-		virtual Widget& operator[](Ry::Widget& Child)
+		virtual Widget& operator[](SharedPtr<Ry::Widget> Child)
 		{
 			return *this;
 		}
@@ -272,6 +316,40 @@ namespace Ry
 		bool bPressed;
 		bool bVisible;
 
+	};
+
+	template<typename WidgetClass>
+	struct WidgetDecl
+	{
+	private:
+
+		Ry::SharedPtr<WidgetClass>* Dst;
+
+	public:
+
+		WidgetDecl()
+		{
+			this->Dst = nullptr;
+		}
+
+		WidgetDecl(Ry::SharedPtr<WidgetClass>& AssignTo)
+		{
+			this->Dst = &AssignTo;
+		}
+
+		Ry::SharedPtr<WidgetClass> operator <<(typename WidgetClass::Args ConArgs)
+		{
+			Ry::SharedPtr<WidgetClass> NewWidget = new WidgetClass;
+
+			NewWidget->Construct(ConArgs);
+
+			if (Dst)
+			{
+				(*Dst) = NewWidget;
+			}
+
+			return NewWidget;
+		}
 	};
 
 }

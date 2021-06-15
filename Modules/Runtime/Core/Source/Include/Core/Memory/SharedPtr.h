@@ -119,6 +119,8 @@ namespace Ry
 				if (Counter->Value() <= 0)
 				{
 					delete Value;
+
+					// todo: delete counter too?
 				}
 			}
 		}

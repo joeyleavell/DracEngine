@@ -13,23 +13,34 @@ namespace Ry
 {
 	ContentBrowserItem::ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name)
 	{
+		
 		SetChild(
 			NewWidget(Ry::VerticalLayout)
 			+
-			NewWidgetAssign(Icon, Ry::BorderWidget)
-			.DefaultImage(Texture)
-			.HoveredImage(Texture, WHITE.ScaleRGB(0.5f))
-			.Padding(30.0f, 30.0f)
+			VerticalLayout::MakeSlot()
+			[
+				NewWidgetAssign(Icon, Ry::BorderWidget)
+				.DefaultImage(Texture)
+				.HoveredImage(Texture)
+				.HoveredImageTint(WHITE.ScaleRGB(0.5f))
+				.Padding(30.0f)
+			]
+
 			+
-			NewWidget(Ry::Label)
-			.SetText(Name)
-			.SetStyle(Font, WHITE)
+			VerticalLayout::MakeSlot()
+			[
+				NewWidget(Ry::Label)
+				.Text(Name)
+				.Font(Font)
+				.Color(WHITE)
+			]
 		);
 	}
 
 	ContentBrowserItem::~ContentBrowserItem()
 	{
-		
+		std::cout << kills << std::endl;
+		this->kills += 1;
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -55,30 +66,49 @@ namespace Ry
 		// Create directory grid
 		SetChild(
 			NewWidget(VerticalLayout)
-			.SetMargins(10.0f)
-			+ NewWidget(BorderWidget)
+			.SlotMargin(10.0f)
+			+ 
+			VerticalLayout::MakeSlot()
 			[
-				NewWidget(HorizontalLayout)
-				+
-				// Up directory
-				NewWidgetAssign(UpArrow, Button)
+				NewWidget(BorderWidget)
 				[
-					NewWidget(BorderWidget)
-					.DefaultImage(UpArrowTexture, WHITE)
-					.HoveredImage(UpArrowTexture, WHITE.ScaleRGB(0.8f))
-					.PressedImage(UpArrowTexture, WHITE.ScaleRGB(0.6f))
-					.Padding(10.0f)
+					NewWidget(HorizontalLayout)
+					+
+					HorizontalLayout::MakeSlot()
+					[
+						// Up directory
+						NewWidgetAssign(UpArrow, Ry::Button)
+						[
+							NewWidget(BorderWidget)
+							.DefaultImage(UpArrowTexture)
+							.DefaultImageTint(WHITE)
+							.HoveredImage(UpArrowTexture)
+							.HoveredImageTint(WHITE.ScaleRGB(0.8f))
+							.PressedImage(UpArrowTexture)
+							.PressedImageTint(WHITE.ScaleRGB(0.6f))
+							.Padding(10.0f)
+						]
+					]
+
+					// Current Directory
+					+
+					HorizontalLayout::MakeSlot()
+					[
+						NewWidgetAssign(CurDirLabel, Label)
+						.Color(WHITE)
+						.Font(TextFont)
+					]
+
 				]
 
-				// Current Directory
-				+
-				NewWidgetAssign(CurDirLabel, Label)
-				.SetStyle(TextFont, WHITE)
 			]
 
-			+ NewWidgetAssign(Grid, GridLayout)
-			.SetCellWidth(200.0f)
-			.SetCellHeight(100.0f)
+			+ VerticalLayout::MakeSlot()
+			[
+				NewWidgetAssign(Grid, GridLayout)
+				.CellWidth(200.0f)
+				.CellHeight(100.0f)
+			]
 		);
 
 		TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
@@ -99,18 +129,21 @@ namespace Ry
 		CurDirLabel->SetText(Dir);
 	}
 
-	ContentBrowserItem* ContentBrowserWidget::AddDirectory(Ry::String Name)
+	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddDirectory(Ry::String Name)
 	{
-		ContentBrowserItem* NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);
-		Grid->AppendSlot(*NewItem);
+		Ry::SharedPtr<ContentBrowserItem> NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);
+		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
+		Grid->AppendSlot(AsWidget);
 
 		return NewItem;
 	}
 
-	ContentBrowserItem* ContentBrowserWidget::AddFile(Ry::String Name)
+	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddFile(Ry::String Name)
 	{
-		ContentBrowserItem* NewItem = new ContentBrowserItem(FileTexture, TextFont, Name);
-		Grid->AppendSlot(*NewItem);
+		Ry::SharedPtr<ContentBrowserItem> NewItem = new ContentBrowserItem(FileTexture, TextFont, Name);
+		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
+
+		Grid->AppendSlot(AsWidget);
 
 		return NewItem;
 	}

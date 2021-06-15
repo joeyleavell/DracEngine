@@ -13,6 +13,35 @@ namespace Ry
 	{
 	public:
 
+		// .DefaultImage(UpArrowTexture, WHITE)
+		// 	.HoveredImage(UpArrowTexture, WHITE.ScaleRGB(0.8f))
+		// 	.PressedImage(UpArrowTexture, WHITE.ScaleRGB(0.6f))
+		// 	.Padding(10.0f)
+
+		WidgetBeginArgs(BorderWidget)
+			WidgetProp(float, FillX)
+			WidgetProp(float, FillY)
+			WidgetProp(float, Padding)
+			WidgetProp(HAlign, HorAlign)
+			WidgetProp(VAlign, VertAlign)
+			WidgetProp(Texture*, DefaultImage)
+			WidgetProp(Color, DefaultImageTint)
+			WidgetProp(Texture*, HoveredImage)
+			WidgetProp(Color, HoveredImageTint)
+			WidgetProp(Texture*, PressedImage)
+			WidgetProp(Color, PressedImageTint)
+			WidgetProp(BoxDrawable, DefaultBox)
+			WidgetProp(BoxDrawable, HoveredBox)
+			WidgetProp(BoxDrawable, PressedBox)
+		WidgetEndArgs()
+
+//BorderWidget& DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
+
+		void Construct(Args& In)
+		{
+			
+		}
+
 		BorderWidget():
 		SlotWidget()
 		{

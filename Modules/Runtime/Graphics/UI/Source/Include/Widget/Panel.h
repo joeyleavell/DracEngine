@@ -12,6 +12,26 @@ namespace Ry
 	{
 	public:
 
+		struct Slot
+		{
+			SharedPtr<Ry::Widget> Widget;
+
+			Slot& operator[](SharedPtr<Ry::Widget> Child)
+			{
+				this->Widget = Child;
+				return *this;
+			}
+		};
+
+		WidgetBeginArgsSlot(PanelWidget)
+			WidgetProp(float, SlotMargin)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
 		float SlotMargin;
 
 		// PanelWidget(std::initializer_list<Ry::Widget&> Children):
@@ -43,22 +63,22 @@ namespace Ry
 			return *this;
 		}
 
-		virtual void AppendSlot(Ry::Widget& Widget)
+		virtual void AppendSlot(Ry::SharedPtr<Widget>& Widget)
 		{
 			// Listen for size changes
-			Widget.RenderStateDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
+			Widget->RenderStateDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
 
-			Children.Add(&Widget);
+			Children.Add(Widget);
 
 			// Set existing batches
 			// TODO: this should just be a pointer back up to user interface
-			Widget.SetShapeBatch(ShapeBatch);
-			Widget.SetTextureBatch(TextureBatch);
-			Widget.SetTextBatch(TextBatch);
+			Widget->SetShapeBatch(ShapeBatch);
+			Widget->SetTextureBatch(TextureBatch);
+			Widget->SetTextBatch(TextBatch);
 
 			// Set the widget's parent
-			Widget.SetParent(this);
-			Widget.SetVisible(IsVisible(), true); // Child matches our visibility
+			Widget->SetParent(this);
+			Widget->SetVisible(IsVisible(), true); // Child matches our visibility
 
 			//MarkDirty();
 		}
@@ -87,7 +107,7 @@ namespace Ry
 			}
 		}
 
-		PanelWidget& operator+(Ry::Widget& Widget)
+		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget)
 		{
 			AppendSlot(Widget);
 

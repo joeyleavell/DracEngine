@@ -137,20 +137,20 @@ namespace Ry
 			{
 				UI = new UserInterface;
 
-				Ry::BorderWidget* Canvas;
-				NewWidgetAssign(Canvas, BorderWidget)
-				.FillX(1.0f)
-				.FillY(1.0f)
-				.SetHAlign(HAlign::CENTER)
-				.SetVAlign(VAlign::BOTTOM)
-				[
-					NewWidget(Ry::BorderWidget)
-					.DefaultBox(GREEN, GREEN, 0, 0)\
-					.Padding(100.0f, 100.0f)
-				];
+				// Ry::SharedPtr<Ry::BorderWidget> Canvas;
+				// NewWidgetAssign(Canvas, BorderWidget)
+				// .FillX(1.0f)
+				// .FillY(1.0f)
+				// .HorAlign(HAlign::CENTER)
+				// .VertAlign(VAlign::BOTTOM)
+				// [
+				// 	NewWidget(Ry::BorderWidget)
+				// 	.DefaultBox(GREEN, GREEN, 0, 0)
+				// 	.Padding(100.0f, 100.0f)
+				// ];
 
 
-				UI->AddRoot(*Canvas);
+				//UI->AddRoot(*Canvas);
 			}
 
 		}

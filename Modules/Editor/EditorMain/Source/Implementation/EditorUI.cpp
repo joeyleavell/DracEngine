@@ -36,20 +36,33 @@ namespace Ry
 		UI->SetTextBatch(TextBatch);
 		UI->SetTextureBatch(TextureBatch);
 
-		Ry::SlotWidget* Root;
-		Ry::ContentBrowserWidget* BrowserWidget;
+		Ry::SharedPtr<Ry::BorderWidget> Root;
+		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
+
+		BoxDrawable Default;
+		Default.SetBackgroundColor(WHITE.ScaleRGB(0.1f));
+		Default.SetBorderColor(GREEN);
+		Default.SetBorderRadius(5);
+		Default.SetBorderSize(0);
+
+		BoxDrawable Hovered;
+		Hovered.SetBackgroundColor(WHITE.ScaleRGB(0.05f));
+		Hovered.SetBorderColor(GREEN);
+		Hovered.SetBorderRadius(5);
+		Hovered.SetBorderSize(0);
+
 
 		// Build editor UI
 		NewWidgetAssign(Root, BorderWidget)
 		.FillX(1.0f)
 		.FillY(1.0f)
-		.SetHAlign(HAlign::CENTER)
-		.SetVAlign(VAlign::BOTTOM)
+		.HorAlign(HAlign::CENTER)
+		.VertAlign(VAlign::BOTTOM)
 		[
 			NewWidget(Ry::BorderWidget)
-			.DefaultBox(WHITE.ScaleRGB(0.1f), GREEN, 5, 0)
-			.HoveredBox(WHITE.ScaleRGB(0.05f), GREEN, 5, 0)
-			.Padding(10.0f, 10.0f)
+			.DefaultBox(Default)
+			.HoveredBox(Hovered)
+			.Padding(10.0f)
 			.FillX(1.0f)
 			[
 				NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
@@ -59,7 +72,7 @@ namespace Ry
 		// Create the content browser utility
 		ContentBrowse = new ContentBrowser(BrowserWidget);
 
-		UI->AddRoot(*Root);
+		//UI->AddRoot(*Root);
 	}
 
 	void EditorUI::Update(float Delta)

@@ -12,6 +12,17 @@ namespace Ry
 	{
 	public:
 
+		WidgetBeginArgs(SlotWidget)
+			WidgetProp(float, Padding)
+			WidgetProp(VAlign, VerticalAlignment)
+			WidgetProp(HAlign, HorizontalAlignment)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
 		SlotWidget() :
 			Widget()
 		{
@@ -228,7 +239,7 @@ namespace Ry
 			MarkDirty();
 		}
 
-		void SetChild(Ry::Widget& Child)
+		void SetChild(SharedPtr<Ry::Widget> Child)
 		{
 			// TODO: if there is an existing child, remove the parent/child links
 
@@ -240,15 +251,15 @@ namespace Ry
 
 			// Set existing batches
 			// TODO: this should just be a pointer back up to user interface
-			Child.SetShapeBatch(ShapeBatch);
-			Child.SetTextureBatch(TextureBatch);
-			Child.SetTextBatch(TextBatch);
+			Child->SetShapeBatch(ShapeBatch);
+			Child->SetTextureBatch(TextureBatch);
+			Child->SetTextBatch(TextBatch);
 			
 			// Setup the parent/child relationship
-			this->Child = &Child;
-			Child.SetParent(this);
-			Child.SetVisible(IsVisible(), true); // Child matches our visibility
-			Child.RenderStateDirty.AddMemberFunction(this, &SlotWidget::ChildStateDirty);
+			this->Child = Child;
+			Child->SetParent(this);
+			Child->SetVisible(IsVisible(), true); // Child matches our visibility
+			Child->RenderStateDirty.AddMemberFunction(this, &SlotWidget::ChildStateDirty);
 
 			// Automatically rearrange
 			Arrange();
@@ -301,7 +312,7 @@ namespace Ry
 			return false;
 		}
 
-		Widget& operator[](Ry::Widget& Child) override
+		Widget& operator[](SharedPtr<Ry::Widget> Child) override
 		{
 			SetChild(Child);
 
@@ -378,7 +389,7 @@ namespace Ry
 		/**
 		 * The child stored within this box element.
 		 */
-		Ry::Widget* Child;
+		SharedPtr<Ry::Widget> Child;
 
 		/**
 		 * The padding of the inner content of this box element.

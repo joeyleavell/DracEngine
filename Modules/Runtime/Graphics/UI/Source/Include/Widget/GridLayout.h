@@ -9,6 +9,29 @@ namespace Ry
 
 	class UI_MODULE GridLayout : public PanelWidget
 	{
+	public:
+		struct Slot : public PanelWidget::Slot
+		{
+			int32 Row;
+			int32 Column;
+
+			// float LeftMargin;
+			// float RightMargin;
+			// float TopMargin;
+			// float BottomMargin;
+		};
+		
+		WidgetBeginArgsSlot(GridLayout)
+			WidgetProp(float, CellWidth)
+			WidgetProp(float, CellHeight)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
+
 	private:
 		struct SlotPosition
 		{
@@ -63,25 +86,22 @@ namespace Ry
 		
 	public:
 
-		struct Slot
+		static Slot MakeSlot(int32 Row, int32 Column)
 		{
-			SharedPtr<Ry::Widget> Widget;
-			int32 Row;
-			int32 Column;
+			Slot NewSlot;
+			NewSlot.Row = Row;
+			NewSlot.Column = Column;
 			
-			float LeftMargin;
-			float RightMargin;
-			float TopMargin;
-			float BottomMargin;
-		};
+			return NewSlot;
+		}
 
-		void AppendSlot(Ry::Widget& Widget) override
+		void AppendSlot(Ry::SharedPtr<Widget>& Widget) override
 		{
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
 			Slot PanelSlot;
-			PanelSlot.Widget = &Widget;
+			PanelSlot.Widget = Widget;
 
 			// Find next available slot
 			SlotPosition Next = FindFree();

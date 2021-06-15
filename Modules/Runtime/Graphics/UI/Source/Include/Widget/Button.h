@@ -10,6 +10,14 @@ namespace Ry
 	{
 	public:
 
+		WidgetBeginArgs(Button)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
 		MulticastDelegate<> OnButtonPressed;
 		MulticastDelegate<> OnButtonReleased;
 		MulticastDelegate<> OnButtonHovered;

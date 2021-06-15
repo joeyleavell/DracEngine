@@ -14,6 +14,17 @@ namespace Ry
 	{
 	public:
 
+		WidgetBeginArgs(Label)
+			WidgetProp(Ry::String, Text)
+			WidgetProp(BitmapFont*, Font)
+			WidgetProp(Ry::Color, Color)
+		WidgetEndArgs()
+
+		void Construct(Args& In)
+		{
+
+		}
+
 		Label():
 		Widget()
 		{

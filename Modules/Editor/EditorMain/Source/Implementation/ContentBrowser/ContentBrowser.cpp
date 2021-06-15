@@ -4,7 +4,7 @@
 
 namespace Ry
 {
-	ContentBrowser::ContentBrowser(ContentBrowserWidget* Widget)
+	ContentBrowser::ContentBrowser(Ry::SharedPtr<ContentBrowserWidget> Widget)
 	{
 		this->Browser = Widget;
 
@@ -14,7 +14,7 @@ namespace Ry
 
 		// Initialize content browser to a directory (virtual)
 		// The virtual path will be translated to an absolute path for crawling
-		SetDirectory("/Engine/");
+		SetDirectory("/Engine/Test");
 	}
 
 	void ContentBrowser::UpDirectory()

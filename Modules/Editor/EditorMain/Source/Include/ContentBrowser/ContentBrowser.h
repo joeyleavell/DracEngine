@@ -18,7 +18,7 @@ namespace Ry
 	{
 	public:
 
-		ContentBrowser(ContentBrowserWidget* Widget);
+		ContentBrowser(Ry::SharedPtr<ContentBrowserWidget> Widget);
 
 		void SetDirectory(Ry::String Virtual);
 
@@ -32,7 +32,7 @@ namespace Ry
 
 		GridLayout* Directory;
 
-		ContentBrowserWidget* Browser;
+		Ry::SharedPtr<ContentBrowserWidget> Browser;
 
 		Ry::Map<ContentBrowserItem*, BrowserNode> Nodes;
 	};
