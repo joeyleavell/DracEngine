@@ -15,15 +15,20 @@ namespace Ry
 			WidgetProp(float, SlotMargin)
 		WidgetEndArgs()
 
-		void Construct(Args& In)
-		{
-
-		}
-
 		struct Slot : public PanelWidget::Slot
 		{
-			
+
 		};
+
+		void Construct(HorizontalLayout::Args& In)
+		{
+			this->SlotMargin = In.mSlotMargin;
+
+			for(PanelWidget::Slot& Child : In.Slots)
+			{
+				AppendSlot(Child.Widget);
+			}
+		}
 
 		static Slot MakeSlot()
 		{

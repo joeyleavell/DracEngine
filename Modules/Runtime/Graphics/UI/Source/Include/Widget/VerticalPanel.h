@@ -30,7 +30,12 @@ namespace Ry
 
 		void Construct(Args& In)
 		{
+			this->SlotMargin = In.mSlotMargin;
 
+			for (PanelWidget::Slot& Child : In.Slots)
+			{
+				AppendSlot(Child.Widget);
+			}
 		}
 
 		static VerticalLayout::Slot MakeSlot()

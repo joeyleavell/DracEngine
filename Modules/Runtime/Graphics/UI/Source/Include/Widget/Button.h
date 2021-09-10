@@ -11,11 +11,23 @@ namespace Ry
 	public:
 
 		WidgetBeginArgs(Button)
+			WidgetProp(float, FillX)
+			WidgetProp(float, FillY)
+			WidgetPropDefault(float, Padding, 0.0f)
+			WidgetPropDefault(VAlign, VerticalAlignment, VAlign::CENTER)
+			WidgetPropDefault(HAlign, HorizontalAlignment, HAlign::CENTER)
 		WidgetEndArgs()
 
 		void Construct(Args& In)
 		{
-
+			SlotWidget::Args ParentArgs;
+			ParentArgs.mPadding = In.mPadding;
+			ParentArgs.mVerticalAlignment = In.mVerticalAlignment;
+			ParentArgs.mHorizontalAlignment = In.mHorizontalAlignment;
+			ParentArgs.mFillX = In.mFillX;
+			ParentArgs.mFillY = In.mFillY;
+			ParentArgs.Children = In.Children;
+			SlotWidget::Construct(ParentArgs);
 		}
 
 		MulticastDelegate<> OnButtonPressed;

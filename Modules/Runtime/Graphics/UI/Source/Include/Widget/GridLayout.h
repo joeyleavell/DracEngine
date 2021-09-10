@@ -22,13 +22,24 @@ namespace Ry
 		};
 		
 		WidgetBeginArgsSlot(GridLayout)
+			WidgetProp(float, SlotMargin)
 			WidgetProp(float, CellWidth)
 			WidgetProp(float, CellHeight)
 		WidgetEndArgs()
 
 		void Construct(Args& In)
 		{
+			PanelWidget::Args ParentArgs;
+			ParentArgs.mSlotMargin = In.mSlotMargin;
+			PanelWidget::Construct(ParentArgs);
+			
+			SetCellWidth(In.mCellWidth);
+			SetCellHeight(In.mCellHeight);
 
+			for (Ry::SharedPtr<Widget>& Child : In.Children)
+			{
+				AppendSlot(Child);
+			}
 		}
 
 

@@ -75,40 +75,36 @@ namespace Ry
 			}
 		}
 
-		//template<class OtherClass>
-		SharedPtr(const SharedPtr<Class>& Other):
+		SharedPtr(const SharedPtr<Class>& Other) :
 		Value(nullptr),
 		Counter(nullptr)
-		{			
-			if(Other.IsValid())
-			{
-				//Class* Result = dynamic_cast<Class*>(Other.Get());
+		{
+			Copy(Other);
+		}
 
-				//if(Result)
-				{
-					Other.GetCounter()->Increment();
-
-					this->Counter = Other.GetCounter();
-					this->Value = Other.Get();
-//					this->Value = Result;
-
-				}
-			}
+		template<class OtherClass>
+		SharedPtr(const SharedPtr<OtherClass>& Other):
+		Value(nullptr),
+		Counter(nullptr)
+		{
+			Copy(Other);
 		}
 
 		SharedPtr(SharedPtr<Class>&& Other) noexcept:
 		Value(nullptr),
 		Counter(nullptr)
 		{
-			if (Other.IsValid())
-			{
-				this->Counter = Other.GetCounter();
-				this->Value = Other.Get();
-
-				Other.Counter = nullptr;
-				Other.Value = nullptr;
-			}
+			Move<Class>(std::move(Other));
 		}
+
+		template<class OtherClass>
+		SharedPtr(SharedPtr<OtherClass>&& Other) noexcept :
+		Value(nullptr),
+		Counter(nullptr)
+		{
+			Move(std::move(Other));
+		}
+
 
 		~SharedPtr()
 		{
@@ -163,7 +159,7 @@ namespace Ry
 		}
 
 		template<class Parent>
-		operator SharedPtr<Parent>()
+		operator auto() const
 		{
 			Parent* CastResult = dynamic_cast<Parent*>(Value);
 
@@ -185,59 +181,48 @@ namespace Ry
 			return IsValid();
 		}
 
-		SharedPtr<Class>& operator=(SharedPtr<Class>&& Other) noexcept
-		{
-			if (Other.IsValid())
-			{
-				this->Counter = Other.GetCounter();
-				this->Value = Other.Get();
-
-				Other.Counter = nullptr;
-				Other.Value = nullptr;
-			}
-
-			return *this;
-		}
-
 		template<class OtherClass>
 		bool operator==(const SharedPtr<OtherClass>& Other)
 		{
 			return Other.Get() == Get();
 		}
 
-		SharedPtr<Class>& operator=(const SharedPtr<Class>& Other)
+		SharedPtr<Class>& operator=(SharedPtr<Class>&& Other) noexcept
 		{
-			if (&Other == this)
-				return *this;
-			
-			// Relinquish share of existing pointer
-			if(IsValid())
-			{
-				Counter->Decrement();
-
-				if (Counter->Value() <= 0)
-				{
-					delete Value;
-					this->Value = nullptr;
-					this->Counter = nullptr;
-				}
-			}
-
-			// Copy new pointer over
-			if (Other.IsValid())
-			{
-				Other.Counter->Increment();
-
-				this->Counter = Other.Counter;
-				this->Value = Other.Value;
-			}
-			else
-			{
-				this->Counter = nullptr;
-				this->Value = nullptr;
-			}
+			Move(std::move(Other));
 
 			return *this;
+		}
+		
+		template<class OtherClass>
+		SharedPtr<Class>& operator=(SharedPtr<OtherClass>&& Other) noexcept
+		{
+			Move(std::move(Other));
+
+			return *this;
+		}
+
+		SharedPtr<Class>& operator=(const SharedPtr<Class>& Other)
+		{
+			if (*this == Other)
+				return *this;
+
+			Copy(Other);
+			
+			return *this;
+		}
+
+		template<class OtherClass>
+		SharedPtr<Class>& operator=(const SharedPtr<OtherClass>& Other)
+		{
+			return Copy(Other);
+		}
+
+		// WARNING: for internal use only
+		void Clear()
+		{
+			this->Counter = nullptr;
+			this->Value = nullptr;
 		}
 
 		void Reset(Class* New)
@@ -272,6 +257,47 @@ namespace Ry
 
 		Class* Value;
 		RefCounter* Counter;
+
+		template<class OtherClass>
+		void Copy(const SharedPtr<OtherClass>& Other)
+		{
+			OtherClass* CastResult = dynamic_cast<OtherClass*>(Other.Get());
+
+			CORE_ASSERT(!Other.IsValid() || CastResult);
+
+			//CORE_ASSERT(CastResult);
+			//CORE_ASSERT(Other.IsValid());
+
+			// Relinquish share of existing pointer
+			Reset(nullptr);
+
+			// Copy new pointer over
+			if (CastResult)
+			{
+				Other.GetCounter()->Increment();
+
+				this->Counter = Other.GetCounter();
+				this->Value = CastResult;
+			}
+			
+		}
+
+		template<class OtherClass>
+		void Move(SharedPtr<OtherClass>&& Other)
+		{
+			OtherClass* CastResult = dynamic_cast<OtherClass*>(Other.Get());
+
+			CORE_ASSERT(!Other.IsValid() || CastResult);
+			
+			if (CastResult)
+			{
+				this->Counter = Other.GetCounter();
+				this->Value = CastResult;
+
+				Other.Clear();
+			}
+		}
+
 	};
 
 	template<class To, class From>

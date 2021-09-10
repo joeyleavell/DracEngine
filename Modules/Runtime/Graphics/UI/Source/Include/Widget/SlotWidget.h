@@ -13,14 +13,33 @@ namespace Ry
 	public:
 
 		WidgetBeginArgs(SlotWidget)
-			WidgetProp(float, Padding)
-			WidgetProp(VAlign, VerticalAlignment)
-			WidgetProp(HAlign, HorizontalAlignment)
+			WidgetProp(float, FillX)
+			WidgetProp(float, FillY)
+			WidgetPropDefault(float, Padding, 0.0f)
+			WidgetPropDefault(VAlign, VerticalAlignment, VAlign::CENTER)
+			WidgetPropDefault(HAlign, HorizontalAlignment, HAlign::CENTER)
 		WidgetEndArgs()
 
 		void Construct(Args& In)
 		{
+			this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = In.mPadding;
+			this->VerticalAlign = In.mVerticalAlignment;
+			this->HorizontalAlign = In.mHorizontalAlignment;
 
+			if (In.mFillX.IsSet())
+			{
+				this->FillX(In.mFillX);
+			}
+
+			if (In.mFillY.IsSet())
+			{
+				this->FillY(In.mFillY);
+			}
+
+			if(In.Children.GetSize() == 1)
+			{
+				SetChild(In.Children[0]);
+			}
 		}
 
 		SlotWidget() :
@@ -239,7 +258,7 @@ namespace Ry
 			MarkDirty();
 		}
 
-		void SetChild(SharedPtr<Ry::Widget> Child)
+		void SetChild(Ry::SharedPtr<Ry::Widget> Child)
 		{
 			// TODO: if there is an existing child, remove the parent/child links
 

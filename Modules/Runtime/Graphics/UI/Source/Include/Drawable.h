@@ -119,6 +119,14 @@ namespace Ry
 			return *this;
 		}
 
+		void Set(const BoxDrawable& Other)
+		{
+			this->BackgroundColor = Other.BackgroundColor;
+			this->BorderColor = Other.BorderColor;
+			this->BorderRadius = Other.BorderRadius;
+			this->BorderSize = Other.BorderSize;
+		}
+
 		void Show() override
 		{
 			ShapeBatch->AddItemSet(ItemSet);

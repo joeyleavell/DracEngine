@@ -21,9 +21,10 @@ namespace Ry
 		WidgetBeginArgs(BorderWidget)
 			WidgetProp(float, FillX)
 			WidgetProp(float, FillY)
-			WidgetProp(float, Padding)
-			WidgetProp(HAlign, HorAlign)
-			WidgetProp(VAlign, VertAlign)
+			WidgetPropDefault(float, Padding, 0.0f)
+			WidgetPropDefault(HAlign, HorAlign, HAlign::CENTER)
+			WidgetPropDefault(VAlign, VertAlign, VAlign::CENTER)
+			WidgetPropDefault(bool, HasStyle, true)
 			WidgetProp(Texture*, DefaultImage)
 			WidgetProp(Color, DefaultImageTint)
 			WidgetProp(Texture*, HoveredImage)
@@ -34,12 +35,50 @@ namespace Ry
 			WidgetProp(BoxDrawable, HoveredBox)
 			WidgetProp(BoxDrawable, PressedBox)
 		WidgetEndArgs()
-
+		
 //BorderWidget& DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
 
 		void Construct(Args& In)
 		{
-			
+			SlotWidget::Args ParentArgs;
+			ParentArgs.mPadding = In.mPadding;
+			ParentArgs.mVerticalAlignment = In.mVertAlign;
+			ParentArgs.mHorizontalAlignment = In.mHorAlign;
+			ParentArgs.mFillX = In.mFillX;
+			ParentArgs.mFillY = In.mFillY;
+			ParentArgs.Children = In.Children;
+			SlotWidget::Construct(ParentArgs);
+
+			if (In.mDefaultImage.IsSet())
+			{
+				this->DefaultImage(In.mDefaultImage, In.mDefaultImageTint);
+			}
+		
+			if(In.mDefaultBox.IsSet())
+			{
+				this->Style.DefaultBox().Set(In.mDefaultBox);
+			}
+
+			if (In.mHoveredImage.IsSet())
+			{
+				this->HoveredImage(In.mHoveredImage, In.mHoveredImageTint);
+			}
+
+			if(In.mHoveredBox.IsSet())
+			{
+				this->Style.HoveredBox().Set(In.mHoveredBox);
+			}
+
+			if (In.mPressedImage.IsSet())
+			{
+				this->PressedImage(In.mPressedImage, In.mPressedImageTint);
+			}
+		
+			if(In.mPressedBox.IsSet())
+			{
+				this->Style.PressedBox().Set(In.mPressedBox);
+			}
+
 		}
 
 		BorderWidget():

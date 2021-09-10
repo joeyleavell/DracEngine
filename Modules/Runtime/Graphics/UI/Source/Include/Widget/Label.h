@@ -22,7 +22,8 @@ namespace Ry
 
 		void Construct(Args& In)
 		{
-
+			this->SetText(In.mText);
+			this->SetStyle(In.mFont, In.mColor);
 		}
 
 		Label():

@@ -60,7 +60,7 @@ namespace Ry
 		/**
 		 * Adds a widget to the root-level of this user interface.
 		 */
-		void AddRoot(Ry::SharedPtr<Ry::Widget>& Widget)
+		void AddRoot(Ry::SharedPtr<Ry::Widget> Widget)
 		{
 			RootWidgets.Add(Widget);
 

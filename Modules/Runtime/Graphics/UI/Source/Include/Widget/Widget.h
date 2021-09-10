@@ -35,8 +35,16 @@ struct Args \
 		return *this; \
 	} \
 
+#define WidgetPropDefault(Type, Name, Default) \
+OptionalValue<Type> m##Name = Default; \
+WidgetArgsType& Name(Type InAttrib) \
+{ \
+	m##Name = InAttrib; \
+	return *this; \
+}
+
 #define WidgetProp(Type, Name) \
-Type m##Name; \
+OptionalValue<Type> m##Name; \
 WidgetArgsType& Name(Type InAttrib) \
 { \
 	m##Name = InAttrib; \
@@ -57,6 +65,71 @@ namespace Ry
 
 	class Batch;
 
+	template<typename T>
+	struct OptionalValue
+	{
+		OptionalValue()
+		{
+			bSet = false;
+		}
+
+		OptionalValue(T Val)
+		{
+			this->Value = Val;
+			bSet = true;
+		}
+
+		bool IsSet()
+		{
+			return bSet;
+		}
+
+		void Set(const T& Value)
+		{
+			this->Value = Value;
+			bSet = true;
+		}
+
+		void Set(T&& Value)
+		{
+			this->Value = Value;
+			bSet = true;
+		}
+
+		T Get()
+		{
+			return Value;
+		}
+
+		operator T() const
+		{
+			return Value;
+		}
+
+		OptionalValue<T>& operator=(T&& Value)
+		{
+			Set(std::move(Value));
+			return *this;
+		}
+
+		OptionalValue<T>& operator=(const OptionalValue<T>& Opt)
+		{
+			this->bSet = Opt.bSet;
+			this->Value = Opt.Value;
+			return *this;
+		}
+
+		OptionalValue<T>& operator=(const T& Value)
+		{
+			Set(Value);
+			return *this;
+		}
+		
+	private:
+		T Value;
+		mutable bool bSet;
+		
+	};
 	
 	struct UI_MODULE SizeType
 	{

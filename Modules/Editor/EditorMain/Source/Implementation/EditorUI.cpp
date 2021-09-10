@@ -42,22 +42,21 @@ namespace Ry
 		BoxDrawable Default;
 		Default.SetBackgroundColor(WHITE.ScaleRGB(0.1f));
 		Default.SetBorderColor(GREEN);
-		Default.SetBorderRadius(5);
+		Default.SetBorderRadius(10);
 		Default.SetBorderSize(0);
 
 		BoxDrawable Hovered;
 		Hovered.SetBackgroundColor(WHITE.ScaleRGB(0.05f));
 		Hovered.SetBorderColor(GREEN);
-		Hovered.SetBorderRadius(5);
+		Hovered.SetBorderRadius(10);
 		Hovered.SetBorderSize(0);
-
 
 		// Build editor UI
 		NewWidgetAssign(Root, BorderWidget)
-		.FillX(1.0f)
-		.FillY(1.0f)
 		.HorAlign(HAlign::CENTER)
 		.VertAlign(VAlign::BOTTOM)
+		.FillX(1.0f)
+		.FillY(1.0f)
 		[
 			NewWidget(Ry::BorderWidget)
 			.DefaultBox(Default)
@@ -68,11 +67,11 @@ namespace Ry
 				NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
 			]
 		];
-
+		
 		// Create the content browser utility
 		ContentBrowse = new ContentBrowser(BrowserWidget);
 
-		//UI->AddRoot(*Root);
+		UI->AddRoot(Root);
 	}
 
 	void EditorUI::Update(float Delta)

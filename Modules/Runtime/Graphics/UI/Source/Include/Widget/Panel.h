@@ -29,7 +29,7 @@ namespace Ry
 
 		void Construct(Args& In)
 		{
-
+			this->SlotMargin = In.mSlotMargin;
 		}
 
 		float SlotMargin;
