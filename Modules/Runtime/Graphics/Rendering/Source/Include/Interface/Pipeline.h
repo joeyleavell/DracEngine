@@ -47,6 +47,15 @@ namespace Ry
 
 	};
 
+	struct RectScissor
+	{
+		bool bEnableScissorTest = true;
+		int32 X = 0;
+		int32 Y = 0;
+		int32 Width = 0;
+		int32 Height = 0;
+	};
+
 	struct PipelineCreateInfo
 	{
 		Ry::ArrayList<Ry::ResourceLayout*> ResourceDescriptions;
@@ -55,10 +64,12 @@ namespace Ry
 		Ry::VertexFormat VertFormat;
 		PipelineDepth Depth;
 		PipelineBlendInfo Blend;
+		RectScissor Scissor;
 
 		// todo: GET THESE FROM SWAP CHAIN WHEN CREATING
 		uint32 ViewportWidth = 0;
 		uint32 ViewportHeight = 0;
+
 	};
 
 	class RENDERING_MODULE Pipeline

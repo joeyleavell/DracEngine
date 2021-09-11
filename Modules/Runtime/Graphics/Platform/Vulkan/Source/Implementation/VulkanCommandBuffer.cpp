@@ -294,8 +294,12 @@ namespace Ry
 
 	void VulkanCommandBuffer2::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight)
 	{
+		int32 Height = Swap->GetSwapChainHeight();
+		
+		int32 ConvertedY = Height - (ScissorY + ScissorHeight);
+
 		VkRect2D Scissor;
-		Scissor.offset = { ScissorX, ScissorY };
+		Scissor.offset = { ScissorX, ConvertedY};
 		Scissor.extent = VkExtent2D{ScissorWidth, ScissorHeight};
 
 		vkCmdSetScissor(CmdBuffer, 0, 1, &Scissor);

@@ -738,11 +738,11 @@ namespace Ry
 		
 		AtLayer->CommandBuffer->BeginCmd();
 		{
-			AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
-			AtLayer->CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
-
 			// Bind pipeline
 			AtLayer->CommandBuffer->BindPipeline(Pipeline);
+
+			AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+			AtLayer->CommandBuffer->SetScissorSize(10, 10, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
 
 			for (const BatchGroup* Group : AtLayer->Groups)
 			{
