@@ -340,6 +340,16 @@ namespace Ry
 			return false;
 		}
 
+		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override
+		{
+			if (Child)
+			{
+				return Child->OnMouseScroll(MouseEv);
+			}
+
+			return false;
+		}
+
 		Widget& operator[](SharedPtr<Ry::Widget> Child) override
 		{
 			SetChild(Child);

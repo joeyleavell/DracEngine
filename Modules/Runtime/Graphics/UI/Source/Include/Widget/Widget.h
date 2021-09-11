@@ -4,6 +4,7 @@
 #include "Core/Delegate.h"
 #include "UIGen.h"
 #include "Event.h"
+#include "Interface/Pipeline.h"
 
 #define WidgetBeginArgsSlot(ClassName) \
 public: \
@@ -283,6 +284,21 @@ namespace Ry
 			}
 		}
 
+		virtual RectScissor GetClipSpace()
+		{
+			if(Parent)
+			{
+				// Return clip space of parent
+				return Parent->GetClipSpace();
+			}
+			else
+			{
+				// By default widgets never clip
+				static RectScissor Clip;
+				return Clip;
+			}
+		}
+
 		virtual Widget& operator[](SharedPtr<Ry::Widget> Child)
 		{
 			return *this;
@@ -322,6 +338,7 @@ namespace Ry
 		virtual bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv);
 		virtual bool OnMouseClicked(const MouseClickEvent& MouseEv);
 		virtual bool OnMouseDragged(const MouseDragEvent& MouseEv);
+		virtual bool OnMouseScroll(const MouseScrollEvent& MouseEv);
 
 		virtual bool OnEvent(const Event& Ev)
 		{
@@ -346,6 +363,11 @@ namespace Ry
 			{
 				const MouseDragEvent& MouseDrag = static_cast<const MouseDragEvent&>(Ev);
 				return OnMouseDragged(MouseDrag);
+			}
+			else if (Ev.Type == EVENT_MOUSE_SCROLL)
+			{
+				const MouseScrollEvent& MouseScroll = static_cast<const MouseScrollEvent&>(Ev);
+				return OnMouseScroll(MouseScroll);
 			}
 
 			return false;

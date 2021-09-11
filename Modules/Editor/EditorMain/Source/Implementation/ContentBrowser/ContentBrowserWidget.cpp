@@ -6,7 +6,7 @@
 #include "Manager/AssetManager.h"
 #include "VectorFontAsset.h"
 #include "Widget/HorizontalPanel.h"
-#include <chrono>
+#include "Widget/ScrollPane.h"
 #include "Widget/Button.h"
 
 namespace Ry
@@ -39,8 +39,6 @@ namespace Ry
 
 	ContentBrowserItem::~ContentBrowserItem()
 	{
-		std::cout << kills << std::endl;
-		this->kills += 1;
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -105,9 +103,17 @@ namespace Ry
 
 			+ VerticalLayout::MakeSlot()
 			[
-				NewWidgetAssign(Grid, GridLayout)
-				.CellWidth(200.0f)
-				.CellHeight(100.0f)
+				NewWidgetAssign(Pane, ScrollPane)
+				.Width(600)
+				.Height(300)
+				
+				+ ScrollPane::MakeSlot()
+				[
+					NewWidgetAssign(Grid, GridLayout)
+					.CellWidth(200.0f)
+					.CellHeight(100.0f)
+				]
+
 			]
 		);
 

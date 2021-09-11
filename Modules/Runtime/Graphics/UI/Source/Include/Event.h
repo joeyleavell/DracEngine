@@ -10,10 +10,17 @@ namespace Ry
 	constexpr uint32 EVENT_MOUSE_BUTTON = 1;
 	constexpr uint32 EVENT_MOUSE_CLICK  = 2;
 	constexpr uint32 EVENT_MOUSE_DRAG   = 3;
+	constexpr uint32 EVENT_MOUSE_SCROLL = 4;
 
 	struct UI_MODULE Event
 	{
 		uint32 Type;
+	};
+
+	struct UI_MODULE MouseScrollEvent : public Event
+	{
+		double ScrollX = 0.0f;
+		double ScrollY = 0.0f;
 	};
 
 	struct UI_MODULE MouseEvent : public Event

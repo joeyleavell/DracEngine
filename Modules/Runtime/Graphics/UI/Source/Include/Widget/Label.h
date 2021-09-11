@@ -68,7 +68,7 @@ namespace Ry
 		{
 			if(Bat)
 			{
-				Bat->AddItemSet(ItemSet, "Font", Style.Font->GetAtlasTexture(), WidgetLayer);
+				Bat->AddItemSet(ItemSet, "Font", GetClipSpace(), Style.Font->GetAtlasTexture(), WidgetLayer);
 			}
 		}
 

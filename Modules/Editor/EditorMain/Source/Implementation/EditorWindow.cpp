@@ -80,8 +80,7 @@ namespace Ry
 	void EditorWindow::Update(float Delta)
 	{
 		// Update the layers
-		// todo: use real delta time
-		EdLayers.Update(0.0f);
+		EdLayers.Update(Delta);
 
 		double MouseX, MouseY;
 		EdWindow->GetCursorPos(MouseX, MouseY);
@@ -194,7 +193,7 @@ namespace Ry
 
 	void EditorWindow::OnScroll(double ScrollX, double ScrollY)
 	{
-		
+		FireScrollEvent(ScrollX, ScrollY);
 	}
 
 	void EditorWindow::FireClick(int32 Button, double XPos, double YPos)
@@ -240,6 +239,16 @@ namespace Ry
 		ButtonEvent.bPressed = bPressed;
 
 		EdLayers.OnEvent(ButtonEvent);
+	}
+
+	void EditorWindow::FireScrollEvent(float ScrollX, float ScrollY)
+	{
+		MouseScrollEvent ScrollEvent{};
+		ScrollEvent.Type = EVENT_MOUSE_SCROLL;
+		ScrollEvent.ScrollX = ScrollX;
+		ScrollEvent.ScrollY = ScrollY;
+
+		EdLayers.OnEvent(ScrollEvent);
 	}
 
 	void EditorWindow::Render()

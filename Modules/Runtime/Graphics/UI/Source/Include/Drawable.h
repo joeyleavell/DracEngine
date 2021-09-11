@@ -17,7 +17,7 @@ namespace Ry
 		Drawable() = default;
 		virtual ~Drawable() = default;
 
-		virtual void Show(int32 Layer) = 0;
+		virtual void Show(int32 Layer, RectScissor ClipSpace) = 0;
 		virtual void Hide() = 0;
 		virtual void Draw(float X, float Y, float Width, float Height) = 0;
 	};
@@ -46,11 +46,11 @@ namespace Ry
 			return *this;
 		}
 
-		void Show(int32 Layer) override
+		void Show(int32 Layer, RectScissor ClipSpace) override
 		{
 			if(Bat)
 			{
-				Bat->AddItem(Item, "Texture", ParentTexture, Layer);
+				Bat->AddItem(Item, "Texture", ClipSpace, ParentTexture, Layer);
 			}
 		}
 
@@ -132,11 +132,11 @@ namespace Ry
 			this->BorderSize = Other.BorderSize;
 		}
 
-		void Show(int32 Layer) override
+		void Show(int32 Layer, RectScissor ClipSpace) override
 		{
 			if(Bat)
 			{
-				Bat->AddItemSet(ItemSet, "Shape", nullptr, Layer);
+				Bat->AddItemSet(ItemSet, "Shape", ClipSpace, nullptr, Layer);
 			}
 		}
 

@@ -196,6 +196,18 @@ namespace Ry
 			return bHandled;
 		}
 
+		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override
+		{
+			bool bHandled = Widget::OnMouseScroll(MouseEv);
+
+			for (SharedPtr<Widget> Child : Children)
+			{
+				bHandled |= Child->OnMouseScroll(MouseEv);
+			}
+
+			return bHandled;
+		}
+
 		virtual void ClearChildren()
 		{
 			for(SharedPtr<Widget> Child : Children)

@@ -5,6 +5,7 @@
 #include "Widget/Label.h"
 #include "Widget/BorderWidget.h"
 #include "Widget/Button.h"
+#include "Widget/ScrollPane.h"
 
 namespace Ry
 {
@@ -31,6 +32,8 @@ namespace Ry
 	class ContentBrowserWidget : public SlotWidget
 	{
 	public:
+
+		SharedPtr<Ry::ScrollPane> Pane;
 
 		Ry::SharedPtr<Label> CurDirLabel;
 		Ry::SharedPtr<Button> UpArrow;

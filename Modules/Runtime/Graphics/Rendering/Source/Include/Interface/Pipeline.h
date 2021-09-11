@@ -49,10 +49,25 @@ namespace Ry
 
 	struct RectScissor
 	{
-		int32 X = 0;
-		int32 Y = 0;
-		int32 Width = 0;
-		int32 Height = 0;
+		int32 X = -1;
+		int32 Y = -1;
+		int32 Width = -1;
+		int32 Height = -1;
+
+		RectScissor()
+		{
+						
+		}
+
+		bool IsEnabled() const
+		{
+			return X >= 0 && Y >= 0 && Width >= 0 && Height >= 0;
+		}
+
+		bool operator==(const RectScissor& Other) const
+		{
+			return X == Other.X && Y == Other.Y && Width == Other.Width && Height == Other.Height;
+		}
 	};
 
 	struct PipelineCreateInfo

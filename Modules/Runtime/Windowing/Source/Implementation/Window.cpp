@@ -258,7 +258,6 @@ namespace Ry
 		ScrollCallbacks.Add(Delegate);
 	}
 
-
 	Window* Window::FindWindow(::GLFWwindow* Window)
 	{
 		Ry::Window** Result = Windows.get(Window);

@@ -183,6 +183,7 @@ namespace Ry
 	RENDERING_MODULE Ry::SharedPtr<BatchItem> MakeItem();
 	RENDERING_MODULE Ry::SharedPtr<BatchItemSet> MakeItemSet();
 	RENDERING_MODULE void BatchRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Depth);
+	RENDERING_MODULE void BatchHollowRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Thickness, float Depth);
 	RENDERING_MODULE void BatchSubArc(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float InnerRadius, float OuterRadius, float Theta0, float Theta1, int32 Segments, float Depth);
 	RENDERING_MODULE void BatchArc(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Radius, float Theta0, float Theta1, int32 Segments, float Depth);
 	RENDERING_MODULE void BatchStyledBox(Ry::SharedPtr<BatchItemSet> Item, float X, float Y, float W, float H, const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize, float Depth);
@@ -192,7 +193,8 @@ namespace Ry
 	struct RENDERING_MODULE BatchGroup
 	{
 		BatchPipeline* OwningPipeline;
-		
+
+		RectScissor Scissor;
 		Texture* Text = nullptr;
 		Mesh* BatchMesh = nullptr;
 		Ry::ArrayList<ResourceSet*> ResourceSets;
@@ -227,7 +229,6 @@ namespace Ry
 		Ry::Map<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Groups;
 
 		bool bNeedsRecord = false;
-		RectScissor Scissor;
 	};
 
 	class RENDERING_MODULE Batch
@@ -237,10 +238,9 @@ namespace Ry
 		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass);
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
-		void SetLayerScissor(int32 Layer, RectScissor Scissor);
 
-		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, Texture* Texture = nullptr, int32 Layer = 0);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, Texture* Texture = nullptr, int32 Layer = 0);
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = 0);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = 0);
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
@@ -264,8 +264,8 @@ namespace Ry
 		void CreateLayersIfNeeded(int32 Index);
 
 		// Finds a batch group for given state information
-		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, Texture* Text, int32 Layer);
-		BatchGroup* FindBatchGroup(Texture* Text, int32& OutLayer);
+		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer);
+		BatchGroup* FindBatchGroup(Texture* Text, RectScissor Scissor, int32 Layer);
 
 		void RecordCommands(int32 Layer);
 

@@ -19,8 +19,8 @@ namespace Ry
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
 		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());
 
-		Bat->SetLayerScissor(6, RectScissor{ 5, 75, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
-		Bat->SetLayerScissor(7, RectScissor{ 5, 75, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
+		//Bat->SetLayerScissor(6, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
+		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 
 		// Create UI
 		UI = new UserInterface(Bat);
@@ -65,7 +65,6 @@ namespace Ry
 
 	void EditorUI::Update(float Delta)
 	{
-		
 	}
 
 	void EditorUI::Render()

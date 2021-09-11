@@ -73,5 +73,11 @@ namespace Ry
 	{
 		return false;
 	}
+
+	bool Widget::OnMouseScroll(const MouseScrollEvent& MouseEv)
+	{
+		return false;
+	}
+
 	
 }

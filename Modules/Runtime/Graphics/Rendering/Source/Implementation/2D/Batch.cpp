@@ -32,6 +32,44 @@ namespace Ry
 		return Ry::MakeShared<>(new BatchItemSet);
 	}
 
+	void BatchHollowRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Thickness, float Depth)
+	{
+		// Clear the previous item data
+		Item->Clear();
+
+		// Left border
+		Item->AddVertex1P1C(X - Thickness, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X - Thickness, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+
+		// Top border
+		Item->AddVertex1P1C(X - Thickness, Y + Height, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X - Thickness, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y + Height, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+
+		// Right border
+		Item->AddVertex1P1C(X + Width, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y + Height + Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+
+		// Bottom border
+		Item->AddVertex1P1C(X - Thickness, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X - Thickness, Y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C(X + Width + Thickness, Y - Thickness, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+
+		// Add rects
+		for(int32 Rect = 0; Rect < 4; Rect++)
+		{
+			int32 Base = Rect * 4;
+			Item->AddTriangle(Base + 0, Base + 1, Base + 2);
+			Item->AddTriangle(Base + 2, Base + 3, Base + 0);
+		}
+	}
+
 	void BatchRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Depth)
 	{
 		// Clear the previous item data
@@ -371,9 +409,9 @@ namespace Ry
 		Pipelines.insert(Name, NewPipeline);
 	}
 
-	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, Texture* Text, int32 Layer)
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Text, Layer);
+		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 
 		if(Group)
 		{
@@ -384,9 +422,9 @@ namespace Ry
 
 	}
 
-	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, Texture* Text, int32 Layer)
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Text, Layer);
+		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 		if(Group)
 		{
 			Group->ItemSets.Add(Item);
@@ -436,14 +474,6 @@ namespace Ry
 			Layer->bNeedsRecord = true;
 		}
 
-	}
-
-	void Batch::SetLayerScissor(int32 Layer, RectScissor Scissor)
-	{
-		CreateLayersIfNeeded(Layer);
-
-		Layers[Layer]->Scissor = Scissor;
-		Layers[Layer]->bNeedsRecord = true;
 	}
 
 	void Batch::SetView(const Matrix4& View)
@@ -605,9 +635,9 @@ namespace Ry
 		return nullptr;
 	}
 
-	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, Texture* Text, int32 Layer)
+	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Existing = FindBatchGroup(Text, Layer);
+		BatchGroup* Existing = FindBatchGroup(Text, Scissor, Layer);
 
 		if(!Existing)
 		{
@@ -620,6 +650,7 @@ namespace Ry
 
 			NewGroup->OwningPipeline = (*Pipelines.get(PipelineId));
 			NewGroup->Text = Text;			
+			NewGroup->Scissor = Scissor;
 			NewGroup->ResourceSets.Add(NewGroup->OwningPipeline->SceneResources);
 
 			// Create a new texture resource if needed
@@ -658,22 +689,23 @@ namespace Ry
 
 	}
 
-	BatchGroup* Batch::FindBatchGroup(Texture* Text, int32& OutLayer)
+	BatchGroup* Batch::FindBatchGroup(Texture* Text, RectScissor Scissor, int32 Layer)
 	{
-		for(BatchLayer* Layer : Layers)
+		if (Layer >= Layers.GetSize())
+			return nullptr;
+
+		BatchLayer* LayerPtr = Layers[Layer];
+		Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = LayerPtr->Groups.CreateKeyIterator();
+		while (PipelineItr)
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
-			while (PipelineItr)
+			for (BatchGroup* Group : *PipelineItr.Value())
 			{
-				for (BatchGroup* Group : *PipelineItr.Value())
+				if (Group->Text == Text && Group->Scissor == Scissor)
 				{
-					if (Group->Text == Text)
-					{
-						return Group;
-					}
+					return Group;
 				}
-				++PipelineItr;
 			}
+			++PipelineItr;
 		}
 
 		return nullptr;
@@ -730,11 +762,6 @@ namespace Ry
 		{
 			BatchLayer* NewLayer = new BatchLayer;
 
-			NewLayer->Scissor.X = 0;
-			NewLayer->Scissor.Y = 0;
-			NewLayer->Scissor.Width = (int32) Swap->GetSwapChainWidth();
-			NewLayer->Scissor.Height = (int32)Swap->GetSwapChainHeight();
-
 			// Init depth
 			NewLayer->Depth = Layers.GetSize();
 			NewLayer->CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Swap, ParentPass);
@@ -763,10 +790,20 @@ namespace Ry
 				AtLayer->CommandBuffer->BindPipeline(Key->Pipeline);
 
 				AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
-				AtLayer->CommandBuffer->SetScissorSize(AtLayer->Scissor.X, AtLayer->Scissor.Y, AtLayer->Scissor.Width, AtLayer->Scissor.Height);
 
 				for (const BatchGroup* Group : *PipelineItr.Value())
 				{
+					if(Group->Scissor.IsEnabled())
+					{
+						// Do conversion
+						int32 ConvertedY = Swap->GetSwapChainHeight() - (Group->Scissor.Y + Group->Scissor.Height);
+						AtLayer->CommandBuffer->SetScissorSize(Group->Scissor.X, ConvertedY, Group->Scissor.Width, Group->Scissor.Height);
+					}
+					else
+					{
+						AtLayer->CommandBuffer->SetScissorSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
+					}
+
 					if (Group->Items.GetSize() > 0 || Group->ItemSets.GetSize() > 0)
 					{
 						// Bind resources

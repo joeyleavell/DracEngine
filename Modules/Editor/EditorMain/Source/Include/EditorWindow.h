@@ -61,6 +61,8 @@ namespace Ry
 		void FireDragEvent(int32 Button, float XPos, float YPos);
 		void FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed);
 
+		void FireScrollEvent(float ScrollX, float ScrollY);
+
 		// Layers that get drawn to the 
 		LayerStack EdLayers;
 
@@ -70,6 +72,9 @@ namespace Ry
 		float DoublePressDist     = 5.0f; // Pixel deviation allowed before drag event is triggered
 
 		MouseEventInfo ButtonsInfo[MAX_BUTTONS];
+
+		double LastScrollX = 0.0f;
+		double LastScrollY = 0.0f;
 
 	};
 

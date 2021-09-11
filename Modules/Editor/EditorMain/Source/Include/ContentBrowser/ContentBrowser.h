@@ -24,6 +24,8 @@ namespace Ry
 
 		void UpDirectory();
 
+		Ry::SharedPtr<ContentBrowserWidget> Browser;
+
 	private:
 
 		void OpenNode(ContentBrowserItem* Item);
@@ -32,7 +34,6 @@ namespace Ry
 
 		GridLayout* Directory;
 
-		Ry::SharedPtr<ContentBrowserWidget> Browser;
 
 		Ry::Map<ContentBrowserItem*, BrowserNode> Nodes;
 	};

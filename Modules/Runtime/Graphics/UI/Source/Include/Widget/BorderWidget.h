@@ -135,26 +135,26 @@ namespace Ry
 				{
 					if(Style.Pressed)
 					{
-						Style.Pressed->Show(WidgetLayer);
+						Style.Pressed->Show(WidgetLayer, GetClipSpace());
 					}
 					else if(Style.Hovered)
 					{
-						Style.Hovered->Show(WidgetLayer);
+						Style.Hovered->Show(WidgetLayer, GetClipSpace());
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(WidgetLayer);
+						Style.Default->Show(WidgetLayer, GetClipSpace());
 					}
 				}
 				else
 				{
 					if(Style.Hovered)
 					{
-						Style.Hovered->Show(WidgetLayer);
+						Style.Hovered->Show(WidgetLayer, GetClipSpace());
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(WidgetLayer);
+						Style.Default->Show(WidgetLayer, GetClipSpace());
 					}
 				}
 			}
@@ -162,7 +162,7 @@ namespace Ry
 			{
 				if(Style.Default)
 				{
-					Style.Default->Show(WidgetLayer);
+					Style.Default->Show(WidgetLayer, GetClipSpace());
 				}
 			}
 		}
