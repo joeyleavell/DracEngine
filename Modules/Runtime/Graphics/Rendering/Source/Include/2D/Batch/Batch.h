@@ -9,6 +9,7 @@
 #include "Data/ArrayList.h"
 #include <cstdarg>
 #include "Mesh.h"
+#include "Interface/Pipeline.h"
 
 #define TEXT_VERT "/Engine/Shaders/Vertex/font.glv"
 #define TEXT_FRAG "/Engine/Shaders/Fragment/font.glf"
@@ -70,6 +71,7 @@ Mesh->GetMeshData()->AddTriangle(i0+2, i0+3, i0+0); \
 
 namespace Ry
 {
+	struct BatchPipeline;
 	class RenderPass;
 	class Texture;
 	class Text;
@@ -189,6 +191,8 @@ namespace Ry
 
 	struct RENDERING_MODULE BatchGroup
 	{
+		BatchPipeline* OwningPipeline;
+		
 		Texture* Text = nullptr;
 		Mesh* BatchMesh = nullptr;
 		Ry::ArrayList<ResourceSet*> ResourceSets;
@@ -203,23 +207,40 @@ namespace Ry
 
 	};
 
+	struct RENDERING_MODULE BatchPipeline
+	{
+		Ry::Pipeline* Pipeline;
+		VertexFormat Format;
+
+		// Pipeline/scene specific resources
+		ResourceSet* SceneResources;
+
+		// Resource layouts
+		const Ry::ResourceLayout* SceneResDesc;
+		const Ry::ResourceLayout* TextureResDesc;
+	};
+
 	struct RENDERING_MODULE BatchLayer
 	{
 		int32 Depth = 0;
 		Ry::CommandBuffer* CommandBuffer = nullptr;		
-		Ry::ArrayList<BatchGroup*> Groups;
+		Ry::Map<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Groups;
 
 		bool bNeedsRecord = false;
+		RectScissor Scissor;
 	};
 
 	class RENDERING_MODULE Batch
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass, Ry::Shader* Shad = nullptr, bool bTexture = false);
-		
-		void AddItem(Ry::SharedPtr<BatchItem> Item, Texture* Texture = nullptr, int32 Layer = 0);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Texture* Texture = nullptr, int32 Layer = 0);
+		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass);
+
+		void AddPipeline(Ry::String Name, Ry::String Shader);
+		void SetLayerScissor(int32 Layer, RectScissor Scissor);
+
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, Texture* Texture = nullptr, int32 Layer = 0);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, Texture* Texture = nullptr, int32 Layer = 0);
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
@@ -227,10 +248,8 @@ namespace Ry
 		void SetView(const Matrix4& View);
 		void Resize(int32 Width, int32 Height);
 		void SetProjection(const Matrix4& Proj);
-		//void SetShader(const Ry::String& ShaderName);
 		void Camera(const Camera* Cam);
 		void Update();
-		//void SetTexture(Texture* Texture);
 		bool Render();
 
 		void SetRenderPass(RenderPass* ParentRenderPass);
@@ -242,44 +261,21 @@ namespace Ry
 		
 	private:
 
+		void CreateLayersIfNeeded(int32 Index);
+
 		// Finds a batch group for given state information
-		BatchGroup* FindOrCreateBatchGroup(Texture* Text, int32 Layer);
+		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, Texture* Text, int32 Layer);
 		BatchGroup* FindBatchGroup(Texture* Text, int32& OutLayer);
-
-
-	//	bool bNeedsRecord = false;
-
-		void CreateResources(SwapChain* Swap);
-		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad);
 
 		void RecordCommands(int32 Layer);
 
-		//Shader* Shad;
 		Matrix4 Projection;
 		Matrix4 View;
-
-		VertexFormat Format;
 		
 		Ry::RenderPass* ParentPass;
-
 		Ry::SwapChain* Swap = nullptr;
 		
-		// Resource layouts
-		const Ry::ResourceLayout* SceneResDesc;
-		const Ry::ResourceLayout* TextureResDesc;
-
-		// Scene resources
-		Ry::ResourceSet* SceneRes;
-
-		Ry::Pipeline* Pipeline;
-
-		// Maps depth to a list of items
-		//Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
-		//Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
-
-		// Map texture to the list of batch items 
-	//	Ry::ArrayList<BatchGroup*> Groups;
-
+		Ry::Map<Ry::String, Ry::BatchPipeline*> Pipelines;
 		Ry::ArrayList<BatchLayer*> Layers;
 	};
 

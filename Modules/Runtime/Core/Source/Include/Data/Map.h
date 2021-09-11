@@ -3,7 +3,7 @@
 #include "Algorithm/Algorithm.h"
 #include <iostream>
 
-#define TABLE_SIZE 5000
+#define TABLE_SIZE 10
 
 namespace Ry
 {
@@ -168,7 +168,6 @@ namespace Ry
 			{
 				if (HashTable[Index])
 				{
-					this->CurrentEntry = HashTable[Index];
 					Found = true;
 				}
 				else

@@ -135,26 +135,26 @@ namespace Ry
 				{
 					if(Style.Pressed)
 					{
-						Style.Pressed->Show();
+						Style.Pressed->Show(WidgetLayer);
 					}
 					else if(Style.Hovered)
 					{
-						Style.Hovered->Show();
+						Style.Hovered->Show(WidgetLayer);
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show();
+						Style.Default->Show(WidgetLayer);
 					}
 				}
 				else
 				{
 					if(Style.Hovered)
 					{
-						Style.Hovered->Show();
+						Style.Hovered->Show(WidgetLayer);
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show();
+						Style.Default->Show(WidgetLayer);
 					}
 				}
 			}
@@ -162,7 +162,7 @@ namespace Ry
 			{
 				if(Style.Default)
 				{
-					Style.Default->Show();
+					Style.Default->Show(WidgetLayer);
 				}
 			}
 		}
@@ -216,51 +216,25 @@ namespace Ry
 			return Style.Default || Style.Hovered || Style.Pressed;
 		}
 
-		void SetShapeBatch(Batch* Shape) override
+		void SetBatch(Ry::Batch* Bat) override
 		{
-			SlotWidget::SetShapeBatch(Shape);
+			SlotWidget::SetBatch(Bat);
 
 			if(Style.Default.IsValid())
 			{
-				Style.Default->ShapeBatch = Shape;
+				Style.Default->Bat = Bat;
 			}
 
 			if(Style.Hovered.IsValid())
 			{
-				Style.Hovered->ShapeBatch = Shape;
+				Style.Hovered->Bat = Bat;
 			}
 
 			if(Style.Pressed.IsValid())
 			{
-				Style.Pressed->ShapeBatch = Shape;
+				Style.Pressed->Bat = Bat;
 			}
 
-		}
-
-		void SetTextBatch(Batch* Text) override
-		{
-			SlotWidget::SetTextBatch(Text);
-
-		}
-
-		void SetTextureBatch(Batch* Text) override
-		{
-			SlotWidget::SetTextureBatch(Text);
-
-			if (Style.Default.IsValid())
-			{
-				Style.Default->TextureBatch = Text;
-			}
-
-			if (Style.Hovered.IsValid())
-			{
-				Style.Hovered->TextureBatch = Text;
-			}
-
-			if (Style.Pressed.IsValid())
-			{
-				Style.Pressed->TextureBatch = Text;
-			}
 		}
 
 		void OnHovered(const MouseEvent& MouseEv) override
@@ -307,10 +281,8 @@ namespace Ry
 			// Construct border graphic mesh
 			Draw();
 
-			// Update the batches (todo: only shape and texture batches?)
-			ShapeBatch->Update();
-			TextBatch->Update();
-			TextureBatch->Update();
+			// Update the batch
+			Bat->Update();
 		}
 
 		/**

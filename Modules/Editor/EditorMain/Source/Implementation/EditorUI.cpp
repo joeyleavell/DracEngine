@@ -17,24 +17,13 @@ namespace Ry
 	{
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
+		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());
 
-		Shader* UIShader = GetShader("Shape");
-		Shader* UIText = GetShader("Font");
-		Shader* UITexture = GetShader("Texture");
-
-		ShapeBatch = new Batch(ParentSC, ParentSC->GetDefaultRenderPass(), UIShader, false);
-		TextBatch = new Batch(ParentSC, ParentSC->GetDefaultRenderPass(), UIText, true);
-		TextureBatch = new Batch(ParentSC, ParentSC->GetDefaultRenderPass(), UITexture, true);
-
-		//TextureBatch->AddItem(TextureItem, Tex);
-		//TextureBatch->Update();
-		//TextureBatch->Render();
+		Bat->SetLayerScissor(6, RectScissor{ 5, 75, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
+		Bat->SetLayerScissor(7, RectScissor{ 5, 75, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 
 		// Create UI
-		UI = new UserInterface;
-		UI->SetShapeBatch(ShapeBatch);
-		UI->SetTextBatch(TextBatch);
-		UI->SetTextureBatch(TextureBatch);
+		UI = new UserInterface(Bat);
 
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
@@ -81,9 +70,7 @@ namespace Ry
 
 	void EditorUI::Render()
 	{
-		ShapeBatch->Render();
-		TextureBatch->Render();
-		TextBatch->Render();
+		Bat->Render();
 
 		RecordCmds();
 
@@ -100,13 +87,9 @@ namespace Ry
 		// todo: cant re record primary command buffer here unless we explicitly re-record secondary buffers
 		// the below just marks the secondaries for needing recording
 
-		ShapeBatch->SetRenderPass(ParentSC->GetDefaultRenderPass());
-		TextureBatch->SetRenderPass(ParentSC->GetDefaultRenderPass());
-		TextBatch->SetRenderPass(ParentSC->GetDefaultRenderPass());
+		Bat->SetRenderPass(ParentSC->GetDefaultRenderPass());
 
-		ShapeBatch->Resize(Width, Height);
-		TextureBatch->Resize(Width, Height);
-		TextBatch->Resize(Width, Height);
+		Bat->Resize(Width, Height);
 
 		UI->Draw();
 
@@ -129,23 +112,11 @@ namespace Ry
 				// Only draw first 10 layers
 				for (int32 Layer = 0; Layer < 10; Layer++)
 				{
-					CommandBuffer* Shape = ShapeBatch->GetCommandBuffer(Layer);
-					CommandBuffer* Text = TextBatch->GetCommandBuffer(Layer);
-					CommandBuffer* Texture = TextureBatch->GetCommandBuffer(Layer);
+					CommandBuffer* BatBuffer = Bat->GetCommandBuffer(Layer);
 
-					if (Shape)
+					if (BatBuffer)
 					{
-						Cmd->DrawCommandBuffer(Shape);
-					}
-
-					if (Texture)
-					{
-						Cmd->DrawCommandBuffer(Texture);
-					}
-
-					if (Text)
-					{
-						Cmd->DrawCommandBuffer(Text);
+						Cmd->DrawCommandBuffer(BatBuffer);
 					}
 				}
 

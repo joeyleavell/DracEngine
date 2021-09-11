@@ -66,12 +66,18 @@ namespace Ry
 
 		void OnShow() override
 		{
-			TextBatch->AddItemSet(ItemSet, Style.Font->GetAtlasTexture());
+			if(Bat)
+			{
+				Bat->AddItemSet(ItemSet, "Font", Style.Font->GetAtlasTexture(), WidgetLayer);
+			}
 		}
 
 		void OnHide() override
 		{
-			TextBatch->RemoveItemSet(ItemSet);
+			if(Bat)
+			{
+				Bat->RemoveItemSet(ItemSet);
+			}
 		}
 
 		void Draw() override

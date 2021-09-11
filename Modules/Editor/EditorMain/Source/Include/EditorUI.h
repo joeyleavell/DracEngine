@@ -27,9 +27,7 @@ namespace Ry
 
 		Ry::CommandBuffer* Cmd;
 
-		Ry::Batch* ShapeBatch;
-		Ry::Batch* TextBatch;
-		Ry::Batch* TextureBatch;
+		Ry::Batch* Bat;
 
 		UserInterface* UI;
 

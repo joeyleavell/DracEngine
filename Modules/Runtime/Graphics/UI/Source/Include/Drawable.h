@@ -12,13 +12,12 @@ namespace Ry
 	{
 	public:
 
-		Batch* ShapeBatch   = nullptr;
-		Batch* TextureBatch = nullptr;
+		Ry::Batch* Bat   = nullptr;
 
 		Drawable() = default;
 		virtual ~Drawable() = default;
 
-		virtual void Show() = 0;
+		virtual void Show(int32 Layer) = 0;
 		virtual void Hide() = 0;
 		virtual void Draw(float X, float Y, float Width, float Height) = 0;
 	};
@@ -47,14 +46,20 @@ namespace Ry
 			return *this;
 		}
 
-		void Show() override
+		void Show(int32 Layer) override
 		{
-			TextureBatch->AddItem(Item, ParentTexture);
+			if(Bat)
+			{
+				Bat->AddItem(Item, "Texture", ParentTexture, Layer);
+			}
 		}
 
 		void Hide() override
 		{
-			TextureBatch->RemoveItem(Item);
+			if(Bat)
+			{
+				Bat->RemoveItem(Item);
+			}
 		}
 
 		// todo: make use this texture regions
@@ -127,14 +132,20 @@ namespace Ry
 			this->BorderSize = Other.BorderSize;
 		}
 
-		void Show() override
+		void Show(int32 Layer) override
 		{
-			ShapeBatch->AddItemSet(ItemSet);
+			if(Bat)
+			{
+				Bat->AddItemSet(ItemSet, "Shape", nullptr, Layer);
+			}
 		}
 
 		void Hide() override
 		{
-			ShapeBatch->RemoveItemSet(ItemSet);
+			if(Bat)
+			{
+				Bat->RemoveItemSet(ItemSet);
+			}
 		}
 
 		void Draw(float X, float Y, float Width, float Height) override

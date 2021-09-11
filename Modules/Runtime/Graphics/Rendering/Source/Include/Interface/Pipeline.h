@@ -49,7 +49,6 @@ namespace Ry
 
 	struct RectScissor
 	{
-		bool bEnableScissorTest = true;
 		int32 X = 0;
 		int32 Y = 0;
 		int32 Width = 0;
@@ -64,6 +63,8 @@ namespace Ry
 		Ry::VertexFormat VertFormat;
 		PipelineDepth Depth;
 		PipelineBlendInfo Blend;
+
+		bool bEnableScissorTest = true;
 		RectScissor Scissor;
 
 		// todo: GET THESE FROM SWAP CHAIN WHEN CREATING

@@ -196,12 +196,11 @@ namespace Ry
 		RelativePosition{ 0, 0 },
 		MaxSize{-1, -1},
 		Parent(nullptr),
-		ShapeBatch(nullptr),
-		TextBatch(nullptr),
-		TextureBatch(nullptr),
+		Bat(nullptr),
 		bPressed(false),
 		bHovered(false),
-		bVisible(false)
+		bVisible(false),
+		WidgetLayer(0)
 		{
 			
 		};
@@ -261,9 +260,27 @@ namespace Ry
 			return *this;
 		}
 
-		void SetParent(Widget* Parent)
+		virtual void SetParent(Widget* Parent)
 		{
 			this->Parent = Parent;
+
+			// Calculate widget layer for new parent
+			int32 PreviousDepth = WidgetLayer;
+			
+			WidgetLayer = 0;
+			Widget* Temp = Parent;
+			while(Temp)
+			{
+				WidgetLayer++;
+				Temp = Temp->Parent;
+			}
+
+			// Hide and show the widget so it's added to the correct layer
+			if(WidgetLayer != PreviousDepth && IsVisible())
+			{
+				OnHide();
+				OnShow();
+			}
 		}
 
 		virtual Widget& operator[](SharedPtr<Ry::Widget> Child)
@@ -271,21 +288,10 @@ namespace Ry
 			return *this;
 		}
 
-		virtual void SetShapeBatch(Batch* Shape)
+		virtual void SetBatch(Batch* Bat)
 		{
-			this->ShapeBatch = Shape;
+			this->Bat = Bat;
 		}
-
-		virtual void SetTextBatch(Batch* Text)
-		{
-			this->TextBatch = Text;
-		}
-
-		virtual void SetTextureBatch(Batch* Text)
-		{
-			this->TextureBatch = Text;
-		}
-
 
 		virtual void Arrange()
 		{
@@ -377,9 +383,9 @@ namespace Ry
 		Widget* Parent;
 		SizeType MaxSize;
 
-		Batch* ShapeBatch;
-		Batch* TextBatch;
-		Batch* TextureBatch;
+		Ry::Batch* Bat;
+
+		int32 WidgetLayer;
 
 	private:
 		

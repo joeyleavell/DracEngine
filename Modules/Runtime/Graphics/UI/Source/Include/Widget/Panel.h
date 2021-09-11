@@ -72,9 +72,7 @@ namespace Ry
 
 			// Set existing batches
 			// TODO: this should just be a pointer back up to user interface
-			Widget->SetShapeBatch(ShapeBatch);
-			Widget->SetTextureBatch(TextureBatch);
-			Widget->SetTextBatch(TextBatch);
+			Widget->SetBatch(Bat);
 
 			// Set the widget's parent
 			Widget->SetParent(this);
@@ -99,6 +97,17 @@ namespace Ry
 			// }
 		}
 
+		virtual void SetParent(Widget* Parent) override
+		{
+			Widget::SetParent(Parent);
+
+			// Update child's depth
+			for(SharedPtr<Widget> Child : Children)
+			{
+				Child->SetParent(this);
+			}
+		}
+
 		virtual void Draw() override
 		{
 			for (SharedPtr<Widget> Child : Children)
@@ -114,33 +123,13 @@ namespace Ry
 			return *this;
 		}
 
-		void SetShapeBatch(Batch* Shape) override
+		void SetBatch(Batch* Bat) override
 		{
-			Widget::SetShapeBatch(Shape);
+			Widget::SetBatch(Bat);
 
 			for(SharedPtr<Widget> Sl : Children)
 			{
-				Sl->SetShapeBatch(Shape);
-			}
-		}
-
-		void SetTextBatch(Batch* Text) override
-		{
-			Widget::SetTextBatch(Text);
-
-			for (SharedPtr<Widget> Sl : Children)
-			{
-				Sl->SetTextBatch(Text);
-			}
-		}
-
-		void SetTextureBatch(Batch* Text) override
-		{
-			Widget::SetTextureBatch(Text);
-
-			for (SharedPtr<Widget> Sl : Children)
-			{
-				Sl->SetTextureBatch(Text);
+				Sl->SetBatch(Bat);
 			}
 		}
 

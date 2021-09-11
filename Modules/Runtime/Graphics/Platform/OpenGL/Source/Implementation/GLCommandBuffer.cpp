@@ -185,7 +185,7 @@ namespace Ry
 		//glEnable(GL_SCISSOR_TEST);
 		const PipelineCreateInfo& StateInfo = State->GetCreateInfo();
 
-		if (StateInfo.Scissor.bEnableScissorTest)
+		if (StateInfo.bEnableScissorTest)
 		{
 			glEnable(GL_SCISSOR_TEST);
 		}

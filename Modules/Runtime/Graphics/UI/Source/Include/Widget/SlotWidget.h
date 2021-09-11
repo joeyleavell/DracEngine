@@ -57,6 +57,17 @@ namespace Ry
 			this->HorizontalAlign = HAlign::LEFT;
 		}
 
+		virtual void SetParent(Widget* Parent) override
+		{
+			Widget::SetParent(Parent);
+
+			// Update child's depth
+			if(Child)
+			{
+				Child->SetParent(this);
+			}
+		}
+
 		SlotWidget& Padding(float Pad)
 		{
 			return Padding(Pad, Pad);
@@ -270,9 +281,7 @@ namespace Ry
 
 			// Set existing batches
 			// TODO: this should just be a pointer back up to user interface
-			Child->SetShapeBatch(ShapeBatch);
-			Child->SetTextureBatch(TextureBatch);
-			Child->SetTextBatch(TextBatch);
+			Child->SetBatch(Bat);
 			
 			// Setup the parent/child relationship
 			this->Child = Child;
@@ -338,36 +347,15 @@ namespace Ry
 			return *this;
 		}
 
-		void SetShapeBatch(Batch* Shape) override
+		void SetBatch(Batch* Bat) override
 		{
-			Widget::SetShapeBatch(Shape);
+			Widget::SetBatch(Bat);
 
 			if (Child)
 			{
-				Child->SetShapeBatch(Shape);
+				Child->SetBatch(Bat);
 			}
 
-		}
-
-		void SetTextBatch(Batch* Text) override
-		{
-			Widget::SetTextBatch(Text);
-
-			if (Child)
-			{
-				Child->SetTextBatch(Text);
-			}
-
-		}
-
-		void SetTextureBatch(Batch* Text) override
-		{
-			Widget::SetTextureBatch(Text);
-
-			if (Child)
-			{
-				Child->SetTextureBatch(Text);
-			}
 		}
 
 		void OnHovered(const MouseEvent& MouseEv) override

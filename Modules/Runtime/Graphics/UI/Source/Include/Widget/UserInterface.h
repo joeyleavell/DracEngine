@@ -15,9 +15,10 @@ namespace Ry
 	{
 	public:
 
-		UserInterface()
+		UserInterface(Batch* Bat = nullptr)
 		{
 			this->KeyboardFocus = nullptr;
+			SetBatch(Bat);
 		}
 		
 		~UserInterface() = default;
@@ -42,19 +43,9 @@ namespace Ry
 			return false;
 		}
 
-		void SetTextBatch(Batch* Text)
+		void SetBatch(Batch* Bat)
 		{
-			this->TextBatch = Text;
-		}
-
-		void SetShapeBatch(Batch* Shape)
-		{
-			this->ShapeBatch = Shape;
-		}
-
-		void SetTextureBatch(Batch* Shape)
-		{
-			this->TextureBatch = Shape;
+			this->Bat = Bat;
 		}
 
 		/**
@@ -65,9 +56,7 @@ namespace Ry
 			RootWidgets.Add(Widget);
 
 			// Set the widget's batches
-			Widget->SetShapeBatch(ShapeBatch);
-			Widget->SetTextBatch(TextBatch);
-			Widget->SetTextureBatch(TextureBatch);
+			Widget->SetBatch(Bat);
 
 			Widget->SetVisible(true, true);
 
@@ -103,9 +92,7 @@ namespace Ry
 				RootWidget->Draw();
 			}
 
-			ShapeBatch->Update();
-			TextBatch->Update();
-			TextureBatch->Update();
+			Bat->Update();
 		}
 
 	private:
@@ -115,9 +102,7 @@ namespace Ry
 			Draw();
 		}
 
-		Ry::Batch* ShapeBatch;
-		Ry::Batch* TextBatch;
-		Ry::Batch* TextureBatch;
+		Ry::Batch* Bat;
 
 		Ry::ArrayList<Ry::SharedPtr<Ry::Widget>> RootWidgets;
 
