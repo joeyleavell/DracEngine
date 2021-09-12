@@ -72,6 +72,7 @@ namespace Ry
 					NewWidget(HorizontalLayout)
 					+
 					HorizontalLayout::MakeSlot()
+					.SetBottomPadding(10.0f)
 					[
 						// Up directory
 						NewWidgetAssign(UpArrow, Ry::Button)

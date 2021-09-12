@@ -31,7 +31,8 @@ namespace Ry
 		{
 			for(PanelWidget::Slot& Child : In.Slots)
 			{
-				AppendSlot(Child.GetWidget());
+				SharedPtr<Slot> Result = CastShared<Slot>(AppendSlot(Child.GetWidget()));
+				Result->SetPadding(Child.GetPadding());
 			}
 		}
 

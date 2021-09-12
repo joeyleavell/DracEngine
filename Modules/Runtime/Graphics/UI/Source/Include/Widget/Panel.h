@@ -20,6 +20,11 @@ namespace Ry
 			{
 			}
 
+			virtual ~Slot()
+			{
+				
+			}
+
 			Slot(SharedPtr<Ry::Widget> Wid)
 			{
 				this->Widget = Wid;
@@ -41,25 +46,67 @@ namespace Ry
 				return SlotPadding;
 			}
 
-			void SetPadding(float Padding)
+			Slot& SetPadding(float Padding)
 			{
 				this->SlotPadding = Padding;
 
 				MarkWidgetDirty();
+
+				return *this;
 			}
 
-			void SetPadding(float Horizontal, float Vertical)
+			Slot& SetBottomPadding(float Padding)
+			{
+				this->SlotPadding.Bottom = Padding;
+
+				MarkWidgetDirty();
+
+				return *this;
+			}
+
+			Slot& SetTopPadding(float Padding)
+			{
+				this->SlotPadding.Top = Padding;
+
+				MarkWidgetDirty();
+
+				return *this;
+			}
+
+			Slot& SetLeftPadding(float Padding)
+			{
+				this->SlotPadding.Left = Padding;
+
+				MarkWidgetDirty();
+
+				return *this;
+			}
+
+			Slot& SetRightPadding(float Padding)
+			{
+				this->SlotPadding.Right = Padding;
+
+				MarkWidgetDirty();
+
+				return *this;
+			}
+
+			Slot& SetPadding(float Horizontal, float Vertical)
 			{
 				this->SlotPadding.Set(Horizontal, Vertical);
 
 				MarkWidgetDirty();
+
+				return *this;
 			}
 
-			void SetPadding(Margin Padding)
+			Slot& SetPadding(Margin Padding)
 			{
 				this->SlotPadding = Padding;
 
 				MarkWidgetDirty();
+
+				return *this;
 			}
 
 		protected:

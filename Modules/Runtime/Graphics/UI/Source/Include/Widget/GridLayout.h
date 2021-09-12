@@ -157,8 +157,6 @@ namespace Ry
 
 				for (int32 Col = 0; Col < MaxCols; Col++)
 				{
-					// Assume slot padding on left and right to be zero unless a slot is found
-					CurrentX += CellWidth;
 					
 					if(IsSlotOccupied(MaxRow, Col))
 					{
@@ -202,6 +200,9 @@ namespace Ry
 
 						bRowExists = true;
 					}
+
+					// Assume slot padding on left and right to be zero unless a slot is found
+					CurrentX += CellWidth;
 
 				}
 
