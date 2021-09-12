@@ -12,21 +12,26 @@ namespace Ry
 	public:
 
 		WidgetBeginArgsSlot(HorizontalLayout)
-			WidgetProp(float, SlotMargin)
 		WidgetEndArgs()
 
 		struct Slot : public PanelWidget::Slot
 		{
+			Slot() :
+			PanelWidget::Slot()
+			{
+			}
 
+			Slot(SharedPtr<Ry::Widget> Wid) :
+			PanelWidget::Slot(Wid)
+			{
+			}
 		};
 
 		void Construct(HorizontalLayout::Args& In)
 		{
-			this->SlotMargin = In.mSlotMargin;
-
 			for(PanelWidget::Slot& Child : In.Slots)
 			{
-				AppendSlot(Child.Widget);
+				AppendSlot(Child.GetWidget());
 			}
 		}
 
@@ -43,19 +48,20 @@ namespace Ry
 		virtual void Arrange() override
 		{
 			// Default margin: 5px
-			int32 CurrentX = static_cast<int32>(SlotMargin);
-			int32 CurrentY = static_cast<int32>(SlotMargin);
+			int32 CurrentX = static_cast<int32>(0);
 
 			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 			{
-				SharedPtr<Ry::Widget> Widget = ChildSlot->Widget;
+				SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 				SizeType ContentSize = Widget->ComputeSize();
 
+				CurrentX += static_cast<int32>(ChildSlot->GetPadding().Left);
+
 				// Set the widget's relative position
-				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(CurrentY));
+				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(ChildSlot->GetPadding().Top));
 				Widget->Arrange();
 
-				CurrentX += static_cast<int32>(ContentSize.Width + SlotMargin);
+				CurrentX += static_cast<int32>(ContentSize.Width + ChildSlot->GetPadding().Right);
 			}
 		}
 
@@ -69,38 +75,39 @@ namespace Ry
 
 			if (!ChildrenSlots.IsEmpty())
 			{
-				// Initial margins
-				Result.Width = static_cast<int32>(SlotMargin);
-				Result.Height = static_cast<int32>(2 * SlotMargin);
-
 				int32 MaxChildHeight = 0;
 				for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 				{
-					SizeType WidgetSize = ChildSlot->Widget->ComputeSize();
+					SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
+					// Add vertical padding
+					WidgetSize.Height += ChildSlot->GetPadding().Top + ChildSlot->GetPadding().Bottom;
+					
 					if (WidgetSize.Height > MaxChildHeight)
 					{
 						MaxChildHeight = WidgetSize.Height;
 					}
 
-					Result.Width += static_cast<int32>(WidgetSize.Width + SlotMargin);
+					// Calculate width
+					Result.Width += static_cast<int32>(ChildSlot->GetPadding().Left);
+					Result.Width += static_cast<int32>(WidgetSize.Width);
+					Result.Width += static_cast<int32>(ChildSlot->GetPadding().Right);
 				}
 
-				Result.Height += MaxChildHeight;
+				Result.Height = MaxChildHeight;
 			}
 
 			return Result;
 		}
 
-		void AppendSlot(Ry::SharedPtr<Ry::Widget>& Widget) override
+		virtual Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override
 		{
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
-			SharedPtr<Slot> PanelSlot = new Slot;
-			PanelSlot->Widget = Widget;
-
-			ChildrenSlots.Add(PanelSlot);			
+			SharedPtr<Slot> PanelSlot = new Slot(Widget);
+			ChildrenSlots.Add(PanelSlot);
+			return PanelSlot;
 		}
 
 		void ClearChildren() override

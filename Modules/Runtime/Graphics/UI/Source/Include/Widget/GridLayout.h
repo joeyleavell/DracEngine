@@ -10,19 +10,30 @@ namespace Ry
 	class UI_MODULE GridLayout : public PanelWidget
 	{
 	public:
-		struct Slot : public PanelWidget::Slot
+		
+		class Slot : public PanelWidget::Slot
 		{
+		public:
 			int32 Row;
 			int32 Column;
 
-			// float LeftMargin;
-			// float RightMargin;
-			// float TopMargin;
-			// float BottomMargin;
+			Slot() :
+			PanelWidget::Slot(),
+			Row(0),
+			Column(0)
+			{
+			}
+
+			Slot(SharedPtr<Ry::Widget> Wid) :
+			PanelWidget::Slot(Wid),
+			Row(0),
+			Column(0)
+			{
+			}
+			
 		};
 		
 		WidgetBeginArgsSlot(GridLayout)
-			WidgetProp(float, SlotMargin)
 			WidgetProp(float, CellWidth)
 			WidgetProp(float, CellHeight)
 		WidgetEndArgs()
@@ -30,7 +41,6 @@ namespace Ry
 		void Construct(Args& In)
 		{
 			PanelWidget::Args ParentArgs;
-			ParentArgs.mSlotMargin = In.mSlotMargin;
 			PanelWidget::Construct(ParentArgs);
 			
 			SetCellWidth(In.mCellWidth);
@@ -106,22 +116,22 @@ namespace Ry
 			return NewSlot;
 		}
 
-		void AppendSlot(Ry::SharedPtr<Widget>& Widget) override
+		virtual Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Widget> Widget) override
 		{
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
-			Slot PanelSlot;
-			PanelSlot.Widget = Widget;
+			SharedPtr<GridLayout::Slot> PanelSlot = new GridLayout::Slot(Widget);
 
 			// Find next available slot
 			SlotPosition Next = FindFree();
-			PanelSlot.Row = Next.Row;
-			PanelSlot.Column = Next.Col;
+			PanelSlot->Row = Next.Row;
+			PanelSlot->Column = Next.Col;
 
 			Occupied.Add(Next);
-
 			ChildrenSlots.Add(PanelSlot);
+
+			return PanelSlot;
 		}
 		
 		/**
@@ -130,7 +140,7 @@ namespace Ry
 		virtual void Arrange() override
 		{
 			// Default margin: 5px
-			int32 CurrentY = static_cast<int32>(SlotMargin);
+			int32 CurrentY = static_cast<int32>(0);
 
 			// For each row, determine max width. That is the width of each cell.
 			// Apply the same logic for height
@@ -143,26 +153,33 @@ namespace Ry
 			{
 				bRowExists = false;
 
-				int32 CurrentX = static_cast<int32>(SlotMargin);
+				int32 CurrentX = static_cast<int32>(0);
 
-				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth + SlotMargin)
+				for (int32 Col = 0; Col < MaxCols; Col++)
 				{
+					// Assume slot padding on left and right to be zero unless a slot is found
+					CurrentX += CellWidth;
+					
 					if(IsSlotOccupied(MaxRow, Col))
 					{
 						bRowExists = true;
 
 						// Find the slot with this position
 						Slot* FoundSlot = nullptr;
-						for(Slot& Sl : ChildrenSlots)
+						for(SharedPtr<Slot>& Sl : ChildrenSlots)
 						{
-							if (Sl.Row == MaxRow && Sl.Column == Col)
-								FoundSlot = &Sl;
+							if (Sl->Row == MaxRow && Sl->Column == Col)
+								FoundSlot = Sl.Get();
 						}
 
 						if(FoundSlot)
 						{
-							SharedPtr<Ry::Widget> Widget = FoundSlot->Widget;
+							SharedPtr<Ry::Widget> Widget = FoundSlot->GetWidget();
 							SizeType ContentSize = Widget->ComputeSize();
+
+							// Add padding now
+							//CurrentX += FoundSlot->GetPadding().Left;
+							//CurrentY += FoundSlot->GetPadding().Top;
 
 							//int32 CellMX = CurrentX + (int32)(CellSize / 2.0f);
 							//int32 CellMY = CurrentY + (int32)(CellSize / 2.0f);
@@ -176,8 +193,11 @@ namespace Ry
 							// Place the widget in the middle of the cell
 
 							// Set the widget's relative position
-							Widget->SetRelativePosition(static_cast<float>(WidgetX), static_cast<float>(WidgetY));
+							Widget->SetRelativePosition(static_cast<float>(WidgetX + FoundSlot->GetPadding().Left), static_cast<float>(WidgetY + FoundSlot->GetPadding().Top));
 							Widget->Arrange();
+
+							CurrentX += FoundSlot->GetPadding().Right;
+							CurrentY += FoundSlot->GetPadding().Bottom;
 						}
 
 						bRowExists = true;
@@ -185,7 +205,7 @@ namespace Ry
 
 				}
 
-				CurrentY += CellHeight + SlotMargin;
+				CurrentY += CellHeight;
 				
 				MaxRow++;
 			}
@@ -195,8 +215,8 @@ namespace Ry
 		SizeType ComputeSize() const override
 		{
 			// Default margin: 5px
-			int32 SizeX = static_cast<int32>(2 * SlotMargin + MaxCols * CellWidth);
-			int32 SizeY = static_cast<int32>(SlotMargin);
+			int32 SizeX = static_cast<int32>(MaxCols * CellWidth);
+			int32 SizeY = static_cast<int32>(0.0f);
 
 			// Find max row/col
 			int32 MaxRow = 0;
@@ -206,9 +226,9 @@ namespace Ry
 			{
 				bRowExists = false;
 
-				int32 CurrentX = static_cast<int32>(SlotMargin);
+				int32 CurrentX = static_cast<int32>(0.0f);
 
-				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth + SlotMargin)
+				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth)
 				{
 					if (IsSlotOccupied(MaxRow, Col))
 					{
@@ -218,7 +238,7 @@ namespace Ry
 
 				if(bRowExists)
 				{
-					SizeY += CellHeight + SlotMargin;
+					SizeY += CellHeight;
 				}
 
 				MaxRow++;
@@ -261,10 +281,10 @@ namespace Ry
 
 		int32 MaxCols = 5;
 
-		float CellWidth= 50.0f;
+		float CellWidth  = 50.0f;
 		float CellHeight = 50.0f;
 
-		Ry::ArrayList<Slot> ChildrenSlots;
+		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
 		// TODO: implement this as a set
 		Ry::ArrayList<SlotPosition> Occupied;

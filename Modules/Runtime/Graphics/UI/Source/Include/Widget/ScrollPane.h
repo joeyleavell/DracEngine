@@ -13,26 +13,35 @@ namespace Ry
 
 		struct Slot : public PanelWidget::Slot
 		{
-			Slot& operator[](SharedPtr<Ry::Widget> Child)
+			Slot() :
+			PanelWidget::Slot()
+			{
+			}
+
+			Slot(SharedPtr<Ry::Widget> Wid):
+			PanelWidget::Slot(Wid)
+			{
+			}
+
+			ScrollPane::Slot& operator[](SharedPtr<Ry::Widget> Child)
 			{
 				this->Widget = Child;
 				return *this;
 			}
+
 		};
 
 		WidgetBeginArgsSlot(ScrollPane)
-			WidgetProp(float, SlotMargin)
 			WidgetProp(int32, Width)
 			WidgetProp(int32, Height)
 		WidgetEndArgs()
 
 		void Construct(Args& In)
 		{
-			this->SlotMargin = In.mSlotMargin;
 
 			for (PanelWidget::Slot& Child : In.Slots)
 			{
-				AppendSlot(Child.Widget);
+				AppendSlot(Child.GetWidget());
 			}
 
 			this->Size.Width  = In.mWidth;
@@ -71,15 +80,15 @@ namespace Ry
 			return NewSlot;
 		}
 
-		void AppendSlot(Ry::SharedPtr<Ry::Widget>& Widget) override
+		virtual SharedPtr<PanelWidget::Slot> AppendSlot(SharedPtr<Widget> Widget) override
 		{
 			PanelWidget::AppendSlot(Widget);
 
-			// Create widget
-			SharedPtr<Slot> PanelSlot = new Slot;
-			PanelSlot->Widget = Widget;
+			// Create slot
+			SharedPtr<Slot> ScrollSlot = new Slot(Widget);
+			ChildrenSlots.Add(ScrollSlot);
 
-			ChildrenSlots.Add(PanelSlot);
+			return ScrollSlot;
 		}
 
 		/**
@@ -87,26 +96,28 @@ namespace Ry
 		 */
 		virtual void Arrange() override
 		{
+			// Calculate scroll amount
 			SizeType ChildrenSize = ComputeChildrenSize();
 			float HiddenAmount = ChildrenSize.Height - Size.Height;
 			int32 OffsetY = HiddenAmount * ScrollAmount;
 			if (OffsetY < 0)
 				OffsetY = 0;
 			
-			// Default margin: 5px
-			int32 CurrentX = static_cast<int32>(SlotMargin);
-			int32 CurrentY = static_cast<int32>(SlotMargin);
+			int32 CurrentY = static_cast<int32>(0);
 
 			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 			{
-				SharedPtr<Ry::Widget> Widget = ChildSlot->Widget;
+				SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 				SizeType ContentSize = Widget->ComputeSize();
 
+				// Add top padding prior to setting relative position
+				CurrentY += static_cast<int32>(ChildSlot->GetPadding().Top);
+
 				// Set the widget's relative position
-				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(CurrentY - OffsetY));
+				Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left), static_cast<float>(CurrentY - OffsetY));
 				Widget->Arrange();
 
-				CurrentY += static_cast<int32>(ContentSize.Height + SlotMargin);
+				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Bottom);
 			}
 
 		}
@@ -188,22 +199,26 @@ namespace Ry
 
 			if (!ChildrenSlots.IsEmpty())
 			{
-				// Initial margins
-				Result.Width = static_cast<int32>(2 * SlotMargin);
-				Result.Height = static_cast<int32>(SlotMargin);
-
+				
 				int32 MaxChildWidth = 0;
 
 				for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 				{
-					SizeType WidgetSize = ChildSlot->Widget->ComputeSize();
+					SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
+					// Add horizontal padding
+					WidgetSize.Width += ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right;
+
+					// Check if max width
 					if (WidgetSize.Width > MaxChildWidth)
 					{
 						MaxChildWidth = WidgetSize.Width;
 					}
 
-					Result.Height += static_cast<int32>(WidgetSize.Height + SlotMargin);
+					// Calculate height
+					Result.Height += static_cast<int32>(ChildSlot->GetPadding().Top);
+					Result.Height += static_cast<int32>(WidgetSize.Height);
+					Result.Height += static_cast<int32>(ChildSlot->GetPadding().Bottom);
 				}
 
 				Result.Width += MaxChildWidth;

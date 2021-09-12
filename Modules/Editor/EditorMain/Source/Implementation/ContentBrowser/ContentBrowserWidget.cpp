@@ -64,7 +64,6 @@ namespace Ry
 		// Create directory grid
 		SetChild(
 			NewWidget(VerticalLayout)
-			.SlotMargin(10.0f)
 			+ 
 			VerticalLayout::MakeSlot()
 			[

@@ -18,7 +18,7 @@ struct Args \
 		Children.Add(Wid); \
 		return *this; \
 	} \
-	WidgetArgsType& operator+(const ClassName::Slot WidgetSlot) \
+	WidgetArgsType& operator+(ClassName::Slot WidgetSlot) \
 	{ \
 		Slots.Add(WidgetSlot); \
 		return *this; \
@@ -65,6 +65,31 @@ namespace Ry
 	struct Event;
 
 	class Batch;
+
+	struct Margin
+	{
+		float Left;
+		float Right;
+		float Top;
+		float Bottom;
+
+		Margin()
+		{
+			this->Left = Right = Top = Bottom = 0.0f;
+		}
+
+		void Set(float Horizontal, float Vertical)
+		{
+			this->Left = Right = Horizontal;
+			this->Top = Bottom = Vertical;
+		}
+
+		Margin& operator=(float Pad)
+		{
+			this->Left = Right = Top = Bottom = Pad;
+		}
+		
+	};
 
 	template<typename T>
 	struct OptionalValue

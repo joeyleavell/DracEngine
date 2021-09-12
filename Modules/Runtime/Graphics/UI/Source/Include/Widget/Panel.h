@@ -12,40 +12,80 @@ namespace Ry
 	{
 	public:
 
-		struct Slot
+		class Slot
 		{
-			SharedPtr<Ry::Widget> Widget;
+		public:
+
+			Slot()
+			{
+			}
+
+			Slot(SharedPtr<Ry::Widget> Wid)
+			{
+				this->Widget = Wid;
+			}
 
 			Slot& operator[](SharedPtr<Ry::Widget> Child)
 			{
 				this->Widget = Child;
 				return *this;
 			}
+
+			SharedPtr<Ry::Widget> GetWidget()
+			{
+				return Widget;
+			}
+
+			Margin GetPadding()
+			{
+				return SlotPadding;
+			}
+
+			void SetPadding(float Padding)
+			{
+				this->SlotPadding = Padding;
+
+				MarkWidgetDirty();
+			}
+
+			void SetPadding(float Horizontal, float Vertical)
+			{
+				this->SlotPadding.Set(Horizontal, Vertical);
+
+				MarkWidgetDirty();
+			}
+
+			void SetPadding(Margin Padding)
+			{
+				this->SlotPadding = Padding;
+
+				MarkWidgetDirty();
+			}
+
+		protected:
+			
+			SharedPtr<Ry::Widget> Widget;
+			Margin SlotPadding;
+
+			void MarkWidgetDirty()
+			{
+				if(Widget.IsValid())
+				{
+					Widget->MarkDirty();
+				}
+			}
+
 		};
 
 		WidgetBeginArgsSlot(PanelWidget)
-			WidgetProp(float, SlotMargin)
 		WidgetEndArgs()
 
 		void Construct(Args& In)
 		{
-			this->SlotMargin = In.mSlotMargin;
 		}
-
-		float SlotMargin;
-
-		// PanelWidget(std::initializer_list<Ry::Widget&> Children):
-		// SlotMargin(5.0f)
-		// {
-		// 	for(Ry::Widget& Widget : Children)
-		// 	{
-		// 		AppendSlot(Widget);
-		// 	}
-		// }
 
 		PanelWidget()
 		{
-			this->SlotMargin = 0.0f;
 		}
 		
 		void OnChildSizeDirty()
@@ -56,14 +96,7 @@ namespace Ry
 			MarkDirty();
 		}
 
-		PanelWidget& SetMargins(float Margins)
-		{
-			this->SlotMargin = Margins;
-
-			return *this;
-		}
-
-		virtual void AppendSlot(Ry::SharedPtr<Widget>& Widget)
+		virtual SharedPtr<Slot> AppendSlot(SharedPtr<Widget> Widget)
 		{
 			// Listen for size changes
 			Widget->RenderStateDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
@@ -78,23 +111,15 @@ namespace Ry
 			Widget->SetParent(this);
 			Widget->SetVisible(IsVisible(), true); // Child matches our visibility
 
-			//MarkDirty();
+			return SharedPtr<Slot>{nullptr};
 		}
 
 		virtual void OnShow() override
 		{
-			// for (Widget* Child : Children)
-			// {
-			// 	Child->Show();
-			// }
 		}
 
 		virtual void OnHide() override
 		{
-			// for (Widget* Child : Children)
-			// {
-			// 	Child->Hide();
-			// }
 		}
 
 		virtual void SetParent(Widget* Parent) override
@@ -145,7 +170,6 @@ namespace Ry
 				}
 			}
 		}
-
 
 		bool OnMouseEvent(const MouseEvent& MouseEv) override
 		{
