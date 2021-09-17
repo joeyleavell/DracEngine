@@ -108,8 +108,7 @@ namespace Ry
 			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass());
 			{
 
-				// Only draw first 10 layers
-				for (int32 Layer = 0; Layer < 10; Layer++)
+				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)
 				{
 					CommandBuffer* BatBuffer = Bat->GetCommandBuffer(Layer);
 

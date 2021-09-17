@@ -3,10 +3,12 @@
 #include "Widget/Panel.h"
 #include "UIGen.h"
 #include "2D/Batch/Batch.h"
+#include "Drawable.h"
 
 namespace Ry
 {
 
+	// todo: cull widgets whose bounds are outside of scroll pane visibility
 	class UI_MODULE ScrollPane : public PanelWidget
 	{
 	public:
@@ -47,25 +49,71 @@ namespace Ry
 			this->Size.Width  = In.mWidth;
 			this->Size.Height = In.mHeight;
 
-			this->ScrollAmount = 0.0f;
+			this->bAllowHorizontalScroll = true;
+
+			this->VerticalScrollAmount   = 0.0f;
+			this->HorizontalScrollAmount = 0.0f;
+			this->ScrollBarThickness     = 20.0f;
+
+			VerticalScrollBar = new BoxDrawable;
+			VerticalScrollBar->SetBackgroundColor(WHITE.ScaleRGB(0.4f));
+			VerticalScrollBar->SetBorderRadius(0);
+			VerticalScrollBar->SetBorderSize(0);
+
+			HorizontalScrollBar = new BoxDrawable;
+			HorizontalScrollBar->SetBackgroundColor(WHITE.ScaleRGB(0.4f));
+			HorizontalScrollBar->SetBorderRadius(0);
+			HorizontalScrollBar->SetBorderSize(0);
+
 		}
 
-		float GetScrollAmount()
+		void SetBatch(Batch* Bat) override
 		{
-			return ScrollAmount;
+			PanelWidget::SetBatch(Bat);
+			
+			if(Bat)
+			{
+				VerticalScrollBar->Bat = Bat;
+				HorizontalScrollBar->Bat = Bat;
+			}
 		}
 
-		void SetScrollAmount(float Scroll)
+		float GetVerticalScrollAmount()
 		{
-			float Prev = this->ScrollAmount;
-			this->ScrollAmount = Scroll;
+			return VerticalScrollAmount;
+		}
 
-			std::cout << this->ScrollAmount << std::endl;
+		float GetHorizontalScrollAmount()
+		{
+			return HorizontalScrollAmount;
+		}
 
-			if (ScrollAmount > 1.0f)
-				ScrollAmount = 1.0f;
-			else if (ScrollAmount < 0.0f)
-				ScrollAmount = 0.0f;
+		void SetHorizontalScrollAmount(float Scroll)
+		{
+			float Prev = this->HorizontalScrollAmount;
+			this->HorizontalScrollAmount = Scroll;
+
+			if (HorizontalScrollAmount > 1.0f)
+				HorizontalScrollAmount = 1.0f;
+			else if (HorizontalScrollAmount < 0.0f)
+				HorizontalScrollAmount = 0.0f;
+
+			if (std::abs(Prev - Scroll) >= 0.000001f)
+			{
+				// Scroll amount has changed, mark widget as dirty	
+				MarkDirty();
+			}
+		}
+
+		void SetVerticalScrollAmount(float Scroll)
+		{
+			float Prev = this->VerticalScrollAmount;
+			this->VerticalScrollAmount = Scroll;
+
+			if (VerticalScrollAmount > 1.0f)
+				VerticalScrollAmount = 1.0f;
+			else if (VerticalScrollAmount < 0.0f)
+				VerticalScrollAmount = 0.0f;
 
 			if(std::abs(Prev - Scroll) >= 0.000001f)
 			{
@@ -91,6 +139,22 @@ namespace Ry
 			return ScrollSlot;
 		}
 
+		void Draw() override
+		{
+			Point HorLoc;
+			Point VertLoc;
+			SizeType HorSize;
+			SizeType VertSize;
+
+			GetVertScrollBarBounds(VertLoc, VertSize);
+			GetHorScrollBarBounds(HorLoc, HorSize);
+
+			VerticalScrollBar->Draw(VertLoc.X, VertLoc.Y, VertSize.Width, VertSize.Height);
+			HorizontalScrollBar->Draw(HorLoc.X, HorLoc.Y, HorSize.Width, HorSize.Height);
+
+			Ry::PanelWidget::Draw();
+		}
+
 		/**
 		 * Arrange widgets vertically.
 		 */
@@ -98,11 +162,15 @@ namespace Ry
 		{
 			// Calculate scroll amount
 			SizeType ChildrenSize = ComputeChildrenSize();
-			float HiddenAmount = ChildrenSize.Height - Size.Height;
-			int32 OffsetY = HiddenAmount * ScrollAmount;
+			float HiddenAmountX = ChildrenSize.Width - Size.Width;
+			float HiddenAmountY = ChildrenSize.Height - Size.Height;
+			int32 OffsetX = HiddenAmountX * HorizontalScrollAmount;
+			int32 OffsetY = HiddenAmountY * VerticalScrollAmount;
+			if (OffsetX < 0)
+				OffsetX = 0;
 			if (OffsetY < 0)
 				OffsetY = 0;
-			
+
 			int32 CurrentY = static_cast<int32>(0);
 
 			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
@@ -114,7 +182,7 @@ namespace Ry
 				CurrentY += static_cast<int32>(ChildSlot->GetPadding().Top);
 
 				// Set the widget's relative position
-				Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left), static_cast<float>(CurrentY - OffsetY));
+				Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left - OffsetX), static_cast<float>(CurrentY - OffsetY));
 				Widget->Arrange();
 
 				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Bottom);
@@ -156,6 +224,11 @@ namespace Ry
 				RectScissor Scissor;
 				Bat->AddItem(DebugRect, "Shape", Scissor, nullptr, WidgetLayer);
 			}
+
+			// Push scroll bar to last layer
+			RectScissor Scissor;
+			HorizontalScrollBar->Show(-1, Scissor);
+			VerticalScrollBar->Show(-1, Scissor);
 		}
 
 		virtual void OnHide() override
@@ -163,6 +236,9 @@ namespace Ry
 			Widget::OnHide();
 
 			Bat->RemoveItem(DebugRect);
+
+			VerticalScrollBar->Hide();
+			HorizontalScrollBar->Hide();
 		}
 
 		SizeType ComputeSize() const override
@@ -179,14 +255,152 @@ namespace Ry
 
 		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override
 		{
-			float ScrollY = MouseEv.ScrollY;
+			bool bChildHandle = PanelWidget::OnMouseScroll(MouseEv);
 
-			SetScrollAmount(ScrollAmount - ScrollY / 30.0f);
+			if(!bChildHandle && !bVerticalBarPressed && IsHovered())
+			{
+				float ScrollY = MouseEv.ScrollY;
 
-			return true;
+				SetVerticalScrollAmount(VerticalScrollAmount - ScrollY / 30.0f);
+
+				return true;
+			}
+
+			return bChildHandle;
+		}
+
+		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override
+		{
+			Point VertLoc;
+			SizeType VertSize;
+			Point HorLoc;
+			SizeType HorSize;
+
+			GetVertScrollBarBounds(VertLoc, VertSize);
+			GetHorScrollBarBounds(HorLoc, HorSize);
+			
+			bool bVertBoundsTest = MouseEv.MouseX >= VertLoc.X && MouseEv.MouseX < VertLoc.X + VertSize.Width;
+			bVertBoundsTest &= MouseEv.MouseY >= VertLoc.Y && MouseEv.MouseY < VertLoc.Y + VertSize.Height;
+
+			bool bHorBoundsTest = MouseEv.MouseX >= HorLoc.X && MouseEv.MouseX < HorLoc.X + HorSize.Width;
+			bHorBoundsTest &= MouseEv.MouseY >= HorLoc.Y && MouseEv.MouseY < HorLoc.Y + HorSize.Height;
+
+			if(MouseEv.ButtonID == 0)
+			{
+				// Mouse must be inside scroll bar rect to initiate drag
+				if(MouseEv.bPressed)
+				{
+					if(bVertBoundsTest && !bVerticalBarPressed)
+					{
+						// Start dragging vertical scroll bar
+						bVerticalBarPressed = true;
+
+						// Store the initial delta Y position
+						RelativeScrollBarPressed.Y = MouseEv.MouseY - VertLoc.Y;
+					}
+					else if(bHorBoundsTest && !bHorizontalBarPressed)
+					{
+						// Start dragging vertical scroll bar
+						bHorizontalBarPressed = true;
+
+						// Store the initial delta Y position
+						RelativeScrollBarPressed.X = MouseEv.MouseX - HorLoc.X;
+					}
+				}
+
+				// Mouse must not continue to stay in scroll bar
+				if(!MouseEv.bPressed)
+				{
+					bVerticalBarPressed = false;
+					bHorizontalBarPressed = false;
+				}
+				
+				return true;
+			}
+
+			return PanelWidget::OnMouseButtonEvent(MouseEv);
+		}
+
+		bool OnMouseEvent(const MouseEvent& MouseEv) override
+		{
+			if(bVerticalBarPressed)
+			{
+				Point VertAbs;
+				SizeType VertSize;
+				GetVertScrollBarBounds(VertAbs, VertSize);
+				float ScrollRange = Size.Height - VertSize.Height;
+
+				// get new location
+				float CurY = MouseEv.MouseY;
+				float Adjusted = CurY - RelativeScrollBarPressed.Y;
+				float Relative = Adjusted - GetAbsolutePosition().Y;
+
+				if (Relative < 0)
+					Relative = 0;
+				if (Relative > ScrollRange)
+					Relative = ScrollRange;
+
+				if(ScrollRange > 0.01f)
+				{
+					SetVerticalScrollAmount(Relative / ScrollRange);
+				}
+				
+				return true;
+			}
+
+			if(bHorizontalBarPressed)
+			{
+				Point HorAbs;
+				SizeType HorSize;
+				GetHorScrollBarBounds(HorAbs, HorSize);
+				float ScrollRange = (Size.Width - ScrollBarThickness) - HorSize.Width;
+
+				// get new location
+				float CurX = MouseEv.MouseX;
+				float Adjusted = CurX - RelativeScrollBarPressed.X;
+				float Relative = Adjusted - GetAbsolutePosition().X;
+
+				if (Relative < 0)
+					Relative = 0;
+				if (Relative > ScrollRange)
+					Relative = ScrollRange;
+
+				if (ScrollRange > 0.01f)
+				{
+					SetHorizontalScrollAmount(Relative / ScrollRange);
+				}
+
+				return true;
+			}
+
+			return PanelWidget::OnMouseEvent(MouseEv);
 		}
 
 	private:
+
+		void GetVertScrollBarBounds(Point& OutPos, SizeType& OutSize)
+		{
+			Point Abs = GetAbsolutePosition();
+			SizeType ChildrenSize = ComputeChildrenSize();
+			OutSize.Width = ScrollBarThickness;
+			OutSize.Height = Size.Height * std::min(Size.Height / (float)ChildrenSize.Height, 1.0f);
+
+			float ScrollRange = Size.Height - OutSize.Height;
+			OutPos.X = Abs.X + Size.Width - ScrollBarThickness;
+			OutPos.Y = Abs.Y + ScrollRange * VerticalScrollAmount;
+		}
+
+		void GetHorScrollBarBounds(Point& OutPos, SizeType& OutSize)
+		{
+			Point Abs = GetAbsolutePosition();
+			SizeType ChildrenSize = ComputeChildrenSize();
+			OutSize.Width = (Size.Width - ScrollBarThickness) * std::min((Size.Width - ScrollBarThickness) / (float)ChildrenSize.Width, 1.0f);
+			OutSize.Height = ScrollBarThickness;
+
+			float ScrollRange = (Size.Width - ScrollBarThickness) - OutSize.Width;
+			OutPos.X = Abs.X + ScrollRange * HorizontalScrollAmount;
+			OutPos.Y = Abs.Y + Size.Height - ScrollBarThickness;
+		}
 
 		// Utility to compute the size of the children embedded within the scroll pane
 		SizeType ComputeChildrenSize() const
@@ -233,8 +447,19 @@ namespace Ry
 
 		Ry::SharedPtr<BatchItem> DebugRect;
 
-		float ScrollAmount;
+		float VerticalScrollAmount;
+		float HorizontalScrollAmount;
 
+		float ScrollBarThickness;
+
+		Ry::SharedPtr<BoxDrawable> VerticalScrollBar;
+		Ry::SharedPtr<BoxDrawable> HorizontalScrollBar;
+
+		bool bVerticalBarPressed;
+		bool bHorizontalBarPressed;
+		Point RelativeScrollBarPressed;
+
+		bool bAllowHorizontalScroll;
 	};
 
 }

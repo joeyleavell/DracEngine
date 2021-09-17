@@ -239,8 +239,8 @@ namespace Ry
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
 
-		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = 0);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = 0);
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = -1);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = -1);
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
@@ -251,6 +251,8 @@ namespace Ry
 		void Camera(const Camera* Cam);
 		void Update();
 		bool Render();
+
+		int32 GetLayerCount() const;
 
 		void SetRenderPass(RenderPass* ParentRenderPass);
 

@@ -411,6 +411,9 @@ namespace Ry
 
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
 	{
+		if (Layer < 0)
+			Layer = Layers.GetSize() + 1;
+
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 
 		if(Group)
@@ -424,6 +427,9 @@ namespace Ry
 
 	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
 	{
+		if (Layer < 0)
+			Layer = Layers.GetSize() + 1;
+
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 		if(Group)
 		{
@@ -614,6 +620,11 @@ namespace Ry
 		}
 
 		return bReturn;
+	}
+
+	int32 Batch::GetLayerCount() const
+	{
+		return Layers.GetSize();
 	}
 
 	void Batch::SetRenderPass(RenderPass* ParentRenderPass)
