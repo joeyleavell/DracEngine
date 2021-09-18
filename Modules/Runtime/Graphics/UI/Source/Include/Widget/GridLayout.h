@@ -3,9 +3,21 @@
 #include "Widget/Panel.h"
 #include "UIGen.h"
 #include <chrono>
+#include "Data/Set.h"
 
 namespace Ry
 {
+
+	struct SlotPosition
+	{
+		int Row;
+		int Col;
+
+		bool operator==(const SlotPosition& Other) const
+		{
+			return Row == Other.Row && Col == Other.Col;
+		}
+	};
 
 	class UI_MODULE GridLayout : public PanelWidget
 	{
@@ -54,17 +66,6 @@ namespace Ry
 
 
 	private:
-		struct SlotPosition
-		{
-			int Row;
-			int Col;
-
-			bool operator==(const SlotPosition& Other)
-			{
-				return Row == Other.Row && Col == Other.Col;
-			}
-	
-		};
 
 		bool IsSlotOccupied(int32 Row, int32 Col) const
 		{
@@ -128,7 +129,7 @@ namespace Ry
 			PanelSlot->Row = Next.Row;
 			PanelSlot->Column = Next.Col;
 
-			Occupied.Add(Next);
+			Occupied.Insert(Next);
 			ChildrenSlots.Add(PanelSlot);
 
 			return PanelSlot;
@@ -288,8 +289,18 @@ namespace Ry
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
 		// TODO: implement this as a set
-		Ry::ArrayList<SlotPosition> Occupied;
+		Ry::Set<SlotPosition> Occupied;
 
 	};
+
+	template <>
+	inline uint32 HashImpl<Ry::SlotPosition>(TypeTag<Ry::SlotPosition>, const Ry::SlotPosition& Object)
+	{
+		uint32 Hash = 17;
+		Hash = Hash * 37 + Object.Col;
+		Hash = Hash * 37 + Object.Row;
+		return Hash;
+	}
+
 
 }

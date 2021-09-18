@@ -400,22 +400,17 @@ namespace Ry
 
 		virtual void SetVisible(bool bVisibility, bool bPropagate)
 		{
+			this->bVisible = bVisibility;
 
-			if(bVisibility != bVisible)
+			// Check parent visibility
+			if(bVisibility && !IsParentHidden())
 			{
-				this->bVisible = bVisibility;
-
-				if (bVisibility)
-				{
-					OnShow();
-				}
-				else
-				{
-					OnHide();
-				}
-
+				OnShow();
+			}				
+			else
+			{
+				OnHide();
 			}
-		
 		}
 		
 		virtual void Draw() {};
@@ -434,7 +429,22 @@ namespace Ry
 
 		int32 WidgetLayer;
 
-	private:
+	protected:
+
+		bool IsParentHidden()
+		{
+			Widget* CurParent = Parent;
+			bool bHidden = false;
+			while(CurParent && !bHidden)
+			{
+				if(!CurParent->IsVisible())
+				{
+					bHidden = true;
+				}
+				CurParent = CurParent->Parent;
+			}
+			return bHidden;			
+		}
 		
 		Point RelativePosition;
 

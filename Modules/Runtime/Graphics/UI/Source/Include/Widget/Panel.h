@@ -4,6 +4,7 @@
 #include <vector>
 #include "UIGen.h"
 #include "Data/ArrayList.h"
+#include "2D/Batch/Batch.h"
 
 namespace Ry
 {
@@ -197,7 +198,6 @@ namespace Ry
 					if(!Child->IsVisible())
 					{
 						Child->SetVisible(true, true);
-						Child->Arrange();
 					}
 					
 					Child->Draw();
@@ -211,6 +211,8 @@ namespace Ry
 				}
 				
 			}
+
+			Bat->Update();
 		}
 
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget)
@@ -238,7 +240,8 @@ namespace Ry
 			{
 				for (SharedPtr<Widget> Child : Children)
 				{
-					Child->SetVisible(bVisibility, bPropagate);
+					// Set child to its own visibility, needs to refresh
+					Child->SetVisible(Child->IsVisible(), true);
 				}
 			}
 		}

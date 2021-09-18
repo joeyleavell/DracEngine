@@ -67,6 +67,7 @@ namespace Ry
 			HorizontalScrollBar->SetBorderRadius(0);
 			HorizontalScrollBar->SetBorderSize(0);
 
+			DebugRect = Ry::MakeItem();
 		}
 
 		void SetBatch(Batch* Bat) override
@@ -143,6 +144,9 @@ namespace Ry
 
 		void Draw() override
 		{
+			Point Abs = GetAbsolutePosition();
+			Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X, Abs.Y, Size.Width, Size.Height, 5.0f, 0.0f);
+
 			Point HorLoc;
 			Point VertLoc;
 			SizeType HorSize;
@@ -217,17 +221,10 @@ namespace Ry
 		{
 			Widget::OnShow();
 
-			if(!DebugRect)
-			{
-				DebugRect = Ry::MakeItem();
-			}
-
-			Point Abs = GetAbsolutePosition();
-			Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X, Abs.Y, Size.Width, Size.Height, 5.0f, 0.0f);
 			if(Bat)
 			{
 				RectScissor Scissor;
-				Bat->AddItem(DebugRect, "Shape", Scissor, nullptr, WidgetLayer);
+				Bat->AddItem(DebugRect, "Shape", Scissor);
 			}
 
 			// Push scroll bar to last layer
@@ -240,7 +237,10 @@ namespace Ry
 		{
 			Widget::OnHide();
 
-			Bat->RemoveItem(DebugRect);
+			if(Bat)
+			{
+				Bat->RemoveItem(DebugRect);
+			}
 
 			VerticalScrollBar->Hide();
 			HorizontalScrollBar->Hide();

@@ -209,7 +209,7 @@ namespace Ry
 		void Draw() override
 		{			
 			// Render child
-			if (Child)
+			if (Child && Child->IsVisible())
 			{
 				Child->Draw();
 			}
