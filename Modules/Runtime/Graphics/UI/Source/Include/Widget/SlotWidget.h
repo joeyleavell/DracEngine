@@ -199,10 +199,10 @@ namespace Ry
 		void SetVisible(bool bVisibility, bool bPropagate) override
 		{
 			Widget::SetVisible(bVisibility, bPropagate);
-
+			
 			if (bPropagate && Child)
 			{
-				Child->SetVisible(bVisibility, bPropagate);
+				Child->SetVisible(bVisibility, true);
 			}
 		}
 

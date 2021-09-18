@@ -22,7 +22,7 @@ namespace Ry
 	};
 
 	template<class K>
-	class EXPORT_ONLY SetIterator : public Ry::Iterator<K>
+	class EXPORT_ONLY SetIterator
 	{
 	public:
 
@@ -41,6 +41,15 @@ namespace Ry
 			CurrentEntry(Other.CurrentEntry),
 			NextEntry(Other.NextEntry),
 			NextIndex(Other.NextIndex)
+		{
+		}
+
+		SetIterator() :
+			HashTable(nullptr),
+			TableIndex(-1),
+			CurrentEntry(nullptr),
+			NextEntry(nullptr),
+			NextIndex(-1)
 		{
 		}
 
@@ -67,18 +76,43 @@ namespace Ry
 
 		virtual ~SetIterator() = default;
 
-		explicit operator bool() const override
+		explicit operator bool() const
 		{
 			return CurrentEntry != nullptr;
 		}
 
-		K* operator*() const override
+		bool operator!=(const typename SetIterator<K>& Other) const
+		{
+			return !(*this == Other);
+		}
+
+		bool operator==(const typename SetIterator<K>& Other) const
+		{
+			if(CurrentEntry && Other.CurrentEntry)
+			{
+				return CurrentEntry->Key == Other.CurrentEntry->Key;
+			}
+			else if(CurrentEntry && !Other.CurrentEntry)
+			{
+				return false;
+			}
+			else if (!CurrentEntry && Other.CurrentEntry)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		K operator*() const
 		{
 			// Check if we've reached the end of the hash table
 			if (TableIndex >= TABLE_SIZE)
 				return nullptr;
 
-			return &CurrentEntry->key;
+			return CurrentEntry->Key;
 		}
 
 		K* Key() const
@@ -86,12 +120,12 @@ namespace Ry
 			return operator*();
 		}
 
-		SetIterator& operator++() override
+		SetIterator& operator++()
 		{
 			// Check if there is another table entry at this index (collision)
-			if (CurrentEntry->next)
+			if (CurrentEntry->Next)
 			{
-				CurrentEntry = CurrentEntry->next;
+				CurrentEntry = CurrentEntry->Next;
 			}
 			else
 			{
@@ -201,19 +235,21 @@ namespace Ry
 		{
 			for (uint32 i = 0; i < TABLE_SIZE; i++)
 				Table[i] = nullptr;
+			Elements = 0;
 		}
 
 		Set(const Set<K>& Other)
 		{
 			for (uint32 i = 0; i < TABLE_SIZE; i++)
 				Table[i] = nullptr;
+			Elements = 0;
 
 			Copy(Other);
 		}
 
 		SetIterator<K> CreateIterator()
 		{
-			SetIterator<K> KeyItr(table);
+			SetIterator<K> KeyItr(Table);
 			return KeyItr;
 		}
 
@@ -232,6 +268,11 @@ namespace Ry
 
 				Table[TableIndex] = nullptr;
 			}
+		}
+
+		bool IsEmpty()
+		{
+			
 		}
 
 		bool Contains(const K& key) const
@@ -287,6 +328,8 @@ namespace Ry
 				HeadPrev->Next = NewChain;
 			}
 
+			Elements++;
+
 		}
 
 		void Remove(const K& Value)
@@ -295,49 +338,64 @@ namespace Ry
 			uint32 Bucket = HashValue % TABLE_SIZE;
 			SetChain<K>* Chain = Table[Bucket];
 
-			if (Chain == nullptr)
+			if(Chain)
 			{
-				std::cerr << "ERROR: tried to delete element that was not in hashmap" << std::endl;
-			}
-			else if (Chain->next == nullptr)
-			{
-				if (Chain->key == Value)
+				if (Chain->Next == nullptr)
 				{
-					delete Table[Bucket];
-					Table[Bucket] = nullptr;
+					if (Chain->Key == Value)
+					{
+						delete Table[Bucket];
+						Table[Bucket] = nullptr;
+						Elements--;
+					}
 				}
-				else
+				else if(Chain->Key == Value)
 				{
-					std::cerr << "ERROR: tried to delete element that was not in hashmap" << std::endl;
-				}
-			}
-			else
-			{
-				SetChain<K>* PrevChain = Table[Bucket];
-				Chain = Chain->next;
-
-				while (Chain != nullptr && !(Chain->key == Value))
-				{
-					PrevChain = Chain;
-					Chain = Chain->next;
-				}
-
-				if (Chain != nullptr)
-				{
-					PrevChain->next = Chain->next;
+					Table[Bucket] = Chain->Next;
 					delete Chain;
+					Elements--;
 				}
 				else
 				{
-					std::cerr << "ERROR: tried to delete element that was not in hashmap" << std::endl;
-				}
+					SetChain<K>* PrevChain = Table[Bucket];
+					Chain = Chain->Next;
+
+					while (Chain != nullptr && !(Chain->Key == Value))
+					{
+						PrevChain = Chain;
+						Chain = Chain->Next;
+					}
+
+					if (Chain)
+					{
+						PrevChain->Next = Chain->Next;
+						delete Chain;
+						Elements--;
+					}
+				}				
 			}
+
 		}
 
 		Set<K>& operator=(const Set<K>& Other)
 		{			
 			Copy(Other);
 			return *this;
+		}
+
+		typename SetIterator<K> begin()
+		{
+			return SetIterator<K>(Table);
+		}
+
+		typename SetIterator<K> end()
+		{
+			return SetIterator<K>();
+		}
+
+		int32 GetSize() const
+		{
+			return Elements;
 		}
 
 		void Copy(const Set<K>& Other)
@@ -391,6 +449,7 @@ namespace Ry
 	private:
 
 		SetChain<K>* Table [TABLE_SIZE];
+		int32 Elements;
 	};
 
 }

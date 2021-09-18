@@ -86,7 +86,7 @@ namespace Ry
 
 		void OnHide() override
 		{
-			if(Bat)
+ 			if(Bat)
 			{
 				Bat->RemoveItemSet(ItemSet);
 			}

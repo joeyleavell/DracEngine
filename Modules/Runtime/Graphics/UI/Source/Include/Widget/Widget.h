@@ -225,7 +225,7 @@ namespace Ry
 		Bat(nullptr),
 		bPressed(false),
 		bHovered(false),
-		bVisible(false),
+		bVisible(true),
 		WidgetLayer(0)
 		{
 			
@@ -332,6 +332,11 @@ namespace Ry
 		virtual void SetBatch(Batch* Bat)
 		{
 			this->Bat = Bat;
+
+			if(Bat && bVisible)
+			{
+			//	OnShow();
+			}
 		}
 
 		virtual void Arrange()
@@ -403,7 +408,7 @@ namespace Ry
 			this->bVisible = bVisibility;
 
 			// Check parent visibility
-			if(bVisibility && !IsParentHidden())
+			if(bVisibility)
 			{
 				OnShow();
 			}				
@@ -431,7 +436,7 @@ namespace Ry
 
 	protected:
 
-		bool IsParentHidden()
+		/*bool IsParentHidden()
 		{
 			Widget* CurParent = Parent;
 			bool bHidden = false;
@@ -444,7 +449,7 @@ namespace Ry
 				CurParent = CurParent->Parent;
 			}
 			return bHidden;			
-		}
+		}*/
 		
 		Point RelativePosition;
 

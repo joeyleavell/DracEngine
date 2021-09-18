@@ -90,7 +90,7 @@ namespace Ry
 
 		Bat->Resize(Width, Height);
 
-		//UI->Redraw();
+		UI->Redraw();
 		
 		// ShapeBatch->Render();
 		// TextureBatch->Render();

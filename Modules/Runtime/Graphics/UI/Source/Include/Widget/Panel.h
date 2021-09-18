@@ -185,6 +185,8 @@ namespace Ry
 		{
 			RectScissor ClipSpace = GetClipSpace();
 
+			bool bUpdateBatch = false;
+
 			for (SharedPtr<Widget> Child : Children)
 			{
 				Point Pos = Child->GetAbsolutePosition();
@@ -198,6 +200,7 @@ namespace Ry
 					if(!Child->IsVisible())
 					{
 						Child->SetVisible(true, true);
+						bUpdateBatch = true;
 					}
 					
 					Child->Draw();
@@ -207,12 +210,18 @@ namespace Ry
 					if (Child->IsVisible())
 					{
 						Child->SetVisible(false, true);
+						bUpdateBatch = true;
 					}
 				}
 				
 			}
 
-			Bat->Update();
+			if(bUpdateBatch)
+			{
+				Bat->Update();
+				Bat->Render();
+			}
+
 		}
 
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget)
@@ -241,7 +250,7 @@ namespace Ry
 				for (SharedPtr<Widget> Child : Children)
 				{
 					// Set child to its own visibility, needs to refresh
-					Child->SetVisible(Child->IsVisible(), true);
+					Child->SetVisible(bVisibility, true);
 				}
 			}
 		}

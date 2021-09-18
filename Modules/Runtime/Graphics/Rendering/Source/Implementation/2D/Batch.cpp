@@ -413,7 +413,7 @@ namespace Ry
 
 		if(Group)
 		{
-			Group->Items.Add(Item);
+			Group->Items.Insert(Item);
 
 			Layers[Layer]->bNeedsRecord = true;
 		}
@@ -428,7 +428,7 @@ namespace Ry
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 		if(Group)
 		{
-			Group->ItemSets.Add(Item);
+			Group->ItemSets.Insert(Item);
 
 			Layers[Layer]->bNeedsRecord = true;
 		}
@@ -455,6 +455,7 @@ namespace Ry
 
 			Layer->bNeedsRecord = true;
 		}
+
 	}
 
 	void Batch::RemoveItemSet(Ry::SharedPtr<BatchItemSet> Item)
@@ -475,6 +476,14 @@ namespace Ry
 			Layer->bNeedsRecord = true;
 		}
 
+	}
+
+	void Batch::Clear()
+	{
+		for (BatchLayer* Layer : Layers)
+			delete Layer;
+		
+		Layers.Clear();
 	}
 
 	void Batch::SetView(const Matrix4& View)
@@ -624,6 +633,7 @@ namespace Ry
 
 	void Batch::SetRenderPass(RenderPass* ParentRenderPass)
 	{
+		this->ParentPass = ParentRenderPass;
 		for (BatchLayer* Layer : Layers)
 		{
 			Layer->CommandBuffer->UpdateParentRenderPass(ParentRenderPass);
@@ -731,7 +741,7 @@ namespace Ry
 
 				for (BatchGroup* Group : *PipelineItr.Value())
 				{
-					if (Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
+					//if (Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
 					{
 						GroupsToRemove.Add(Group);
 					}
@@ -756,6 +766,8 @@ namespace Ry
 
 					delete RemoveGroup;
 				}
+
+				++PipelineItr;
 			}
 			
 		}

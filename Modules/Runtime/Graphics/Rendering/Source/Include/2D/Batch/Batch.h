@@ -10,6 +10,7 @@
 #include <cstdarg>
 #include "Mesh.h"
 #include "Interface/Pipeline.h"
+#include "Data/Set.h"
 
 #define TEXT_VERT "/Engine/Shaders/Vertex/font.glv"
 #define TEXT_FRAG "/Engine/Shaders/Fragment/font.glf"
@@ -210,8 +211,8 @@ namespace Ry
 		Mesh* BatchMesh = nullptr;
 		Ry::ArrayList<ResourceSet*> ResourceSets;
 		
-		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
-		Ry::ArrayList<Ry::SharedPtr<BatchItemSet>> ItemSets;
+		Ry::Set<Ry::SharedPtr<BatchItem>> Items;
+		Ry::Set<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
 		// Batch group specific resources
 		ResourceSet* TextureResources;
@@ -240,6 +241,19 @@ namespace Ry
 		Ry::Map<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Groups;
 
 		bool bNeedsRecord = false;
+
+		~BatchLayer()
+		{
+			Ry::KeyIterator<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Itr = Groups.CreateKeyIterator();
+			while(Itr)
+			{
+				for (BatchGroup* Group : *Itr.Value())
+					delete Group;				
+				++Itr;
+			}
+
+			Groups.Clear();
+		}
 	};
 
 	class RENDERING_MODULE Batch
@@ -255,6 +269,8 @@ namespace Ry
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
+
+		void Clear();
 		
 		void SetView(const Matrix4& View);
 		void Resize(int32 Width, int32 Height);

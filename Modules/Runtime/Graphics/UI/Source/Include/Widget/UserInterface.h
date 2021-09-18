@@ -83,17 +83,19 @@ namespace Ry
 
 		void Redraw()
 		{
+			//Bat->Clear();
+			
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
 				RootWidget->Arrange();
+				RootWidget->Draw();
 
 				RootWidget->SetVisible(false, true);
 				RootWidget->SetVisible(true, true);
-
-				RootWidget->Draw();
 			}
 
 			Bat->Update();
+		//	Bat->Render();
 		}
 
 		void Draw()

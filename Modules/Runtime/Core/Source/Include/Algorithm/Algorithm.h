@@ -74,6 +74,13 @@ namespace Ry
 		return HashImpl<T>(TypeTag<T>{}, Object);
 	}
 
+	template <typename T>
+	uint32 Hash(SharedPtr<T> Object)
+	{
+		return HashImpl<T>(TypeTag<T>{}, Object.Get());
+	}
+
+
 	/**
 	 * Overloaded hashing for object references
 	 */

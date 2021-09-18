@@ -279,7 +279,7 @@ namespace Ry
 		void Refresh()
 		{
 			// Ensures the correct border graphic is displayed
-			if(IsVisible() && !IsParentHidden())
+			if(IsVisible())
 			{
 				OnHide();
 				OnShow();
