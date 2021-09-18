@@ -45,6 +45,8 @@ namespace Ry
 
 		Filesystem::directory_iterator CurDirItr(*Absolute);
 
+		std::cout << "start" << std::endl;
+
 		// Iterate paths in directory
 		for(auto& Path : CurDirItr)
 		{
@@ -70,6 +72,8 @@ namespace Ry
 			}
 
 		}
+
+		std::cout << "end" << std::endl;
 
 		Browser->MarkDirty();
 		

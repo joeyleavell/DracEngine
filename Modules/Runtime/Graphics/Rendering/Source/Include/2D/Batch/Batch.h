@@ -88,6 +88,17 @@ namespace Ry
 	class ResourceLayout;
 	class CommandBuffer;
 
+	struct RENDERING_MODULE TextLine
+	{
+		Ry::ArrayList<Ry::String> Words;
+	};
+
+
+	struct RENDERING_MODULE PrecomputedTextData
+	{
+		Ry::ArrayList<Ry::TextLine> Lines;
+	};
+
 	struct RENDERING_MODULE BatchItem
 	{
 		Ry::ArrayList<float> Data;
@@ -188,7 +199,7 @@ namespace Ry
 	RENDERING_MODULE void BatchArc(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Radius, float Theta0, float Theta1, int32 Segments, float Depth);
 	RENDERING_MODULE void BatchStyledBox(Ry::SharedPtr<BatchItemSet> Item, float X, float Y, float W, float H, const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize, float Depth);
 	RENDERING_MODULE void BatchTexture(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, float X, float Y, float U, float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth);
-	RENDERING_MODULE void BatchText(Ry::SharedPtr<BatchItemSet> Item, const Ry::Color& Color, BitmapFont* Font, const Ry::String& Text, float XPosition, float YPosition, float LineWidth);
+	RENDERING_MODULE void BatchText(Ry::SharedPtr<BatchItemSet> Item, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth);
 
 	struct RENDERING_MODULE BatchGroup
 	{

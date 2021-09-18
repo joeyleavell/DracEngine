@@ -182,9 +182,34 @@ namespace Ry
 
 		virtual void Draw() override
 		{
+			RectScissor ClipSpace = GetClipSpace();
+
 			for (SharedPtr<Widget> Child : Children)
 			{
-				Child->Draw();
+				Point Pos = Child->GetAbsolutePosition();
+				SizeType ContentSize = Child->ComputeSize();
+
+				RectScissor WidgetBounds{ Pos.X, Pos.Y, ContentSize.Width, ContentSize.Height };
+
+				// Do cull test
+				if(!ClipSpace.IsEnabled() || ClipSpace.TestAgainst(WidgetBounds))
+				{
+					if(!Child->IsVisible())
+					{
+						Child->SetVisible(true, true);
+						Child->Arrange();
+					}
+					
+					Child->Draw();
+				}
+				else
+				{
+					if (Child->IsVisible())
+					{
+						Child->SetVisible(false, true);
+					}
+				}
+				
 			}
 		}
 

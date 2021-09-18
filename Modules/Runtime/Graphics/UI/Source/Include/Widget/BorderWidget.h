@@ -188,24 +188,28 @@ namespace Ry
 		void Draw() override
 		{
 			// Note: super function is called later on
-			
-			Point Abs = GetAbsolutePosition();
-			SizeType ComputedSize = ComputeSize();
 
-			if(IsHovered())
+			if(IsVisible())
 			{
-				if(IsPressed() && Style.Pressed)
+				Point Abs = GetAbsolutePosition();
+				SizeType ComputedSize = ComputeSize();
+
+				if (IsHovered())
 				{
-					Style.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float) ComputedSize.Height);
+					if (IsPressed() && Style.Pressed)
+					{
+						Style.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					}
+					else if (Style.Hovered)
+					{
+						Style.Hovered->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					}
 				}
-				else if(Style.Hovered)
+				else if (Style.Default)
 				{
-					Style.Hovered->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					Style.Default->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
 				}
-			}
-			else if(Style.Default)
-			{
-				Style.Default->Draw((float) Abs.X, (float) Abs.Y, (float) ComputedSize.Width, (float) ComputedSize.Height);
+
 			}
 
 			SlotWidget::Draw();
@@ -275,8 +279,11 @@ namespace Ry
 		void Refresh()
 		{
 			// Ensures the correct border graphic is displayed
-			OnHide();
-			OnShow();
+			if(IsVisible())
+			{
+				OnHide();
+				OnShow();
+			}
 
 			// Construct border graphic mesh
 			Draw();

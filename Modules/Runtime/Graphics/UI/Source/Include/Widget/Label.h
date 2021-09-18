@@ -24,6 +24,8 @@ namespace Ry
 		{
 			this->SetText(In.mText);
 			this->SetStyle(In.mFont, In.mColor);
+
+			this->bTextSizeDirty = true;
 		}
 
 		Label():
@@ -34,15 +36,23 @@ namespace Ry
 
 		SizeType ComputeSize() const override
 		{
-			SizeType Result;
-			Result.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
-			Result.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(Result.Width)));
-			return Result;
+			if(bTextSizeDirty)
+			{
+				CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
+				CachedSize.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
+				bTextSizeDirty = false;
+			}
+
+			return CachedSize;
 		}
 
 		Label& SetText(const Ry::String& Text)
 		{
 			this->Text = Text;
+			bTextSizeDirty = true;
+
+			// Pre compute text data
+			ComputeTextData();
 
 			RenderStateDirty.Broadcast();
 			
@@ -52,6 +62,7 @@ namespace Ry
 		Label& SetStyle(BitmapFont* Font, const Color& Color)
 		{
 			Style.SetFont(Font).SetColor(Color);
+			bTextSizeDirty = true;
 
 			return *this;
 		}
@@ -59,6 +70,7 @@ namespace Ry
 		Label& SetFont(BitmapFont* Font)
 		{
 			Style.SetFont(Font);
+			bTextSizeDirty = true;
 			
 			RenderStateDirty.Broadcast();
 			return *this;
@@ -82,15 +94,48 @@ namespace Ry
 
 		void Draw() override
 		{
-			Point Abs = GetAbsolutePosition();
-			Ry::BatchText(ItemSet, Style.TextColor, Style.Font, Text, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
+			if(IsVisible())
+			{
+				Point Abs = GetAbsolutePosition();
+				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
+			}
 
 			//TextBatch->SetTexture(Style.Font->GetAtlasTexture());
 		}
 
 	private:
+
+		void ComputeTextData()
+		{
+			ComputedTextData.Lines.Clear();
+			
+			Ry::StringView* Lines = nullptr;
+			int32 LineCount = Text.split("\n", &Lines);
+			for (int32 Line = 0; Line < LineCount; Line++)
+			{
+				TextLine NewLine;
+
+				Ry::StringView* Words = nullptr;
+				int32 WordCount = Lines[Line].split(" ", &Words);
+				for (int32 Word = 0; Word < WordCount; Word++)
+				{
+					NewLine.Words.Add(Words[Word]);
+				}
+
+				// Add the cached line
+				ComputedTextData.Lines.Add(NewLine);
+
+				delete[] Words;
+			}
+			delete[] Lines;
+		}
+
+		mutable SizeType CachedSize;
+		mutable bool bTextSizeDirty;
+		PrecomputedTextData ComputedTextData;
 		
 		String Text;
+		
 		TextStyle Style;
 		Ry::SharedPtr<BatchItemSet> ItemSet;
 	};

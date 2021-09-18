@@ -54,6 +54,8 @@ namespace Ry
 			this->VerticalScrollAmount   = 0.0f;
 			this->HorizontalScrollAmount = 0.0f;
 			this->ScrollBarThickness     = 20.0f;
+			this->bVerticalBarPressed    = false;
+			this->bHorizontalBarPressed  = false;
 
 			VerticalScrollBar = new BoxDrawable;
 			VerticalScrollBar->SetBackgroundColor(WHITE.ScaleRGB(0.4f));
@@ -170,7 +172,7 @@ namespace Ry
 				OffsetX = 0;
 			if (OffsetY < 0)
 				OffsetY = 0;
-
+			
 			int32 CurrentY = static_cast<int32>(0);
 
 			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
@@ -181,8 +183,11 @@ namespace Ry
 				// Add top padding prior to setting relative position
 				CurrentY += static_cast<int32>(ChildSlot->GetPadding().Top);
 
+				float WidgetX = static_cast<float>(ChildSlot->GetPadding().Left - OffsetX);
+				float WidgetY = static_cast<float>(CurrentY - OffsetY);
+
 				// Set the widget's relative position
-				Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left - OffsetX), static_cast<float>(CurrentY - OffsetY));
+				Widget->SetRelativePosition(WidgetX, WidgetY);
 				Widget->Arrange();
 
 				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Bottom);

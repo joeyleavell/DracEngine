@@ -250,7 +250,7 @@ namespace Ry
 		Item->AddTriangle(2, 3, 0);
 	}
 
-	void BatchText(Ry::SharedPtr<BatchItemSet> ItemSet, const Ry::Color& Color, BitmapFont* Font, const Ry::String& Text, float XPosition, float YPosition, float LineWidth)
+	void BatchText(Ry::SharedPtr<BatchItemSet> ItemSet, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth)
 	{
 		ItemSet->Items.Clear();
 
@@ -264,17 +264,12 @@ namespace Ry
 
 		// Get the advance width of the space character
 
-		StringView* Lines = nullptr;
-		int32 LineCount = Text.split("\n", &Lines);
-
-		for (int32 Line = 0; Line < LineCount; Line++)
+		for (int32 Line = 0; Line < TextData.Lines.GetSize(); Line++)
 		{
-			StringView* Words = nullptr;
-			int32 WordCount = Lines[Line].split(" ", &Words);
-
+			int32 WordCount = TextData.Lines[Line].Words.GetSize();
 			for (int32 Word = 0; Word < WordCount; Word++)
 			{
-				const Ry::StringView& CurrentWord = Words[Word];
+				const Ry::String& CurrentWord = TextData.Lines[Line].Words[Word];
 				float TextWidth = Font->MeasureWidth(CurrentWord);
 
 				// Wrap text to next line

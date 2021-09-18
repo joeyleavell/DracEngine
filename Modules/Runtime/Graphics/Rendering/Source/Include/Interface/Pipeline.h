@@ -59,6 +59,15 @@ namespace Ry
 						
 		}
 
+		RectScissor(int32 InX, int32 InY, int32 InWidth, int32 InHeight)
+		{
+			this->X = InX;
+			this->Y = InY;
+			this->Width = InWidth;
+			this->Height = InHeight;
+		}
+
+
 		bool IsEnabled() const
 		{
 			return X >= 0 && Y >= 0 && Width >= 0 && Height >= 0;
@@ -67,6 +76,19 @@ namespace Ry
 		bool operator==(const RectScissor& Other) const
 		{
 			return X == Other.X && Y == Other.Y && Width == Other.Width && Height == Other.Height;
+		}
+
+		bool TestAgainst(const RectScissor& Other)
+		{
+			bool bVisX = Other.X >= X && Other.X < X + Width;
+			bVisX |= Other.X + Other.Width >= X && Other.X + Other.Width < X + Width;
+			bVisX |= Other.X < X && Other.X + Other.Width >= X + Width;
+
+			bool bVisY = Other.Y >= Y && Other.Y < Y + Height;
+			bVisY |= Other.Y + Other.Height >= Y && Other.Y + Other.Height < Y + Height;
+			bVisY |= Other.Y < Y && Other.Y + Other.Height >= Y + Height;
+
+			return bVisX && bVisY;
 		}
 	};
 

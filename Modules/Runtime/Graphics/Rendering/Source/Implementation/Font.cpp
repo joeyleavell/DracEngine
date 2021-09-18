@@ -158,6 +158,8 @@ namespace Ry
 			}
 		}
 
+		delete[] Lines;
+
 		return CurY;
 	}
 	
@@ -167,6 +169,8 @@ namespace Ry
 		const int32 SPACE_ADVANCE = GetGlyph(' ')->AdvanceWidth;
 
 		Ry::StringView* Lines = nullptr;
+
+		// TODO: optimize string split? having to manually delete output might be a bad idea
 		int32 LineCount = String.split("\n", &Lines);
 
 		int32 MaxLineWidth = 0;
@@ -225,6 +229,8 @@ namespace Ry
 				MaxLineWidth = LineWidth;
 			}
 		}
+
+		delete[] Lines;
 
 		return (float) MaxLineWidth;
 	}
