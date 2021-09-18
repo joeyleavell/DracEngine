@@ -83,7 +83,7 @@ namespace Ry
 
 		void Redraw()
 		{
-			//Bat->Clear();
+			Bat->Clear();
 			
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
@@ -95,7 +95,7 @@ namespace Ry
 			}
 
 			Bat->Update();
-		//	Bat->Render();
+			//Bat->Render();
 		}
 
 		void Draw()
