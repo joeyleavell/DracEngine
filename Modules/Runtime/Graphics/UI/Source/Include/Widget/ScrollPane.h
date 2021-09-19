@@ -121,8 +121,7 @@ namespace Ry
 			if(std::abs(Prev - Scroll) >= 0.000001f)
 			{
 				// Scroll amount has changed, mark widget as dirty	
-				Arrange();
-				Draw();
+				MarkDirty();
 			}
 		}
 
