@@ -235,6 +235,11 @@ namespace Ry
 			return Size <= 0;
 		}
 
+		void SoftClear()
+		{
+			this->Size = 0;
+		}
+
 		void Clear()
 		{
 			if(Size > 0)

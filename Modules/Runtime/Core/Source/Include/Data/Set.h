@@ -391,6 +391,11 @@ namespace Ry
 			return SetIterator<K>();
 		}
 
+		bool IsEmpty() const
+		{
+			return Elements <= 0;
+		}
+	
 		int32 GetSize() const
 		{
 			return Elements;

@@ -252,8 +252,7 @@ namespace Ry
 
 	void BatchText(Ry::SharedPtr<BatchItemSet> ItemSet, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth)
 	{
-		ItemSet->Items.Clear();
-
+		
 		// The amount of spaces in a tab
 		const int32 TAB_SPACES = 4;
 		const int32 SPACE_ADVANCE = Font->GetGlyph(static_cast<int32>(' '))->AdvanceWidth;
@@ -264,6 +263,8 @@ namespace Ry
 
 		// Get the advance width of the space character
 
+		int32 GlyphIndex = 0;
+		
 		for (int32 Line = 0; Line < TextData.Lines.GetSize(); Line++)
 		{
 			int32 WordCount = TextData.Lines[Line].Words.GetSize();
@@ -321,14 +322,26 @@ namespace Ry
 						float BR_Y = TL_Y + RasterHeight;
 
 						// Create a batch item for this glyph
-						Ry::SharedPtr<BatchItem> GlyphItem = MakeItem();
+						Ry::SharedPtr<BatchItem> GlyphItem;
+						if(GlyphIndex < ItemSet->Items.GetSize())
+						{
+							GlyphItem = ItemSet->Items[GlyphIndex];
+							GlyphItem->Clear();
+						}
+						else
+						{
+							GlyphItem = MakeItem();
+							ItemSet->AddItem(GlyphItem);
+						}
+						
+						GlyphIndex++;
+						
 						GlyphItem->AddVertex1P1UV1C(TL_X, TL_Y, 0.0f, U, V, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Top left
 						GlyphItem->AddVertex1P1UV1C(TR_X, TR_Y, 0.0f, U + UVW, V, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Top right
 						GlyphItem->AddVertex1P1UV1C(BR_X, BR_Y, 0.0f, U + UVW, V + UVH, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Bottom right
 						GlyphItem->AddVertex1P1UV1C(BL_X, BL_Y, 0.0f, U, V + UVH, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Bottom left
 						GlyphItem->AddTriangle(2, 1, 0);
 						GlyphItem->AddTriangle(0, 3, 2);
-						ItemSet->AddItem(GlyphItem);
 
 						// Advance the cursor
 						CurX += AdvanceWidth;
@@ -441,10 +454,10 @@ namespace Ry
 
 		for(BatchLayer* Layer : Layers)
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while(PipelineItr)
 			{
-				for (BatchGroup* Group : *PipelineItr.Value())
+				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
 					Group->Items.Remove(Item);
 				}
@@ -462,10 +475,10 @@ namespace Ry
 	{
 		for (BatchLayer* Layer : Layers)
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
-				for (BatchGroup* Group : *PipelineItr.Value())
+				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
 					Group->ItemSets.Remove(Item);
 				}
@@ -527,10 +540,10 @@ namespace Ry
 		// Reset/create meshes
 		for (BatchLayer* Layer : Layers)
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
-				for (BatchGroup* Group : *PipelineItr.Value())
+				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
 					if (Group->BatchMesh)
 					{
@@ -575,16 +588,16 @@ namespace Ry
 		// Update resource resets and re-record command buffers if needed
 		for (BatchLayer* Layer : Layers)
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
-				BatchPipeline* Key = *PipelineItr.Key();
+				BatchPipeline* Key = PipelineItr.GetKey();
 
 				// Update uniform
 				// Todo: change this to a push constant and only change it if needed
 				Key->SceneResources->SetMatConstant("Scene", "ViewProjection", Projection * View);
 
-				for (BatchGroup* Group : *PipelineItr.Value())
+				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
 					for (ResourceSet* Set : Group->ResourceSets)
 					{
@@ -687,13 +700,13 @@ namespace Ry
 			NewGroup->BatchMesh = new Mesh(NewGroup->OwningPipeline->Format);
 
 			// Add this group to the layer, create array if needed
-			if(AtLayer->Groups.contains(NewGroup->OwningPipeline))
+			if(AtLayer->Groups.Contains(NewGroup->OwningPipeline))
 			{
-				(*AtLayer->Groups.get(NewGroup->OwningPipeline)).Add(NewGroup);
+				AtLayer->Groups.Get(NewGroup->OwningPipeline).Add(NewGroup);
 			}
 			else
 			{
-				AtLayer->Groups.insert(NewGroup->OwningPipeline, Ry::ArrayList<BatchGroup*>{NewGroup});
+				AtLayer->Groups.Insert(NewGroup->OwningPipeline, Ry::ArrayList<BatchGroup*>{NewGroup});
 			}
 
 			return NewGroup;
@@ -711,10 +724,10 @@ namespace Ry
 			return nullptr;
 
 		BatchLayer* LayerPtr = Layers[Layer];
-		Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = LayerPtr->Groups.CreateKeyIterator();
+		Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = LayerPtr->Groups.CreatePairIterator();
 		while (PipelineItr)
 		{
-			for (BatchGroup* Group : *PipelineItr.Value())
+			for (BatchGroup* Group : PipelineItr.GetValue())
 			{
 				if (Group->Text == Text && Group->Scissor == Scissor)
 				{
@@ -734,12 +747,12 @@ namespace Ry
 		for(BatchLayer* Layer : Layers)
 		{
 
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
 				Ry::ArrayList<BatchGroup*> GroupsToRemove;
 
-				for (BatchGroup* Group : *PipelineItr.Value())
+				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
 					//if (Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
 					{
@@ -762,7 +775,7 @@ namespace Ry
 						RemoveGroup->TextureResources = nullptr;
 					}
 
-					(*Layer->Groups.get(*PipelineItr.Key())).Remove(RemoveGroup);
+					Layer->Groups.Get(PipelineItr.GetKey()).Remove(RemoveGroup);
 
 					delete RemoveGroup;
 				}
@@ -799,17 +812,17 @@ namespace Ry
 		
 		AtLayer->CommandBuffer->BeginCmd();
 		{
-			Ry::KeyIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = AtLayer->Groups.CreateKeyIterator();
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = AtLayer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
-				BatchPipeline* Key = *PipelineItr.Key();
+				BatchPipeline* Key = PipelineItr.GetKey();
 
 				// Bind pipeline
 				AtLayer->CommandBuffer->BindPipeline(Key->Pipeline);
 
 				AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
 
-				for (const BatchGroup* Group : *PipelineItr.Value())
+				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
 					if(Group->Scissor.IsEnabled())
 					{

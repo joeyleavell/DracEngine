@@ -73,6 +73,9 @@ namespace Ry
 
 	private:
 
+		Ry::OAHashMap<Ry::String, float> MeasuredWidth;
+		Ry::OAHashMap<Ry::String, float> MeasuredHeight;
+
 		int32 Ascent;
 		int32 Descent;
 		int32 LineGap;

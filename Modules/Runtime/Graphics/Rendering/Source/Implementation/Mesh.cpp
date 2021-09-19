@@ -114,8 +114,8 @@ namespace Ry
 	void Mesh::Reset()
 	{
 		// TODO: Performance: could probably be better here, do not erase elements but stomp over them instead maintaining the greatest allocated size
-		Data->VertData->Vertices.Clear();
-		Data->VertData->Indices.Clear();
+		Data->VertData->Vertices.SoftClear();
+		Data->VertData->Indices.SoftClear();
 
 		Data->VertData->VertexCount = 0;
 		Data->VertData->IndexCount = 0;

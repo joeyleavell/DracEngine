@@ -6,9 +6,13 @@
 #include <cstring>
 #include <cstdio>
 #include "Core/Assert.h"
+#include "Core/Memory/PoolAllocator.h"
 
 namespace Ry
 {
+
+	// 1000 200 byte chunks
+	static PoolAllocator* SmallStringAllocator;
 
 	void StringCopy(char* Dst, const char* Src, uint64 DstSize)
 	{
@@ -254,89 +258,61 @@ namespace Ry
 		return String(std::to_string(a).c_str());
 	}
 
-	String::String()
+	String::String():
+	data(nullptr)
 	{
-		data = new char[1];
-		data[0] = '\0';
-
-		size = 0;
+		AllocData(0);
 	}
 
 	String::String(const char* dat)
 	{
-		size = 0;
-
-		while (dat[size])
-			size++;
-
-		data = new char[(uint64) size + 1];
-
+		AllocData(strlen(dat));
 		StringCopy(data, dat, (uint64) size + 1);
 	}
 
-	String::String(const char* Data, int32 Size)
+	String::String(const char* InData, int32 Size)
 	{
 		// Allocate
-		data = new char[Size];
-
-		// Initialize
-		for (int32 Index = 0; Index < Size; Index++)
-			this->data[Index] = Data[Index];
-
-		// Set size
-		this->size = Size;
+		AllocData(Size);
+		Ry::StringCopy(data, InData, Size + 1);
 	}
 
 	String::String(const String& other)
 	{
-		size = other.size;
-		data = new char[(uint64) size + 1];
-		
-		for (uint32 i = 0; i < size + 1; i++)
-			data[i] = other.data[i];
+		AllocData(other.size);
+		Ry::StringCopy(data, other.data, size + 1);
 	}
 
 	String::String(String&& Other) noexcept
 	{
 		this->size = Other.size;
 		this->data = Other.data;
+		this->bStackAllocated = Other.bStackAllocated;
 		Other.data = nullptr;
-		
-		//data = new char[(uint64) Other.size + 1];
-
-		//StringCopy(this->data, *Other, ((uint64) this->size + 1) * sizeof(char));
-		// for (uint32 i = 0; i < size + 1; i++)
-		// 	data[i] = Other.data[i];
 	}
 
-	String::String(const StringView& View)
+	String::String(const StringView& View):
+	data(nullptr),
+	size(0)
 	{
-		this->size = View.getSize();
-		this->data = new char[View.getSize() + 1];
-
+		AllocData(View.getSize());
 		for (uint32 i = 0; i < View.getSize(); i++)
 		{
 			data[i] = View[i];
 		}
-		
-		data[View.getSize()] = '\0';
+		data[size] = '\0';
 	}
 
 	String::String(uint32 AllocSize):
-	data(nullptr)
+	data(nullptr),
+	size(0)
 	{
-		size = 0;
-
-		if(AllocSize > 0)
-		{
-			this->data = new char[AllocSize];
-			this->data[0] = '\0';
-		}
+		AllocData(AllocSize);
 	}
 
 	String::~String()
 	{
-		delete[] data;
+		FreeData();
 	}
 
 	char* String::getData() const
@@ -351,17 +327,14 @@ namespace Ry
 
 	String String::to_lower() const
 	{
-		char* dst = new char[size + 1];
+		String Res(size);
 
 		for (uint32 Character = 0; Character < size; Character++)
 		{
-			dst[Character] = tolower((int)data[Character]);
+			Res[Character] = tolower((int)data[Character]);
 		}
 
-		dst[size] = '\0';
-
-		String Res(dst);
-		delete[] dst;
+		Res[size] = '\0';
 
 		return Res;
 	}
@@ -370,28 +343,24 @@ namespace Ry
 	{
 		if (this == &other)
 			return *this;
-		
-		if (data)
-			delete data;
-		size = other.size;
-		data = new char[(uint64) size + 1];
 
-		// This also copies over the null terminator
-		for (uint32 i = 0; i < size + 1; i++)
-			data[i] = other.data[i];
+		FreeData();
+		
+		AllocData(other.size);
+		
+		Ry::StringCopy(data, other.data, size + 1);
 
 		return *this;
 	}
 
 	String& String::operator=(String&& Other) noexcept
 	{
-		delete data;
-		
-		this->size = Other.size;
-		this->data = new char[(uint64) size + 1];
+		FreeData();
 
-		// This also copies over the null terminator
-		StringCopy(this->data, Other.data, ((uint64)this->size + 1) * sizeof(char));
+		this->data = Other.data;
+		this->size = Other.size;
+		this->bStackAllocated = Other.bStackAllocated;
+		Other.data = nullptr;
 
 		return *this;
 	}
@@ -455,25 +424,21 @@ namespace Ry
 
 	String String::operator+(const String& other) const
 	{
-		char* newData = new char[(uint64) size + other.size + 1];
+		Ry::String Result(size + other.size);
 		for (uint32 i = 0; i < size; i++)
-			newData[i] = data[i];
+			Result[i] = data[i];
 		for (uint32 i = size; i < size + other.size; i++)
-			newData[i] = other.data[i - size];
-		newData[size + other.size] = '\0';
+			Result[i] = other.data[i - size];
+		Result[size + other.size] = '\0';
 
-		String Res(newData);
-		delete[] newData;
-
-		return Res;
+		return Result;
 	}
 
 	String operator+(const StringView& View, const String& b)
 	{
 		uint32 ASize = View.getSize();
-		String Result{ASize + b.size + 1};
-		Result.size = ASize + b.size;
-
+		String Result(ASize + b.size);
+		
 		for (uint32 i = 0; i < ASize; i++)
 			Result[i] = View[i];
 		for (uint32 i = ASize; i < ASize + b.size; i++)
@@ -486,8 +451,7 @@ namespace Ry
 	String operator+(const String& A, const StringView& View)
 	{
 		int32 BSize = View.getSize();
-		String Result{ A.size + BSize + 1};
-		Result.size = A.size + BSize;
+		String Result( A.size + BSize);
 
 		for (uint32 i = 0; i < A.size; i++)
 			Result[i] = A[i];
@@ -540,22 +504,16 @@ namespace Ry
 		return data[index];
 	}
 
-	String String::operator+(const char* other) const
+	String String::operator+(const char* Other) const
 	{
-		size_t otherSize = strlen(other);
-		char* newData = new char[size + otherSize + 1];
-
+		int32 OtherSize = strlen(Other);
+		String Res(size + strlen(Other));
 		for (uint32 i = 0; i < size; i++)
-			newData[i] = data[i];
+			Res[i] = data[i];
+		for (uint32 i = size; i < size + OtherSize; i++)
+			Res[i] = Other[i - size];
 
-		for (uint32 i = size; i < size + otherSize; i++)
-			newData[i] = other[i - size];
-
-		newData[size + otherSize] = '\0';
-
-		String Res(newData);
-		delete[] newData;
-
+		Res[size + OtherSize] = '\0';
 		return Res;
 	}
 
@@ -591,13 +549,10 @@ namespace Ry
 		if (count == getSize())
 			return *this;
 
-		char* chars = new char[(uint64) count + 1];
+		String Res(count);
 		for (uint32 i = 0; i < count; i++)
-			chars[i] = data[i + (getSize() - count)];
-		chars[count] = '\0';
-
-		String Res(chars);
-		delete[] chars;
+			Res[i] = data[i + (getSize() - count)];
+		Res[count] = '\0';
 
 		return String(Res);
 	}
@@ -609,13 +564,10 @@ namespace Ry
 		if (count == getSize())
 			return *this;
 
-		char* chars = new char[(uint64) count + 1];
+		String Res(count);
 		for (uint32 i = 0; i < count; i++)
-			chars[i] = data[i];
-		chars[count] = '\0';
-
-		String Res(chars);
-		delete[] chars;
+			Res[i] = data[i];
+		Res[count] = '\0';
 
 		return Res;
 	}
@@ -687,6 +639,45 @@ namespace Ry
 	Ry::StringView String::Trim()
 	{
 		return TrimString(data, size);
+	}
+
+	void String::AllocData(uint32 Size)
+	{
+		if (!SmallStringAllocator)
+			SmallStringAllocator = new PoolAllocator(SMALL_STRING_SIZE, 10000);
+
+		this->size = Size;
+
+		int32 ActualSize = Size + 1; // Account for null terminator
+		
+#if ENABLE_SSO
+		if(ActualSize <= SMALL_STRING_SIZE)
+		{
+			data = (char*) SmallStringAllocator->Allocate();
+			bStackAllocated = true;
+		}
+		else
+#endif
+		{
+			bStackAllocated = false;
+			data = new char[ActualSize];
+		}
+
+		data[0] = '\0';		
+	}
+
+	void String::FreeData()
+	{
+		if(data)
+		{
+			if (bStackAllocated)
+				SmallStringAllocator->Free(data);
+			else
+				delete[] data;
+
+			data = nullptr;
+		}
+		
 	}
 
 	String CreateFormatted(Ry::String Format, va_list ArgsList)

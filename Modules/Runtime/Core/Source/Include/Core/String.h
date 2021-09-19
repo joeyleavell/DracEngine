@@ -7,6 +7,9 @@
 
 #define PRINTF_BUFFER_SIZE (5*1024)
 
+#define ENABLE_SSO 1
+#define SMALL_STRING_SIZE 200
+
 namespace Ry
 {
 	
@@ -368,7 +371,11 @@ namespace Ry
 
 	private:
 
-		char* data;
+		void AllocData(uint32 Size);
+		void FreeData();
+
+		bool bStackAllocated = false;
+		char* data = nullptr;
 		
 		uint32 size;
 

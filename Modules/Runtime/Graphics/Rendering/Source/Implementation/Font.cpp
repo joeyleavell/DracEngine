@@ -79,6 +79,9 @@ namespace Ry
 
 	float BitmapFont::MeasureHeight(const Ry::String& Text, float WrapWidth)
 	{
+		if (MeasuredHeight.Contains(Text))
+			return MeasuredHeight.Get(Text);
+
 		// The amount of spaces in a tab
 		const int32 TAB_SPACES = 4;
 		const int32 SPACE_ADVANCE = GetGlyph(static_cast<int32>(' '))->AdvanceWidth;
@@ -160,11 +163,16 @@ namespace Ry
 
 		delete[] Lines;
 
+		MeasuredHeight.Insert(Text, CurY);
+
 		return CurY;
 	}
 	
 	float BitmapFont::MeasureWidth(const Ry::String& String)
 	{
+		if (MeasuredWidth.Contains(String))
+			return MeasuredWidth.Get(String);
+		
 		const int32 TAB_SPACES = 4;
 		const int32 SPACE_ADVANCE = GetGlyph(' ')->AdvanceWidth;
 
@@ -231,6 +239,8 @@ namespace Ry
 		}
 
 		delete[] Lines;
+
+		MeasuredWidth.Insert(String, MaxLineWidth);
 
 		return (float) MaxLineWidth;
 	}

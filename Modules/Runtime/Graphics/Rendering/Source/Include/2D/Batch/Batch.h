@@ -115,8 +115,8 @@ namespace Ry
 
 		void Clear()
 		{
-			Data.Clear();
-			Indices.Clear();
+			Data.SoftClear();
+			Indices.SoftClear();
 
 			// Reset vertex and index count back to zero
 			this->VertexCount = 0;
@@ -238,16 +238,21 @@ namespace Ry
 	{
 		int32 Depth = 0;
 		Ry::CommandBuffer* CommandBuffer = nullptr;		
-		Ry::Map<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Groups;
-
+		Ry::OAHashMap<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Groups;
 		bool bNeedsRecord = false;
+
+		BatchLayer():
+		Groups(10) // Small table size to increase load factor
+		{
+			
+		}
 
 		~BatchLayer()
 		{
-			Ry::KeyIterator<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Itr = Groups.CreateKeyIterator();
+			Ry::OAPairIterator<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Itr = Groups.CreatePairIterator();
 			while(Itr)
 			{
-				for (BatchGroup* Group : *Itr.Value())
+				for (BatchGroup* Group : Itr.GetValue())
 					delete Group;				
 				++Itr;
 			}
