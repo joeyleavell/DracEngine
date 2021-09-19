@@ -45,9 +45,6 @@ namespace Ry
 		SlotWidget() :
 			Widget()
 		{
-			// No child initially
-			this->Child = nullptr;
-
 			this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = 0;
 
 			this->WidthMode = SizeMode::AUTO;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include "Core/Memory/Memory.h"
 
 namespace Ry
 {
@@ -236,11 +237,16 @@ namespace Ry
 
 		void Clear()
 		{
-			// Deletes all elements
-			Resize(AllocatedSize);
-			
-			// todo: delete data, needed for shared ptrs etc
-			Size = 0;
+			if(Size > 0)
+			{
+				delete[] Data;
+				this->Size = 0;
+				this->AllocatedSize = 0;
+
+				// re-alloc
+				//Resize(AllocatedSize);
+			}
+
 		}
 
 		T* GetData() const
@@ -313,7 +319,10 @@ namespace Ry
 				Size = NewSize;
 			}
 
-			delete[] Data;
+			if(AllocatedSize > 0)
+			{
+				delete[] Data;
+			}
 
 			// Reassign to new array
 			this->Data = NewArray;

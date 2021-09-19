@@ -23,7 +23,6 @@ namespace Ry
 
 		Entity()
 		{
-			this->Body = nullptr;
 			this->CollisionEnabled = true;
 			this->PhysicsEnabled = true;
 			this->Mass = 0.0f;
@@ -104,8 +103,6 @@ namespace Ry
 			if(Component == RootTransform)
 			{
 				TransformComponent* Transform = dynamic_cast<TransformComponent*>(Component.Get());
-
-				RootTransform = nullptr;
 
 				Transform->OnHierarchyChanged.RemoveMemberFunction(this, &Entity::OnChildStructureChanged);
 			}

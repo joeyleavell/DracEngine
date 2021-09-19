@@ -122,7 +122,7 @@ namespace Ry
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
-			SharedPtr<GridLayout::Slot> PanelSlot = new GridLayout::Slot(Widget);
+			SharedPtr<GridLayout::Slot> PanelSlot = MakeShared(new GridLayout::Slot(Widget));
 
 			// Find next available slot
 			SlotPosition Next = FindFree();

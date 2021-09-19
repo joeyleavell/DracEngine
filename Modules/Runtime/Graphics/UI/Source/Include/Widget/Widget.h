@@ -480,7 +480,7 @@ namespace Ry
 
 		Ry::SharedPtr<WidgetClass> operator <<(typename WidgetClass::Args ConArgs)
 		{
-			Ry::SharedPtr<WidgetClass> NewWidget = new WidgetClass;
+			Ry::SharedPtr<WidgetClass> NewWidget = MakeShared(new WidgetClass);
 
 			NewWidget->Construct(ConArgs);
 

@@ -159,7 +159,7 @@ namespace Ry
 			Widget->SetParent(this);
 			Widget->SetVisible(IsVisible(), true); // Child matches our visibility
 
-			return SharedPtr<Slot>{nullptr};
+			return SharedPtr<Slot>();
 		}
 
 		virtual void OnShow() override

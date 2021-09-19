@@ -25,6 +25,7 @@ namespace Ry
 		int32 kills = 0;
 
 		Ry::SharedPtr<BorderWidget> Icon;
+		Ry::SharedPtr<Label> Lab;
 
 	};
 

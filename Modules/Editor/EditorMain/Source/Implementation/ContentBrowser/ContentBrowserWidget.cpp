@@ -29,7 +29,7 @@ namespace Ry
 			+
 			VerticalLayout::MakeSlot()
 			[
-				NewWidget(Ry::Label)
+				NewWidgetAssign(Lab, Ry::Label)
 				.Text(Name)
 				.Font(Font)
 				.Color(WHITE)
@@ -39,6 +39,7 @@ namespace Ry
 
 	ContentBrowserItem::~ContentBrowserItem()
 	{
+		//std::cout << "killing " << *Lab->GetText() << std::endl;
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -137,7 +138,7 @@ namespace Ry
 
 	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddDirectory(Ry::String Name)
 	{
-		Ry::SharedPtr<ContentBrowserItem> NewItem = new ContentBrowserItem(DirectoryTexture, TextFont, Name);
+		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem(DirectoryTexture, TextFont, Name));
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 		Grid->AppendSlot(AsWidget);
 
@@ -146,7 +147,7 @@ namespace Ry
 
 	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddFile(Ry::String Name)
 	{
-		Ry::SharedPtr<ContentBrowserItem> NewItem = new ContentBrowserItem(FileTexture, TextFont, Name);
+		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem(FileTexture, TextFont, Name));
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 
 		Grid->AppendSlot(AsWidget);

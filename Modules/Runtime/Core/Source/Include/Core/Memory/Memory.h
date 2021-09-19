@@ -26,5 +26,6 @@ namespace Ry
 	}
 
 	CORE_MODULE void MemCpy(void* Dest, uint64 DstSize, const void* Src, uint64 SrcSize);
-	
+	CORE_MODULE void MemSet(void* Dst, uint64 DstSize, int32 Value);
+
 }

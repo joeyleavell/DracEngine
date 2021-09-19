@@ -57,12 +57,12 @@ namespace Ry
 			this->bVerticalBarPressed    = false;
 			this->bHorizontalBarPressed  = false;
 
-			VerticalScrollBar = new BoxDrawable;
+			VerticalScrollBar = MakeShared(new BoxDrawable);
 			VerticalScrollBar->SetBackgroundColor(WHITE.ScaleRGB(0.4f));
 			VerticalScrollBar->SetBorderRadius(0);
 			VerticalScrollBar->SetBorderSize(0);
 
-			HorizontalScrollBar = new BoxDrawable;
+			HorizontalScrollBar = MakeShared(new BoxDrawable);
 			HorizontalScrollBar->SetBackgroundColor(WHITE.ScaleRGB(0.4f));
 			HorizontalScrollBar->SetBorderRadius(0);
 			HorizontalScrollBar->SetBorderSize(0);
@@ -136,7 +136,7 @@ namespace Ry
 			PanelWidget::AppendSlot(Widget);
 
 			// Create slot
-			SharedPtr<Slot> ScrollSlot = new Slot(Widget);
+			SharedPtr<Slot> ScrollSlot = MakeShared(new Slot(Widget));
 			ChildrenSlots.Add(ScrollSlot);
 
 			return ScrollSlot;

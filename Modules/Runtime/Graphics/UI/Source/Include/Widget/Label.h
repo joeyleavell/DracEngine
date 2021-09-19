@@ -76,6 +76,11 @@ namespace Ry
 			return *this;
 		}
 
+		const Ry::String& GetText() const
+		{
+			return Text;
+		}
+
 		void OnShow() override
 		{
 			if(Bat)

@@ -106,7 +106,7 @@ namespace Ry
 			PanelWidget::AppendSlot(Widget);
 
 			// Create widget
-			SharedPtr<Slot> PanelSlot = new Slot(Widget);
+			SharedPtr<Slot> PanelSlot = MakeShared(new Slot(Widget));
 			ChildrenSlots.Add(PanelSlot);
 			return PanelSlot;
 		}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Assert.h"
+
 namespace Ry
 {
 
@@ -53,7 +55,7 @@ namespace Ry
 		/**
 		 * Creates a new reference counter pointer to an object.
 		 */
-		SharedPtr(Class* Object):
+		/*SharedPtr(Class* Object):
 		Value(nullptr),
 		Counter(nullptr)
 		{
@@ -62,7 +64,7 @@ namespace Ry
 				this->Value = Object;
 				this->Counter = new RefCounter;
 			}
-		}
+		}*/
 
 		SharedPtr(Class* Object, RefCounter* Counter):
 		Value(nullptr),
@@ -115,8 +117,7 @@ namespace Ry
 				if (Counter->Value() <= 0)
 				{
 					delete Value;
-
-					// todo: delete counter too?
+					delete Counter;
 				}
 			}
 		}
@@ -235,6 +236,7 @@ namespace Ry
 				if (Counter->Value() <= 0)
 				{
 					delete Value;
+					delete Counter;
 					this->Value = nullptr;
 					this->Counter = nullptr;
 				}
@@ -319,8 +321,9 @@ namespace Ry
 	template<class Class>
 	Ry::SharedPtr<Class> MakeShared(Class* ToOwn)
 	{
-		return Ry::SharedPtr<Class>(ToOwn);
-		// return std::make_shared<T>(Arguments...);
+		Ry::SharedPtr<Class> RetPtr;
+		RetPtr.Reset(ToOwn);
+		return RetPtr;
 	}
 	
 }

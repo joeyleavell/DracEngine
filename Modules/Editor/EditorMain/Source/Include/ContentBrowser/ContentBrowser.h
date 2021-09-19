@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include "Widget/GridLayout.h"
 #include "Data/Map.h"
 
@@ -9,7 +10,7 @@ namespace Ry
 
 	struct BrowserNode
 	{
-		SharedPtr<ContentBrowserItem> Widget = nullptr;
+		SharedPtr<ContentBrowserItem> Widget;
 		bool bDirectory = false;
 		Ry::String Name;
 	};

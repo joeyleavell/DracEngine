@@ -11,4 +11,9 @@ namespace Ry
 	#endif
 
 	}
+
+	void MemSet(void* Dst, uint64 DstSize, int32 Value)
+	{
+		memset(Dst, Value, DstSize);
+	}
 }

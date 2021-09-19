@@ -360,7 +360,10 @@ namespace Ry
 
 		dst[size] = '\0';
 
-		return String(dst);
+		String Res(dst);
+		delete[] dst;
+
+		return Res;
 	}
 
 	String& String::operator=(const String& other)
@@ -459,7 +462,10 @@ namespace Ry
 			newData[i] = other.data[i - size];
 		newData[size + other.size] = '\0';
 
-		return String(newData);
+		String Res(newData);
+		delete[] newData;
+
+		return Res;
 	}
 
 	String operator+(const StringView& View, const String& b)
@@ -547,7 +553,10 @@ namespace Ry
 
 		newData[size + otherSize] = '\0';
 
-		return String(newData);
+		String Res(newData);
+		delete[] newData;
+
+		return Res;
 	}
 
 	char* String::operator*() const
@@ -587,7 +596,10 @@ namespace Ry
 			chars[i] = data[i + (getSize() - count)];
 		chars[count] = '\0';
 
-		return String(chars);
+		String Res(chars);
+		delete[] chars;
+
+		return String(Res);
 	}
 
 	String String::left_most(uint32 count) const
@@ -602,7 +614,10 @@ namespace Ry
 			chars[i] = data[i];
 		chars[count] = '\0';
 
-		return String(chars);
+		String Res(chars);
+		delete[] chars;
+
+		return Res;
 	}
 
 	int32 String::find_first(const String& str, uint32 index) const

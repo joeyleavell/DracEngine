@@ -3,7 +3,7 @@
 #include "Algorithm/Algorithm.h"
 #include <iostream>
 
-#define TABLE_SIZE 1000
+#define TABLE_SIZE 5000
 
 namespace Ry
 {
@@ -108,10 +108,8 @@ namespace Ry
 
 		K operator*() const
 		{
-			// Check if we've reached the end of the hash table
-			if (TableIndex >= TABLE_SIZE)
-				return nullptr;
-
+			CORE_ASSERTF(TableIndex < TABLE_SIZE, "Tryed to dereference an invalid iterator");
+			
 			return CurrentEntry->Key;
 		}
 

@@ -3,7 +3,7 @@
 #include "Algorithm/Algorithm.h"
 #include <iostream>
 
-#define TABLE_SIZE 1000
+#define TABLE_SIZE 5000
 
 namespace Ry
 {
