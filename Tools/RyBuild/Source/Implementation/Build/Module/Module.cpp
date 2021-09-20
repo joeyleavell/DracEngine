@@ -855,3 +855,8 @@ void RecurseDependencies(const Module& Mod, const std::map<std::string, Module*>
 	}	
 	
 }
+
+std::string Module::GetGeneratedDir() const
+{
+	return (Filesystem::path(GetEngineIntermediateDir()) / "Generated" / (Name + (char)Filesystem::path::preferred_separator)).string();
+}

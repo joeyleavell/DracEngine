@@ -63,15 +63,13 @@ public:
 class Module
 {
 public:
-	
+
 	std::string Name;
 	ModuleType Type;
 	std::string RootDir;
-	//PlatformThirdParty ModuleThirdParty;
 	std::vector<std::string> ModuleDependencies;
 	std::vector<std::string> MacroDefinitions;
 	std::vector<ExternDependency> ExternDependencies;
-	//PlatformLibDef Libs;
 
 	std::vector<std::string> PythonIncludes;
 	std::vector<std::string> PythonLibraryPaths;
@@ -91,29 +89,6 @@ public:
 	bool bAttemptedBuild = false;
 
 	bool bEngineModule = false;
-
-	// void DiscoverLibs(std::vector<std::string>& Out) const
-	// {
-	// 	for(const std::string& LibsDir : ModuleThirdParty.LibPaths)
-	// 	{
-	// 		// Make libs dir relative to module root third party
-	// 		
-	// 		Filesystem::recursive_directory_iterator DirItr(Filesystem::path(GetThirdPartyDir()) / LibsDir);
-	//
-	// 		for(Filesystem::path Path : DirItr)
-	// 		{
-	// 			if(Path.extension() == ".lib")
-	// 			{
-	// 				Out.push_back(Path.filename().string());
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// std::string GetModuleFilePath() const
-	// {
-	// 	return (Filesystem::path(RootDir) / (Name + ".module")).string();
-	// }
 
 	bool HasCorrespondingObject(std::string ObjectDir, std::string ObjectExt, std::string SourceFile)
 	{
@@ -252,26 +227,8 @@ public:
 		return (Filesystem::path(RootDir) / (std::string("Include") + (char)Filesystem::path::preferred_separator)).string();
 	}
 
-	std::string GetIntermediateDir() const
-	{
-		return (Filesystem::path(RootDir) / (std::string("Intermediate") + (char)Filesystem::path::preferred_separator)).string();
-	}
-
-	std::string GetGeneratedDir() const
-	{
-		return (Filesystem::path(RootDir) / std::string("Intermediate") / (std::string("Generated") + (char)Filesystem::path::preferred_separator)).string();
-	}
-
-	// std::string GetIntermediateDir() const
-	// {
-	// 	return (Filesystem::path(RootDir) / (std::string("Intermediate") + (char)Filesystem::path::preferred_separator)).string();
-	// }
-	//
-	// std::string GetBinaryDir() const
-	// {
-	// 	return (Filesystem::path(RootDir) / (std::string("Binary") + (char)Filesystem::path::preferred_separator)).string();
-	// }
-
+	std::string GetGeneratedDir() const;
+	
 	std::string GetArtifactName() const
 	{
 		return std::string("RyRuntime-") + Name;
@@ -365,74 +322,6 @@ public:
 		}
 
 	}
-
-	// void GetTargetLibs(const BuildSettings& Settings, std::vector<std::string>& OutLibs)
-	// {
-	// 	std::vector<std::string>* TargetVec = nullptr;
-	// 	
-	// 	if (Settings.TargetPlatform.OS == TargetOS::Windows)
-	// 	{
-	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-	// 		{
-	// 			if (Settings.Toolset == BuildToolset::MSVC)
-	// 			{
-	// 				TargetVec = &Libs.Win64Libs.MSVCLibs;
-	// 			}
-	// 			else if (Settings.Toolset == BuildToolset::GCC)
-	// 			{
-	// 				TargetVec = &Libs.Win64Libs.MinGWLibs;
-	// 			}
-	// 		}
-	// 	}
-	// 	else if (Settings.TargetPlatform.OS == TargetOS::Linux)
-	// 	{
-	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-	// 		{
-	// 			if (Settings.Toolset == BuildToolset::GCC)
-	// 			{
-	// 				TargetVec = &Libs.Linux64Libs.GCCLibs;
-	// 			}
-	// 		}
-	// 	}
-	//
-	// 	if(TargetVec)
-	// 	{
-	// 		for(std::string& Lib : *TargetVec)
-	// 		{
-	// 			OutLibs.push_back(Lib);
-	// 		}
-	// 	}
-	// }
-
-	// std::vector<std::string>* GetTargetLibPaths(const BuildSettings& Settings)
-	// {
-	// 	if(Settings.TargetPlatform.OS == TargetOS::Windows)
-	// 	{
-	// 		if(Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-	// 		{
-	// 			if(Settings.Toolset == BuildToolset::MSVC)
-	// 			{
-	// 				return &ModuleThirdParty.Win64Libs.MSVCLibs;
-	// 			}
-	// 			else if(Settings.Toolset == BuildToolset::GCC)
-	// 			{
-	// 				return &ModuleThirdParty.Win64Libs.MinGWLibs;
-	// 			}
-	// 		}
-	// 	}
-	// 	else if(Settings.TargetPlatform.OS == TargetOS::Linux)
-	// 	{
-	// 		if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
-	// 		{
-	// 			if (Settings.Toolset == BuildToolset::GCC)
-	// 			{
-	// 				return &ModuleThirdParty.Linux64Libs.GCCLibs;
-	// 			}
-	// 		}
-	// 	}
-	//
-	// 	return nullptr;
-	// }
 	
 };
 
