@@ -129,7 +129,7 @@ public:
 	
 	void DiscoverHeaders(std::vector<std::string>& OutHeaders, bool bThirdParty = false) const
 	{
-		Filesystem::recursive_directory_iterator DirectoryItr(GetSourceDir());
+		Filesystem::recursive_directory_iterator DirectoryItr(GetIncludeDir());
 
 		for (Filesystem::path File : DirectoryItr)
 		{
@@ -158,7 +158,7 @@ public:
 
 	bool SourceCheck() const
 	{
-		Filesystem::recursive_directory_iterator DirectoryItr(GetSourceDir());
+		Filesystem::recursive_directory_iterator DirectoryItr(GetCppDir());
 
 		for (Filesystem::path File : DirectoryItr)
 		{
@@ -174,7 +174,7 @@ public:
 	
 	void DiscoverSource(std::vector<std::string>& OutSource, bool bThirdParty = false) const
 	{
-		Filesystem::recursive_directory_iterator DirectoryItr(GetSourceDir());
+		Filesystem::recursive_directory_iterator DirectoryItr(GetCppDir());
 
 		for (Filesystem::path File : DirectoryItr)
 		{
@@ -232,7 +232,7 @@ public:
 		return Filesystem::absolute(RootDir).string() + (char) Filesystem::path::preferred_separator;
 	}
 
-	std::string GetSourceDir() const
+	std::string GetCppDir() const
 	{
 		return (Filesystem::path(RootDir) / (std::string("Source") + (char)Filesystem::path::preferred_separator)).string();
 	}
@@ -249,12 +249,7 @@ public:
 
 	std::string GetIncludeDir() const
 	{
-		return (Filesystem::path(GetSourceDir()) / (std::string("Include") + (char)Filesystem::path::preferred_separator)).string();
-	}
-
-	std::string GetImplementationDir() const
-	{
-		return (Filesystem::path(GetSourceDir()) / "Implementation").string();
+		return (Filesystem::path(RootDir) / (std::string("Include") + (char)Filesystem::path::preferred_separator)).string();
 	}
 
 	std::string GetIntermediateDir() const

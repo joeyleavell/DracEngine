@@ -197,7 +197,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 		return;
 	}
 
-	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetSourceDir());
+	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetCppDir());
 
 	//bHeaderChanged = false;
 

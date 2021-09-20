@@ -759,7 +759,7 @@ bool IsModuleOutOfDate(const Module& Module, std::string BinaryDir, BuildSetting
 		return true;
 	}
 
-	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetSourceDir());
+	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetCppDir());
 
 	for (Filesystem::path File : DirectoryItr)
 	{

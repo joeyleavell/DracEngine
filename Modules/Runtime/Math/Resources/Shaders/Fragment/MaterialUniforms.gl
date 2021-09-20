@@ -1,4 +1,0 @@
-
-uniform sampler2D DiffuseTexture;
-uniform int HasDiffuseTexture;
-uniform vec3 DiffuseColor;
