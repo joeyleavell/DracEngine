@@ -91,6 +91,22 @@ namespace Ry
 			return HorizontalScrollAmount;
 		}
 
+		void VerticalScroll(float Pixels)
+		{
+			SizeType ChildrenSize = ComputeChildrenSize();
+			float HiddenAmountY = ChildrenSize.Height - Size.Height;
+
+			SetVerticalScrollAmount(VerticalScrollAmount + Pixels / HiddenAmountY);
+		}
+
+		void HorizontalScroll(float Pixels)
+		{
+			SizeType ChildrenSize = ComputeChildrenSize();
+			float HiddenAmountX = ChildrenSize.Width - Size.Width;
+
+			SetHorizontalScrollAmount(HorizontalScrollAmount + Pixels / HiddenAmountX);
+		}
+
 		void SetHorizontalScrollAmount(float Scroll)
 		{
 			float Prev = this->HorizontalScrollAmount;
@@ -266,7 +282,9 @@ namespace Ry
 			{
 				float ScrollY = MouseEv.ScrollY;
 
-				SetVerticalScrollAmount(VerticalScrollAmount - ScrollY / 30.0f);
+				std::cout << ScrollY << std::endl;
+
+				VerticalScroll(-ScrollY * 30.0f);
 
 				return true;
 			}

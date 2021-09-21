@@ -197,8 +197,6 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 		return;
 	}
 
-	Filesystem::recursive_directory_iterator DirectoryItr(Module.GetCppDir());
-
 	//bHeaderChanged = false;
 
 	std::vector<std::string> AllSourceFiles;
@@ -209,7 +207,18 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 
 	Filesystem::file_time_type EarliestChangedObj = Filesystem::file_time_type::max();
 
-	for (Filesystem::path File : DirectoryItr)
+	Filesystem::recursive_directory_iterator SourceDirectoryItr(Module.GetCppDir());
+	Filesystem::recursive_directory_iterator IncludeDirectoryItr (Module.GetIncludeDir());
+
+	auto ProcessFile = [this,
+		IntDir,
+		&bHeaderChanged,
+		&FileErrorCode,
+		&CheckAgainstAllStamps,
+		&EarliestChangedObj,
+		&OutOfDateFiles,
+		&AllSourceFiles]
+		(const Filesystem::path& File)
 	{
 		bool bIsCPP = File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c";
 		bool bIsHeader = File.extension() == ".h";
@@ -236,7 +245,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 				// In these cases, we have to compare against the earliest OBJ timestamp to check for recompilation.
 
 				CheckAgainstAllStamps.push_back(File.string());
-				continue;
+				return;
 
 				/*if (LastSourceWriteTime < EarliestChangedObj)
 				{
@@ -261,7 +270,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 				{
 					// We're a header, mark EVERYTHING as out of date
 					bHeaderChanged = true;
-					break;
+					return;
 				}
 				else
 				{
@@ -270,12 +279,22 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 				}
 			}
 
-			if(bIsCPP)
+			if (bIsCPP)
 			{
 				AllSourceFiles.push_back(File.string());
 			}
-			
+
 		}
+	};
+
+	for (Filesystem::path File : SourceDirectoryItr)
+	{
+		ProcessFile(File);
+	}
+
+	for (Filesystem::path File : IncludeDirectoryItr)
+	{
+		ProcessFile(File);
 	}
 
 	// No point in doing this computation if we already know we need to rebuild all
