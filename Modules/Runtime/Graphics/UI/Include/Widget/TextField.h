@@ -32,7 +32,11 @@ namespace Ry
 			Widget()
 		{
 			ItemSet = MakeItemSet();
-			CursorItem = MakeItemSet();
+			CursorItem = MakeItem();
+			SelectionItem = MakeItem();
+
+			CursorPos = 0;
+			SelectionPos = -1;
 		}
 
 		SizeType ComputeSize() const override
@@ -91,7 +95,12 @@ namespace Ry
 			if (Bat)
 			{
 				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
+
+				Bat->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
 			}
+
+			if (CursorPos != SelectionPos && SelectionPos >= 0)
+				ShowSelection();
 		}
 
 		void OnHide() override
@@ -99,7 +108,11 @@ namespace Ry
 			if (Bat)
 			{
 				Bat->RemoveItemSet(ItemSet);
+
+				Bat->RemoveItem(CursorItem);
 			}
+
+			HideSelection();
 		}
 
 		void Draw() override
@@ -108,38 +121,109 @@ namespace Ry
 			{
 				Point Abs = GetAbsolutePosition();
 				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
+
+				Ry::ArrayList<float> XOffsets;
+				Style.Font->MeasureXOffsets(XOffsets, Text);
+
+				// Draw cursor
+				float CursorX = XOffsets[CursorPos] + Abs.X;
+				float Height = Style.Font->GetAscent() - Style.Font->GetDescent();
+				Ry::BatchRectangle(CursorItem, WHITE, CursorX, Abs.Y, 1.0f, Height, 0.0f);
+
+				// Draw selection if applicable
+				if(SelectionPos >= 0)
+				{
+					float SelectionX = XOffsets[SelectionPos] + Abs.X;
+					Ry::BatchRectangle(SelectionItem, BLUE, SelectionX, Abs.Y, 1.0f, Height, 0.0f);
+				}
+
 			}
+		}
+
+		int32 FindClosestCursorIndex(int32 Offset)
+		{
+			int32 RetCursorPos = -1;
+			
+			// Calc offsets
+			Ry::ArrayList<float> XOffsets;
+			Style.Font->MeasureXOffsets(XOffsets, Text);
+
+			// Find closest offset
+			int32 SmallestDiff = INT32_MAX;
+			int32 Index = 0;
+			while (Index < XOffsets.GetSize())
+			{
+				int32 Delta = std::abs(Offset - XOffsets[Index]);
+				if (Delta < SmallestDiff)
+				{
+					SmallestDiff = Delta;
+					RetCursorPos = Index;
+				}
+
+				Index++;
+			}
+
+			return RetCursorPos;
+		}
+
+		bool OnMouseDragged(const MouseDragEvent& MouseEv) override
+		{
+			if(MouseEv.ButtonID == 0 && bDragging)
+			{
+				Point Abs = GetAbsolutePosition();
+				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+				CursorPos = FindClosestCursorIndex(MouseXOffset);
+
+				std::cout << CursorPos << " " << SelectionPos << std::endl;
+
+				Draw();
+				Bat->Update();
+
+				if(CursorPos != SelectionPos && SelectionPos >= 0)
+				{
+					ShowSelection();
+				}
+				else
+				{
+					HideSelection();
+				}
+			}
+
+			return true;
 		}
 
 		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override
 		{
-			if(MouseEv.ButtonID == 0 && MouseEv.bPressed && IsHovered())
+			if (MouseEv.ButtonID == 0)
 			{
-				// Calc offsets
-				Ry::ArrayList<float> XOffsets;
-				Style.Font->MeasureXOffsets(XOffsets, Text);
-
-				// Find closest offset
-				Point Abs = GetAbsolutePosition();
-				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
-
-				// Find closest offset
-				int32 SmallestDiff = INT32_MAX;
-				int32 Index = 0;
-				while(Index < XOffsets.GetSize())
+				if (MouseEv.bPressed)
 				{
-					int32 Delta = std::abs(MouseXOffset - XOffsets[Index]);
-					if(Delta < SmallestDiff)
+					if (IsHovered())
 					{
-						SmallestDiff = Delta;
-						CursorPos = Index;
+						bDragging = true;
+
+						// Find closest offset
+						Point Abs = GetAbsolutePosition();
+						int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+						SelectionPos = FindClosestCursorIndex(MouseXOffset);
+						CursorPos = SelectionPos;
+
+					}
+					else
+					{
+						HideSelection();
 					}
 
-					Index++;
+					HideSelection();
 				}
-
-				std::cout << "set cursor to " << CursorPos << std::endl;
+				else
+				{
+					bDragging = false;
+				}
 			}
+			
+			Draw();
+			Bat->Update();
 
 			return true;
 		}
@@ -181,6 +265,8 @@ namespace Ry
 
 				std::cout << "cursor pos: " << CursorPos << std::endl;
 
+				Draw();
+				Bat->Update();
 			}
 
 			return true;
@@ -207,10 +293,31 @@ namespace Ry
 
 			CursorPos++;
 
+			Draw();
+			Bat->Update();
+
 			return true;
 		}
 
 	private:
+
+		void ShowSelection()
+		{
+			if (Bat)
+			{
+				Bat->AddItem(SelectionItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
+				//std::cout << "show sel" << std::endl;
+			}
+		}
+
+		void HideSelection()
+		{
+			if(Bat)
+			{
+				Bat->RemoveItem(SelectionItem);
+				std::cout << "hide sel" << std::endl;
+			}
+		}
 
 		void ComputeTextData()
 		{
@@ -237,8 +344,10 @@ namespace Ry
 			delete[] Lines;
 		}
 
+		bool bDragging = false;
 		bool bShowCursor;
 		int32 CursorPos;
+		int32 SelectionPos;
 
 		mutable SizeType CachedSize;
 		mutable bool bTextSizeDirty;
@@ -248,7 +357,10 @@ namespace Ry
 		TextStyle Style;
 		Ry::SharedPtr<BatchItemSet> ItemSet;
 
-		Ry::SharedPtr<BatchItemSet> CursorItem;
+		Ry::SharedPtr<BatchItem> CursorItem;
+		
+		Ry::SharedPtr<BatchItem> SelectionItem;
+
 	};
 	
 }
