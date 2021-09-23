@@ -71,6 +71,8 @@ namespace Ry
 		float MeasureHeight(const Ry::String& String, float WrapWidth);
 		float MeasureWidth(const Ry::String& String);
 
+		void MeasureXOffsets(Ry::ArrayList<float>& OutOffsets, const Ry::String& String);
+
 	private:
 
 		Ry::OAHashMap<Ry::String, float> MeasuredWidth;

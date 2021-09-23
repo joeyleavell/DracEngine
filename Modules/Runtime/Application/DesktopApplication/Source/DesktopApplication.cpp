@@ -22,6 +22,7 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include "Window.h"
 
 // Json
 #include "nlohmann/json.hpp"
@@ -42,9 +43,16 @@ namespace Ry
 		Ry::input_handler->setButton(Button, bPressed);
 	}
 
-	void DesktopApp::OnKeyPressed(int32 Key, bool bPressed)
+	void DesktopApp::OnKeyPressed(int32 Key, Ry::KeyAction Action)
 	{
-		Ry::input_handler->setKey(Key, bPressed);
+		if(Action == PRESS)
+		{
+			Ry::input_handler->setKey(Key, true);
+		}
+		else if(Action == RELEASE)
+		{
+			Ry::input_handler->setKey(Key, false);
+		}
 	}
 
 	void DesktopApp::OnCharPressed(uint32 Codepoint)
@@ -353,7 +361,7 @@ namespace Ry
 		}
 
 		// Setup window callbacks
-		GameWindow->AddKeyPressDelegate(Ry::Delegate<void, int32, bool>::CreateMemberFunctionDelegate(this, &DesktopApp::OnKeyPressed));
+		GameWindow->AddKeyPressDelegate(Ry::Delegate<void, int32, KeyAction>::CreateMemberFunctionDelegate(this, &DesktopApp::OnKeyPressed));
 		GameWindow->AddMouseButtonDelegate(Ry::Delegate<void, int32, bool>::CreateMemberFunctionDelegate(this, &DesktopApp::OnMouseButtonPressed));
 		GameWindow->AddWindowResizedDelegate(Ry::Delegate<void, int32, int32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnWindowResized));
 		GameWindow->AddKeyCharDelegate(Ry::Delegate<void, uint32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnCharPressed));

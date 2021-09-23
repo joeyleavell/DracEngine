@@ -93,7 +93,7 @@ namespace Ry
 					+
 					HorizontalLayout::MakeSlot()
 					[
-						NewWidgetAssign(CurDirLabel, Label)
+						NewWidgetAssign(CurDirLabel, TextField)
 						.Color(WHITE)
 						.Font(TextFont)
 					]

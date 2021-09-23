@@ -3,6 +3,20 @@
 
 namespace Ry
 {
+	static uint32 IDCounter;
+
+	Widget::Widget() :
+		RelativePosition{ 0, 0 },
+		MaxSize{ -1, -1 },
+		Parent(nullptr),
+		Bat(nullptr),
+		bPressed(false),
+		bHovered(false),
+		bVisible(true),
+		WidgetLayer(0)
+	{
+		this->WidgetID = IDCounter++;
+	};
 
 	bool Widget::OnMouseEvent(const MouseEvent& MouseEv)
 	{
@@ -79,5 +93,13 @@ namespace Ry
 		return false;
 	}
 
-	
+	bool Widget::OnKey(const KeyEvent& KeyEv)
+	{
+		return false;
+	}
+
+	bool Widget::OnChar(const CharEvent& CharEv)
+	{
+		return false;
+	}
 }

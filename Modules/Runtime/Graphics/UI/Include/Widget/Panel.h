@@ -316,6 +316,30 @@ namespace Ry
 			return bHandled;
 		}
 
+		bool OnKey(const KeyEvent& KeyEv) override
+		{
+			bool bHandled = Widget::OnKey(KeyEv);
+
+			for (SharedPtr<Widget> Child : Children)
+			{
+				bHandled |= Child->OnKey(KeyEv);
+			}
+
+			return bHandled;
+		}
+
+		bool OnChar(const CharEvent& CharEv) override
+		{
+			bool bHandled = Widget::OnChar(CharEv);
+
+			for (SharedPtr<Widget> Child : Children)
+			{
+				bHandled |= Child->OnChar(CharEv);
+			}
+
+			return bHandled;
+		}
+
 		virtual void ClearChildren()
 		{
 			for(SharedPtr<Widget> Child : Children)

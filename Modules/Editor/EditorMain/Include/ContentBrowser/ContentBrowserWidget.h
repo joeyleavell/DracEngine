@@ -6,6 +6,7 @@
 #include "Widget/BorderWidget.h"
 #include "Widget/Button.h"
 #include "Widget/ScrollPane.h"
+#include "Widget/TextField.h"
 
 namespace Ry
 {
@@ -34,9 +35,9 @@ namespace Ry
 	{
 	public:
 
-		SharedPtr<Ry::ScrollPane> Pane;
+		Ry::SharedPtr<Ry::ScrollPane> Pane;
 
-		Ry::SharedPtr<Label> CurDirLabel;
+		Ry::SharedPtr<TextField> CurDirLabel;
 		Ry::SharedPtr<Button> UpArrow;
 
 		ContentBrowserWidget();

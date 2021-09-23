@@ -111,7 +111,7 @@ namespace Ry
 
 		// There can not be more delimiters found than the size of the string (unless, of course, we allow empty strings which we're not)
 		// Also, we're allocating the delimiters on the stack for small strings for efficiency
-		uint32* delims = new uint32[(uint64) StringLength + 2];
+		uint32* delims = new uint32[(uint64) StringLength * 2 + 2];
 
 		// Set the first delimited index as the beginning of the string
 		uint32 delim = 0;
@@ -150,7 +150,7 @@ namespace Ry
 			(*Result)[j] = StringSubstring(String, StringLength, this_delim, next_delim);
 		}
 
-		delete[] delims;
+		//delete[] delims;
 
 		return delim / 2;
 	}
@@ -462,6 +462,19 @@ namespace Ry
 		return Result;
 	}
 
+	String operator+(char A, const String& B)
+	{
+		String Res(B.size + 1);
+
+		Res[0] = A;
+		for (uint32 i = 0; i < B.size; i++)
+			Res[i + 1] = B.data[i];
+
+		Res[B.size + 1] = '\0';
+
+		return Res;
+	}
+
 	String& String::operator+=(const String& other)
 	{
 		const_cast<String*>(this)->operator=(*this + other);
@@ -514,6 +527,18 @@ namespace Ry
 			Res[i] = Other[i - size];
 
 		Res[size + OtherSize] = '\0';
+		return Res;
+	}
+
+	String String::operator+(char Other) const
+	{
+		String Res(size + 1);
+		for (uint32 i = 0; i < size; i++)
+			Res[i] = data[i];
+
+		Res[size] = Other;
+		Res[size + 1] = '\0';
+
 		return Res;
 	}
 

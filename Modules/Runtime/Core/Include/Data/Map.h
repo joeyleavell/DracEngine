@@ -1,314 +1,25 @@
 #pragma once
 
 #include "Algorithm/Algorithm.h"
+#include "Data/HashTable.h"
 #include <iostream>
-
-#define TABLE_SIZE 5000
-#define LOAD_FACTOR 0.75
-
-constexpr uint32 Probe_Linear(uint32 Hash, uint32 Probe, uint32 N)
-{
-	return (Hash + Probe) % N;
-}
 
 namespace Ry
 {
 
-	template<typename T>
-	struct OAHashBucket
-	{
-		T Storage;
-		bool bOccupied;
-
-		OAHashBucket()
-		{
-			bOccupied = false;
-		}
-	};
-
-	template<typename T>
-	class OAHashTableIterator
-	{
-	public:
-
-		OAHashTableIterator()
-		{
-			this->IteratingTable = nullptr;
-			this->TableSize = 0;
-			this->CurrentBucket = -1;
-		}
-		
-		OAHashTableIterator(const OAHashTableIterator& Other)
-		{
-			Init(Other.IteratingTable, Other.TableSize);
-		}
-
-		OAHashTableIterator(OAHashTableIterator&& Other) noexcept
-		{
-			Init(Other.IteratingTable, Other.TableSize);
-		}
-
-		OAHashTableIterator(const OAHashBucket<T>* Table, int32 TableSize)
-		{
-			Init(Table, TableSize);
-		}
-
-		void Init(const OAHashBucket<T>* Table, int32 TableSize)
-		{
-			this->IteratingTable = Table;
-			this->TableSize = TableSize;
-			this->CurrentBucket = -1;
-
-			Next();
-		}
-
-		const T& GetCurrent()
-		{
-			return IteratingTable[CurrentBucket].Storage;
-		}
-
-		void Next()
-		{
-			do
-			{
-				CurrentBucket++;
-			} while (CurrentBucket < TableSize && !IteratingTable[CurrentBucket].bOccupied);
-		}
-
-		OAHashTableIterator& operator++()
-		{
-			Next();
-			return *this;
-		}
-
-		operator bool()
-		{
-			return HasNext();
-		}
-
-		bool HasNext() const
-		{
-			return CurrentBucket < TableSize;
-		}
-
-		T& operator*() const
-		{
-			return IteratingTable[CurrentBucket].Storage;
-		}
-
-		OAHashTableIterator<T>& operator=(OAHashTableIterator<T>&& Other) noexcept
-		{
-			Init(Other.IteratingTable, Other.TableSize);
-			return *this;
-		}
-
-		OAHashTableIterator<T>& operator=(const OAHashTableIterator<T>& Other)
-		{
-			Init(Other.IteratingTable, Other.TableSize);
-			return *this;
-		}
-
-		bool operator==(const OAHashTableIterator<T>& Other) const
-		{
-			return IteratingTable == Other.IteratingTable && CurrentBucket == Other.CurrentBucket;
-		}
-
-	private:
-		const OAHashBucket<T>* IteratingTable;
-		int32 CurrentBucket;
-		int32 TableSize;
-	};
-
-	// Open addressing table using a specified probe funciton
-	template<typename T, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize)>
-	class OAHashTable
-	{
-	public:
-
-		OAHashTable(int32 TableSize = TABLE_SIZE)
-		{
-			// Allocate buckets
-			this->Table = nullptr;
-			this->Elements = 0;
-			Rehash(TableSize);
-		}
-
-		OAHashTableIterator<T> CreateTableIterator() const
-		{
-			OAHashTableIterator<T> Res(Table, TableSize);
-			return Res;
-		}
-
-		template<typename K>
-		T& Get(const K& Key)
-		{
-			uint32 HashValue = Ry::Hash(Key);
-			int32 Probe = 0;
-			
-			while (Probe < TableSize)
-			{
-				uint32 BucketIndex = ProbeFunc(HashValue, Probe, TableSize);
-				OAHashBucket<T>& Bucket = Table[BucketIndex];
-
-				if (Bucket.bOccupied && Bucket.Storage == Key)
-				{
-					return Bucket.Storage;
-				}
-
-				Probe++;
-			}
-
-			CORE_ASSERTF(false, "Value not in hash table, undefined behavior");
-		}
-
-		void Insert(const T& Value)
-		{
-			bool bInserted = false;
-			
-			uint32 HashValue = Ry::Hash(Value);
-
-			int32 Probe = 0;
-			while(Probe < TableSize && !bInserted)
-			{
-				uint32 BucketIndex = ProbeFunc(HashValue, Probe, TableSize);
-				OAHashBucket<T>& Bucket = Table[BucketIndex];
-
-				if(!Bucket.bOccupied)
-				{
-					// Insert value into bucket, set bInserted and bOccupied to true
-					Bucket.bOccupied = true;
-					Bucket.Storage = Value;
-					bInserted = true;
-					Elements++;
-
-					// Calc new load factor, rehash if needed
-					float LoadFactor = Elements / (float)TableSize;
-					if(LoadFactor >= LOAD_FACTOR)
-					{
-						Rehash(TableSize * 2);
-					}
-				}
-				
-				Probe++;
-			}
-
-		}
-
-		template<typename K>
-		bool Remove(const K& Value)
-		{
-			uint32 HashValue = Ry::Hash(Value);
-
-			int32 Probe = 0;
-			while (Probe < TableSize)
-			{
-				uint32 BucketIndex = ProbeFunc(HashValue, Probe, TableSize);
-				OAHashBucket<T>& Bucket = Table[BucketIndex];
-
-				if(Bucket.bOccupied && Bucket.Storage == Value)
-				{					
-					Bucket.bOccupied = false;
-
-					if constexpr (std::is_destructible<T>::value)
-					{
-						Bucket.Storage.~T(); // Manually call destructor
-					}
-
-					Elements--;
-					
-					return true;
-				}
-
-				Probe++;
-			}
-
-			return false;
-		}
-
-		template<typename K>
-		bool Contains(const K& Value)
-		{
-			uint32 HashValue = Ry::Hash(Value);
-
-			int32 Probe = 0;
-			while (Probe < TableSize)
-			{
-				uint32 BucketIndex = ProbeFunc(HashValue, Probe, TableSize);
-				OAHashBucket<T>& Bucket = Table[BucketIndex];
-
-				if (Bucket.bOccupied && Bucket.Storage == Value)
-				{
-					return true;
-				}
-
-				Probe++;
-			}
-
-			return false;
-		}
-
-		void Clear()
-		{
-			this->Elements = 0;
-			
-			for (int32 Bucket = 0; Bucket < TableSize; Bucket++)
-			{
-				if (Table[Bucket].bOccupied)
-				{
-					if constexpr (std::is_destructible<T>::value)
-						Table[Bucket].Storage.~T(); // Manually call destructor
-
-					Table[Bucket].bOccupied = false;
-				}
-			}
-		}
-
-	private:
-
-		void Rehash(int32 NewSize)
-		{
-			// Cache old table for rehashing
-			int32 OldSize = TableSize;
-			OAHashBucket<T>* OldTable = Table;
-
-			// Create new table
-			this->Table = new OAHashBucket<T>[NewSize];
-			this->TableSize = NewSize;
-
-			// Rehash all values from old table
-			if(OldTable)
-			{
-				this->Elements = 0;
-				for(int32 Bucket = 0; Bucket < OldSize; Bucket++)
-				{
-					if(OldTable[Bucket].bOccupied)
-					{
-						Insert(OldTable[Bucket].Storage);
-					}
-				}
-
-				// Delete old table
-				delete[] OldTable;
-			}
-		}
-
-		int32 TableSize;
-		OAHashBucket<T>* Table;
-		int32 Elements;
-	};
 
 	template<typename K, typename V>
-	struct OAHashContainer
+	struct OAMapContainer
 	{
 		K Key;
 		V Value;
 
-		OAHashContainer()
+		OAMapContainer()
 		{
 			
 		}
 
-		OAHashContainer(const K& InKey, const V& InValue)
+		OAMapContainer(const K& InKey, const V& InValue)
 		{
 			this->Key = InKey;
 			this->Value = InValue;
@@ -323,13 +34,13 @@ namespace Ry
 
 	// Hash implementation for openly addressed hash containers
 	template <typename K, typename V>
-	uint32 Hash(OAHashContainer<K*, V> Object)
+	uint32 Hash(OAMapContainer<K*, V> Object)
 	{
 		return Hash<K>(Object.Key);
 	}
 
 	template <typename K, typename V>
-	uint32 Hash(OAHashContainer<K, V> Object)
+	uint32 Hash(OAMapContainer<K, V> Object)
 	{
 		return Hash<K>(Object.Key);
 	}
@@ -340,7 +51,7 @@ namespace Ry
 	{
 	public:
 
-		OAPairIterator(OAHashTable<OAHashContainer<K, V>, ProbeFunc>& InTable)
+		OAPairIterator(OAHashTable<OAMapContainer<K, V>, ProbeFunc>& InTable)
 		{
 			this->TableIterator = InTable.CreateTableIterator();
 		}
@@ -351,7 +62,7 @@ namespace Ry
 			return *this;
 		}
 
-		OAHashContainer<K, V> operator*() const
+		OAMapContainer<K, V> operator*() const
 		{
 			return *TableIterator;
 		}
@@ -379,12 +90,12 @@ namespace Ry
 
 	protected:
 
-		OAHashTableIterator<OAHashContainer<K, V>> TableIterator;
+		OAHashTableIterator<OAMapContainer<K, V>> TableIterator;
 
 	};
 	
 	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
-	class OAHashMap
+	class EXPORT_ONLY OAHashMap
 	{
 	public:
 		friend class OAPairIterator<K, V, ProbeFunc>;
@@ -417,12 +128,22 @@ namespace Ry
 
 		void Insert(const K& Key, const V& Value)
 		{
-			Table.Insert(OAHashContainer<K, V>(Key, Value));
+			Table.Insert(OAMapContainer<K, V>(Key, Value));
 		}
 
 		void Clear()
 		{
 			Table.Clear();
+		}
+
+		bool IsEmpty() const
+		{
+			return Table.IsEmpty();
+		}
+
+		int32 GetSize() const
+		{
+			return Table.GetSize();
 		}
 
 		OAPairIterator<K, V, ProbeFunc> CreatePairIterator()
@@ -432,7 +153,7 @@ namespace Ry
 
 	private:
 
-		OAHashTable<OAHashContainer<K, V>, ProbeFunc> Table;
+		OAHashTable<OAMapContainer<K, V>, ProbeFunc> Table;
 		
 	};
 	

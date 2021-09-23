@@ -245,8 +245,9 @@ namespace Ry
 			if(Size > 0)
 			{
 				delete[] Data;
-				this->Size = 0;
+  				this->Size = 0;
 				this->AllocatedSize = 0;
+				this->Data = nullptr;
 
 				// re-alloc
 				//Resize(AllocatedSize);

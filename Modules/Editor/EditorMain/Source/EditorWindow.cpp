@@ -68,7 +68,7 @@ namespace Ry
 		KeyCharDelegate.BindMemberFunction(this, &EditorWindow::OnKeyChar);
 		EdWindow->AddKeyCharDelegate(KeyCharDelegate);
 
-		Ry::Delegate<void, int32, bool> KeyPressDelegate;
+		Ry::Delegate<void, int32, KeyAction> KeyPressDelegate;
 		KeyPressDelegate.BindMemberFunction(this, &EditorWindow::OnKeyPressed);
 		EdWindow->AddKeyPressDelegate(KeyPressDelegate);
 
@@ -98,6 +98,7 @@ namespace Ry
 			EdLayers.OnEvent(Ev);
 		}
 
+		// todo: handle a "click" event as a mouse down and then mouse up event
 		for(int32 Index = 0; Index < MAX_BUTTONS; Index++)
 		{
 			MouseEventInfo& Info = ButtonsInfo[Index];
@@ -181,14 +182,14 @@ namespace Ry
 		FireButtonEvent(Button, CurX, CurY, bPressed);
 	}
 
-	void EditorWindow::OnKeyPressed(int32 Key, bool bPressed)
+	void EditorWindow::OnKeyPressed(int32 Key, KeyAction Action)
 	{
-		
+		FireKeyEvent(Key, Action);
 	}
 
 	void EditorWindow::OnKeyChar(uint32 Codepoint)
 	{
-		
+		FireCharEvent(Codepoint);
 	}
 
 	void EditorWindow::OnScroll(double ScrollX, double ScrollY)
@@ -239,6 +240,25 @@ namespace Ry
 		ButtonEvent.bPressed = bPressed;
 
 		EdLayers.OnEvent(ButtonEvent);
+	}
+
+	void EditorWindow::FireKeyEvent(int32 KeyCode, KeyAction Action)
+	{
+		Ry::KeyEvent Ev;
+		Ev.Type = EVENT_KEY;
+		Ev.Action = Action;
+		Ev.KeyCode = KeyCode;
+
+		EdLayers.OnEvent(Ev);
+	}
+
+	void EditorWindow::FireCharEvent(int32 Codepoint)
+	{
+		CharEvent Ev;
+		Ev.Type = EVENT_CHAR;
+		Ev.Codepoint = Codepoint;
+
+		EdLayers.OnEvent(Ev);
 	}
 
 	void EditorWindow::FireScrollEvent(float ScrollX, float ScrollY)

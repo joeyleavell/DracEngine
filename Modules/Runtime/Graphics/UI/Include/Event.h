@@ -2,15 +2,18 @@
 
 #include "Core/Core.h"
 #include "UIGen.h"
+#include "Input.h"
 
 namespace Ry
 {
-
+	
 	constexpr uint32 EVENT_MOUSE        = 0;
 	constexpr uint32 EVENT_MOUSE_BUTTON = 1;
 	constexpr uint32 EVENT_MOUSE_CLICK  = 2;
 	constexpr uint32 EVENT_MOUSE_DRAG   = 3;
 	constexpr uint32 EVENT_MOUSE_SCROLL = 4;
+	constexpr uint32 EVENT_KEY          = 5;
+	constexpr uint32 EVENT_CHAR         = 6;
 
 	struct UI_MODULE Event
 	{
@@ -52,5 +55,15 @@ namespace Ry
 		float MouseY = 0.0f;
 	};
 
+	struct UI_MODULE KeyEvent : public Event
+	{
+		KeyAction Action;
+		int32 KeyCode;
+	};
+
+	struct UI_MODULE CharEvent : public Event
+	{
+		int32 Codepoint;
+	};
 	
 }

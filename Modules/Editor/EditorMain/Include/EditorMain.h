@@ -320,7 +320,7 @@ namespace Ry
 						//CommandBuffer->BindResources(&ResSet, 1);
 
 						CommandBuffer->BindResources(*ResourceSets.get(Mat->Name), 2);
-						CommandBuffer->DrawVertexArrayIndexed(NewMesh->GetVertexArray(), NewMesh->GetMeshData()->Sections.get(MatIndex)->StartIndex, NewMesh->GetMeshData()->Sections.get(MatIndex)->Count);
+						CommandBuffer->DrawVertexArrayIndexed(NewMesh->GetVertexArray(), NewMesh->GetMeshData()->Sections.Get(MatIndex).StartIndex, NewMesh->GetMeshData()->Sections.Get(MatIndex).Count);
 					}
 				}
 				CommandBuffer->EndRenderPass();

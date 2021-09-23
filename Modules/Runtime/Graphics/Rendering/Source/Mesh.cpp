@@ -113,7 +113,6 @@ namespace Ry
 	
 	void Mesh::Reset()
 	{
-		// TODO: Performance: could probably be better here, do not erase elements but stomp over them instead maintaining the greatest allocated size
 		Data->VertData->Vertices.SoftClear();
 		Data->VertData->Indices.SoftClear();
 
@@ -121,11 +120,11 @@ namespace Ry
 		Data->VertData->IndexCount = 0;
 
 		// Erase mesh section count/start index information.
-		KeyIterator<int32, MeshSection> KeyItr = Data->Sections.CreateKeyIterator();
+		OAPairIterator<int32, MeshSection> KeyItr = Data->Sections.CreatePairIterator();
 		while (KeyItr)
 		{
-			Data->Sections.get(**KeyItr)->Count = 0;
-			Data->Sections.get(**KeyItr)->StartIndex = 0;
+			Data->Sections.Get(KeyItr.GetKey()).Count = 0;
+			Data->Sections.Get(KeyItr.GetKey()).StartIndex = 0;
 
 			++KeyItr;
 		}
@@ -138,7 +137,7 @@ namespace Ry
 
 	MeshSection* Mesh::GetSection(int32 Index)
 	{
-		return Data->Sections.get(Index);
+		return &Data->Sections.Get(Index);
 	}
 
 	VertexArray* Mesh::GetVertexArray()

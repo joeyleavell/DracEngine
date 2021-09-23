@@ -161,7 +161,7 @@ namespace Ry
 		void Draw() override
 		{
 			Point Abs = GetAbsolutePosition();
-			Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X, Abs.Y, Size.Width, Size.Height, 5.0f, 0.0f);
+			Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X + 2.0f, Abs.Y + 2.0f, Size.Width - 4.0f, Size.Height - 4.0f, 2.0f, 0.0f);
 
 			Point HorLoc;
 			Point VertLoc;
@@ -182,6 +182,13 @@ namespace Ry
 		 */
 		virtual void Arrange() override
 		{
+			RectScissor Clip = GetClipSpace();
+			if(!(Clip == LastClip))
+			{
+				UpdatePipelineState();
+			}
+			LastClip = Clip;
+			
 			// Calculate scroll amount
 			SizeType ChildrenSize = ComputeChildrenSize();
 			float HiddenAmountX = ChildrenSize.Width - Size.Width;
@@ -215,7 +222,16 @@ namespace Ry
 
 		}
 
-		virtual RectScissor GetClipSpace() override
+		PipelineState GetPipelineState() const override
+		{
+			PipelineState State;
+			State.Scissor = GetClipSpace();
+			State.StateID = GetWidgetID();
+
+			return State;
+		}
+
+		virtual RectScissor GetClipSpace() const override
 		{			
 			Point Position = GetAbsolutePosition();
 
@@ -226,9 +242,21 @@ namespace Ry
 			Res.Height = Size.Height;
 
 			if (Res.Y < 0)
+			{
+				Res.Height += Res.Y;
 				Res.Y = 0;
+			}
 			if (Res.X < 0)
+			{
+				Res.Width += Res.X;
 				Res.X = 0;
+			}
+
+			if (Res.Width < 0)
+				Res.Width = 0;
+
+			if (Res.Height < 0)
+				Res.Height = 0;
 
 			return Res;
 		}
@@ -239,14 +267,14 @@ namespace Ry
 
 			if(Bat)
 			{
-				RectScissor Scissor;
-				Bat->AddItem(DebugRect, "Shape", Scissor);
+				Bat->AddItem(DebugRect, "Shape", GetPipelineState());
 			}
 
 			// Push scroll bar to last layer
+			// todo: come up with better way than this
 			RectScissor Scissor;
-			HorizontalScrollBar->Show(-1, Scissor);
-			VerticalScrollBar->Show(-1, Scissor);
+			HorizontalScrollBar->Show(-1, GetPipelineState());
+			VerticalScrollBar->Show(-1, GetPipelineState());
 		}
 
 		virtual void OnHide() override
@@ -483,6 +511,8 @@ namespace Ry
 		Point RelativeScrollBarPressed;
 
 		bool bAllowHorizontalScroll;
+
+		RectScissor LastClip;
 	};
 
 }

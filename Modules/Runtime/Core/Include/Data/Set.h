@@ -2,11 +2,128 @@
 
 #include "Algorithm/Algorithm.h"
 #include <iostream>
-
-#define TABLE_SIZE 5000
+#include "HashTable.h"
 
 namespace Ry
 {
+
+	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	class OASetIterator
+	{
+	public:
+		
+		OASetIterator()
+		{
+		}
+
+		OASetIterator(OAHashTable<V, ProbeFunc>& InTable)
+		{
+			this->TableIterator = InTable.begin();
+		}
+
+		OASetIterator<V, ProbeFunc>& operator++()
+		{
+			++TableIterator;
+			return *this;
+		}
+
+		const V& operator*() const
+		{
+			return *TableIterator;
+		}
+
+		const V& GetValue()
+		{
+			return TableIterator.GetCurrent();
+		}
+
+		operator bool() const
+		{
+			return TableIterator.HasNext();
+		}
+
+		bool operator==(const OASetIterator<V, ProbeFunc>& Other) const
+		{
+			return TableIterator == Other.TableIterator;
+		}
+
+	protected:
+
+		OAHashTableIterator<V> TableIterator;
+
+	};
+
+	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	class OASet
+	{
+	public:
+		friend class OASetIterator<V, ProbeFunc>;
+
+		OASet(int32 TableSize = TABLE_SIZE) :
+			Table(TableSize)
+		{
+
+		}
+
+		~OASet()
+		{
+
+		}
+
+		bool Contains(const V& Value)
+		{
+			return Table.Contains(Value);
+		}
+
+		bool Remove(const V& Value)
+		{
+			return Table.Remove(Value);
+		}
+
+		void Insert(const V& Value)
+		{
+			if (Contains(Value))
+				return;
+			
+			Table.Insert(Value);
+		}
+
+		void Clear()
+		{
+			Table.Clear();
+		}
+
+		bool IsEmpty() const
+		{
+			return Table.IsEmpty();
+		}
+
+		int32 GetSize() const
+		{
+			return Table.GetSize();
+		}
+
+		OASetIterator<V, ProbeFunc> CreatePairIterator()
+		{
+			return OASetIterator<V, ProbeFunc>(Table);
+		}
+
+		OASetIterator<V> begin()
+		{
+			return OASetIterator<V>(Table);
+		}
+
+		OASetIterator<V> end()
+		{
+			return OASetIterator<V>();
+		}
+
+	private:
+
+		OAHashTable<V, ProbeFunc> Table;
+
+	};
+	
 	template <class K>
 	struct EXPORT_ONLY SetChain
 	{

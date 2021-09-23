@@ -347,6 +347,26 @@ namespace Ry
 			return false;
 		}
 
+		bool OnChar(const CharEvent& CharEv) override
+		{
+			if (Child)
+			{
+				return Child->OnChar(CharEv);
+			}
+
+			return false;
+		}
+
+		bool OnKey(const KeyEvent& KeyEv) override
+		{
+			if (Child)
+			{
+				return Child->OnKey(KeyEv);
+			}
+
+			return false;
+		}
+
 		Widget& operator[](SharedPtr<Ry::Widget> Child) override
 		{
 			SetChild(Child);

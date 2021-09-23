@@ -10,6 +10,11 @@
 namespace Ry
 {
 
+	enum KeyAction
+	{
+		PRESS, RELEASE, REPEAT
+	};
+
 	struct GLFWwindow;
 
 	/**

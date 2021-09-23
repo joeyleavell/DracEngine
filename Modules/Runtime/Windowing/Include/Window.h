@@ -12,6 +12,9 @@ struct GLFWmonitor;
 
 namespace Ry
 {
+	
+	enum KeyAction;
+	
 	class CommandBuffer;
 	class SwapChain;
 	class Context;
@@ -58,7 +61,7 @@ namespace Ry
 		void Update();
 
 		void AddWindowResizedDelegate(const Ry::Delegate<void, int32, int32>& Delegate);
-		void AddKeyPressDelegate(const Ry::Delegate<void, int32, bool>& Delegate);
+		void AddKeyPressDelegate(const Ry::Delegate<void, int32, KeyAction>& Delegate);
 		void AddKeyCharDelegate(const Ry::Delegate<void, uint32>& Delegate);
 		void AddMouseButtonDelegate(const Ry::Delegate<void, int32, bool>& Delegate);
 		void AddScrollDelegate(const Ry::Delegate<void, double, double>& Delegate);
@@ -72,7 +75,7 @@ namespace Ry
 
 		Ry::ArrayList<Ry::Delegate<void, int32, int32>> ErrorCallbacks;
 		Ry::ArrayList<Ry::Delegate<void, int32, int32>> WindowResizedDelegates;
-		Ry::ArrayList<Ry::Delegate<void, int32, bool>> KeyCallbacks;
+		Ry::ArrayList<Ry::Delegate<void, int32, KeyAction>> KeyCallbacks;
 		Ry::ArrayList<Ry::Delegate<void, int32, bool>> MouseButtonCallbacks;
 		Ry::ArrayList<Ry::Delegate<void, double, double>> ScrollCallbacks;
 		Ry::ArrayList<Ry::Delegate<void, uint32>> CharacterCallbacks;

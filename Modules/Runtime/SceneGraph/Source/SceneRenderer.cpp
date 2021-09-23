@@ -66,7 +66,7 @@ namespace Ry
 			MeshData* Data = SMPrimitive->GetMesh()->GetMeshData();
 			for (int32 MeshSection = 0; MeshSection < Data->SectionCount; MeshSection++)
 			{
-				Ry::MeshSection& Sec = *Data->Sections.get(MeshSection);
+				Ry::MeshSection& Sec = Data->Sections.Get(MeshSection);
 
 				MaterialResources* SectionResources = new MaterialResources;
 				SectionResources->StartIndex = Sec.StartIndex;

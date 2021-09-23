@@ -170,6 +170,7 @@ namespace Ry
 	
 	float BitmapFont::MeasureWidth(const Ry::String& String)
 	{
+		// todo: get rid of need to cache width/height - make this function faster
 		if (MeasuredWidth.Contains(String))
 			return MeasuredWidth.Get(String);
 		
@@ -243,6 +244,46 @@ namespace Ry
 		MeasuredWidth.Insert(String, MaxLineWidth);
 
 		return (float) MaxLineWidth;
+	}
+
+	void BitmapFont::MeasureXOffsets(Ry::ArrayList<float>& OutOffsets, const Ry::String& String)
+	{
+		const int32 TAB_SPACES = 4;
+		const int32 SPACE_ADVANCE = GetGlyph(' ')->AdvanceWidth;
+
+		int32 CursorPosition = 0;
+
+		for (uint32 Char = 0; Char < String.getSize(); Char++)
+		{
+			int32 Codepoint = static_cast<int32>(String[Char]);
+			BitmapGlyph* Glyph = GetGlyph(Codepoint);
+
+			OutOffsets.Add(CursorPosition);
+
+			if (!Glyph)
+			{
+				// Add spacing for tabs
+				if (Codepoint == '\t')
+					CursorPosition += TAB_SPACES * SPACE_ADVANCE;
+			}
+			else
+			{
+				// Move pen to next character
+				CursorPosition += Glyph->AdvanceWidth;
+
+				// Apply kerning specific to the next character
+				if (Char < String.getSize() - 1)
+				{
+					int32 NextCodepoint = static_cast<int32>(String[Char + 1]);
+
+					if (Glyph->KerningTable.contains(NextCodepoint))
+					{
+						CursorPosition += *Glyph->KerningTable.get(NextCodepoint);
+					}
+				}
+			}
+		}
+
 	}
 
 	void BitmapFont::SetAscent(int32 Ascent)

@@ -165,7 +165,7 @@ namespace Ry
 		/**
 		 * A map of section IDs to their respective section.
 		 */
-		Map<int32, MeshSection> Sections;
+		OAHashMap<int32, MeshSection> Sections{5};
 
 		MeshVertexData* VertData;
 
@@ -261,7 +261,7 @@ namespace Ry
 			VertData->Indices.Add(Index);
 
 			VertData->IndexCount++;
-			Sections.get(SectionCount - 1)->Count++;
+			Sections.Get(SectionCount - 1).Count++;
 		}
 
 		void AddIndexData(std::initializer_list<uint32> Input)
@@ -272,7 +272,7 @@ namespace Ry
 			}
 
 			VertData->IndexCount += Input.size();
-			Sections.get(SectionCount - 1)->Count += Input.size();
+			Sections.Get(SectionCount - 1).Count += Input.size();
 		}
 
 		void AddIndexRaw(uint32* Buffer, uint32 Count, uint32 BaseIndex)
@@ -283,7 +283,7 @@ namespace Ry
 			}
 
 			VertData->IndexCount += Count;
-			Sections.get(SectionCount - 1)->Count += Count;
+			Sections.Get(SectionCount - 1).Count += Count;
 		}
 
 		/**
@@ -297,7 +297,7 @@ namespace Ry
 			VertData->Indices.Add(Second);
 
 			VertData->IndexCount += 2;
-			Sections.get(SectionCount - 1)->Count += 2;
+			Sections.Get(SectionCount - 1).Count += 2;
 		}
 
 		/**
@@ -313,17 +313,17 @@ namespace Ry
 			VertData->Indices.Add(Third);
 
 			VertData->IndexCount += 3;
-			Sections.get(SectionCount - 1)->Count += 3;
+			Sections.Get(SectionCount - 1).Count += 3;
 		}
 
 		Material* GetMaterial(int32 Slot)
 		{
-			return Sections.get(Slot)->Mat;
+			return Sections.Get(Slot).Mat;
 		}
 
 		void SetMaterial(int32 Slot, Material* Material)
 		{
-			Sections.get(Slot)->Mat = Material;
+			Sections.Get(Slot).Mat = Material;
 		}
 
 		int32 GetCurrentSectionIndex() const
@@ -335,10 +335,10 @@ namespace Ry
 		{
 			MeshSection Section;
 			Section.SectionId = SectionCount;
-			Section.StartIndex = SectionCount > 0 ? Sections.get(SectionCount - 1)->StartIndex + Sections.get(SectionCount - 1)->Count : 0;
+			Section.StartIndex = SectionCount > 0 ? Sections.Get(SectionCount - 1).StartIndex + Sections.Get(SectionCount - 1).Count : 0;
 			Section.Count = 0;
 
-			Sections.insert(SectionCount, Section);
+			Sections.Insert(SectionCount, Section);
 			SectionCount++;
 		}
 

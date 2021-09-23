@@ -5,6 +5,7 @@
 #include "UIGen.h"
 #include "Event.h"
 #include "Interface/Pipeline.h"
+#include "2D/Batch/Batch.h"
 
 #define WidgetBeginArgsSlot(ClassName) \
 public: \
@@ -218,18 +219,7 @@ namespace Ry
 		 */
 		MulticastDelegate<> RenderStateDirty;
 
-		Widget() :
-		RelativePosition{ 0, 0 },
-		MaxSize{-1, -1},
-		Parent(nullptr),
-		Bat(nullptr),
-		bPressed(false),
-		bHovered(false),
-		bVisible(true),
-		WidgetLayer(0)
-		{
-			
-		};
+		Widget();
 		
 		virtual ~Widget() = default;
 
@@ -309,7 +299,25 @@ namespace Ry
 			}
 		}
 
-		virtual RectScissor GetClipSpace()
+		virtual PipelineState GetPipelineState() const
+		{
+			if (Parent)
+			{
+				// Return clip space of parent
+				return Parent->GetPipelineState();
+			}
+			else
+			{
+				// By default widgets never clip
+				PipelineState State;
+				State.Scissor = GetClipSpace();
+				State.StateID = WidgetID;
+
+				return State;
+			}
+		}
+
+		virtual RectScissor GetClipSpace() const
 		{
 			if(Parent)
 			{
@@ -369,6 +377,8 @@ namespace Ry
 		virtual bool OnMouseClicked(const MouseClickEvent& MouseEv);
 		virtual bool OnMouseDragged(const MouseDragEvent& MouseEv);
 		virtual bool OnMouseScroll(const MouseScrollEvent& MouseEv);
+		virtual bool OnKey(const KeyEvent& KeyEv);
+		virtual bool OnChar(const CharEvent& CharEv);
 
 		virtual bool OnEvent(const Event& Ev)
 		{
@@ -398,6 +408,16 @@ namespace Ry
 			{
 				const MouseScrollEvent& MouseScroll = static_cast<const MouseScrollEvent&>(Ev);
 				return OnMouseScroll(MouseScroll);
+			}
+			else if (Ev.Type == EVENT_KEY)
+			{
+				const KeyEvent& Key = static_cast<const KeyEvent&>(Ev);
+				return OnKey(Key);
+			}
+			else if (Ev.Type == EVENT_CHAR)
+			{
+				const CharEvent& Char = static_cast<const CharEvent&>(Ev);
+				return OnChar(Char);
 			}
 
 			return false;
@@ -436,6 +456,14 @@ namespace Ry
 
 	protected:
 
+		void UpdatePipelineState()
+		{
+			if(Bat)
+			{
+				Bat->UpdatePipelineState(GetPipelineState());
+			}
+		}
+
 		/*bool IsParentHidden()
 		{
 			Widget* CurParent = Parent;
@@ -456,6 +484,15 @@ namespace Ry
 		bool bHovered;
 		bool bPressed;
 		bool bVisible;
+
+		int32 GetWidgetID() const
+		{
+			return WidgetID;
+		}
+
+	private:
+
+		uint32 WidgetID;
 
 	};
 

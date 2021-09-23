@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Widget/Widget.h"
-#include "RenderingEngine.h"
-#include "RenderingPass.h"
 #include "Font.h"
 #include "Color.h"
+#include "Widget/HorizontalPanel.h"
 #include "Style.h"
-#include "UIGen.h"
+#include "Keys.h"
 
 namespace Ry
 {
-	class UI_MODULE Label : public Widget
+
+	class UI_MODULE TextField : public Widget
 	{
 	public:
 
-		WidgetBeginArgs(Label)
+		WidgetBeginArgs(TextField)
 			WidgetProp(Ry::String, Text)
 			WidgetProp(BitmapFont*, Font)
 			WidgetProp(Ry::Color, Color)
@@ -28,15 +28,16 @@ namespace Ry
 			this->bTextSizeDirty = true;
 		}
 
-		Label():
-		Widget()
+		TextField() :
+			Widget()
 		{
 			ItemSet = MakeItemSet();
+			CursorItem = MakeItemSet();
 		}
 
 		SizeType ComputeSize() const override
 		{
-			if(bTextSizeDirty)
+			if (bTextSizeDirty)
 			{
 				CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
 				CachedSize.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
@@ -46,20 +47,24 @@ namespace Ry
 			return CachedSize;
 		}
 
-		Label& SetText(const Ry::String& Text)
+		TextField& SetText(const Ry::String& Text)
 		{
 			this->Text = Text;
 			bTextSizeDirty = true;
 
+			if(CursorPos >= Text.getSize())
+			{
+				CursorPos = Text.getSize() - 1;
+			}
+
 			// Pre compute text data
 			ComputeTextData();
+			MarkDirty();
 
-			RenderStateDirty.Broadcast();
-			
 			return *this;
 		}
 
-		Label& SetStyle(BitmapFont* Font, const Color& Color)
+		TextField& SetStyle(BitmapFont* Font, const Color& Color)
 		{
 			Style.SetFont(Font).SetColor(Color);
 			bTextSizeDirty = true;
@@ -67,11 +72,11 @@ namespace Ry
 			return *this;
 		}
 
-		Label& SetFont(BitmapFont* Font)
+		TextField& SetFont(BitmapFont* Font)
 		{
 			Style.SetFont(Font);
 			bTextSizeDirty = true;
-			
+
 			RenderStateDirty.Broadcast();
 			return *this;
 		}
@@ -83,7 +88,7 @@ namespace Ry
 
 		void OnShow() override
 		{
-			if(Bat)
+			if (Bat)
 			{
 				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
 			}
@@ -91,7 +96,7 @@ namespace Ry
 
 		void OnHide() override
 		{
- 			if(Bat)
+			if (Bat)
 			{
 				Bat->RemoveItemSet(ItemSet);
 			}
@@ -99,13 +104,79 @@ namespace Ry
 
 		void Draw() override
 		{
-			if(IsVisible())
+			if (IsVisible())
 			{
 				Point Abs = GetAbsolutePosition();
 				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
 			}
+		}
 
-			//TextBatch->SetTexture(Style.Font->GetAtlasTexture());
+		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override
+		{
+			if(MouseEv.ButtonID == 0 && MouseEv.bPressed && IsHovered())
+			{
+				// Calc offsets
+				Ry::ArrayList<float> XOffsets;
+				Style.Font->MeasureXOffsets(XOffsets, Text);
+
+				// Find closest offset
+				Point Abs = GetAbsolutePosition();
+				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+
+				// Find closest offset
+				int32 SmallestDiff = INT32_MAX;
+				int32 Index = 0;
+				while(Index < XOffsets.GetSize() - 1)
+				{
+					int32 Delta = std::abs(MouseXOffset - XOffsets[Index]);
+					if(Delta < SmallestDiff)
+					{
+						SmallestDiff = Delta;
+						CursorPos = Index;
+					}
+
+					Index++;
+				}
+
+				std::cout << "set cursor to " << CursorPos << std::endl;
+			}
+
+			return true;
+		}
+
+		bool OnKey(const KeyEvent& KeyEv) override
+		{
+			if(KeyEv.Action == Ry::KeyAction::PRESS || KeyEv.Action == Ry::KeyAction::REPEAT)
+			{
+				if(KeyEv.KeyCode == KEY_BACKSPACE)
+				{
+					// Modify the text
+					if(CursorPos > 0)
+					{
+						Ry::String Prev = Text.substring(0, CursorPos - 1);
+						Ry::String Post = Text.substring(CursorPos);
+
+						SetText(Prev + Post);
+
+						CursorPos--;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		bool OnChar(const CharEvent& CharEv) override
+		{
+			// Modify the text
+			Ry::String Prev = Text.substring(0, CursorPos);
+			Ry::String Post = Text.substring(CursorPos);
+
+			SetText(Prev + static_cast<char>(CharEv.Codepoint) + Post);
+
+			CursorPos++;
+
+			return true;
 		}
 
 	private:
@@ -113,7 +184,7 @@ namespace Ry
 		void ComputeTextData()
 		{
 			ComputedTextData.Lines.Clear();
-			
+
 			Ry::StringView* Lines = nullptr;
 			int32 LineCount = Text.split("\n", &Lines);
 			for (int32 Line = 0; Line < LineCount; Line++)
@@ -135,13 +206,18 @@ namespace Ry
 			delete[] Lines;
 		}
 
+		bool bShowCursor;
+		int32 CursorPos;
+
 		mutable SizeType CachedSize;
 		mutable bool bTextSizeDirty;
 		PrecomputedTextData ComputedTextData;
-		
 		String Text;
-		
+
 		TextStyle Style;
 		Ry::SharedPtr<BatchItemSet> ItemSet;
+
+		Ry::SharedPtr<BatchItemSet> CursorItem;
 	};
+	
 }

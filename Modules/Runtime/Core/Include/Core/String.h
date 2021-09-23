@@ -252,6 +252,8 @@ namespace Ry
 		 * Standard string concatenation with a c string.
 		 */
 		String operator+(const char* other) const;
+
+		String operator+(char Other) const;
 		
 		/**
 		 * 
@@ -299,6 +301,7 @@ namespace Ry
 		CORE_MODULE friend String operator+(const char* a, const String& b);
 		CORE_MODULE friend String operator+(const StringView& View, const String& b);
 		CORE_MODULE friend String operator+(const String& String, const StringView& View);
+		CORE_MODULE friend String operator+(char A, const String& B);
 
 		/**
 		 * Retrieves the character at the specified index. Undefined results if index is out of bounds.

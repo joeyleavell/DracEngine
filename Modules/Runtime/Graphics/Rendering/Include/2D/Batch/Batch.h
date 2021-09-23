@@ -202,17 +202,29 @@ namespace Ry
 	RENDERING_MODULE void BatchTexture(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, float X, float Y, float U, float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth);
 	RENDERING_MODULE void BatchText(Ry::SharedPtr<BatchItemSet> Item, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth);
 
+	struct RENDERING_MODULE PipelineState
+	{
+		// Used for referencing this specific state ID in the future.
+		int32 StateID = 0;
+		RectScissor Scissor;
+
+		bool operator==(const PipelineState& Other) const
+		{
+			return StateID == Other.StateID;
+		}
+	};
+
 	struct RENDERING_MODULE BatchGroup
 	{
 		BatchPipeline* OwningPipeline;
 
-		RectScissor Scissor;
+		PipelineState State;
 		Texture* Text = nullptr;
 		Mesh* BatchMesh = nullptr;
 		Ry::ArrayList<ResourceSet*> ResourceSets;
 		
-		Ry::Set<Ry::SharedPtr<BatchItem>> Items;
-		Ry::Set<Ry::SharedPtr<BatchItemSet>> ItemSets;
+		Ry::OASet<Ry::SharedPtr<BatchItem>> Items;
+		Ry::OASet<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
 		// Batch group specific resources
 		ResourceSet* TextureResources;
@@ -269,8 +281,8 @@ namespace Ry
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
 
-		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = -1);
-		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, RectScissor Scissor, Texture* Texture = nullptr, int32 Layer = -1);
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Texture = nullptr, int32 Layer = -1);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State, Texture* Texture = nullptr, int32 Layer = -1);
 		
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
@@ -283,6 +295,8 @@ namespace Ry
 		void Camera(const Camera* Cam);
 		void Update();
 		bool Render();
+
+		void UpdatePipelineState(const PipelineState& State);
 
 		int32 GetLayerCount() const;
 
@@ -298,8 +312,8 @@ namespace Ry
 		void CreateLayersIfNeeded(int32 Index);
 
 		// Finds a batch group for given state information
-		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer);
-		BatchGroup* FindBatchGroup(Texture* Text, RectScissor Scissor, int32 Layer);
+		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer);
+		BatchGroup* FindBatchGroup(Texture* Text, PipelineState State, int32 Layer);
 
 		void RecordCommands(int32 Layer);
 

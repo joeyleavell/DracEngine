@@ -371,6 +371,13 @@ namespace Ry
 			CurY += Font->GetAscent() - Font->GetDescent() + Font->GetLineGap();
 			CurX = XPosition;
 		}
+
+		// Remove extraneous glyphs
+		for(int32 RemoveIndex = GlyphIndex; RemoveIndex < ItemSet->Items.GetSize(); RemoveIndex++)
+		{
+			ItemSet->Items.RemoveAt(RemoveIndex);
+		}
+		
 	}
 	
 	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass)
@@ -417,12 +424,12 @@ namespace Ry
 		Pipelines.insert(Name, NewPipeline);
 	}
 
-	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
 	{
 		if (Layer < 0)
 			Layer = Layers.GetSize() + 1;
 
-		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
+		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Text, Layer);
 
 		if(Group)
 		{
@@ -433,7 +440,7 @@ namespace Ry
 
 	}
 
-	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, PipelineState Scissor, Texture* Text, int32 Layer)
 	{
 		if (Layer < 0)
 			Layer = Layers.GetSize() + 1;
@@ -537,6 +544,8 @@ namespace Ry
 			BatchMesh->GetMeshData()->AddIndexRaw(Item->Indices.GetData(), (int32)Item->Indices.GetSize(), BaseIndex);
 		};
 
+		int32 Items = 0;
+
 		// Reset/create meshes
 		for (BatchLayer* Layer : Layers)
 		{
@@ -550,10 +559,14 @@ namespace Ry
 						Group->BatchMesh->Reset();
 					}
 
+					Items += Group->Items.GetSize();
+
 					// Rebuild the mesh
-					for (SharedPtr<BatchItem> Item : Group->Items)
+					OASetIterator<SharedPtr<BatchItem>> ItemItr = Group->Items.CreatePairIterator();
+					while(ItemItr)
 					{
-						AddItem(Item, Group->BatchMesh);
+						AddItem(*ItemItr, Group->BatchMesh);
+						++ItemItr;
 					}
 
 					for (SharedPtr<BatchItemSet> ItemSet : Group->ItemSets)
@@ -578,7 +591,7 @@ namespace Ry
 				++PipelineItr;
 			}
 		}
-
+		
 	}
 
 	bool Batch::Render()
@@ -639,6 +652,26 @@ namespace Ry
 		return bReturn;
 	}
 
+	void Batch::UpdatePipelineState(const PipelineState& State)
+	{
+		for (BatchLayer* Layer : Layers)
+		{
+			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
+			while (PipelineItr)
+			{
+				for (BatchGroup* Group : PipelineItr.GetValue())
+				{
+					if (Group->State == State)
+					{
+ 						Group->State = State;
+					}
+				}
+				++PipelineItr;
+			}
+			Layer->bNeedsRecord = true;
+		}
+	}
+
 	int32 Batch::GetLayerCount() const
 	{
 		return Layers.GetSize();
@@ -664,9 +697,9 @@ namespace Ry
 		return nullptr;
 	}
 
-	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, RectScissor Scissor, Texture* Text, int32 Layer)
+	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
 	{
-		BatchGroup* Existing = FindBatchGroup(Text, Scissor, Layer);
+		BatchGroup* Existing = FindBatchGroup(Text, State, Layer);
 
 		if(!Existing)
 		{
@@ -679,7 +712,7 @@ namespace Ry
 
 			NewGroup->OwningPipeline = (*Pipelines.get(PipelineId));
 			NewGroup->Text = Text;			
-			NewGroup->Scissor = Scissor;
+			NewGroup->State = State;
 			NewGroup->ResourceSets.Add(NewGroup->OwningPipeline->SceneResources);
 
 			// Create a new texture resource if needed
@@ -718,7 +751,7 @@ namespace Ry
 
 	}
 
-	BatchGroup* Batch::FindBatchGroup(Texture* Text, RectScissor Scissor, int32 Layer)
+	BatchGroup* Batch::FindBatchGroup(Texture* Text, PipelineState State, int32 Layer)
 	{
 		if (Layer >= Layers.GetSize())
 			return nullptr;
@@ -729,7 +762,7 @@ namespace Ry
 		{
 			for (BatchGroup* Group : PipelineItr.GetValue())
 			{
-				if (Group->Text == Text && Group->Scissor == Scissor)
+				if (Group->Text == Text && Group->State == State)
 				{
 					return Group;
 				}
@@ -824,24 +857,25 @@ namespace Ry
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
-					if(Group->Scissor.IsEnabled())
+					RectScissor Scissor = Group->State.Scissor;
+					if(Scissor.IsEnabled())
 					{
 						// Do conversion
-						int32 ConvertedY = Swap->GetSwapChainHeight() - (Group->Scissor.Y + Group->Scissor.Height);
-						AtLayer->CommandBuffer->SetScissorSize(Group->Scissor.X, ConvertedY, Group->Scissor.Width, Group->Scissor.Height);
+						int32 ConvertedY = Swap->GetSwapChainHeight() - (Scissor.Y + Scissor.Height);
+						AtLayer->CommandBuffer->SetScissorSize(Scissor.X, ConvertedY, Scissor.Width, Scissor.Height);
 					}
 					else
 					{
 						AtLayer->CommandBuffer->SetScissorSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
 					}
 
-					if (Group->Items.GetSize() > 0 || Group->ItemSets.GetSize() > 0)
+					if (!Group->Items.IsEmpty() || !Group->ItemSets.IsEmpty())
 					{
 						// Bind resources
 						AtLayer->CommandBuffer->BindResources(Group->ResourceSets.GetData(), Group->ResourceSets.GetSize());
 
 						// Draw the mesh
-						MeshSection& Section = *Group->BatchMesh->GetMeshData()->Sections.get(0);
+						MeshSection& Section = Group->BatchMesh->GetMeshData()->Sections.Get(0);
 						AtLayer->CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
 
 					}
@@ -998,7 +1032,7 @@ namespace Ry
 				CommandBuffer->BindResources(Resources, 2);
 
 				// Draw the mesh
-				CommandBuffer->DrawVertexArrayIndexed(FontMesh->GetVertexArray(), FontMesh->GetMeshData()->Sections.get(0)->StartIndex, FontMesh->GetMeshData()->Sections.get(0)->Count);
+				CommandBuffer->DrawVertexArrayIndexed(FontMesh->GetVertexArray(), FontMesh->GetMeshData()->Sections.Get(0).StartIndex, FontMesh->GetMeshData()->Sections.Get(0).Count);
 
 			}
 			//CommandBuffer->EndRenderPass();

@@ -120,6 +120,10 @@ namespace Ry
 					delete Counter;
 				}
 			}
+
+			// These two statements are VERY important for placement new construction
+			Value = nullptr;
+			Counter = nullptr;
 		}
 
 		/**
@@ -205,9 +209,6 @@ namespace Ry
 
 		SharedPtr<Class>& operator=(const SharedPtr<Class>& Other)
 		{
-			if (*this == Other)
-				return *this;
-
 			Copy(Other);
 			
 			return *this;

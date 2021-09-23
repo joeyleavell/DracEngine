@@ -8,6 +8,7 @@
 #include "VulkanContext.h"
 #include "VulkanSwapChain.h"
 #include "SwapChain.h"
+#include "Input.h"
 
 namespace Ry
 {
@@ -238,7 +239,7 @@ namespace Ry
 		WindowResizedDelegates.Add(Delegate);
 	}
 
-	void Window::AddKeyPressDelegate(const Ry::Delegate<void, int32, bool>& Delegate)
+	void Window::AddKeyPressDelegate(const Ry::Delegate<void, int32, KeyAction>& Delegate)
 	{
 		KeyCallbacks.Add(Delegate);
 	}
@@ -278,16 +279,21 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
-			for (const Delegate<void, int32, bool>& Callback : AssociatedWindow->KeyCallbacks)
+			for (const Delegate<void, int32, KeyAction>& Callback : AssociatedWindow->KeyCallbacks)
 			{
 				if (Action == GLFW_PRESS)
 				{
-					Callback.Execute(Key, true);
+					Callback.Execute(Key, KeyAction::PRESS);
 				}
 				else if (Action == GLFW_RELEASE)
 				{
-					Callback.Execute(Key, false);
+					Callback.Execute(Key, Ry::KeyAction::RELEASE);
 				}
+				else if(Action == GLFW_REPEAT)
+				{
+					Callback.Execute(Key, KeyAction::REPEAT);
+				}
+
 			}
 		}
 	}
