@@ -128,6 +128,10 @@ namespace Ry
 
 		void Insert(const K& Key, const V& Value)
 		{
+			// todo: make this fast
+			if (Table.Contains(Key))
+				return;
+			
 			Table.Insert(OAMapContainer<K, V>(Key, Value));
 		}
 

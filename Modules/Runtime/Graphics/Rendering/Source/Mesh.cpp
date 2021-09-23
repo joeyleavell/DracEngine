@@ -42,14 +42,16 @@ namespace Ry
 	
 	void Mesh::Update()
 	{
+		VertArray->PushVertexData(Data->GetVertData(), Data->GetVertexCount());
+		VertArray->PushIndexData(Data->GetIndexData(), Data->GetIndexCount());
+
+		// todo: how to handle resetting a mesh to empty
 		if(Data->VertData->VertexCount > 0)
 		{
-			VertArray->PushVertexData(Data->GetVertData(), Data->GetVertexCount());
 		}
 
 		if (Data->VertData->IndexCount > 0)
 		{
-			VertArray->PushIndexData(Data->GetIndexData(), Data->GetIndexCount());
 		}
 	}
 	

@@ -253,7 +253,7 @@ namespace Ry
 
 		int32 CursorPosition = 0;
 
-		for (uint32 Char = 0; Char < String.getSize(); Char++)
+		for (uint32 Char = 0; Char <= String.getSize(); Char++)
 		{
 			int32 Codepoint = static_cast<int32>(String[Char]);
 			BitmapGlyph* Glyph = GetGlyph(Codepoint);

@@ -17,10 +17,14 @@ namespace Ry
 	{
 		T Storage;
 		bool bOccupied;
+		bool bDeleted;
 
 		OAHashBucket()
 		{
 			bOccupied = false;
+
+			// Keep track of last element stored in this bucket
+			bDeleted = false;
 		}
 	};
 
@@ -235,6 +239,7 @@ namespace Ry
 				if (Bucket.bOccupied && Bucket.Storage == Value)
 				{
 					Bucket.bOccupied = false;
+					Bucket.bDeleted = true;
 
 					if constexpr (std::is_destructible<T>::value)
 					{
@@ -262,6 +267,9 @@ namespace Ry
 			{
 				uint32 BucketIndex = ProbeFunc(HashValue, Probe, TableSize);
 				OAHashBucket<T>& Bucket = Table[BucketIndex];
+
+				if (!Bucket.bOccupied && !Bucket.bDeleted)
+					return false;
 
 				if (Bucket.bOccupied && Bucket.Storage == Value)
 				{

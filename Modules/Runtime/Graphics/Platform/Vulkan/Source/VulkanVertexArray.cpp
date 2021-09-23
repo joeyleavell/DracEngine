@@ -41,13 +41,8 @@ namespace Ry
 		
 		this->VertCount = Vertices;
 
-		if(StagingVertexBuffer && DeviceVertexBuffer)
-		{
-			if(Vertices == 0)
-			{
-				std::cout << "verts: " << Vertices << " elements: " << Format.GetElementCount() << std::endl;
-			}
-			
+		if(StagingVertexBuffer && DeviceVertexBuffer && VertCount > 0)
+		{			
 			// Map the memory to the staging buffer
 			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.GetElementCount());
 
@@ -77,7 +72,7 @@ namespace Ry
 
 		this->IndexCount = Count;
 
-		if (StagingIndexBuffer)
+		if (StagingIndexBuffer && IndexCount > 0)
 		{
 			// Map the memory to the staging buffer
 			StagingIndexBuffer->UploadData(Indices, Count);
@@ -133,7 +128,7 @@ namespace Ry
 
 			VkBufferMemoryBarrier MemoryBarrier{};
 			MemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			MemoryBarrier.size = CopySize;
+			MemoryBarrier.size = CopySize == 0 ? VK_WHOLE_SIZE : CopySize;
 			MemoryBarrier.buffer = Device;
 			MemoryBarrier.srcAccessMask = bIndexOrVertex ? VK_ACCESS_INDEX_READ_BIT : VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
 			MemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;

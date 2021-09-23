@@ -52,9 +52,9 @@ namespace Ry
 			this->Text = Text;
 			bTextSizeDirty = true;
 
-			if(CursorPos >= Text.getSize())
+			if(CursorPos > Text.getSize())
 			{
-				CursorPos = Text.getSize() - 1;
+				CursorPos = Text.getSize();
 			}
 
 			// Pre compute text data
@@ -126,7 +126,7 @@ namespace Ry
 				// Find closest offset
 				int32 SmallestDiff = INT32_MAX;
 				int32 Index = 0;
-				while(Index < XOffsets.GetSize() - 1)
+				while(Index < XOffsets.GetSize())
 				{
 					int32 Delta = std::abs(MouseXOffset - XOffsets[Index]);
 					if(Delta < SmallestDiff)
@@ -154,13 +154,33 @@ namespace Ry
 					if(CursorPos > 0)
 					{
 						Ry::String Prev = Text.substring(0, CursorPos - 1);
-						Ry::String Post = Text.substring(CursorPos);
-
-						SetText(Prev + Post);
+						Ry::String Post;
+						if(CursorPos <= Text.getSize() - 1)
+						{
+							Post = Text.substring(CursorPos);
+						}
 
 						CursorPos--;
+						SetText(Prev + Post);
 					}
 				}
+
+				if(KeyEv.KeyCode == KEY_LEFT)
+				{
+					CursorPos--;
+					if (CursorPos < 0)
+						CursorPos = 0;
+				}
+				
+				if (KeyEv.KeyCode == KEY_RIGHT)
+				{
+					CursorPos++;
+					if (CursorPos > Text.getSize())
+						CursorPos = Text.getSize();
+				}
+
+				std::cout << "cursor pos: " << CursorPos << std::endl;
+
 			}
 
 			return true;
@@ -169,10 +189,21 @@ namespace Ry
 		bool OnChar(const CharEvent& CharEv) override
 		{
 			// Modify the text
-			Ry::String Prev = Text.substring(0, CursorPos);
-			Ry::String Post = Text.substring(CursorPos);
-
-			SetText(Prev + static_cast<char>(CharEv.Codepoint) + Post);
+			if (Text.getSize() >= 1)
+			{
+				Ry::String Prev = Text.substring(0, CursorPos);
+				Ry::String Post;
+				if (CursorPos <= Text.getSize() - 1)
+				{
+					Post = Text.substring(CursorPos);
+				}
+				
+				SetText(Prev + static_cast<char>(CharEv.Codepoint) + Post);
+			}
+			else
+			{
+				SetText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
+			}
 
 			CursorPos++;
 
