@@ -362,6 +362,7 @@ namespace Ry
 	void VulkanCommandBuffer2::RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, 
 		uint32 FirstIndex, uint32 Count)
 	{
+
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
 
 		if (!VkArray->DeviceIndexBuffer)

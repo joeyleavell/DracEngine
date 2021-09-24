@@ -73,15 +73,19 @@ namespace Ry
 
 		BufferHint DataHint = BufferHint::STATIC;
 
-		glBindVertexArray(vao);
+		if(Verts > 0)
 		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glBindVertexArray(vao);
 			{
-				glBufferData(GL_ARRAY_BUFFER, 4 * Verts * VFormat.GetElementCount(), VertData, HintToGL(DataHint));
+				glBindBuffer(GL_ARRAY_BUFFER, vbo);
+				{
+					glBufferData(GL_ARRAY_BUFFER, 4 * Verts * VFormat.GetElementCount(), VertData, HintToGL(DataHint));
+				}
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
 		}
-		glBindVertexArray(0);
+
 	}
 
 	void GLVertexArray::PushIndexData(uint32* Indices, uint32 Count)
@@ -90,14 +94,18 @@ namespace Ry
 
 		BufferHint DataHint = BufferHint::STATIC;
 
-		glBindVertexArray(vao);
+		if(Count > 0)
 		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			glBindVertexArray(vao);
 			{
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32) * Count, Indices, HintToGL(DataHint));
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+				{
+					glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32) * Count, Indices, HintToGL(DataHint));
+				}
 			}
+			glBindVertexArray(0);
 		}
-		glBindVertexArray(0);
+
 	}
 
 	uint32 GLVertexArray::GetVertexCount() const

@@ -94,9 +94,9 @@ namespace Ry
 		{
 			if (Bat)
 			{
-				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
+				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
 
-				Bat->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
+				Bat->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer + 1);
 			}
 
 			if (CursorPos != SelectionPos && SelectionPos >= 0)
@@ -133,8 +133,12 @@ namespace Ry
 				// Draw selection if applicable
 				if(SelectionPos >= 0)
 				{
-					float SelectionX = XOffsets[SelectionPos] + Abs.X;
-					Ry::BatchRectangle(SelectionItem, BLUE, SelectionX, Abs.Y, 1.0f, Height, 0.0f);
+					float CursorX = XOffsets[CursorPos];
+					float SelectionX = XOffsets[SelectionPos];
+					float Width = std::abs(SelectionX - CursorX);
+					float X = Abs.X + (CursorX < SelectionX ? CursorX : SelectionX);
+
+					Ry::BatchRectangle(SelectionItem, BLUE, X, Abs.Y, Width, Height, 0.0f);
 				}
 
 			}
@@ -211,10 +215,10 @@ namespace Ry
 					}
 					else
 					{
-						HideSelection();
+						SelectionPos = -1;
 					}
 
-					HideSelection();
+					HideSelection();			
 				}
 				else
 				{
@@ -237,14 +241,34 @@ namespace Ry
 					// Modify the text
 					if(CursorPos > 0)
 					{
-						Ry::String Prev = Text.substring(0, CursorPos - 1);
-						Ry::String Post;
-						if(CursorPos <= Text.getSize() - 1)
+						int32 Start;
+						int32 End;
+						if(CursorPos == SelectionPos || SelectionPos < 0)
 						{
-							Post = Text.substring(CursorPos);
+							Start = CursorPos - 1;
+							End = CursorPos;
+						}
+						else
+						{
+							Start = CursorPos < SelectionPos ? CursorPos : SelectionPos;
+							End = CursorPos < SelectionPos ? SelectionPos : CursorPos;
 						}
 
-						CursorPos--;
+						Ry::String Prev = Text.substring(0, Start);
+						Ry::String Post;
+						if (End <= Text.getSize() - 1)
+						{
+							Post = Text.substring(End);
+						}
+
+						if (CursorPos > Start)
+						{
+							CursorPos -= (End - Start);
+						}
+						SelectionPos = -1;
+						
+						HideSelection();
+						
 						SetText(Prev + Post);
 					}
 				}

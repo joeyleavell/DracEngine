@@ -15,6 +15,7 @@ namespace Ry
 
 	void GLCommandBuffer::Submit()
 	{
+
 		// Begin readback of the recorded command
 		uint32 ReadBack = 0;
 
@@ -23,6 +24,7 @@ namespace Ry
 			// Parse op will directly change marker val
 			ParseOp(CmdBuffer, ReadBack);
 		}
+
 	}
 
 	void GLCommandBuffer::BeginCmd()
@@ -99,10 +101,14 @@ namespace Ry
 
 	void GLCommandBuffer::GLBeginRenderPass(Ry::BeginRenderPassCommand* Cmd)
 	{
+
 		// todo: only change state here if we switch render passes
 		
 		// Bind default framebuffer (for now)
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Force scissor test off for clearing screen
+		glDisable(GL_SCISSOR_TEST);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -110,7 +116,6 @@ namespace Ry
 
 	void GLCommandBuffer::GLEndRenderPass()
 	{
-		
 	}
 
 	void GLCommandBuffer::GLSetViewportSize(SetViewportSizeCmd* Cmd)
@@ -160,9 +165,12 @@ namespace Ry
 	{
 		const GLVertexArray* VertArray = dynamic_cast<const GLVertexArray*>(Cmd->VertexArray);
 
-		glBindVertexArray(VertArray->GetVaoHandle());
-		glDrawArrays(GL_TRIANGLES, Cmd->FirstVertex, Cmd->VertexCount);
-		glBindVertexArray(0);
+		if(Cmd->VertexCount > 0)
+		{
+			glBindVertexArray(VertArray->GetVaoHandle());
+			glDrawArrays(GL_TRIANGLES, Cmd->FirstVertex, Cmd->VertexCount);
+			glBindVertexArray(0);
+		}
 
 	}
 
@@ -170,13 +178,17 @@ namespace Ry
 	{
 		const GLVertexArray* VertArray = dynamic_cast<const GLVertexArray*>(Cmd->VertexArray);
 
-		glBindVertexArray(VertArray->GetVaoHandle());
-		glDrawElements(GL_TRIANGLES, Cmd->IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void*>(Cmd->FirstIndex * sizeof(int32)));
-		glBindVertexArray(0);
+		if(Cmd->IndexCount > 0)
+		{			
+			glBindVertexArray(VertArray->GetVaoHandle());
+			glDrawElements(GL_TRIANGLES, Cmd->IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void*>(Cmd->FirstIndex * sizeof(int32)));
+			glBindVertexArray(0);
+		}
 	}
 
 	void GLCommandBuffer::GLBindState(BindPipelineCommand* Cmd)
 	{
+
 		GLState* State = dynamic_cast<GLState*>(Cmd->Pipeline);
 
 		// Todo: only change this state if needed
@@ -206,6 +218,7 @@ namespace Ry
 
 		if(StateInfo.Blend.bEnabled)
 		{
+
 			static Ry::ArrayList<GLuint> MappedBlendFuncs = {GL_SRC_ALPHA,
 				GL_DST_ALPHA,
 				GL_ONE_MINUS_SRC_ALPHA,
@@ -223,13 +236,15 @@ namespace Ry
 			GLuint SrcAlFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.SrcAlphaFactor)];
 			GLuint DstAlFactor = MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.DstAlphaFactor)];
 
-			glBlendFuncSeparate(SrcFactor, DstFactor, SrcAlFactor, DstAlFactor);
-			glBlendEquation(MappedBlendFuncs[static_cast<uint32>(StateInfo.Blend.Op)]);			
+
+			glBlendFuncSeparate(SrcFactor, DstFactor, SrcAlFactor, DstAlFactor);			
+			glBlendEquation(MappedBlendOps[static_cast<uint32>(StateInfo.Blend.Op)]);
 		}
 		else
 		{
 			glDisable(GL_BLEND);
 		}
+
 		
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_FRAMEBUFFER_SRGB);
@@ -241,6 +256,7 @@ namespace Ry
 		// Todo: Set blend parameters
 
 		this->BoundState = dynamic_cast<GLState*>(Cmd->Pipeline);
+
 	}
 
 	void GLCommandBuffer::GLCmdBufferCommand(CommandBufferCommand* Cmd)

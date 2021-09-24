@@ -25,6 +25,9 @@ namespace Ry
 		// Create UI
 		UI = new UserInterface(Bat);
 
+		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
+		BitmapFont* TextFont = Font->GenerateBitmapFont(40);
+
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
 
@@ -48,8 +51,8 @@ namespace Ry
 		.FillY(1.0f)
 		[
 			NewWidget(Ry::BorderWidget)
-			.DefaultBox(Default)
-			.HoveredBox(Hovered)
+//			.DefaultBox(Default)
+//			.HoveredBox(Hovered)
 			.Padding(10.0f)
 			.FillX(1.0f)
 			[

@@ -373,9 +373,10 @@ namespace Ry
 		}
 
 		// Remove extraneous glyphs
-		for(int32 RemoveIndex = GlyphIndex; RemoveIndex < ItemSet->Items.GetSize(); RemoveIndex++)
+		int32 Count = ItemSet->Items.GetSize() - GlyphIndex;
+		for(int32 RemoveIndex = 0; RemoveIndex < Count; RemoveIndex++)
 		{
-			ItemSet->Items.RemoveAt(RemoveIndex);
+			ItemSet->Items.RemoveAt(ItemSet->Items.GetSize() - 1);
 		}
 		
 	}
@@ -586,6 +587,7 @@ namespace Ry
 						Layer->bNeedsRecord = true;
 						Group->LastIndexCount = CurrentIndexCount;
 					}
+
 				}
 
 				++PipelineItr;
@@ -876,6 +878,7 @@ namespace Ry
 
 						// Draw the mesh
 						MeshSection& Section = Group->BatchMesh->GetMeshData()->Sections.Get(0);
+
 						AtLayer->CommandBuffer->DrawVertexArrayIndexed(Group->BatchMesh->GetVertexArray(), Section.StartIndex, Section.Count);
 
 					}
