@@ -52,7 +52,7 @@ namespace Ry
 	private:
 
 		void OnButtonPressed(int32 Button, bool bPressed);
-		void OnKeyPressed(int32 Key, KeyAction Action);
+		void OnKeyPressed(int32 Key, KeyAction Action, int32 Mods);
 		void OnKeyChar(uint32 Codepoint);
 		void OnScroll(double ScrollX, double ScrollY);
 
@@ -60,7 +60,7 @@ namespace Ry
 		void FireDoubleClick(int32 Button, double XPos, double YPos);
 		void FireDragEvent(int32 Button, float XPos, float YPos);
 		void FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed);
-		void FireKeyEvent(int32 KeyCode, KeyAction Action);
+		void FireKeyEvent(int32 KeyCode, KeyAction Action, int32 Mods);
 		void FireCharEvent(int32 Codepoint);
 
 		void FireScrollEvent(float ScrollX, float ScrollY);

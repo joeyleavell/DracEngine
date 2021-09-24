@@ -62,7 +62,7 @@ namespace Ry
 	private:
 		
 		void OnMouseButtonPressed(int32 Key, bool bPressed);
-		void OnKeyPressed(int32 Key, Ry::KeyAction Action);
+		void OnKeyPressed(int32 Key, Ry::KeyAction Action, int32 Mods);
 		void OnCharPressed(uint32 Codepoint);
 		void OnScroll(double ScrollX, double ScrollY);
 		void OnWindowResized(int32 NewWidth, int32 NewHeight);

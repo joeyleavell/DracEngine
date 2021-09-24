@@ -59,6 +59,10 @@ namespace Ry
 	{
 		KeyAction Action;
 		int32 KeyCode;
+
+		bool bAlt;
+		bool bShift;
+		bool bCtrl;
 	};
 
 	struct UI_MODULE CharEvent : public Event

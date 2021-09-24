@@ -239,7 +239,7 @@ namespace Ry
 		WindowResizedDelegates.Add(Delegate);
 	}
 
-	void Window::AddKeyPressDelegate(const Ry::Delegate<void, int32, KeyAction>& Delegate)
+	void Window::AddKeyPressDelegate(const Ry::Delegate<void, int32, KeyAction, int32>& Delegate)
 	{
 		KeyCallbacks.Add(Delegate);
 	}
@@ -279,19 +279,19 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
-			for (const Delegate<void, int32, KeyAction>& Callback : AssociatedWindow->KeyCallbacks)
+			for (const Delegate<void, int32, KeyAction, int32>& Callback : AssociatedWindow->KeyCallbacks)
 			{
 				if (Action == GLFW_PRESS)
 				{
-					Callback.Execute(Key, KeyAction::PRESS);
+					Callback.Execute(Key, KeyAction::PRESS, Mods);
 				}
 				else if (Action == GLFW_RELEASE)
 				{
-					Callback.Execute(Key, Ry::KeyAction::RELEASE);
+					Callback.Execute(Key, Ry::KeyAction::RELEASE, Mods);
 				}
 				else if(Action == GLFW_REPEAT)
 				{
-					Callback.Execute(Key, KeyAction::REPEAT);
+					Callback.Execute(Key, KeyAction::REPEAT, Mods);
 				}
 
 			}

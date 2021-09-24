@@ -43,7 +43,7 @@ namespace Ry
 		Ry::input_handler->setButton(Button, bPressed);
 	}
 
-	void DesktopApp::OnKeyPressed(int32 Key, Ry::KeyAction Action)
+	void DesktopApp::OnKeyPressed(int32 Key, Ry::KeyAction Action, int32 Mods)
 	{
 		if(Action == PRESS)
 		{
@@ -361,7 +361,7 @@ namespace Ry
 		}
 
 		// Setup window callbacks
-		GameWindow->AddKeyPressDelegate(Ry::Delegate<void, int32, KeyAction>::CreateMemberFunctionDelegate(this, &DesktopApp::OnKeyPressed));
+		GameWindow->AddKeyPressDelegate(Ry::Delegate<void, int32, KeyAction, int32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnKeyPressed));
 		GameWindow->AddMouseButtonDelegate(Ry::Delegate<void, int32, bool>::CreateMemberFunctionDelegate(this, &DesktopApp::OnMouseButtonPressed));
 		GameWindow->AddWindowResizedDelegate(Ry::Delegate<void, int32, int32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnWindowResized));
 		GameWindow->AddKeyCharDelegate(Ry::Delegate<void, uint32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnCharPressed));

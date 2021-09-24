@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "EditorUI.h"
 #include "Buttons.h"
+#include "Keys.h"
 
 namespace Ry
 {
@@ -68,7 +69,7 @@ namespace Ry
 		KeyCharDelegate.BindMemberFunction(this, &EditorWindow::OnKeyChar);
 		EdWindow->AddKeyCharDelegate(KeyCharDelegate);
 
-		Ry::Delegate<void, int32, KeyAction> KeyPressDelegate;
+		Ry::Delegate<void, int32, KeyAction, int32> KeyPressDelegate;
 		KeyPressDelegate.BindMemberFunction(this, &EditorWindow::OnKeyPressed);
 		EdWindow->AddKeyPressDelegate(KeyPressDelegate);
 
@@ -182,9 +183,9 @@ namespace Ry
 		FireButtonEvent(Button, CurX, CurY, bPressed);
 	}
 
-	void EditorWindow::OnKeyPressed(int32 Key, KeyAction Action)
+	void EditorWindow::OnKeyPressed(int32 Key, KeyAction Action, int32 Mods)
 	{
-		FireKeyEvent(Key, Action);
+		FireKeyEvent(Key, Action, Mods);
 	}
 
 	void EditorWindow::OnKeyChar(uint32 Codepoint)
@@ -242,12 +243,15 @@ namespace Ry
 		EdLayers.OnEvent(ButtonEvent);
 	}
 
-	void EditorWindow::FireKeyEvent(int32 KeyCode, KeyAction Action)
+	void EditorWindow::FireKeyEvent(int32 KeyCode, KeyAction Action, int32 Mods)
 	{
 		Ry::KeyEvent Ev;
 		Ev.Type = EVENT_KEY;
 		Ev.Action = Action;
 		Ev.KeyCode = KeyCode;
+		Ev.bCtrl = (Mods & MOD_CONTROL) == MOD_CONTROL;
+		Ev.bShift = (Mods & MOD_SHIFT) == MOD_SHIFT;
+		Ev.bAlt = (Mods & MOD_ALT) == MOD_ALT;
 
 		EdLayers.OnEvent(Ev);
 	}
