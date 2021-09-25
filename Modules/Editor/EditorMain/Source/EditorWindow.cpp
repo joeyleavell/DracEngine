@@ -161,6 +161,9 @@ namespace Ry
 		double CurX, CurY;
 		EdWindow->GetCursorPos(CurX, CurY);
 
+		// TODO: Fire raw mouse pressed/released event
+		FireButtonEvent(Button, CurX, CurY, bPressed);
+
 		// Upon the first press, double click events become eligible
 		if(bPressed)
 		{
@@ -179,8 +182,6 @@ namespace Ry
 			}
 		}
 
-		// TODO: Fire raw mouse pressed/released event
-		FireButtonEvent(Button, CurX, CurY, bPressed);
 	}
 
 	void EditorWindow::OnKeyPressed(int32 Key, KeyAction Action, int32 Mods)
@@ -205,6 +206,8 @@ namespace Ry
 		ClickEvent.Type = EVENT_MOUSE_CLICK;
 		ClickEvent.ButtonID = Button;
 		ClickEvent.bDoubleClick = false;
+		ClickEvent.MouseX = XPos;
+		ClickEvent.MouseY = YPos;
 
 		EdLayers.OnEvent(ClickEvent);
 	}
@@ -216,6 +219,8 @@ namespace Ry
 		DoubleClickEvent.Type = EVENT_MOUSE_CLICK;
 		DoubleClickEvent.ButtonID = Button;
 		DoubleClickEvent.bDoubleClick = true;
+		DoubleClickEvent.MouseX = XPos;
+		DoubleClickEvent.MouseY = YPos;
 
 		EdLayers.OnEvent(DoubleClickEvent);
 	}

@@ -46,6 +46,8 @@ namespace Ry
 	{
 		int32 ButtonID = 0;
 		bool bDoubleClick = false;
+		float MouseX = 0.0f;
+		float MouseY = 0.0f;
 	};
 
 	struct UI_MODULE MouseDragEvent : public Event

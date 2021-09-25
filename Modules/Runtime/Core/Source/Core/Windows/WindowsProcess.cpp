@@ -27,7 +27,7 @@ namespace Ry
 	{
 		return Ry::File::GetParentPath(GetPlatformModulePath());
 	}
-	
+
 }
 
 /**

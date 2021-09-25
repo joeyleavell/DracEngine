@@ -5,7 +5,7 @@ Modules = []
 Type = "Runtime"
 
 # Declare external dependencies
-Externs = ["Test"]
+Extern = ["Glfw"]
 
 if TargetOS == "Linux":
 	if BuildToolset == "GCC":

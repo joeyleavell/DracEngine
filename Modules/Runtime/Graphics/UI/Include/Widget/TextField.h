@@ -6,6 +6,7 @@
 #include "Widget/HorizontalPanel.h"
 #include "Style.h"
 #include "Keys.h"
+#include "Core/PlatformProcess.h"
 
 namespace Ry
 {
@@ -170,6 +171,29 @@ namespace Ry
 			return RetCursorPos;
 		}
 
+		bool OnMouseClicked(const MouseClickEvent& MouseEv) override
+		{
+			if(MouseEv.ButtonID == 0 && MouseEv.bDoubleClick && IsHovered())
+			{
+				Point Abs = GetAbsolutePosition();
+				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+				
+				int32 Initial = FindClosestCursorIndex(MouseXOffset);
+				CursorPos = CursorAdvanceRight(Initial);
+				SelectionPos = CursorAdvanceLeft(Initial);
+
+				if(HasSelection())
+					ShowSelection();
+
+				Draw();
+				Bat->Update();
+
+				return true;
+			}
+
+			return false;
+		}
+
 		bool OnMouseDragged(const MouseDragEvent& MouseEv) override
 		{
 			if(MouseEv.ButtonID == 0 && bDragging)
@@ -177,8 +201,6 @@ namespace Ry
 				Point Abs = GetAbsolutePosition();
 				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
 				CursorPos = FindClosestCursorIndex(MouseXOffset);
-
-				std::cout << CursorPos << " " << SelectionPos << std::endl;
 
 				Draw();
 				Bat->Update();
@@ -242,46 +264,53 @@ namespace Ry
 			return true;
 		}
 
+		bool HasSelection()
+		{
+			return SelectionPos >= 0 && SelectionPos != CursorPos;
+		}
+
+		void RemoveSubstring(int32 Start, int32 End)
+		{
+			Ry::String Prev = Text.substring(0, Start);
+			Ry::String Post;
+			if (End <= Text.getSize() - 1)
+			{
+				Post = Text.substring(End);
+			}
+
+			SetText(Prev + Post);
+
+			if (CursorPos > Start)
+			{
+				CursorPos = Start;
+			}
+			
+			SelectionPos = -1;
+		}
+
 		void ChopSelection()
 		{
 			// Modify the text
-			if (CursorPos >= 0)
+			if (SelectionPos >= 0)
 			{
-				int32 Start;
-				int32 End;
-				if (CursorPos == SelectionPos || SelectionPos < 0)
-				{
-					Start = CursorPos - 1;
-					End = CursorPos;
-				}
-				else
-				{
-					Start = CursorPos < SelectionPos ? CursorPos : SelectionPos;
-					End = CursorPos < SelectionPos ? SelectionPos : CursorPos;
-				}
-
-				Ry::String Prev = Text.substring(0, Start);
-				Ry::String Post;
-				if (End <= Text.getSize() - 1)
-				{
-					Post = Text.substring(End);
-				}
-
-				if (CursorPos > Start)
-				{
-					CursorPos -= (End - Start);
-				}
-				SelectionPos = -1;
+				int32 Start = CursorPos < SelectionPos ? CursorPos : SelectionPos;
+				int32 End = CursorPos < SelectionPos ? SelectionPos : CursorPos;
 
 				HideSelection();
-
-				SetText(Prev + Post);
+				RemoveSubstring(Start, End);
 			}
 		}
 
 		void HandleBackspace()
 		{
-			ChopSelection();
+ 			if(HasSelection())
+			{
+				ChopSelection();
+			}
+			else if(CursorPos > 0)
+			{
+				RemoveSubstring(CursorPos - 1, CursorPos);
+			}
 		}
 
 		void HandleLeftArrow(const KeyEvent& KeyEv)
@@ -289,17 +318,7 @@ namespace Ry
 			if (KeyEv.bCtrl && KeyEv.bShift)
 			{
 				int32 InitialCursor = CursorPos;
-
-				// Skip whitespace
-				while (CursorPos > 0 && std::isspace(Text[CursorPos - 1]))
-					CursorPos--;
-
-				if (CursorPos > 0 && IsDelimiter(Text[CursorPos - 1]))
-					CursorPos--;
-				else
-					// Move selection to the left (find next delimeter to the left)
-					while (CursorPos > 0 && !IsDelimiter(Text[CursorPos - 1]))
-						CursorPos--;
+				CursorPos = CursorAdvanceLeft(InitialCursor);
 
 				if (InitialCursor != CursorPos)
 				{
@@ -351,22 +370,51 @@ namespace Ry
 				CursorPos = 0;
 		}
 
+		int32 CursorAdvanceLeft(int32 Initial)
+		{
+			int32 Increment = Initial;
+			
+			// Skip whitespace
+			while (Increment > 0 && std::isspace(Text[Increment - 1]))
+				Increment--;
+
+			if (Increment > 0 && IsDelimiter(Text[Increment - 1]))
+				Increment--;
+			else
+				// Move selection to the left (find next delimeter to the left)
+				while (Increment > 0 && !IsDelimiter(Text[Increment - 1]))
+					Increment--;
+
+			Increment = std::max(Increment, 0);
+
+			return Increment;
+		}
+
+		int32 CursorAdvanceRight(int32 Initial)
+		{
+			int32 Increment = Initial;
+			// Skip whitespace
+			while (Increment < Text.getSize() && std::isspace(Text[Increment]))
+				Increment++;
+
+			if (Increment < Text.getSize() && IsDelimiter(Text[Increment])) // Landed on a delimeter
+				Increment++;
+			else
+				// Move selection to the right (find next delimeter to the left)
+				while (Increment < Text.getSize() && !IsDelimiter(Text[Increment]))
+					Increment++;
+			
+			Increment = std::min(Increment, (int32) Text.getSize());
+
+			return Increment;
+		}
+
 		void HandleRightArrow(const KeyEvent& KeyEv)
 		{
 			if (KeyEv.bCtrl && KeyEv.bShift)
 			{
 				int32 InitialCursor = CursorPos;
-
-				// Skip whitespace
-				while (CursorPos < Text.getSize() && std::isspace(Text[CursorPos]))
-					CursorPos++;
-
-				if (CursorPos < Text.getSize() && IsDelimiter(Text[CursorPos]))
-					CursorPos++;
-				else
-					// Move selection to the left (find next delimeter to the left)
-					while (CursorPos < Text.getSize() && !IsDelimiter(Text[CursorPos]))
-						CursorPos++;
+				CursorPos = CursorAdvanceRight(InitialCursor);
 
 				if (InitialCursor != CursorPos)
 				{
@@ -416,10 +464,62 @@ namespace Ry
 				CursorPos = Text.getSize();
 		}
 
+		void InsertText(const Ry::String Insert)
+		{
+			if (CursorPos != SelectionPos && SelectionPos >= 0)
+				ChopSelection();
+
+			if (Text.getSize() >= 1)
+			{
+				Ry::String Prev = Text.substring(0, CursorPos);
+				Ry::String Post;
+				if (CursorPos <= Text.getSize() - 1)
+				{
+					Post = Text.substring(CursorPos);
+				}
+
+				SetText(Prev + Insert + Post);
+			}
+			else
+			{
+				SetText(Insert);
+			}
+
+			CursorPos += Insert.getSize();
+			SelectionPos = -1; // Selection immediately goes away on type
+			HideSelection();
+		}
+
 		bool OnKey(const KeyEvent& KeyEv) override
 		{
 			if(KeyEv.Action == Ry::KeyAction::PRESS || KeyEv.Action == Ry::KeyAction::REPEAT)
 			{
+				if(KeyEv.bCtrl)
+				{
+					// Copying text
+					if (KeyEv.KeyCode == KEY_C && SelectionPos >= 0 && SelectionPos != CursorPos)
+					{
+						int32 Start = CursorPos > SelectionPos ? SelectionPos : CursorPos;
+						int32 End = CursorPos > SelectionPos ? CursorPos : SelectionPos;
+						Ry::String Substring = Text.substring(Start, End);
+						Ry::SetClipboardString(Substring);
+					}
+
+					// Selecting all text
+					if (KeyEv.KeyCode == KEY_A)
+					{
+						SelectionPos = 0;
+						CursorPos = Text.getSize();
+						ShowSelection();
+					}
+
+					// Pasting text
+					if (KeyEv.KeyCode == KEY_V)
+						InsertText(Ry::GetClipboardString());
+
+				}
+
+
 				if(KeyEv.KeyCode == KEY_BACKSPACE)
 				{
 					HandleBackspace();
@@ -442,31 +542,9 @@ namespace Ry
 		}
 
 		bool OnChar(const CharEvent& CharEv) override
-		{
-			// Chop selection if needed
-			if (CursorPos != SelectionPos && SelectionPos >= 0)
-				ChopSelection();
-			
+		{			
 			// Modify the text
-			if (Text.getSize() >= 1)
-			{
-				Ry::String Prev = Text.substring(0, CursorPos);
-				Ry::String Post;
-				if (CursorPos <= Text.getSize() - 1)
-				{
-					Post = Text.substring(CursorPos);
-				}
-				
-				SetText(Prev + static_cast<char>(CharEv.Codepoint) + Post);
-			}
-			else
-			{
-				SetText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
-			}
-
-			CursorPos++;
-			SelectionPos = -1; // Selection immediately goes away on type
-			HideSelection();
+			InsertText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
 			
 			Draw();
 			Bat->Update();

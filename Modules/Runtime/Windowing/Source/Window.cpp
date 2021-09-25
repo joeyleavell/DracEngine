@@ -97,7 +97,7 @@ namespace Ry
 		// Create the rendering api specific swap chain
 		// Todo: investigate creating multiple contexts per window/swapchain, and multiple windows per context/swapchain
 		CreateSwapChain();
-		
+
 		// Setup callbacks
 		glfwSetKeyCallback(WindowResource, &KeyCallback);
 		glfwSetCharCallback(WindowResource, &CharacterEntryCallback);
