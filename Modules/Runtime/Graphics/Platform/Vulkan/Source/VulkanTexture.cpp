@@ -8,8 +8,8 @@
 namespace Ry
 {
 	
-	VulkanTexture::VulkanTexture(TextureUsage InUsage):
-	Texture(InUsage)
+	VulkanTexture::VulkanTexture(TextureUsage InUsage, TextureFiltering Filter):
+	Texture(InUsage, Filter)
 	{
 		this->StagingMemory = nullptr;
 	}
@@ -38,6 +38,8 @@ namespace Ry
 
 	void VulkanTexture::Data(const Bitmap* Bitmap)
 	{
+		Texture::Data(Bitmap);
+
 		/*if(Bitmap->GetPixelBuffer()->GetPixelStorage() != PixelStorage::THREE_BYTE_RGB)
 		{
 			Ry::Log->LogError("Vulkan textures only support three byte RGB bitmaps");
@@ -115,14 +117,15 @@ namespace Ry
 			return;
 		}
 
+		VkFilter VulkanFilter = VK_FILTER_LINEAR;
+		if (GetFilter() == TextureFiltering::Nearest)
+			VulkanFilter = VK_FILTER_NEAREST;
+
 		// Now create a sampler to use with this texture
 		VkSamplerCreateInfo SamplerInfo{};
 		SamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		SamplerInfo.magFilter = VK_FILTER_LINEAR;
-		SamplerInfo.minFilter = VK_FILTER_LINEAR;
-		SamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		SamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		SamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		SamplerInfo.magFilter = VulkanFilter;
+		SamplerInfo.minFilter = VulkanFilter;
 		SamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		SamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		SamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;

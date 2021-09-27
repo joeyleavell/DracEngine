@@ -12,4 +12,6 @@ namespace Ry
 	CORE_MODULE void SetClipboardString(const Ry::String& Value);
 	CORE_MODULE Ry::String GetClipboardString();
 
+	CORE_MODULE double GetSystemTime();
+
 }

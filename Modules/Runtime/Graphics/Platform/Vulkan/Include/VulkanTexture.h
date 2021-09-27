@@ -14,7 +14,7 @@ namespace Ry
 
 	public:
 
-		VulkanTexture(TextureUsage InUsage);
+		VulkanTexture(TextureUsage InUsage, TextureFiltering Filter);
 		virtual ~VulkanTexture();
 
 		virtual void DeleteTexture();

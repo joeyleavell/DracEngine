@@ -19,6 +19,7 @@ namespace Ry
 	class RenderPass;
 	struct PipelineCreateInfo;
 	enum class ShaderStage;
+	enum class TextureFiltering;
 
 	class RENDERING_MODULE RenderAPI
 	{
@@ -33,7 +34,7 @@ namespace Ry
 		virtual Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo) = 0;
 		virtual ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) = 0;
 		virtual ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC) = 0;
-		virtual Texture* CreateTexture() = 0;
+		virtual Texture* CreateTexture(TextureFiltering Filter) = 0;
 
 		virtual Pipeline* CreatePipelineFromShader(const PipelineCreateInfo& CreateInfo, Shader* Src);
 

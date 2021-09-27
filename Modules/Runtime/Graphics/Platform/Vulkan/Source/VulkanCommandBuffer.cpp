@@ -138,7 +138,7 @@ namespace Ry
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertexArray);
 	
 		// Bind the vertex buffer
-		VkBuffer VertexBuffers[] = { VkArray->DeviceVertexBuffer->GetBufferObject() };
+		VkBuffer VertexBuffers[] = { VkArray->StagingVertexBuffer->GetBufferObject() };
 		VkDeviceSize Offsets[] = { 0 };
 	
 		vkCmdBindVertexBuffers(CmdBuffer, 0, 1, VertexBuffers, Offsets);
@@ -351,7 +351,7 @@ namespace Ry
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
 
 		// Bind the vertex buffer
-		VkBuffer VertexBuffers[] = { VkArray->DeviceVertexBuffer->GetBufferObject() };
+		VkBuffer VertexBuffers[] = { VkArray->StagingVertexBuffer->GetBufferObject() };
 		VkDeviceSize Offsets[] = { 0 };
 		int32 VertexCount = Count > 0 ? Count : VkArray->GetVertexCount(); // Draw all elements if count is zero
 
@@ -373,12 +373,12 @@ namespace Ry
 
 		if(VkArray->GetVertexCount() > 0 && VkArray->GetIndexCount() > 0)
 		{
-			VkBuffer VertexBuffers[] = { VkArray->DeviceVertexBuffer->GetBufferObject() };
+			VkBuffer VertexBuffers[] = { VkArray->StagingVertexBuffer->GetBufferObject() };
 			VkDeviceSize Offsets[] = { 0 };
 
 			vkCmdBindVertexBuffers(CmdBuffer, 0, 1, VertexBuffers, Offsets);
 			{
-				vkCmdBindIndexBuffer(CmdBuffer, VkArray->DeviceIndexBuffer->GetBufferObject(), 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindIndexBuffer(CmdBuffer, VkArray->StagingIndexBuffer->GetBufferObject(), 0, VK_INDEX_TYPE_UINT32);
 				{
 					int32 IndexCount = Count > 0 ? Count : VkArray->GetIndexCount(); // Draw all elements if count is zero
 

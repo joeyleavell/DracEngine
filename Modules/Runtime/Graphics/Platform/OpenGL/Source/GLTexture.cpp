@@ -5,8 +5,8 @@
 namespace Ry
 {
 	
-	GLTexture::GLTexture(TextureUsage InUsage):
-	Texture(InUsage)
+	GLTexture::GLTexture(TextureUsage InUsage, TextureFiltering Filter):
+	Texture(InUsage, Filter)
 	{
 		// Todo: support different types of textures
 
@@ -16,6 +16,10 @@ namespace Ry
 
 		glGenTextures(1, &Handle);
 		Ry::Log->Log("OpenGL texture generated: " + Ry::to_string(Handle));
+
+		GLint GLFilter = GL_LINEAR;
+		if (Filter == TextureFiltering::Nearest)
+			GLFilter = GL_NEAREST;
 		
 		// Setup texture 2D parameters
 		glBindTexture(GL_TEXTURE_2D, Handle);
@@ -23,14 +27,15 @@ namespace Ry
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLFilter);
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	void GLTexture::Data(const Bitmap* Bitmap)
 	{
+		Texture::Data(Bitmap);
 		//this->InternalFormat = PixelFormatToGL(Bitmap->GetPixelBuffer()->GetPixelFormat());
 	
 		uint32 Width = Bitmap->GetWidth();

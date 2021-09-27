@@ -46,7 +46,7 @@ namespace Ry
 			// Map the memory to the staging buffer
 			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.GetElementCount());
 
-			TransferStagedToDevice(Size, StagingVertexBuffer->GetBufferObject(), DeviceVertexBuffer->GetBufferObject());
+			//TransferStagedToDevice(Size, StagingVertexBuffer->GetBufferObject(), DeviceVertexBuffer->GetBufferObject());
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace Ry
 			// Map the memory to the staging buffer
 			StagingIndexBuffer->UploadData(Indices, Count);
 
-			TransferStagedToDevice(Size, StagingIndexBuffer->GetBufferObject(), DeviceIndexBuffer->GetBufferObject(), DeviceIndexBuffer != nullptr);
+			//TransferStagedToDevice(Size, StagingIndexBuffer->GetBufferObject(), DeviceIndexBuffer->GetBufferObject(), DeviceIndexBuffer != nullptr);
 		}
 
 	}

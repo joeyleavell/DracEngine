@@ -14,7 +14,7 @@ namespace Ry
 
 	Texture* TextureAsset::CreateRuntimeTexture()
 	{
-		Texture* NewTexture = Ry::RendAPI->CreateTexture();
+		Texture* NewTexture = Ry::RendAPI->CreateTexture(TextureFiltering::Nearest);
 		NewTexture->Data(Resource);
 
 		RuntimeResources.Add(NewTexture);

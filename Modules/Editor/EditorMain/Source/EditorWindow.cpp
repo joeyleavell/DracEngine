@@ -80,6 +80,8 @@ namespace Ry
 
 	void EditorWindow::Update(float Delta)
 	{
+		EdWindow->Update();
+
 		// Update the layers
 		EdLayers.Update(Delta);
 
@@ -99,11 +101,10 @@ namespace Ry
 			EdLayers.OnEvent(Ev);
 		}
 
-		// todo: handle a "click" event as a mouse down and then mouse up event
+		// Handle drag events
 		for(int32 Index = 0; Index < MAX_BUTTONS; Index++)
 		{
 			MouseEventInfo& Info = ButtonsInfo[Index];
-			Info.TimeSincePressed += Delta;
 
 			// Check if click event is still applicable
 			if(Info.bIsPressed)
@@ -115,15 +116,15 @@ namespace Ry
 					double DY = MouseY - Info.StartY;
 					double Dist = sqrt(DX * DX + DY * DY);
 
-					if (Dist >= DoublePressDist)
+					if (Dist >= ClickDistThreshold)
 					{
 						Info.bDrag = true;
-						Info.bDoublePressEligable = false; // Drag automatically disqualifies double click
 					}
 				}
-				else
+
+				// Fire drag event
+				if (Info.bDrag)
 				{
-					// Fire drag event
 					FireDragEvent(Index, MouseX, MouseY);
 				}
 			}
@@ -131,21 +132,6 @@ namespace Ry
 			{
 				// No longer pressed, means stop firing drag event
 				Info.bDrag = false;
-			}
-
-			if(Info.bDoublePressEligable)
-			{
-				// Check if still eligible for double press
-
-				// Timing factor
-				if (Info.TimeSincePressed >= DoublePressInterval)
-				{
-					Info.bDoublePressEligable = false;
-
-					// Fire click event if we aren't pressed
-					FireClick(Index, MouseX, MouseY);
-				}
-
 			}
 
 		}
@@ -164,22 +150,55 @@ namespace Ry
 		// TODO: Fire raw mouse pressed/released event
 		FireButtonEvent(Button, CurX, CurY, bPressed);
 
+		// Calc distance
+		float Dx = CurX - EventInfo.StartX;
+		float Dy = CurY - EventInfo.StartY;
+		float Dist = std::sqrt(Dx * Dx + Dy * Dy);
+
 		// Upon the first press, double click events become eligible
 		if(bPressed)
 		{
-			if(!EventInfo.bDoublePressEligable)
-			{
+			// Record start pos
+			EventInfo.StartX = (int32)CurX;
+			EventInfo.StartY = (int32)CurY;
 
-				EventInfo.StartX = (int32)CurX;
-				EventInfo.StartY = (int32)CurY;
-				EventInfo.TimeSincePressed = 0.0f;
-				EventInfo.bDoublePressEligable = true;
-			}
-			else
+			// Reset click count if enough time has passed, or passed distance threshold
+			if(Dist >= ClickDistThreshold || EventInfo.ClickTimer.is_ready())
 			{
-				FireDoubleClick(Button, CurX, CurY);
-				EventInfo.bDoublePressEligable = false;
+				EventInfo.ClickCount = 0;
 			}
+
+			EventInfo.ClickTimer.restart();
+		}
+		else
+		{
+			// Distance and time check
+			if(Dist <= ClickDistThreshold && !EventInfo.ClickTimer.is_ready())
+			{
+				EventInfo.ClickCount++;
+
+				if(EventInfo.ClickCount == 1)
+				{
+					// Fire mouse click, 
+					FireClick(Button, CurX, CurY);
+				}
+				else if(EventInfo.ClickCount == 2)
+				{
+					FireDoubleClick(Button, CurX, CurY);
+				}
+				else if (EventInfo.ClickCount == 3) // Triple click
+				{
+					//FireDoubleClick(Button, CurX, CurY);
+					EventInfo.ClickCount = 0;
+				}
+				else
+				{
+					// Higher order clicks not supported, reset clicks
+					EventInfo.ClickCount = 0;
+				}
+
+			}
+
 		}
 
 	}
@@ -282,8 +301,6 @@ namespace Ry
 
 	void EditorWindow::Render()
 	{
-		EdWindow->Update();
-
 		EdWindow->BeginFrame();
 		{
 			// Render all of the layers

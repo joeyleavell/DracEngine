@@ -322,7 +322,7 @@ namespace Ry
 		const int32 LINE_HEIGHT = Ascent - Descent + LineGap;
 		auto* FontAtlas = new Ry::Bitmap(FONT_BITMAP_SIZE, FONT_BITMAP_SIZE, PixelStorage::RED8);
 		
-		AtlasTexture = Ry::RendAPI->CreateTexture();
+		AtlasTexture = Ry::RendAPI->CreateTexture(TextureFiltering::Linear);
 
 		int32 X = 0;
 		int32 Y = 0;

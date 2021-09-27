@@ -21,7 +21,7 @@ namespace Ry
 		Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo) override;
 		ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) override;
 		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC) override;
-		Texture* CreateTexture() override;
+		Texture* CreateTexture(TextureFiltering Filter) override;
 
 
 	};

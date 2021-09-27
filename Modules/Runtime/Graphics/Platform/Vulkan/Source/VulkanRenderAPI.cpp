@@ -56,9 +56,9 @@ namespace Ry
 		return ResSet;
 	}
 
-	Texture* VulkanRenderAPI::CreateTexture()
+	Texture* VulkanRenderAPI::CreateTexture(TextureFiltering Filter)
 	{
-		return new Ry::VulkanTexture(Ry::TextureUsage::STATIC);
+		return new Ry::VulkanTexture(Ry::TextureUsage::STATIC, Filter);
 	}
 
 	bool InitVulkanAPI()

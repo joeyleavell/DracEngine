@@ -11,7 +11,7 @@ namespace Ry
 	{
 	public:
 
-		GLTexture(TextureUsage InUsage);
+		GLTexture(TextureUsage InUsage, TextureFiltering Filter);
 		virtual ~GLTexture() = default;
 		
 		void Data(const Bitmap* Bitmap) override;

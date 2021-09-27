@@ -47,7 +47,7 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 
 	// Setup NMake batch commands for build, clean and rebuild
 	Filesystem::path BuildScriptsFolder = Filesystem::canonical(EngineRootPath) / "BuildScripts" / "BatchFiles";
-	ModulesProject->SetPhysicalName("AryzeEngine"); // This sets the name of the .vcxproj that gets generated.
+	ModulesProject->SetPhysicalName("AryzeEngine"); // This sets the name of the .vcxproj that gets Gamd.
 	ModulesProject->SetArtifactDirectory((Filesystem::path(GetEngineIntermediateDir()) / "ProjectFiles").string());
 	ModulesProject->SetBuildCmdLine("\"" + (BuildScriptsFolder / "Build.bat").string() + "\" " + EngineModulesDir + " -" + Compiler);
 	ModulesProject->SetRebuildCmdLine("\"" + (BuildScriptsFolder / "Rebuild.bat").string() + "\" " + EngineModulesDir + " -" + Compiler);
@@ -238,9 +238,8 @@ void GenerateModuleCmd(std::vector<std::string>& Args)
 	// Declare folders for module
 	Filesystem::path ModuleFilePath = ModulePath / (ModuleName + ".build.py");
 
+	Filesystem::create_directories(ModulePath / "Include");
 	Filesystem::create_directories(ModulePath / "Source");
-	Filesystem::create_directories(ModulePath / "Source" / "Include");
-	Filesystem::create_directories(ModulePath / "Source" / "Implementation");
 
 	// Write out module file here so it's generated
 
@@ -279,7 +278,7 @@ void GenerateModuleCmd(std::vector<std::string>& Args)
 	{
 		std::ofstream OutGameHeader;
 
-		OutGameHeader.open((Filesystem::path(ModulePath) / "Source" / "Include" / "Game.h").string());
+		OutGameHeader.open((Filesystem::path(ModulePath) / "Include" / "Game.h").string());
 		{
 			OutGameHeader << R"(#pragma once
 
@@ -302,7 +301,7 @@ public:
 		OutGameHeader.close();
 
 		std::ofstream OutGameSource;
-		OutGameSource.open((Filesystem::path(ModulePath) / "Source" / "Implementation" / "Game.cpp").string());
+		OutGameSource.open((Filesystem::path(ModulePath) / "Source" / "Game.cpp").string());
 		{
 			OutGameSource << R"(#include "Game.h"
 #include "EntryPoint.h"

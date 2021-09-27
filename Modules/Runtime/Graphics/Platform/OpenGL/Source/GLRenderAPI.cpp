@@ -50,9 +50,9 @@ namespace Ry
 		return new GLResources(Desc, SC);
 	}
 
-	Texture* GLRenderAPI::CreateTexture()
+	Texture* GLRenderAPI::CreateTexture(TextureFiltering Filter)
 	{
-		return new GLTexture(TextureUsage::STATIC);
+		return new GLTexture(TextureUsage::STATIC, Filter);
 	}
 
 	bool InitOGLRendering()

@@ -13,5 +13,6 @@ namespace Ry
 	{
 		return glfwGetClipboardString(nullptr);
 	}
+
 	
 }

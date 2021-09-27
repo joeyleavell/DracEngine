@@ -169,7 +169,7 @@ namespace Ry
 			// Create 1x1 white texture as a default diffuse map
 			Ry::Bitmap DefaultDiffuseBmp(1, 1, PixelStorage::FOUR_BYTE_RGBA);
 			DefaultDiffuseBmp.SetPixel(0, 0, 0xFFFFFFFF);
-			DefaultDiffuse = Ry::RendAPI->CreateTexture();
+			DefaultDiffuse = Ry::RendAPI->CreateTexture(TextureFiltering::Nearest);
 			DefaultDiffuse->Data(&DefaultDiffuseBmp);
 
 			Proj = Ry::perspective4(EditorMainWindow->GetWindowWidth() / (float)EditorMainWindow->GetWindowHeight(), 70.0f, 0.01f, 2500.0f);

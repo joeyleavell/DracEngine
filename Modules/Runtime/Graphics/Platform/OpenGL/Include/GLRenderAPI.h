@@ -22,7 +22,7 @@ namespace Ry
 		Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo);
 		ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0);
 		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC);
-		Texture* CreateTexture();
+		Texture* CreateTexture(TextureFiltering Filter);
 
 	private:
 

@@ -3,12 +3,16 @@
 #include "Window.h"
 #include "2D/Batch/Batch.h"
 #include "Input.h"
+#include "Timer.h"
 
 namespace Ry
 {
 
 	struct MouseEventInfo
 	{
+		// Single click delay
+		Timer ClickTimer {0.5};
+		
 		int32 Button = 0;
 
 		// Whether the current button is pressed
@@ -18,10 +22,8 @@ namespace Ry
 		// Dragging begins after the mouse cursor has moved a certain radius away from the initial click point
 		bool bDrag = false;
 
-		bool bDoublePressEligable = false;
+		int32 ClickCount = 0;
 		
-		float TimeSincePressed = 0.0f; // Used for double press timing
-
 		// When a press is initiated, this is recorded since
 		// it controls if the event was a click or drag
 		int32 StartX = 0;
@@ -70,8 +72,9 @@ namespace Ry
 
 		Window* EdWindow;
 
-		float DoublePressInterval = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press)
-		float DoublePressDist     = 5.0f; // Pixel deviation allowed before drag event is triggered
+		float HigherOrderClickInterval = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press, etc.)
+		float SingleClickInterval      = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press)
+		float ClickDistThreshold       = 10.0f; // Pixel deviation allowed before drag event is triggered
 
 		MouseEventInfo ButtonsInfo[MAX_BUTTONS];
 

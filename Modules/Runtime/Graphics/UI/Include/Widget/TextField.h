@@ -139,7 +139,7 @@ namespace Ry
 					float Width = std::abs(SelectionX - CursorX);
 					float X = Abs.X + (CursorX < SelectionX ? CursorX : SelectionX);
 
-					Ry::BatchRectangle(SelectionItem, BLUE, X, Abs.Y, Width, Height, 0.0f);
+					Ry::BatchRectangle(SelectionItem, WHITE.ScaleRGB(0.1f), X, Abs.Y, Width, Height, 0.0f);
 				}
 
 			}
@@ -181,6 +181,8 @@ namespace Ry
 				int32 Initial = FindClosestCursorIndex(MouseXOffset);
 				CursorPos = CursorAdvanceRight(Initial);
 				SelectionPos = CursorAdvanceLeft(Initial);
+
+				std::cout << "dc cursor " << CursorPos << " selection " << SelectionPos << std::endl;
 
 				if(HasSelection())
 					ShowSelection();

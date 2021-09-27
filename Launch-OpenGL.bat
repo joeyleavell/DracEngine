@@ -1,1 +1,0 @@
-.\Binary\RyRuntime-EditorMain.exe -OpenGL
