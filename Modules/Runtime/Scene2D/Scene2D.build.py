@@ -2,4 +2,4 @@ Type = "Runtime"
 
 Extern = []
 
-Modules = ["Core", "Math", "Rendering", "Physics", "AssetCore"]
+Modules = ["Core", "Math", "Rendering", "Physics", "AssetCore", "Utility"]

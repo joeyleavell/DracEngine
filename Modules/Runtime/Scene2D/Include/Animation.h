@@ -7,7 +7,7 @@
 namespace Ry
 {
 
-	struct TextureRegion
+	struct SCENE2D_MODULE TextureRegion
 	{
 		int32 X;
 		int32 Y;
@@ -34,8 +34,30 @@ namespace Ry
 		{
 			return H / (float)Parent->GetHeight();
 		}
-
-
 	};
-	
+
+	class SCENE2D_MODULE Animation
+	{
+	public:
+
+		// @param Speed Length of each frame in seconds
+		Animation(Texture* Parent, float Speed);
+
+		void AddFrame(int32 X, int32 Y, int32 W, int32 H);
+		TextureRegion& GetFrame(int32 Index);
+
+		float GetSpeed() const;
+
+		int32 GetNumFrames() const;
+
+		Texture* GetParent() const;
+
+	private:
+		Ry::ArrayList<TextureRegion> Frames;
+		Texture* Parent;
+		float Speed;
+	};
+
+	SCENE2D_MODULE SharedPtr<Animation> CreateAnimation(Texture* Parent, float Speed, int32 StartX, int32 StartY, int32 FrameWidth, int32 FrameHeight, int32 FramesWide, int32 FramesHigh);
+
 }

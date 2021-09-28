@@ -2,6 +2,7 @@
 #include "Interface/RenderAPI.h"
 #include "SwapChain.h"
 #include "Interface/RenderCommand.h"
+#include "Timer.h"
 
 namespace Ry
 {
@@ -41,6 +42,7 @@ namespace Ry
 	ScenePrimitive(Mobility)
 	{
 		this->Texture = Region;
+
 		Item = MakeItem();
 		ItemSet->Items.Add(Item);
 	}
@@ -65,14 +67,51 @@ namespace Ry
 			0.0f);
 	}
 
+	AnimationScenePrimitive::AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::SharedPtr<Animation> Anim):
+	ScenePrimitive(Mobility)	
+	{
+		this->Anim = Anim;
+		this->FrameIndex = 0;
+
+		AnimTimer = new Timer(Anim->GetSpeed());
+
+		// Create animation item
+		Item = MakeItem();
+		ItemSet->Items.Add(Item);
+	}
+
+	AnimationScenePrimitive::~AnimationScenePrimitive()
+	{
+		delete AnimTimer;
+	}
+
 	Texture* AnimationScenePrimitive::GetTexture()
 	{
-		return nullptr;
+		return Anim->GetParent();
 	}
 
 	void AnimationScenePrimitive::Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation)
 	{
+		if (Anim->GetNumFrames() <= 0)
+			return;
 		
+		if(AnimTimer->is_ready())
+		{
+			FrameIndex = (FrameIndex + 1) % Anim->GetNumFrames();
+		}
+
+		TextureRegion& CurFrame = Anim->GetFrame(FrameIndex);
+
+		Ry::BatchTexture(Item, WHITE, X, Y,
+			CurFrame.GetUx(),
+			CurFrame.GetVy(),
+			CurFrame.GetUw(),
+			CurFrame.GetVh(),
+			Ox,
+			Oy,
+			W,
+			H,
+			0.0f);
 	}
 
 	Scene2D::Scene2D(Ry::SwapChain* Parent)

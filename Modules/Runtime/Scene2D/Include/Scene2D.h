@@ -10,6 +10,8 @@
 namespace Ry
 {
 
+	class Timer;
+
 	enum PrimitiveMobility
 	{
 		Static,
@@ -68,11 +70,22 @@ namespace Ry
 	{
 	public:
 
+		AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::SharedPtr<Animation> Anim);
+		~AnimationScenePrimitive();
+
 		Texture* GetTexture() override;
 
 		void Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation) override;
 
+		// todo: implement
+		void SetAnim() {};
+
 	private:
+		int32 FrameIndex;
+		Ry::SharedPtr<Animation> Anim;
+		Timer* AnimTimer;
+
+		Ry::SharedPtr<BatchItem> Item;
 	};
 
 	class SCENE2D_MODULE Scene2D
