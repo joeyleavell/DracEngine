@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Entity2D.h"
 #include "Data/ArrayList.h"
 #include "Core/Memory/SharedPtr.h"
 #include "Scene2D.gen.h"
@@ -18,13 +17,13 @@ namespace Ry
 		Movable
 	};
 
-	class SCENE2D_MODULE ScenePrimitive
+	class SCENE2D_MODULE ScenePrimitive2D
 	{
 	public:
 
-		Ry::MulticastDelegate<ScenePrimitive*> OnItemSetDirty;
+		Ry::MulticastDelegate<ScenePrimitive2D*> OnItemSetDirty;
 
-		ScenePrimitive(PrimitiveMobility Mobility);
+		ScenePrimitive2D(PrimitiveMobility Mobility);
 
 		Ry::SharedPtr<BatchItemSet> GetItemSet();
 
@@ -48,7 +47,7 @@ namespace Ry
 
 	};
 
-	class SCENE2D_MODULE TextureScenePrimitive : public ScenePrimitive
+	class SCENE2D_MODULE TextureScenePrimitive : public ScenePrimitive2D
 	{
 	public:
 
@@ -66,7 +65,7 @@ namespace Ry
 
 	};
 
-	class SCENE2D_MODULE AnimationScenePrimitive : public ScenePrimitive
+	class SCENE2D_MODULE AnimationScenePrimitive : public ScenePrimitive2D
 	{
 	public:
 
@@ -94,8 +93,8 @@ namespace Ry
 
 		Scene2D(Ry::SwapChain* Parent);
 
-		void AddPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
-		void RemovePrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
+		void AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
+		void RemovePrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
 		void Update(float Delta);
 
@@ -111,16 +110,16 @@ namespace Ry
 
 		void RecordCommands();
 
-		void OnItemSetDirty(Ry::ScenePrimitive* Prim);
+		void OnItemSetDirty(Ry::ScenePrimitive2D* Prim);
 
-		void AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
-		void RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
+		void AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
+		void RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
-		void AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
-		void RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive);
+		void AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
+		void RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
-		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive>> StaticPrimitives;
-		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive>> DynamicPrimitives;
+		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> StaticPrimitives;
+		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> DynamicPrimitives;
 
 		Ry::Batch* StaticBatch;
 		Ry::Batch* DynamicBatch; 

@@ -6,40 +6,40 @@
 
 namespace Ry
 {
-	ScenePrimitive::ScenePrimitive(PrimitiveMobility Mobility)
+	ScenePrimitive2D::ScenePrimitive2D(PrimitiveMobility Mobility)
 	{
 		ItemSet = MakeItemSet();
 		PipelineId = "Texture";
 		this->Mobility = Mobility;
 	}
 
-	Ry::SharedPtr<BatchItemSet> ScenePrimitive::GetItemSet()
+	Ry::SharedPtr<BatchItemSet> ScenePrimitive2D::GetItemSet()
 	{
 		return ItemSet;
 	}
 
-	PrimitiveMobility ScenePrimitive::GetMobility()
+	PrimitiveMobility ScenePrimitive2D::GetMobility()
 	{
 		return Mobility;
 	}
 
-	int32 ScenePrimitive::GetLayer()
+	int32 ScenePrimitive2D::GetLayer()
 	{
 		return Layer;
 	}
 
-	Ry::String ScenePrimitive::GetPipelineId()
+	Ry::String ScenePrimitive2D::GetPipelineId()
 	{
 		return PipelineId;
 	}
 
-	Texture* ScenePrimitive::GetTexture()
+	Texture* ScenePrimitive2D::GetTexture()
 	{
 		return nullptr;
 	}
 
 	TextureScenePrimitive::TextureScenePrimitive(PrimitiveMobility Mobility, const TextureRegion& Region):
-	ScenePrimitive(Mobility)
+	ScenePrimitive2D(Mobility)
 	{
 		this->Texture = Region;
 
@@ -68,7 +68,7 @@ namespace Ry
 	}
 
 	AnimationScenePrimitive::AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::SharedPtr<Animation> Anim):
-	ScenePrimitive(Mobility)	
+	ScenePrimitive2D(Mobility)
 	{
 		this->Anim = Anim;
 		this->FrameIndex = 0;
@@ -125,7 +125,7 @@ namespace Ry
 		StaticBatch  = new Batch(Parent, Parent->GetDefaultRenderPass());
 	}
 
-	void Scene2D::AddPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		if(Primitive->GetMobility() == Ry::PrimitiveMobility::Movable)
 		{
@@ -140,7 +140,7 @@ namespace Ry
 
 	}
 
-	void Scene2D::RemovePrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::RemovePrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		if (Primitive->GetMobility() == Ry::PrimitiveMobility::Static)
 		{
@@ -152,19 +152,19 @@ namespace Ry
 		}
 	}
 
-	void Scene2D::AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		PipelineState State;
 		DynamicBatch->AddItemSet(Primitive->GetItemSet(), Primitive->GetPipelineId(), State, Primitive->GetTexture(), Primitive->GetLayer());
 		DynamicBatch->Update();
 	}
 
-	void Scene2D::RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		DynamicBatch->RemoveItemSet(Primitive->GetItemSet());
 	}
 
-	void Scene2D::AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		PipelineState State;
 		StaticBatch->AddItemSet(Primitive->GetItemSet(), Primitive->GetPipelineId(), State, Primitive->GetTexture(), Primitive->GetLayer());
@@ -172,7 +172,7 @@ namespace Ry
 		StaticBatch->Update(); // Immediately update static batch
 	}
 
-	void Scene2D::RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive> Primitive)
+	void Scene2D::RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
 	{
 		StaticBatch->RemoveItemSet(Primitive->GetItemSet());
 
@@ -256,7 +256,7 @@ namespace Ry
 		Cmd->EndCmd();
 	}
 
-	void Scene2D::OnItemSetDirty(Ry::ScenePrimitive* Prim)
+	void Scene2D::OnItemSetDirty(Ry::ScenePrimitive2D* Prim)
 	{
 		Batch* Bat = nullptr;
 		if(Prim->GetMobility() == Ry::PrimitiveMobility::Movable)
