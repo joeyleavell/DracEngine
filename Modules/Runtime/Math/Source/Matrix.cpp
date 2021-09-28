@@ -13,18 +13,18 @@ namespace Ry
 	Matrix<R, C>::Matrix()
 	{
 		for (uint32 i = 0; i < R * C; i++)
-			data[i] = 0.0f;
+			data[i] = 0.0;
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C>::Matrix(float a)
+	Matrix<R, C>::Matrix(double a)
 	{
 		for (uint32 i = 0; i < R * C; i++)
 			data[i] = a;
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C>::Matrix(float a, float b, ...)
+	Matrix<R, C>::Matrix(double a, double b, ...)
 	{
 		data[0] = a;
 		data[1] = b;
@@ -34,7 +34,7 @@ namespace Ry
 
 		for (uint32 i = 2; i < R * C; i++)
 		{
-			data[i] = (float)va_arg(vargs, double);
+			data[i] = (double)va_arg(vargs, double);
 		}
 
 		va_end(vargs);
@@ -78,7 +78,7 @@ namespace Ry
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C>& Matrix<R, C>::fill(float a)
+	Matrix<R, C>& Matrix<R, C>::fill(double a)
 	{
 		for (uint32 i = 0; i < R * C; i++)
 			data[i] = a;
@@ -109,7 +109,7 @@ namespace Ry
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C>& Matrix<R, C>::operator*=(float s)
+	Matrix<R, C>& Matrix<R, C>::operator*=(double s)
 	{
 		for (uint32 i = 0; i < R * C; i++)
 			data[i] *= s;
@@ -141,7 +141,7 @@ namespace Ry
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C> Matrix<R, C>::operator*(float s) const
+	Matrix<R, C> Matrix<R, C>::operator*(double s) const
 	{
 		Matrix<R, C> result;
 
@@ -223,12 +223,12 @@ namespace Ry
 	}
 
 	// Determinant functions
-	float deter(const Matrix<2, 2>& mat)
+	double deter(const Matrix<2, 2>& mat)
 	{
 		return mat.data[0 * 2 + 0] * mat.data[1 * 2 + 1] - mat.data[0 * 2 + 1] * mat.data[1 * 2 + 0];
 	}
 
-	float deter(const Matrix<3, 3>& mat)
+	double deter(const Matrix<3, 3>& mat)
 	{
 		float a = mat.data[0 * 3 + 0];
 		float b = mat.data[0 * 3 + 1];
@@ -241,7 +241,7 @@ namespace Ry
 		return i - j + k;
 	}
 
-	float deter(const Matrix<4, 4>& mat)
+	double deter(const Matrix<4, 4>& mat)
 	{
 		const float* b = mat.data;
 		float value =
@@ -368,6 +368,46 @@ namespace Ry
 		m.id();
 
 		return m;
+	}
+
+	Matrix3 Translation2DMatrix(double X, double Y)
+	{
+		Matrix3 Mat;
+		Mat.id();
+
+		Mat[0][2] = X;
+		Mat[1][2] = Y;
+
+		return Mat;
+	}
+
+	Matrix3 Rotation2DMatrix(double Rotation)
+	{
+		double Cos = std::cos(DEG_TO_RAD(Rotation));
+		double Sin = std::sin(DEG_TO_RAD(Rotation));
+
+		Matrix3 Mat;
+		Mat.id();
+
+		Mat[0][0] = Cos;
+		Mat[0][1] = -Sin;
+
+		Mat[1][0] = Sin;
+		Mat[1][1] = Cos;
+
+		return Mat;
+
+	}
+
+	Matrix3 Scale2DMatrix(double Sx, double Sy)
+	{
+		Matrix3 Mat;
+		Mat.id();
+
+		Mat[0][0] = Sx;
+		Mat[1][1] = Sy;
+
+		return Mat;
 	}
 
 	/************************************************************************/
@@ -549,10 +589,21 @@ namespace Ry
 
 		const float* m = mat.data;
 
-		result[0] = m[0 * 4 + 0] * v[0] + m[0 * 4 + 1] * v[1] + m[0 * 4 + 2] * v[2] + m[0 * 4 + 3] * v[3];
-		result[1] = m[1 * 4 + 0] * v[0] + m[1 * 4 + 1] * v[1] + m[1 * 4 + 2] * v[2] + m[1 * 4 + 3] * v[3];
-		result[2] = m[2 * 4 + 0] * v[0] + m[2 * 4 + 1] * v[1] + m[2 * 4 + 2] * v[2] + m[2 * 4 + 3] * v[3];
-		result[3] = m[3 * 4 + 0] * v[0] + m[3 * 4 + 1] * v[1] + m[3 * 4 + 2] * v[2] + m[3 * 4 + 3] * v[3];
+		for(int32 Row = 0; Row < R; Row++)
+		{
+			int32 Dot = 0;
+			for(int32 Col = 0; Col < C; Col++)
+			{
+				Dot += m[Row * C + Col] * v[Col];
+			}
+			
+			result[Row] = Dot;
+		}
+
+		//result[0] = m[0 * 4 + 0] * v[0] + m[0 * 4 + 1] * v[1] + m[0 * 4 + 2] * v[2] + m[0 * 4 + 3] * v[3];
+		//result[1] = m[1 * 4 + 0] * v[0] + m[1 * 4 + 1] * v[1] + m[1 * 4 + 2] * v[2] + m[1 * 4 + 3] * v[3];
+		//result[2] = m[2 * 4 + 0] * v[0] + m[2 * 4 + 1] * v[1] + m[2 * 4 + 2] * v[2] + m[2 * 4 + 3] * v[3];
+		//result[3] = m[3 * 4 + 0] * v[0] + m[3 * 4 + 1] * v[1] + m[3 * 4 + 2] * v[2] + m[3 * 4 + 3] * v[3];
 
 		return result;
 	}

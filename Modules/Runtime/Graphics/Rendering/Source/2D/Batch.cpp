@@ -250,6 +250,42 @@ namespace Ry
 		Item->AddTriangle(2, 3, 0);
 	}
 
+	void BatchTextureTransform(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, Ry::Matrix3 Transform, float U,
+		float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth)
+	{
+		Item->Clear();
+
+		float OriginXModel = OriginX * Width;
+		float OriginYModel = -OriginY * Height;
+
+		Ry::Vector3 V1 { 0.0f, 0.0f, 1.0f },
+			V2{ 0.0f, -Height, 1.0f },
+			V3{ Width, -Height, 1.0f },
+		V4 {Width, 0.0f, 1.0f };
+
+		V1.x -= OriginXModel;
+		V1.y -= OriginYModel;
+		V2.x -= OriginXModel;
+		V2.y -= OriginYModel;
+		V3.x -= OriginXModel;
+		V3.y -= OriginYModel;
+		V4.x -= OriginXModel;
+		V4.y -= OriginYModel;
+
+		V1 = Transform * V1;
+		V2 = Transform * V2;
+		V3 = Transform * V3;
+		V4 = Transform * V4;
+
+		Item->AddVertex1P1UV1C((float) V4.x, (float) V4.y, Depth, U, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V1.x, (float)V1.y, Depth, U + UVWidth, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V2.x, (float)V2.y, Depth, U + UVWidth, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V3.x, (float)V3.y, Depth, U, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+
+		Item->AddTriangle(0, 1, 2);
+		Item->AddTriangle(2, 3, 0);
+	}
+
 	void BatchText(Ry::SharedPtr<BatchItemSet> ItemSet, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth)
 	{
 		
@@ -380,7 +416,7 @@ namespace Ry
 		}
 		
 	}
-	
+
 	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass)
 	{
 		this->ParentPass = ParentPass;		

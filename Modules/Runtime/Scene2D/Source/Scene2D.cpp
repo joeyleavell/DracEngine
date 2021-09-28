@@ -38,8 +38,14 @@ namespace Ry
 		return nullptr;
 	}
 
-	TextureScenePrimitive::TextureScenePrimitive(PrimitiveMobility Mobility, const TextureRegion& Region):
+	QuadScenePrimitive::QuadScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size):
 	ScenePrimitive2D(Mobility)
+	{
+		this->Size = Size;
+	}
+
+	TextureScenePrimitive::TextureScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, const TextureRegion& Region):
+	QuadScenePrimitive(Mobility, Size)
 	{
 		this->Texture = Region;
 
@@ -52,23 +58,23 @@ namespace Ry
 		return Texture.Parent;
 	}
 
-	void TextureScenePrimitive::Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation)
+	void TextureScenePrimitive::Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin)
 	{
 
-		Ry::BatchTexture(Item, WHITE, X, Y,
+		Ry::BatchTextureTransform(Item, WHITE, Transform,
 			Texture.GetUx(),
 			Texture.GetVy(),
 			Texture.GetUw(),
 			Texture.GetVh(),
-			Ox,
-			Oy,
-			W,
-			H,
+			Origin.x,
+			Origin.y,
+			Size.x,
+			Size.y,
 			0.0f);
 	}
 
-	AnimationScenePrimitive::AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::SharedPtr<Animation> Anim):
-	ScenePrimitive2D(Mobility)
+	AnimationScenePrimitive::AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::SharedPtr<Animation> Anim):
+	QuadScenePrimitive(Mobility, Size)
 	{
 		this->Anim = Anim;
 		this->FrameIndex = 0;
@@ -90,7 +96,7 @@ namespace Ry
 		return Anim->GetParent();
 	}
 
-	void AnimationScenePrimitive::Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation)
+	void AnimationScenePrimitive::Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin)
 	{
 		if (Anim->GetNumFrames() <= 0)
 			return;
@@ -102,15 +108,15 @@ namespace Ry
 
 		TextureRegion& CurFrame = Anim->GetFrame(FrameIndex);
 
-		Ry::BatchTexture(Item, WHITE, X, Y,
+		Ry::BatchTextureTransform(Item, WHITE, Transform,
 			CurFrame.GetUx(),
 			CurFrame.GetVy(),
 			CurFrame.GetUw(),
 			CurFrame.GetVh(),
-			Ox,
-			Oy,
-			W,
-			H,
+			Origin.x,
+			Origin.y,
+			Size.x,
+			Size.y,
 			0.0f);
 	}
 

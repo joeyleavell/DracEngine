@@ -14,22 +14,22 @@ namespace Ry
 	public:
 
 		Matrix();
-		Matrix(float a);
-		Matrix(float a, float b, ...);
+		Matrix(double a);
+		Matrix(double a, double b, ...);
 		~Matrix();
 
 		// Matrix initial setup
 		Matrix& id();
 		Matrix& zero();
-		Matrix& fill(float a);
+		Matrix& fill(double a);
 
 		// Elementary operations
 		Matrix& operator-=(const Matrix& o);
 		Matrix& operator+=(const Matrix& o);
-		Matrix& operator*=(float s);
+		Matrix& operator*=(double s);
 		Matrix operator-(const Matrix& o) const;
 		Matrix operator+(const Matrix& o) const;
-		Matrix operator*(float s) const;
+		Matrix operator*(double s) const;
 		float* operator[](uint32 r);
 		const float* operator*() const;
 
@@ -48,9 +48,9 @@ namespace Ry
 		friend String to_string(const Matrix<R_, C_>& m);
 
 		// Determinants
-		friend float deter(const Matrix<2, 2>& mat);
-		friend float deter(const Matrix<3, 3>& mat);
-		friend float deter(const Matrix<4, 4>& mat);
+		friend double deter(const Matrix<2, 2>& mat);
+		friend double deter(const Matrix<3, 3>& mat);
+		friend double deter(const Matrix<4, 4>& mat);
 
 		// Inverses
 		MATH_MODULE friend Matrix<2, 2> inverse(const Matrix<2, 2>& mat);
@@ -107,6 +107,11 @@ namespace Ry
 	MATH_MODULE Matrix2 id2();
 	MATH_MODULE Matrix3 id3();
 	MATH_MODULE Matrix4 id4();
+
+	// 2D Homogenous matrices
+	MATH_MODULE Matrix3 Translation2DMatrix(double X, double Y);
+	MATH_MODULE Matrix3 Rotation2DMatrix(double Rotation);
+	MATH_MODULE Matrix3 Scale2DMatrix(double Sx, double Sy);
 
 	// 4D transformation matrices
 	MATH_MODULE Matrix4 translation4(float x, float y, float z);

@@ -1,7 +1,14 @@
 #include "Component2D.h"
+#include "Entity2D.h"
 
 namespace Ry
 {
+
+	Matrix3 ComposeMatrix(const Matrix3& Left, const Transform2D& Transform)
+	{
+		return Left * Transform.AsMatrix();
+	}
+	
 	Component2D::Component2D(Entity2D* Owner)
 	{
 		this->Owner = Owner;
@@ -53,10 +60,19 @@ namespace Ry
 		return Transform.Rotation;
 	}
 
-	Transform2D Transform2DComponent::GetWorldTransform()
+	Ry::Matrix3 Transform2DComponent::GetWorldTransform()
 	{
-		// todo: correctly calc world transform
-		return GetRelativeTransform();
+		Ry::Matrix3 ParentTransform = id3();
+		if(ParentComponent)
+		{
+			ParentTransform = ParentComponent->GetWorldTransform();
+		}
+		else if(Owner->GetRootComponent() != this)
+		{
+			ParentTransform = Owner->GetRootComponent()->GetWorldTransform();
+		}
+
+		return ComposeMatrix(ParentTransform, GetRelativeTransform());
 	}
 
 	Vector2 Transform2DComponent::GetWorldPos()
@@ -92,13 +108,10 @@ namespace Ry
 		if(Primitive.IsValid())
 		{
 			// Calculate world transform
-			Transform2D WorldTransform = GetWorldTransform();
+			Ry::Matrix3 WorldTransform = GetWorldTransform();
 
 			// Draw primitive
-			Primitive->Draw(WorldTransform.Position.x, WorldTransform.Position.y,
-				Size.x * WorldTransform.Scale.x, Size.y * WorldTransform.Scale.y,
-				Origin.x, Origin.y,
-				WorldTransform.Rotation);
+			Primitive->Draw(WorldTransform, Origin);
 		}
 	}
 
@@ -120,7 +133,13 @@ namespace Ry
 	Texture2DComponent::Texture2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size, const Vector2& Origin, TextureRegion Texture):
 	Primitive2DComponent(Owner, Mobility, Size, Origin)
 	{
-		Primitive = MakeShared(new TextureScenePrimitive{ Mobility, Texture });
+		Primitive = MakeShared(new TextureScenePrimitive{ Mobility, Size, Texture});
 	}
-	
+
+	Animation2DComponent::Animation2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size,
+		const Vector2& Origin, SharedPtr<Animation> Anim):
+	Primitive2DComponent(Owner, Mobility, Size, Origin)
+	{
+		Primitive = MakeShared(new AnimationScenePrimitive{Mobility, Size, Anim});
+	}
 }

@@ -32,7 +32,7 @@ namespace Ry
 		Ry::String GetPipelineId();
 		
 		virtual Texture* GetTexture();
-		virtual void Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation) = 0;
+		virtual void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) = 0;
 
 	protected:
 
@@ -47,15 +47,26 @@ namespace Ry
 
 	};
 
-	class SCENE2D_MODULE TextureScenePrimitive : public ScenePrimitive2D
+	class SCENE2D_MODULE QuadScenePrimitive : public ScenePrimitive2D
 	{
 	public:
 
-		TextureScenePrimitive(PrimitiveMobility Mobility, const TextureRegion& Region);
+		QuadScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size);
+
+	protected:
+
+		Ry::Vector2 Size;
+	};
+
+	class SCENE2D_MODULE TextureScenePrimitive : public QuadScenePrimitive
+	{
+	public:
+
+		TextureScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, const TextureRegion& Region);
 
 		Texture* GetTexture() override;
 
-		void Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation) override;
+		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
 
 	private:
 
@@ -65,16 +76,16 @@ namespace Ry
 
 	};
 
-	class SCENE2D_MODULE AnimationScenePrimitive : public ScenePrimitive2D
+	class SCENE2D_MODULE AnimationScenePrimitive : public QuadScenePrimitive
 	{
 	public:
 
-		AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::SharedPtr<Animation> Anim);
+		AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::SharedPtr<Animation> Anim);
 		~AnimationScenePrimitive();
 
 		Texture* GetTexture() override;
 
-		void Draw(float X, float Y, float W, float H, float Ox, float Oy, float Rotation) override;
+		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
 
 		// todo: implement
 		void SetAnim() {};

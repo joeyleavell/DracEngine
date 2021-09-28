@@ -19,6 +19,23 @@ namespace Ry
 		Ry::Vector2 Position{0.0f, 0.0f};
 		Ry::Vector2 Scale{1.0f, 1.0f};
 		float Rotation {0.0f};
+
+
+		Ry::Matrix3 AsMatrix() const
+		{
+			Ry::Matrix3 T = Ry::Translation2DMatrix(Position.x, Position.y);
+			Ry::Matrix3 R = Ry::Rotation2DMatrix(Rotation);
+			Ry::Matrix3 S = Ry::Scale2DMatrix(Scale.x, Scale.y);
+
+			return T * R * S;
+		}
+
+		Ry::Matrix3 Compose(const Transform2D& Other)
+		{
+			return Other.AsMatrix() * AsMatrix();
+		}
+
+		friend Matrix3 ComposeMatrix(const Matrix3& Left, const Transform2D& Transform);
 	};
 
 	class SCENE2D_MODULE Component2D
@@ -33,7 +50,7 @@ namespace Ry
 		bool CanEverUpdate() const;
 		bool IsUpdateEnabled() const;
 
-	private:
+	protected:
 
 		// Entity that owns this component
 		Entity2D* Owner;
@@ -54,7 +71,7 @@ namespace Ry
 		Vector2& GetRelativeScale();
 		float& GetRelativeRotation();
 
-		Transform2D GetWorldTransform();
+		Ry::Matrix3 GetWorldTransform();
 		Vector2 GetWorldPos();
 		Vector2 GetWorldScale();
 		float GetWorldRotation();
@@ -95,6 +112,13 @@ namespace Ry
 	public:
 
 		Texture2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, TextureRegion Texture = {});
+	};
+
+	class SCENE2D_MODULE Animation2DComponent : public Primitive2DComponent
+	{
+	public:
+
+		Animation2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, SharedPtr<Animation> Anim = {});
 	};
 
 }
