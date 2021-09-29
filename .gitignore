@@ -12,6 +12,7 @@
 *.xcodeproj
 ./Makefile
 ./.ue4dependencies
+.zip
 
 # CMake generated files
 .cmake/
