@@ -93,7 +93,7 @@ namespace Ry
 				for (MeshComponent* MeshComp : MeshComponents)
 				{
 					// Render mesh with model matrix and camera matrix
-					ObjectPipeline->RenderMesh(MeshComp->GetRuntimeMesh(), MeshComp->GetWorldTransform().get_transform(), GlobalCamera->get_view_proj(), Lighting);
+//					ObjectPipeline->RenderMesh(MeshComp->GetRuntimeMesh(), MeshComp->GetWorldTransform().get_transform(), GlobalCamera->get_view_proj(), Lighting);
 				}
 			}
 		}

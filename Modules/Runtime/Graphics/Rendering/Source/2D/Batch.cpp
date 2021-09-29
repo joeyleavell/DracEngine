@@ -256,11 +256,11 @@ namespace Ry
 		Item->Clear();
 
 		float OriginXModel = OriginX * Width;
-		float OriginYModel = -OriginY * Height;
+		float OriginYModel = OriginY * Height;
 
 		Ry::Vector3 V1 { 0.0f, 0.0f, 1.0f },
-			V2{ 0.0f, -Height, 1.0f },
-			V3{ Width, -Height, 1.0f },
+			V2{ 0.0f, Height, 1.0f },
+			V3{ Width, Height, 1.0f },
 		V4 {Width, 0.0f, 1.0f };
 
 		V1.x -= OriginXModel;
@@ -277,10 +277,10 @@ namespace Ry
 		V3 = Transform * V3;
 		V4 = Transform * V4;
 
-		Item->AddVertex1P1UV1C((float) V4.x, (float) V4.y, Depth, U, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C((float)V1.x, (float)V1.y, Depth, U + UVWidth, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C((float)V2.x, (float)V2.y, Depth, U + UVWidth, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
-		Item->AddVertex1P1UV1C((float)V3.x, (float)V3.y, Depth, U, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float) V1.x, (float) V1.y, Depth, U, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V2.x, (float)V2.y, Depth, U, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V3.x, (float)V3.y, Depth, U + UVWidth, V + UVHeight, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
+		Item->AddVertex1P1UV1C((float)V4.x, (float)V4.y, Depth, U + UVWidth, V, Tint.Red, Tint.Green, Tint.Blue, Tint.Alpha);
 
 		Item->AddTriangle(0, 1, 2);
 		Item->AddTriangle(2, 3, 0);
@@ -423,7 +423,7 @@ namespace Ry
 		this->Swap = Target;
 		
 		View = Ry::id4();
-		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight(), 0.0f, -1.0f, 1.0f);
+		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), 0.0f, (float)Ry::GetViewportHeight(), -1.0f, 1.0f);
 
 		// Add default pipelines
 		AddPipeline("Shape", "Shape");
@@ -566,8 +566,8 @@ namespace Ry
 
 	void Batch::Camera(const Ry::Camera* Cam)
 	{
-		this->View = Cam->get_view();
-		this->Projection = Cam->get_proj();
+		this->View = Cam->GetView();
+		this->Projection = Cam->GetProjection();
 	}
 
 	void Batch::Update()

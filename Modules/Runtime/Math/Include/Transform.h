@@ -5,6 +5,70 @@
 namespace Ry
 {
 
+	struct MATH_MODULE Transform2D
+	{
+		Ry::Vector2 Position{ 0.0f, 0.0f };
+		Ry::Vector2 Scale{ 1.0f, 1.0f };
+		float Rotation{ 0.0f };
+
+		Ry::Vector2 GetForward()
+		{
+			float Sin = sin(DEG_TO_RAD(Rotation) + PI / 2.0f);
+			float Cos = cos(DEG_TO_RAD(Rotation) + PI / 2.0f);
+			
+			Vector2 Forward(Cos, Sin);
+
+			return normalized(Forward);
+		}
+
+		Ry::Vector2 GetRight()
+		{
+			float Sin = sin(DEG_TO_RAD(Rotation));
+			float Cos = cos(DEG_TO_RAD(Rotation));
+
+			Vector2 Right (Cos, Sin);
+
+			return normalized(Right);
+		}
+
+		Ry::Matrix4 AsMatrix4() const
+		{
+			Matrix4 Res = id4();
+			Ry::Matrix3 R = Ry::Rotation2DMatrix(Rotation);
+			Ry::Matrix3 S = Ry::Scale2DMatrix(Scale.x, Scale.y);
+			Matrix3 Mat3 = R * S;
+			for (int32 R = 0; R < 2; R++)
+				for (int32 C = 0; C < 2; C++)
+					Res[R][C] = Mat3[R][C];
+			Res[0][3] = Position.x;
+			Res[1][3] = Position.y;
+
+			return Res;
+		}
+		
+		Ry::Matrix3 AsMatrix() const
+		{
+			Ry::Matrix3 T = Ry::Translation2DMatrix(Position.x, Position.y);
+			Ry::Matrix3 R = Ry::Rotation2DMatrix(Rotation);
+			Ry::Matrix3 S = Ry::Scale2DMatrix(Scale.x, Scale.y);
+
+			return T * R * S;
+		}
+
+		Ry::Transform2D Compose(const Transform2D& Other)
+		{
+			Transform2D Res;
+			Res.Position = Position + Other.Position;
+			Res.Rotation = Rotation + Other.Rotation;
+			Res.Scale.x = Scale.x * Other.Scale.x;
+			Res.Scale.y = Scale.y * Other.Scale.y;
+
+			return Res;
+		}
+
+		friend Matrix3 ComposeMatrix(const Matrix3& Left, const Transform2D& Transform);
+	};
+
 	/**
 	 * Translate, rotation, scale transform.
 	 */

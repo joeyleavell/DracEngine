@@ -3,6 +3,7 @@
 #include "SwapChain.h"
 #include "Interface/RenderCommand.h"
 #include "Timer.h"
+#include "Camera.h"
 
 namespace Ry
 {
@@ -192,8 +193,11 @@ namespace Ry
 		DynamicBatch->Update();
 	}
 
-	void Scene2D::Render()
+	void Scene2D::Render(Ry::Camera2D& Cam)
 	{
+		DynamicBatch->Camera(&Cam);
+		StaticBatch->Camera(&Cam);
+
 		// Render batches
 		DynamicBatch->Render();
 		StaticBatch->Render();

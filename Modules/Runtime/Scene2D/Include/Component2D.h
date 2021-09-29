@@ -3,39 +3,33 @@
 #include "Core/Delegate.h"
 #include "Vector.h"
 #include "Scene2D.h"
+#include "Transform.h"
+
+class b2Body;
 
 namespace Ry
 {
 
+	enum class Physics2DType
+	{
+		Static,
+		Dynamic
+	};
+
+	struct PhysicsMaterial2D
+	{
+		Physics2DType Type;
+		float Density = 1.0f;
+		float Friction = 0.3f;
+		float Restitution = 0.3f;
+	};
+
+	class World2D;
 	class Entity2D;
 
 	struct SCENE2D_MODULE TickFunction
 	{
 		Delegate<void, float> TickDelegate;
-	};
-
-	struct SCENE2D_MODULE Transform2D
-	{
-		Ry::Vector2 Position{0.0f, 0.0f};
-		Ry::Vector2 Scale{1.0f, 1.0f};
-		float Rotation {0.0f};
-
-
-		Ry::Matrix3 AsMatrix() const
-		{
-			Ry::Matrix3 T = Ry::Translation2DMatrix(Position.x, Position.y);
-			Ry::Matrix3 R = Ry::Rotation2DMatrix(Rotation);
-			Ry::Matrix3 S = Ry::Scale2DMatrix(Scale.x, Scale.y);
-
-			return T * R * S;
-		}
-
-		Ry::Matrix3 Compose(const Transform2D& Other)
-		{
-			return Other.AsMatrix() * AsMatrix();
-		}
-
-		friend Matrix3 ComposeMatrix(const Matrix3& Left, const Transform2D& Transform);
 	};
 
 	class SCENE2D_MODULE Component2D
@@ -45,10 +39,13 @@ namespace Ry
 		Component2D(Entity2D* Owner);
 
 		void FireUpdate(float Delta);
-		void Update(float Delta) {};
+		virtual void Update(float Delta) {};
 
 		bool CanEverUpdate() const;
 		bool IsUpdateEnabled() const;
+
+		World2D* GetWorld() const;
+		Entity2D* GetOwner() const;
 
 	protected:
 
@@ -66,12 +63,14 @@ namespace Ry
 
 		Transform2DComponent(Entity2D* Owner);
 
+		void SetRelativeTransform(const Transform2D& Transform);
+
 		Transform2D& GetRelativeTransform();
 		Vector2& GetRelativePos();
 		Vector2& GetRelativeScale();
 		float& GetRelativeRotation();
 
-		Ry::Matrix3 GetWorldTransform();
+		Ry::Transform2D GetWorldTransform();
 		Vector2 GetWorldPos();
 		Vector2 GetWorldScale();
 		float GetWorldRotation();
@@ -119,6 +118,47 @@ namespace Ry
 	public:
 
 		Animation2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, SharedPtr<Animation> Anim = {});
+	};
+
+	class SCENE2D_MODULE Physics2DComponent : public Transform2DComponent
+	{
+	public:
+
+		Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat);
+		~Physics2DComponent();
+
+		void Update(float Delta) override;
+
+		b2Body* GetBody();
+
+		virtual void CreatePhysicsState() = 0;
+		void DestroyPhysicsState();
+
+		virtual void OnBeginOverlap(Physics2DComponent* Other);
+		
+		virtual void OnEndOverlap(Physics2DComponent* Other);
+
+		void ApplyForceToCenter(float X, float Y);
+
+	protected:
+
+		PhysicsMaterial2D Mat;
+		b2Body* Body;
+	};
+
+	class SCENE2D_MODULE Box2DComponent : public Physics2DComponent
+	{
+	public:
+
+		Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, float Width, float Height);
+
+		void CreatePhysicsState() override;
+
+	private:
+
+		float Width;
+		float Height;
+
 	};
 
 }

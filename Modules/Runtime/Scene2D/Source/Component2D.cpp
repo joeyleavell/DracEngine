@@ -1,5 +1,11 @@
 #include "Component2D.h"
 #include "Entity2D.h"
+#include <box2d/b2_world.h>
+#include "box2d/b2_body.h"
+#include "World2D.h"
+#include "box2d/b2_polygon_shape.h"
+#include "box2d/b2_fixture.h"
+#include "box2d/b2_math.h"
 
 namespace Ry
 {
@@ -34,10 +40,25 @@ namespace Ry
 		return bUpdateEnabled;
 	}
 
+	World2D* Component2D::GetWorld() const
+	{
+		return Owner->GetWorld();
+	}
+
+	Entity2D* Component2D::GetOwner() const
+	{
+		return Owner;
+	}
+
 	Transform2DComponent::Transform2DComponent(Entity2D* Owner):
 	Component2D(Owner)
 	{
 		
+	}
+
+	void Transform2DComponent::SetRelativeTransform(const Transform2D& Transform)
+	{
+		this->Transform = Transform;
 	}
 
 	Transform2D& Transform2DComponent::GetRelativeTransform()
@@ -60,9 +81,9 @@ namespace Ry
 		return Transform.Rotation;
 	}
 
-	Ry::Matrix3 Transform2DComponent::GetWorldTransform()
+	Ry::Transform2D Transform2DComponent::GetWorldTransform()
 	{
-		Ry::Matrix3 ParentTransform = id3();
+		Ry::Transform2D ParentTransform;
 		if(ParentComponent)
 		{
 			ParentTransform = ParentComponent->GetWorldTransform();
@@ -72,7 +93,7 @@ namespace Ry
 			ParentTransform = Owner->GetRootComponent()->GetWorldTransform();
 		}
 
-		return ComposeMatrix(ParentTransform, GetRelativeTransform());
+		return ParentTransform.Compose(GetRelativeTransform());
 	}
 
 	Vector2 Transform2DComponent::GetWorldPos()
@@ -108,10 +129,10 @@ namespace Ry
 		if(Primitive.IsValid())
 		{
 			// Calculate world transform
-			Ry::Matrix3 WorldTransform = GetWorldTransform();
+			Ry::Transform2D WorldTransform = GetWorldTransform();
 
 			// Draw primitive
-			Primitive->Draw(WorldTransform, Origin);
+			Primitive->Draw(WorldTransform.AsMatrix(), Origin);
 		}
 	}
 
@@ -142,4 +163,104 @@ namespace Ry
 	{
 		Primitive = MakeShared(new AnimationScenePrimitive{Mobility, Size, Anim});
 	}
+
+	Physics2DComponent::Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat):
+	Transform2DComponent(Owner)
+	{
+		bCanUpdate = true;
+		bUpdateEnabled = true;
+
+		this->Mat = Mat;
+	}
+
+	Physics2DComponent::~Physics2DComponent()
+	{
+		DestroyPhysicsState();
+	}
+
+	void Physics2DComponent::Update(float Delta)
+	{
+		if(Body)
+		{
+			// Update transform
+			float XPixels = MetersToPixels(Body->GetPosition().x);
+			float YPixels = MetersToPixels(Body->GetPosition().y);
+
+			GetRelativePos().x = XPixels;
+			GetRelativePos().y = YPixels;
+			GetRelativeRotation() = RAD_TO_DEG(Body->GetAngle());
+		}
+	}
+
+	b2Body* Physics2DComponent::GetBody()
+	{
+		return Body;
+	}
+
+	void Physics2DComponent::DestroyPhysicsState()
+	{
+		// Remove body from world
+		if(Body)
+		{
+			if (b2World* PhysWorld = Owner->GetWorld()->GetPhysicsWorld())
+			{
+				PhysWorld->DestroyBody(Body);
+				Body = nullptr;
+			}
+		}
+	}
+
+	void Physics2DComponent::OnBeginOverlap(Physics2DComponent* Other)
+	{
+		GetOwner()->OnBeginOverlap(Other->GetOwner(), Other, this);
+	}
+
+	void Physics2DComponent::OnEndOverlap(Physics2DComponent* Other)
+	{
+		GetOwner()->OnEndOverlap(Other->GetOwner(), Other, this);
+	}
+
+	void Physics2DComponent::ApplyForceToCenter(float X, float Y)
+	{
+		Body->ApplyForceToCenter(b2Vec2{ X, Y }, true);
+	}
+
+	Box2DComponent::Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, float Width, float Height):
+	Physics2DComponent(Owner, Mat)
+	{
+		this->Width = Width;
+		this->Height = Height;
+	}
+
+	void Box2DComponent::CreatePhysicsState()
+	{
+		b2World* ParentWorld = GetWorld()->GetPhysicsWorld();
+		
+		Transform2D WorldPosition = GetWorldTransform();
+		
+		float XMeters = PixelsToMeters(WorldPosition.Position.x);
+		float YMeters = PixelsToMeters(WorldPosition.Position.y);
+
+		b2BodyDef BodyDef;
+		BodyDef.type = Mat.Type == Physics2DType::Dynamic ? b2_dynamicBody : b2_staticBody;
+		BodyDef.position.Set(XMeters, YMeters);
+
+		Body = ParentWorld->CreateBody(&BodyDef);
+
+		float WMeters = PixelsToMeters(Width / 2);
+		float HMeters = PixelsToMeters(Height / 2);
+		b2PolygonShape BoxShape{};
+		BoxShape.SetAsBox(WMeters, HMeters);
+
+		b2FixtureDef FixtureDef{};
+		FixtureDef.shape = &BoxShape;
+		FixtureDef.density = Mat.Density;
+		FixtureDef.friction = Mat.Friction;
+		FixtureDef.restitution = Mat.Restitution;
+		FixtureDef.userData.pointer = (uintptr_t) this;
+
+		Body->CreateFixture(&FixtureDef);
+		
+	}
+	
 }

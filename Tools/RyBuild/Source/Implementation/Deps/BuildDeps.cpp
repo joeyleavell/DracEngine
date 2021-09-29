@@ -693,6 +693,17 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Bullet3.GitPath = "https://github.com/bulletphysics/bullet3.git";
 	Bullet3.GitLabel = "3.08";
 
+	Dependency Box2D;
+	Box2D.Name = "Box2D";
+	Box2D.CMakeGenArgs = {
+		"USE_MSVC_RUNTIME_LIBRARY_DLL=ON",
+	};
+	//Box2D.LibNames = { "Bullet", "LinearMath" };
+	Box2D.LocatorMethod = ArtifactLocatorMethod::BestGuess;
+	Box2D.IncludesDirectories = { "include" };
+	Box2D.GitPath = "https://github.com/erincatto/box2d.git";
+	Box2D.GitLabel = "v2.4.1";
+
 	Dependency Glew;
 	Glew.Name = "Glew";
 	Glew.CMakeGenArgs = {
@@ -787,7 +798,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	SpirVReflect.LabelType = GitLabelType::None;
 	SpirVReflect.bRunCMakeInstall = true;
 
-	std::vector<Dependency> TestDeps = { Bullet3, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb, SpirVReflect};
+	std::vector<Dependency> TestDeps = { Bullet3, Box2D, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb, SpirVReflect};
 	std::vector<Dependency> Targets;
 
 	// Optionally select the target

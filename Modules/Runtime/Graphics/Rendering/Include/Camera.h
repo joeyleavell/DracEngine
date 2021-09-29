@@ -16,32 +16,45 @@ namespace Ry
 	public:
 
 		/**
-		 * The transform of the camera.
-		 */
-		Ry::Transform transform;
-
-		/**
 		 * @return Matrix4 The projection matrix of this camera.
 		 */
-		virtual Matrix4 get_proj() const;
+		virtual Matrix4 GetProjection() const;
 
 		/**
 		 * @return Matrix4 The view matrix of this camera.
 		 */
-		virtual Matrix4 get_view() const;
+		virtual Matrix4 GetView() const { return id4(); };
 
 		/**
 		 * @return Matrix4 The combined view and projection matrix.
 		 */
-		virtual Matrix4 get_view_proj() const;
+		virtual Matrix4 GetViewProjection() const;
 
-		virtual void update() = 0;
+		virtual void Update() = 0;
 
-		virtual void resize(int32 width, int32 height) = 0;
+		virtual void Resize(int32 width, int32 height) = 0;
 
 	protected:
-		Matrix4 proj;
+		Matrix4 Projection;
 	};
+
+	class RENDERING_MODULE Camera2D : public Camera
+	{
+	public:
+
+		Transform2D Transform;
+
+		Camera2D(float Width, float Height);
+		Camera2D(float Left, float Right, float Bottom, float Top);
+
+		virtual Vector2 ScreenToWorld(Vector2 Screen) const;
+		virtual void Update();
+		virtual void Resize(int32 Width, int32 Height);
+
+		Matrix4 GetView() const override;
+
+	};
+
 
 	/**
 	 * An orthographic camera that displays a 2D view.
@@ -82,6 +95,10 @@ namespace Ry
 	 */
 	class RENDERING_MODULE PerspectiveCamera : public Camera
 	{
+		/**
+		 * The transform of the camera.
+		 */
+		Ry::Transform transform;
 
 	public:
 
@@ -98,8 +115,9 @@ namespace Ry
 		 */
 		PerspectiveCamera(float aspect, float fov, float z_near, float z_far);
 
-		virtual void update();
+		void Update() override;
+		void Resize(int32 width, int32 height) override;
 
-		virtual void resize(int32 width, int32 height);
 	};
+	
 }

@@ -47,9 +47,9 @@ namespace Ry
 			Component::Update(Delta);
 
 			Transform WorldTransform = GetWorldTransform();
-			Camera->transform.position = WorldTransform.position;
-			Camera->transform.rotation = WorldTransform.rotation;
-			Camera->transform.scale = WorldTransform.scale;
+			//Camera->transform.position = WorldTransform.position;
+			//Camera->transform.rotation = WorldTransform.rotation;
+			//Camera->transform.scale = WorldTransform.scale;
 		}
 
 		void InitPerspective(float FieldOfView, float Aspect, float ZNear, float ZFar)
@@ -59,7 +59,7 @@ namespace Ry
 
 		void InitOrtho(float Left, float Right, float Bottom, float Top)
 		{
-			Camera.Reset(new OrthoCamera(Left, Right, Bottom, Top));
+		//	Camera.Reset(new OrthoCamera(Left, Right, Bottom, Top));
 		}
 		
 	private:

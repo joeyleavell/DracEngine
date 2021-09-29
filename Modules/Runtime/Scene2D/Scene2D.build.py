@@ -1,5 +1,5 @@
 Type = "Runtime"
 
-Extern = []
+Extern = ["Box2D"]
 
 Modules = ["Core", "Math", "Rendering", "Physics", "AssetCore", "Utility"]

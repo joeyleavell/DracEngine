@@ -101,10 +101,10 @@ namespace Ry
 
 	void InputHandler::setScroll(double scroll)
 	{
-		/*for (ScrollListener* handler : scrollListeners)
+		for (ScrollListener* handler : scrollListeners)
 		{
 			handler->onScroll(scroll);
-		}*/
+		}
 	}
 	
 	void InputHandler::sendChar(unsigned int codepoint)
@@ -165,11 +165,11 @@ namespace Ry
 
 	void InputHandler::addScrollListener(ScrollListener* listener)
 	{
-		//scrollListeners.insert(listener);
+		scrollListeners.insert(listener);
 	}
 
 	void InputHandler::removeScrollListener(ScrollListener* listener)
 	{
-	//	scrollListeners.erase(listener);
+		scrollListeners.erase(listener);
 	}
 }

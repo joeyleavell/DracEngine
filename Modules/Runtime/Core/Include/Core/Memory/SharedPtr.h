@@ -291,6 +291,9 @@ namespace Ry
 			OtherClass* CastResult = dynamic_cast<OtherClass*>(Other.Get());
 
 			CORE_ASSERT(!Other.IsValid() || CastResult);
+
+			// Relinquish share of existing pointer
+			Reset(nullptr);
 			
 			if (CastResult)
 			{

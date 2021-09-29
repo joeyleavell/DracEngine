@@ -185,7 +185,7 @@ namespace Ry
 		std::set<KeyListener*> keyListeners;
 		//std::set<ButtonListener*> buttonListeners;
 		//std::set<CharListener*> charListeners;
-		//std::set<ScrollListener*> scrollListeners;
+		std::set<ScrollListener*> scrollListeners;
 
 		bool keys_down[MAX_KEYS];
 		bool buttons_down[MAX_BUTTONS];

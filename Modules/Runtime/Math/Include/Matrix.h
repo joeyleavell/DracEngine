@@ -120,6 +120,8 @@ namespace Ry
 	MATH_MODULE Matrix4 rotatez4(float rotation);
 	MATH_MODULE Matrix4 scale4(float x, float y, float z);
 	MATH_MODULE Matrix4 ortho4(float left, float right, float bottom, float top, float far, float near);
+	MATH_MODULE Matrix3 ortho3(float left, float right, float bottom, float top, float far, float near);
+
 	MATH_MODULE Matrix4 perspective4(float aspect, float fov, float z_near, float z_far, bool bFlipY = false);
 
 

@@ -51,7 +51,7 @@ namespace Ry
 	{
 		if (GlobalCamera)
 		{
-			GlobalCamera->resize(Width, Height);
+//			GlobalCamera->resize(Width, Height);
 		}
 	}
 }

@@ -8,6 +8,8 @@
 
 namespace Ry
 {
+	class Camera2D;
+	class OrthoCamera;
 
 	class Timer;
 
@@ -109,7 +111,7 @@ namespace Ry
 
 		void Update(float Delta);
 
-		void Render();
+		void Render(Ry::Camera2D& Cam);
 
 		void Resize(int32 Width, int32 Height);
 
