@@ -22,6 +22,8 @@ namespace Ry
 		float Density = 1.0f;
 		float Friction = 0.3f;
 		float Restitution = 0.3f;
+
+		bool bFixedRotation = false;
 	};
 
 	class World2D;

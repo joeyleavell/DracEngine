@@ -115,6 +115,8 @@ namespace Ry
 
 		void Resize(int32 Width, int32 Height);
 
+		void UpdateStatic();
+
 	private:
 
 		Ry::SwapChain* SC;

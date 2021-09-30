@@ -219,6 +219,11 @@ namespace Ry
 		DynamicBatch->Resize(Width, Height);
 	}
 
+	void Scene2D::UpdateStatic()
+	{
+		StaticBatch->Update();
+	}
+
 	void Scene2D::RecordCommands()
 	{
 		Cmd->Reset();

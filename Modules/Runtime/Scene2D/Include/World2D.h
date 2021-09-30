@@ -38,6 +38,8 @@ namespace Ry
 
 		void Update(float Delta);
 
+		void UpdateStaticGeometry();
+
 		// Todo: separate from main thread
 		void Draw();
 

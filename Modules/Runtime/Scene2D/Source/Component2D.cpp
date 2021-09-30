@@ -171,6 +171,7 @@ namespace Ry
 		bUpdateEnabled = true;
 
 		this->Mat = Mat;
+		this->Body = nullptr;
 	}
 
 	Physics2DComponent::~Physics2DComponent()
@@ -244,6 +245,7 @@ namespace Ry
 		b2BodyDef BodyDef;
 		BodyDef.type = Mat.Type == Physics2DType::Dynamic ? b2_dynamicBody : b2_staticBody;
 		BodyDef.position.Set(XMeters, YMeters);
+		BodyDef.fixedRotation = Mat.bFixedRotation;
 
 		Body = ParentWorld->CreateBody(&BodyDef);
 

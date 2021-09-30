@@ -91,6 +91,11 @@ namespace Ry
 
 	void World2D::Update(float Delta)
 	{
+		// Physics update
+		int32 VelocityIterations = 8;
+		int32 PositionIterations = 3;
+		PhysicsWorld->Step(Delta, VelocityIterations, PositionIterations);
+
 		for(SharedPtr<Entity2D> Ent : Entities)
 		{
 			Ent->FireUpdate(Delta);
@@ -114,17 +119,17 @@ namespace Ry
 
 		WorldScene->Update(Delta);
 
-		// Physics update
-		int32 VelocityIterations = 8;
-		int32 PositionIterations = 3;
-		PhysicsWorld->Step(Delta, VelocityIterations, PositionIterations);
-
 		// Update camera
-		if(CameraController)
+		if (CameraController)
 		{
 			CameraController->Update(Delta, *Camera);
 		}
 		Camera->Update();
+	}
+
+	void World2D::UpdateStaticGeometry()
+	{
+		WorldScene->UpdateStatic();
 	}
 
 	void World2D::Draw()
