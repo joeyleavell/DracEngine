@@ -23,7 +23,8 @@ namespace Ry
 	{
 	public:
 
-		Ry::MulticastDelegate<ScenePrimitive2D*> OnItemSetDirty;
+		bool bItemSetDirty;
+		bool bPrimitiveStateDirty;
 
 		ScenePrimitive2D(PrimitiveMobility Mobility);
 
@@ -32,6 +33,8 @@ namespace Ry
 		PrimitiveMobility GetMobility();
 		int32 GetLayer();
 		Ry::String GetPipelineId();
+
+		void SetLayer(int32 Layer);
 		
 		virtual Texture* GetTexture();
 		virtual void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) = 0;

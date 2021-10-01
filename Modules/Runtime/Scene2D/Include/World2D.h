@@ -13,6 +13,7 @@ constexpr float MetersToPixels(float Meters) { return Meters * 50.0f; }
 
 namespace Ry
 {
+	struct TmxMap;
 
 	class SCENE2D_MODULE CameraController2D
 	{
@@ -65,5 +66,7 @@ namespace Ry
 		Ry::ArrayList < SharedPtr<Entity2D>> KillEnts;
 
 	};
+
+	SCENE2D_MODULE void CreateFromTmx(Ry::World2D* In, const TmxMap& Map);
 
 }

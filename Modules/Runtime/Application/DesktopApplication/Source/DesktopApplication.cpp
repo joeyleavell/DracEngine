@@ -28,6 +28,7 @@
 #include "nlohmann/json.hpp"
 #include "Core/PlatformProcess.h"
 #include "Factory/FbxFactory.h"
+#include "Tiled.h"
 typedef nlohmann::json Json;
 
 namespace Ry
@@ -332,6 +333,7 @@ namespace Ry
 		AssetMan->RegisterFactory("font/truetype", new TrueTypeFontFactory);
 		AssetMan->RegisterFactory("image", new TextureFactory);
 		AssetMan->RegisterFactory("sound", new AudioFactory);
+		AssetMan->RegisterFactory("tmx", new TmxMapFactory);
 
 		// TODO: Load default engine assets here...
 

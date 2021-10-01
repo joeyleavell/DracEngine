@@ -25,11 +25,11 @@ namespace Ry
 	CORE_MODULE StringView TrimString(const char* String, uint32 StringLength);
 
 	// Parse functions for standard c strings
-	CORE_MODULE float ParseFloat(const char* String, uint32 StringLength);
-	CORE_MODULE double ParseDouble(const char* String, uint32 StringLength);
-	CORE_MODULE int32 ParseInt(const char* String, uint32 StringLength);
-	CORE_MODULE uint32 ParseUnsignedInt(const char* String, uint32 StringLength);
-	CORE_MODULE bool ParseBool(const char* String, uint32 StringLength);
+	CORE_MODULE float ParseFloat(const char* String);
+	CORE_MODULE double ParseDouble(const char* String);
+	CORE_MODULE int32 ParseInt(const char* String);
+	CORE_MODULE uint32 ParseUnsignedInt(const char* String);
+	CORE_MODULE bool ParseBool(const char* String);
 
 	class CORE_MODULE StringView
 	{
@@ -147,22 +147,22 @@ namespace Ry
 
 		float to_float() const
 		{
-			return ParseFloat(Parent + Begin, Size);
+			return ParseFloat(Parent + Begin);
 		}
 
 		int32 to_int32() const
 		{
-			return ParseInt(Parent + Begin, Size);
+			return ParseInt(Parent + Begin);
 		}
 
 		int32 to_uint32() const
 		{
-			return ParseUnsignedInt(Parent + Begin, Size);
+			return ParseUnsignedInt(Parent + Begin);
 		}
 
 		bool to_bool() const
 		{
-			return ParseBool(Parent + Begin, Size);
+			return ParseBool(Parent + Begin);
 		}
 
 		StringView& operator=(const StringView& Other)

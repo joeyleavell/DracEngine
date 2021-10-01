@@ -34,6 +34,12 @@ namespace Ry
 		return PipelineId;
 	}
 
+	void ScenePrimitive2D::SetLayer(int32 Layer)
+	{
+		this->Layer = Layer;
+		bPrimitiveStateDirty = true;
+	}
+
 	Texture* ScenePrimitive2D::GetTexture()
 	{
 		return nullptr;

@@ -3,6 +3,8 @@
 #include "box2d/b2_world.h"
 #include "box2d/b2_contact.h"
 #include "SwapChain.h"
+#include "Tiled.h"
+#include "Tile.h"
 
 namespace Ry
 {
@@ -183,12 +185,81 @@ namespace Ry
 		{
 			auto Primitive = (*ScenePrimitiveItr)->GetPrimitive();
 
+			// Remove even if visible to force refresh
+			WorldScene->RemovePrimitive(Primitive);
+
 			if(Ent->IsVisible())
+			{
 				WorldScene->AddPrimitive(Primitive);
-			else
-				WorldScene->RemovePrimitive(Primitive);
+			}
 
 			++ScenePrimitiveItr;
 		}
+	}
+
+	void CreateFromTmx(Ry::World2D* In, const TmxMap& Map)
+	{
+		/*TileLayerEntity(World2D * World,
+			TileSheet * Sheet,
+			int32 Width, int32 Height,
+			int32 WorldWidth, int32 WorldHeight,
+			bool bCreatePhysics);
+		*/
+
+		// Create tile sheet
+
+		TmxTileSheet& MapTileSheet = Map.TmxTileSheets[0];
+		Texture* TilesTexture = MapTileSheet.Image->CreateRuntimeTexture();
+		TileSheet* NewSheet = new TileSheet(TilesTexture, MapTileSheet.TileWidth, MapTileSheet.TileHeight);
+
+		// Register tiles
+		int32 Rows = MapTileSheet.TileCount / MapTileSheet.Columns;
+		for(int32 SheetX = 0; SheetX < MapTileSheet.Columns; SheetX++)
+		{
+			for(int32 SheetY = 0; SheetY < Rows; SheetY++)
+			{
+				NewSheet->RegisterTile(SheetX + (MapTileSheet.Columns - SheetY - 1) * MapTileSheet.Columns + 1, SheetX, SheetY);
+			}
+		}
+
+		for(int32 TileLayerIndex = 0; TileLayerIndex < Map.TmxLayers.GetSize(); TileLayerIndex++)
+		{
+			auto TileLayer = Map.TmxLayers[TileLayerIndex];
+			
+			bool bDraw = true;
+			bool bCollision = false;
+
+			if(TileLayer.Name == "Collision")
+			{
+				// generate collision for this layer
+				bDraw = false;
+				bCollision = true;
+			}
+
+			auto NewTileLayerEntity = CreateEntity<TileLayerEntity>(Transform2D{}, In, NewSheet,
+				TileLayer.Width, TileLayer.Height,
+				Map.TileWidth, Map.TileHeight,
+				bCollision,
+				TileLayerIndex);
+
+			if (!bDraw)
+				NewTileLayerEntity->SetVisibility(false);
+
+			// Setup tile data
+			NewTileLayerEntity->BeginEdit();
+			{
+				for (int32 X = 0; X < TileLayer.Width; X++)
+				{
+					for (int32 Y = 0; Y < TileLayer.Height; Y++)
+					{
+						NewTileLayerEntity->SetTile(X, TileLayer.Height - Y - 1, TileLayer.TileGuids[X + Y * TileLayer.Width]);
+					}
+				}
+			}
+			NewTileLayerEntity->EndEdit();
+
+			In->AddEntity(NewTileLayerEntity);
+		}
+		
 	}
 }

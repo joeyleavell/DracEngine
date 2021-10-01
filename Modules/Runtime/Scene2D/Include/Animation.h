@@ -17,22 +17,22 @@ namespace Ry
 
 		float GetUx()
 		{
-			return X / (float)Parent->GetWidth();
+			return (X / (float)Parent->GetWidth()) + 0.01f;
 		}
 
 		float GetVy()
 		{
-			return Y / (float)Parent->GetHeight();
+			return (Y / (float)Parent->GetHeight()) + 0.01f;
 		}
 
 		float GetUw()
 		{
-			return W / (float)Parent->GetWidth();
+			return (W / (float)Parent->GetWidth()) - 2 * 0.01f;
 		}
 
 		float GetVh()
 		{
-			return H / (float)Parent->GetHeight();
+			return (H / (float)Parent->GetHeight()) - 2 * 0.01f;
 		}
 	};
 

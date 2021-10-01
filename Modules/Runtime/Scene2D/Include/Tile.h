@@ -161,7 +161,7 @@ namespace Ry
 	{
 	public:
 
-		TileLayerComponent(Entity2D* Owner, PrimitiveMobility Mobility, TileSheet* Sheet, int32 TilesWide, int32 TilesTall, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics);
+		TileLayerComponent(Entity2D* Owner, PrimitiveMobility Mobility, TileSheet* Sheet, int32 TilesWide, int32 TilesTall, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics, int32 RenderLayer);
 
 		void SetTile(int32 X, int32 Y, int32 TileID);
 		int32 GetTile(int32 X, int32 Y);
@@ -219,7 +219,8 @@ namespace Ry
 			TileSheet* Sheet, 
 			int32 Width, int32 Height, 
 			int32 WorldWidth, int32 WorldHeight, 
-			bool bCreatePhysics);
+			bool bCreatePhysics, 
+			int32 TileLayer);
 
 		void SetTile(int32 X, int32 Y, int32 TileID);
 		int32 GetTile(int32 X, int32 Y);

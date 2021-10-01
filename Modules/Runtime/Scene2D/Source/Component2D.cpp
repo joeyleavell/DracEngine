@@ -128,6 +128,13 @@ namespace Ry
 	{
 		if(Primitive.IsValid())
 		{
+			// Primitive's grouping needs to be updating
+			if(Primitive->bPrimitiveStateDirty)
+			{
+				Primitive->bPrimitiveStateDirty = false;
+				OnRenderStateDirty.Broadcast();
+			}
+			
 			// Calculate world transform
 			Ry::Transform2D WorldTransform = GetWorldTransform();
 

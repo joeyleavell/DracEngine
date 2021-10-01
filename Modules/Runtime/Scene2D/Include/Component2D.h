@@ -88,6 +88,8 @@ namespace Ry
 	{
 	public:
 
+		MulticastDelegate<> OnRenderStateDirty;
+
 		Primitive2DComponent(Entity2D* Owner, Ry::PrimitiveMobility Mobility, const Vector2& Size = {0.0f, 0.0f}, const Vector2& Origin = { 0.0f, 0.0f });
 
 		void DrawPrimitive();

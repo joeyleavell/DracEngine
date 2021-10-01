@@ -161,13 +161,14 @@ namespace Ry
 		}
 	}
 
-	TileLayerComponent::TileLayerComponent(Entity2D* Owner, PrimitiveMobility Mobility, TileSheet* Sheet, int32 TilesWide, int32 TilesTall, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics):
+	TileLayerComponent::TileLayerComponent(Entity2D* Owner, PrimitiveMobility Mobility, TileSheet* Sheet, int32 TilesWide, int32 TilesTall, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics, int32 RenderLayer):
 	Primitive2DComponent(Owner, Mobility)
 	{
 		this->Sheet = Sheet;
 		this->Layer = new TileLayer(TilesWide, TilesTall);
 
 		Primitive = MakeShared(new TileLayerPrimitive(Mobility, Layer, Sheet, WorldWidth, WorldHeight));
+		Primitive->SetLayer(RenderLayer);
 
 		// Create layer physics component
 		if(bCreatePhysics)
@@ -180,10 +181,6 @@ namespace Ry
 	void TileLayerComponent::SetTile(int32 X, int32 Y, int32 TileID)
 	{
 		Layer->SetTile(X, Y, TileID);
-
-		// Update world static geometry
-		DrawPrimitive();
-		GetWorld()->UpdateStaticGeometry();
 
 		// todo: regenerate collision
 	}
@@ -457,11 +454,6 @@ namespace Ry
 			}
 		}
 
-		for (b2Vec2 Vert : Verts)
-			std::cout << Vert.x << " " << Vert.y << std::endl;
-		std::cout << "enclosed: " << bEnclosed << std::endl;
-		std::cout << std::endl;
-
 		// Reverse the winding order
 		if(bEnclosed)
 		{
@@ -608,10 +600,10 @@ namespace Ry
 		CreatePhysicsState();
 	}
 
-	TileLayerEntity::TileLayerEntity(World2D* World, TileSheet* Sheet, int32 Width, int32 Height, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics):
+	TileLayerEntity::TileLayerEntity(World2D* World, TileSheet* Sheet, int32 Width, int32 Height, int32 WorldWidth, int32 WorldHeight, bool bCreatePhysics, int32 LayerIndex):
 	Entity2D(World)
 	{
-		TileLayer = CreateComponent<TileLayerComponent>(Static, Sheet, Width, Height, WorldWidth, WorldHeight, bCreatePhysics);
+		TileLayer = CreateComponent<TileLayerComponent>(Static, Sheet, Width, Height, WorldWidth, WorldHeight, bCreatePhysics, LayerIndex);
 	}
 
 	void TileLayerEntity::SetTile(int32 X, int32 Y, int32 TileID)

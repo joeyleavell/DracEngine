@@ -171,6 +171,25 @@ namespace Ry
 			return ArrayList<T>::Iterator(*this, 0);
 		}
 
+		void Insert(const T& Item, int32 Index)
+		{
+			// Check if we need to resize
+			if (Size >= AllocatedSize)
+			{
+				Resize((int32)(AllocatedSize * 1.5) + 1);
+			}
+
+			// Scoot over current elements
+			for (int32 Cur = Index + 1; Cur < Size; Cur++)
+				Data[Cur] = Data[Cur - 1];
+
+			// Store element
+			Data[Index] = Item;
+
+			// Size increased
+			Size++;
+		}
+
 		void Add(const T& Item)
 		{
 			// Check if we need to resize

@@ -68,6 +68,8 @@ namespace Ry
 
 	protected:
 
+		void OnPrimitiveRenderStateDirty();
+
 		Ry::ArrayList<Ry::SharedPtr<Ry::Component2D>> Components;
 		Ry::ArrayList<Ry::SharedPtr<Ry::Primitive2DComponent>> PrimitiveComponents;
 		Ry::ArrayList<Ry::SharedPtr<Ry::Physics2DComponent>> PhysicsComponents;
@@ -103,6 +105,7 @@ namespace Ry
 		if(AsPrimitive.IsValid())
 		{
 			PrimitiveComponents.Add(AsPrimitive);
+			AsPrimitive->OnRenderStateDirty.AddMemberFunction(this, &Entity2D::OnPrimitiveRenderStateDirty);
 			OnRenderStateDirty.Broadcast(this);
 		}
 

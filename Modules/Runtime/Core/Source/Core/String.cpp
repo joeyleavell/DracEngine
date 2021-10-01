@@ -173,17 +173,17 @@ namespace Ry
 		return StringSubstring(String, StringLength, TrimBeg, TrimEnd + 1);
 	}
 
-	float ParseFloat(const char* String, uint32 StringLength)
+	float ParseFloat(const char* String)
 	{
 		return (float) atof(String);
 	}
 
-	double ParseDouble(const char* String, uint32 StringLength)
+	double ParseDouble(const char* String)
 	{
 		return atof(String);
 	}
 
-	bool ParseBool(const char* String, uint32 StringLength)
+	bool ParseBool(const char* String)
 	{
 		if (strcmp(String, "true") == 0)
 			return true;
@@ -213,12 +213,12 @@ namespace Ry
 		return false;
 	}
 
-	int32 ParseInt(const char* String, uint32 StringLength)
+	int32 ParseInt(const char* String)
 	{
 		return atoi(String);
 	}
 
-	uint32 ParseUnsignedInt(const char* String, uint32 StringLength)
+	uint32 ParseUnsignedInt(const char* String)
 	{
 		return (uint32) atoi(String);
 	}
@@ -504,7 +504,7 @@ namespace Ry
 	
 	bool String::to_bool() const
 	{
-		return ParseBool(data, size);
+		return ParseBool(data);
 	}
 
 	String operator+(const char* a, const String& b)

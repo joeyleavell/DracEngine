@@ -122,4 +122,10 @@ namespace Ry
 	{
 		return bPendingKill;
 	}
+
+	void Entity2D::OnPrimitiveRenderStateDirty()
+	{
+		OnRenderStateDirty.Broadcast(this);
+	}
+	
 }

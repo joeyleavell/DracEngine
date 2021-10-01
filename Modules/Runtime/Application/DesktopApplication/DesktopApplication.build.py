@@ -12,7 +12,8 @@ Modules = ["Core",
 "Input", 
 "OpenGL", 
 "Vulkan",
-"Windowing"]
+"Windowing",
+"Scene2D"]
 
 # Declare module type
 Type = "Runtime"
