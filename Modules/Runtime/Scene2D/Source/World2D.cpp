@@ -5,6 +5,7 @@
 #include "SwapChain.h"
 #include "Tiled.h"
 #include "Tile.h"
+#include "VectorFontAsset.h"
 
 namespace Ry
 {
@@ -188,7 +189,7 @@ namespace Ry
 			// Remove even if visible to force refresh
 			WorldScene->RemovePrimitive(Primitive);
 
-			if(Ent->IsVisible())
+			if(Ent->IsVisible() && (*ScenePrimitiveItr)->IsVisible())
 			{
 				WorldScene->AddPrimitive(Primitive);
 			}
@@ -197,7 +198,7 @@ namespace Ry
 		}
 	}
 
-	void CreateFromTmx(Ry::World2D* In, const TmxMap& Map)
+	void CreateFromTmx(Ry::World2D* In, const TmxMap& Map, VectorFontAsset* FontAsset)
 	{
 		/*TileLayerEntity(World2D * World,
 			TileSheet * Sheet,
@@ -260,6 +261,24 @@ namespace Ry
 
 			In->AddEntity(NewTileLayerEntity);
 		}
+
+		for (int32 ObjLayerIndex = 0; ObjLayerIndex < Map.TmxObjectLayers.GetSize(); ObjLayerIndex++)
+		{
+			auto ObjLayer = Map.TmxObjectLayers[ObjLayerIndex];
+
+			for(auto Text : ObjLayer.TextObjects)
+			{
+				Transform2D Transform;
+				Transform.Position.x = Text.X;
+				Transform.Position.y = (Map.Height * Map.TileHeight) - Text.Y - 1;
+
+				//	Text2DEntity::Text2DEntity(World2D* World, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font):
+				auto TextEnt = CreateEntity<Text2DEntity>(Transform, In, Ry::Vector2{ Text.Width, Text.Height }, Text.Value, FontAsset->GetOrGenBitmapFont(Text.FontSize), ObjLayerIndex + Map.TmxLayers.GetSize());
+				In->AddEntity(TextEnt);
+			}
+
+		}
+
 		
 	}
 }

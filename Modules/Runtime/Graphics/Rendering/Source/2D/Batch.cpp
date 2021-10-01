@@ -20,7 +20,31 @@
 
 namespace Ry
 {
+	void ComputeTextData(PrecomputedTextData& OutData, const Ry::String Text)
+	{
+		OutData.Lines.Clear();
 
+		Ry::StringView* Lines = nullptr;
+		int32 LineCount = Text.split("\n", &Lines);
+		for (int32 Line = 0; Line < LineCount; Line++)
+		{
+			TextLine NewLine;
+
+			Ry::StringView* Words = nullptr;
+			int32 WordCount = Lines[Line].split(" ", &Words);
+			for (int32 Word = 0; Word < WordCount; Word++)
+			{
+				NewLine.Words.Add(Words[Word]);
+			}
+
+			// Add the cached line
+			OutData.Lines.Add(NewLine);
+
+			delete[] Words;
+		}
+		delete[] Lines;
+
+	}
 
 	Ry::SharedPtr<BatchItem> MakeItem()
 	{
@@ -30,6 +54,46 @@ namespace Ry
 	Ry::SharedPtr<BatchItemSet> MakeItemSet()
 	{
 		return Ry::MakeShared<>(new BatchItemSet);
+	}
+
+	void TransformedRect(Ry::Vector3* OutVerts, Ry::Matrix3 Transform, float OriginX, float OriginY, float Width, float Height)
+	{
+		float OriginXModel = OriginX * Width;
+		float OriginYModel = OriginY * Height;
+
+		Ry::Vector3 V1{ 0.0f, 0.0f, 1.0f },
+			V2{ 0.0f, Height, 1.0f },
+			V3{ Width, Height, 1.0f },
+			V4{ Width, 0.0f, 1.0f };
+
+		V1.x -= OriginXModel;
+		V1.y -= OriginYModel;
+		V2.x -= OriginXModel;
+		V2.y -= OriginYModel;
+		V3.x -= OriginXModel;
+		V3.y -= OriginYModel;
+		V4.x -= OriginXModel;
+		V4.y -= OriginYModel;
+
+		OutVerts[0] = Transform * V1;
+		OutVerts[1] = Transform * V2;
+		OutVerts[2] = Transform * V3;
+		OutVerts[3] = Transform * V4;
+	}
+
+	void BatchRectangleTransform(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, Ry::Matrix3 Transform,
+	                             float Width, float Height, float OriginX, float OriginY, float Depth)
+	{
+		Ry::Vector3 Verts[4];
+		TransformedRect(Verts, Transform, OriginX, OriginY, Width, Height);
+
+		Item->AddVertex1P1C((float)Verts[0].x, (float)Verts[0].y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C((float)Verts[1].x, (float)Verts[1].y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C((float)Verts[2].x, (float)Verts[2].y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+		Item->AddVertex1P1C((float)Verts[3].x, (float)Verts[3].y, Depth, Color.Red, Color.Green, Color.Blue, Color.Alpha);
+
+		Item->AddTriangle(0, 1, 2);
+		Item->AddTriangle(2, 3, 0);
 	}
 
 	void BatchHollowRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Thickness, float Depth)
@@ -294,8 +358,8 @@ namespace Ry
 		const int32 SPACE_ADVANCE = Font->GetGlyph(static_cast<int32>(' '))->AdvanceWidth;
 
 		// Establish origin
-		float CurX = XPosition;
-		float CurY = YPosition + (Font->GetAscent());
+		float CurX = 0;
+		float CurY = 0 - Font->GetAscent();
 
 		// Get the advance width of the space character
 
@@ -310,11 +374,11 @@ namespace Ry
 				float TextWidth = Font->MeasureWidth(CurrentWord);
 
 				// Wrap text to next line
-				if (CurX + TextWidth > XPosition + LineWidth)
+				if (Word > 0 && CurX + TextWidth > XPosition + LineWidth)
 				{
 					// Reset cursor
 					CurX = XPosition;
-					CurY += Font->GetAscent() - Font->GetDescent() + Font->GetLineGap();
+					CurY += -(Font->GetAscent() - Font->GetDescent() + Font->GetLineGap());
 				}
 
 				for (uint32 WordChar = 0; WordChar < CurrentWord.getSize(); WordChar++)
@@ -345,17 +409,19 @@ namespace Ry
 						float UVW = RasterWidth / float(FONT_BITMAP_SIZE);
 						float UVH = RasterHeight / float(FONT_BITMAP_SIZE);
 
-						float TL_X = CurX + OriginX;
-						float TL_Y = CurY + OriginY;
+						float BL_X = CurX + OriginX;
+						float BL_Y = CurY - OriginY;
 
-						float TR_X = TL_X + RasterWidth;
-						float TR_Y = TL_Y;
+						float BR_X = BL_X + RasterWidth;
+						float BR_Y = BL_Y;
 
-						float BL_X = TL_X;
-						float BL_Y = TL_Y + RasterHeight;
+						float TL_X = BL_X;
+						float TL_Y = BL_Y + RasterHeight;
 
-						float BR_X = TL_X + RasterWidth;
-						float BR_Y = TL_Y + RasterHeight;
+						float TR_X = BL_X + RasterWidth;
+						float TR_Y = BL_Y + RasterHeight;
+
+						std::cout << OriginY << " " << CurY << std::endl;
 
 						// Create a batch item for this glyph
 						Ry::SharedPtr<BatchItem> GlyphItem;
@@ -371,7 +437,8 @@ namespace Ry
 						}
 						
 						GlyphIndex++;
-						
+
+						// Transform vert
 						GlyphItem->AddVertex1P1UV1C(TL_X, TL_Y, 0.0f, U, V, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Top left
 						GlyphItem->AddVertex1P1UV1C(TR_X, TR_Y, 0.0f, U + UVW, V, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Top right
 						GlyphItem->AddVertex1P1UV1C(BR_X, BR_Y, 0.0f, U + UVW, V + UVH, Color.Red, Color.Green, Color.Blue, Color.Alpha); // Bottom right
@@ -404,7 +471,7 @@ namespace Ry
 			}
 
 			// Move cursor to the next line
-			CurY += Font->GetAscent() - Font->GetDescent() + Font->GetLineGap();
+			CurY += -(Font->GetAscent() - Font->GetDescent() + Font->GetLineGap());
 			CurX = XPosition;
 		}
 

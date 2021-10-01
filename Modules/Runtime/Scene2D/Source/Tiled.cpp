@@ -16,9 +16,87 @@ namespace Ry
 		AssetDst.push_back(TmxAsset);
 	}
 
-	TmxLayer LoadTmxLayer(xml_node<>* Node)
+	void LoadProps(xml_node<>* Node, Ry::OAHashMap<Ry::String, Ry::String>& OutMap)
 	{
-		TmxLayer Result;
+		// load properties
+		if (xml_node<>* Props = Node->first_node("properties"))
+		{
+			xml_node<>* Prop = Props->first_node();
+			while (Prop)
+			{
+				Ry::String Key = Prop->first_attribute("name")->value();
+				Ry::String Value = Prop->first_attribute("value")->value();
+				OutMap.Insert(Key, Value);
+				Prop = Prop->next_sibling();
+			}
+		}
+	}
+
+	TmxObjectLayer LoadTmxObjectLayer(xml_node<>* Node)
+	{
+		TmxObjectLayer Result;
+
+		xml_node<>* Prop = Node->first_node("object");
+		while (Prop)
+		{
+			xml_attribute<>* XAttr = Prop->first_attribute("x");
+			xml_attribute<>* YAttr = Prop->first_attribute("y");
+			xml_attribute<>* WAttr = Prop->first_attribute("width");
+			xml_attribute<>* HAttr = Prop->first_attribute("height");
+
+			xml_node<>* TextNode = Prop->first_node("text");
+
+			if(TextNode)
+			{
+				// Text
+				TmxText Text;
+				Text.X = Ry::ParseInt(XAttr->value());
+				Text.Y = Ry::ParseInt(YAttr->value());
+				Text.Width = Ry::ParseInt(WAttr->value());
+				Text.Height = Ry::ParseInt(HAttr->value());
+				Text.FontSize = Ry::ParseInt(TextNode->first_attribute("pixelsize")->value());
+				Text.Value = TextNode->value();
+
+				LoadProps(Prop, Text.Properties);
+
+				Result.TextObjects.Add(Text);
+			}
+			else if(WAttr && HAttr)
+			{
+				// Rect
+				TmxRect Rect;
+				Rect.X = Ry::ParseInt(XAttr->value());
+				Rect.Y = Ry::ParseInt(YAttr->value());
+				Rect.W = Ry::ParseInt(WAttr->value());
+				Rect.H = Ry::ParseInt(HAttr->value());
+
+				LoadProps(Prop, Rect.Properties);
+
+				Result.RectObjects.Add(Rect);
+			}
+			else
+			{
+				// Point
+				TmxPoint Point;
+				Point.X = Ry::ParseInt(XAttr->value());
+				Point.Y = Ry::ParseInt(YAttr->value());
+
+				LoadProps(Prop, Point.Properties);
+
+				Result.PointObjects.Add(Point);
+			}
+
+			Prop = Prop->next_sibling();
+		}
+
+		LoadProps(Node, Result.Properties);
+		
+		return Result;
+	}
+
+	TmxTileLayer LoadTmxLayer(xml_node<>* Node)
+	{
+		TmxTileLayer Result;
 
 		Result.Width = Ry::ParseInt(Node->first_attribute("width")->value());
 		Result.Height = Ry::ParseInt(Node->first_attribute("height")->value());
@@ -35,6 +113,9 @@ namespace Ry
 				Result.TileGuids[Tile] = Ry::ParseInt(Values[Tile].GetData());
 			}
 		}
+
+		// load properties
+		LoadProps(Node, Result.Properties);
 
 		delete[] Values;
 
@@ -113,9 +194,14 @@ namespace Ry
 		while(CurNode)
 		{
 			Ry::String NodeName = CurNode->name();
+			if (NodeName == "objectgroup")
+			{
+				TmxObjectLayer NewLayer = LoadTmxObjectLayer(CurNode);
+				Result.TmxObjectLayers.Add(NewLayer);
+			}
 			if(NodeName == "layer")
 			{
-				TmxLayer NewLayer = LoadTmxLayer(CurNode);
+				TmxTileLayer NewLayer = LoadTmxLayer(CurNode);
 				Result.TmxLayers.Add(NewLayer);
 			}
 			else if(NodeName == "tileset")

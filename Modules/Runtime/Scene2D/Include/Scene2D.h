@@ -63,6 +63,23 @@ namespace Ry
 		Ry::Vector2 Size;
 	};
 
+	class SCENE2D_MODULE TextScenePrimitive : public ScenePrimitive2D
+	{
+	public:
+
+		TextScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font);
+
+		Texture* GetTexture() override;
+
+		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
+
+	private:
+
+		float Width;
+		PrecomputedTextData TextData;
+		BitmapFont* Font;
+	};
+
 	class SCENE2D_MODULE TextureScenePrimitive : public QuadScenePrimitive
 	{
 	public:
@@ -81,6 +98,26 @@ namespace Ry
 
 	};
 
+	class SCENE2D_MODULE RectScenePrimitive : public QuadScenePrimitive
+	{
+	public:
+
+		RectScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Color RectColor);
+
+		Texture* GetTexture() override;
+
+		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
+
+	private:
+
+		Color RectColor;
+
+		Ry::SharedPtr<BatchItem> Item;
+
+		TextureRegion Texture;
+
+	};
+
 	class SCENE2D_MODULE AnimationScenePrimitive : public QuadScenePrimitive
 	{
 	public:
@@ -92,10 +129,13 @@ namespace Ry
 
 		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
 
-		// todo: implement
-		void SetAnim() {};
+		void Pause(int32 AtFrame);
+		void Play();
+		void SetAnim(SharedPtr<Animation> Anim);
+		void SetDelay(float Delay);
 
 	private:
+		bool bPlaying;
 		int32 FrameIndex;
 		Ry::SharedPtr<Animation> Anim;
 		Timer* AnimTimer;

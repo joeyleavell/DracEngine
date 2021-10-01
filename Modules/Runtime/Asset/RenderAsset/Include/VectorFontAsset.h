@@ -33,7 +33,8 @@ namespace Ry
 		 */
 		Ry::BitmapFont* GetBitmapFont(int32 Size);
 		Ry::BitmapFont* GenerateBitmapFont(int32 Size);
-				
+		Ry::BitmapFont* GetOrGenBitmapFont(int32 Size);
+
 	private:
 
 		Map<int32, Ry::BitmapFont*> GeneratedFonts;

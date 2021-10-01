@@ -100,6 +100,8 @@ namespace Ry
 		Ry::ArrayList<Ry::TextLine> Lines;
 	};
 
+	RENDERING_MODULE void ComputeTextData(PrecomputedTextData& OutData, const Ry::String Text);
+
 	struct RENDERING_MODULE BatchItem
 	{
 		Ry::ArrayList<float> Data;
@@ -194,6 +196,12 @@ namespace Ry
 
 	RENDERING_MODULE Ry::SharedPtr<BatchItem> MakeItem();
 	RENDERING_MODULE Ry::SharedPtr<BatchItemSet> MakeItemSet();
+
+
+	RENDERING_MODULE void TransformedRect(Ry::Vector3* OutVerts, Ry::Matrix3 Transform, float OriginX, float OriginY, float Width, float Height);
+	
+	RENDERING_MODULE void BatchRectangleTransform(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, Ry::Matrix3 Transform, float Width, float Height, float OriginX, float OriginY, float Depth);
+
 	RENDERING_MODULE void BatchRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Depth);
 	RENDERING_MODULE void BatchHollowRectangle(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float Width, float Height, float Thickness, float Depth);
 	RENDERING_MODULE void BatchSubArc(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, float X, float Y, float InnerRadius, float OuterRadius, float Theta0, float Theta1, int32 Segments, float Depth);

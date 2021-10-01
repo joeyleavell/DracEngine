@@ -22,8 +22,11 @@ namespace Ry
 		float Density = 1.0f;
 		float Friction = 0.3f;
 		float Restitution = 0.3f;
-
 		bool bFixedRotation = false;
+
+		float LinearDamping = 8.0f;
+		float AngularDamping = 1.0f;
+		bool bIsBullet = false;
 	};
 
 	class World2D;
@@ -98,8 +101,13 @@ namespace Ry
 		Ry::Vector2 GetOrigin();
 
 		Ry::SharedPtr<Ry::ScenePrimitive2D> GetPrimitive();
+
+		void SetVisibility(bool bVisible);
+		bool IsVisible() const;
 		
 	protected:
+
+		bool bVisible;
 
 		PrimitiveMobility Mobility;
 
@@ -110,6 +118,14 @@ namespace Ry
 		
 	};
 
+	class SCENE2D_MODULE Text2DComponent : public Primitive2DComponent
+	{
+	public:
+
+		Text2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, Ry::String Text = "", BitmapFont* Font = nullptr, int32 Layer = 0);
+
+	};
+
 	class SCENE2D_MODULE Texture2DComponent : public Primitive2DComponent
 	{
 	public:
@@ -117,16 +133,67 @@ namespace Ry
 		Texture2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, TextureRegion Texture = {});
 	};
 
+	class SCENE2D_MODULE RectComponent : public Primitive2DComponent
+	{
+	public:
+
+		RectComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, Color RectColor = WHITE);
+	};
+
 	class SCENE2D_MODULE Animation2DComponent : public Primitive2DComponent
 	{
 	public:
 
 		Animation2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size = { 0.0f, 0.0f }, const Vector2& Origin = { 0.0f, 0.0f }, SharedPtr<Animation> Anim = {});
+
+		void Pause(int32 AtFrame = 0);
+		void Play();
+		void SetAnimation(SharedPtr<Animation> Anim);
+		void SetDelay(float Delay);
+
+	};
+
+
+	struct AnimPair
+	{
+		Ry::String Name;
+		Ry::SharedPtr<Animation> Anim;
+
+		AnimPair(Ry::String Name, Ry::SharedPtr<Animation> A)
+		{
+			this->Name = Name;
+			Anim = A;
+		}
+	};
+
+	class SCENE2D_MODULE AnimationStateComponent : public Component2D
+	{
+	public:
+
+		AnimationStateComponent(Entity2D* Owner, Ry::SharedPtr<Animation2DComponent> AnimComp);
+
+		void SetAnims(std::initializer_list<AnimPair> Pairs);
+
+		void Pause(int32 AtFrame = 0);
+		void Play();
+		void Play(Ry::String Name);
+
+		void SetAnimDelay(float Delay);
+
+	private:
+
+		Ry::String CurrentAnim;
+		bool bPaused;
+		Ry::OAHashMap<Ry::String, SharedPtr<Ry::Animation>> Anims;
+		SharedPtr<Animation2DComponent> AnimComp;
+
 	};
 
 	class SCENE2D_MODULE Physics2DComponent : public Transform2DComponent
 	{
 	public:
+
+		float DragCoefficient = 7.0f;
 
 		Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat);
 		~Physics2DComponent();
@@ -143,6 +210,11 @@ namespace Ry
 		virtual void OnEndOverlap(Physics2DComponent* Other);
 
 		void ApplyForceToCenter(float X, float Y);
+		void SetLinearVelocity(float X, float Y);
+		void ApplyDragForce(float C);
+
+		float GetSpeed() const;
+		Vector2 GetVelocity() const;
 
 	protected:
 

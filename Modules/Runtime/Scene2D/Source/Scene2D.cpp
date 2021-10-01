@@ -4,6 +4,7 @@
 #include "Interface/RenderCommand.h"
 #include "Timer.h"
 #include "Camera.h"
+#include "Font.h"
 
 namespace Ry
 {
@@ -51,6 +52,30 @@ namespace Ry
 		this->Size = Size;
 	}
 
+	TextScenePrimitive::TextScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font):
+	ScenePrimitive2D(Mobility)
+	{
+		this->Width = Size.x;
+		this->Font = Font;
+		this->PipelineId = "Font";
+		ComputeTextData(TextData, Text);
+	}
+
+	Texture* TextScenePrimitive::GetTexture()
+	{
+		return Font->GetAtlasTexture();
+	}
+
+	void TextScenePrimitive::Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin)
+	{
+		Ry::BatchText(ItemSet, WHITE, 
+			Font, 
+			TextData, 
+			Transform[0][2], Transform[1][2], 
+			Width
+		);
+	}
+
 	TextureScenePrimitive::TextureScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, const TextureRegion& Region):
 	QuadScenePrimitive(Mobility, Size)
 	{
@@ -80,17 +105,51 @@ namespace Ry
 			0.0f);
 	}
 
+	RectScenePrimitive::RectScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Color RectColor):
+	QuadScenePrimitive(Mobility, Size)
+	{
+		PipelineId = "Shape";
+		
+		this->RectColor = RectColor;
+		Item = MakeItem();
+	}
+
+	Texture* RectScenePrimitive::GetTexture()
+	{
+		return nullptr;
+	}
+
+	void RectScenePrimitive::Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin)
+	{
+		ItemSet->Items.Clear();
+		ItemSet->AddItem(Item);
+
+		Item->Clear();
+
+		Ry::BatchRectangleTransform(Item, RectColor, Transform,
+			Size.x, Size.y,
+			Origin.x, Origin.y,
+			0.0f);
+	}
+
 	AnimationScenePrimitive::AnimationScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::SharedPtr<Animation> Anim):
 	QuadScenePrimitive(Mobility, Size)
 	{
 		this->Anim = Anim;
 		this->FrameIndex = 0;
 
-		AnimTimer = new Timer(Anim->GetSpeed());
+		AnimTimer = new Timer;
+
+		if(Anim.IsValid())
+		{
+			AnimTimer->set_delay(Anim->GetSpeed());
+		}
 
 		// Create animation item
 		Item = MakeItem();
 		ItemSet->Items.Add(Item);
+
+		this->bPlaying = true;
 	}
 
 	AnimationScenePrimitive::~AnimationScenePrimitive()
@@ -110,8 +169,10 @@ namespace Ry
 		
 		if(AnimTimer->is_ready())
 		{
-			FrameIndex = (FrameIndex + 1) % Anim->GetNumFrames();
+			FrameIndex++;
 		}
+
+		FrameIndex = FrameIndex % Anim->GetNumFrames();
 
 		TextureRegion& CurFrame = Anim->GetFrame(FrameIndex);
 
@@ -125,6 +186,31 @@ namespace Ry
 			Size.x,
 			Size.y,
 			0.0f);
+	}
+
+	void AnimationScenePrimitive::Pause(int32 AtFrame)
+	{
+		this->bPlaying = false;
+		this->FrameIndex = AtFrame;
+	}
+
+	void AnimationScenePrimitive::Play()
+	{
+		this->bPlaying = true;
+	}
+
+	void AnimationScenePrimitive::SetAnim(SharedPtr<Animation> Anim)
+	{
+		this->Anim = Anim;
+		if (Anim.IsValid())
+		{
+			AnimTimer->set_delay(Anim->GetSpeed());
+		}
+	}
+
+	void AnimationScenePrimitive::SetDelay(float Delay)
+	{
+		AnimTimer->set_delay(Delay);
 	}
 
 	Scene2D::Scene2D(Ry::SwapChain* Parent)

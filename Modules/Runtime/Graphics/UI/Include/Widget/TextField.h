@@ -63,7 +63,7 @@ namespace Ry
 			}
 
 			// Pre compute text data
-			ComputeTextData();
+			ComputeTextData(ComputedTextData, Text);
 			MarkDirty();
 
 			return *this;
@@ -572,31 +572,6 @@ namespace Ry
 				Bat->RemoveItem(SelectionItem);
 				std::cout << "hide sel" << std::endl;
 			}
-		}
-
-		void ComputeTextData()
-		{
-			ComputedTextData.Lines.Clear();
-
-			Ry::StringView* Lines = nullptr;
-			int32 LineCount = Text.split("\n", &Lines);
-			for (int32 Line = 0; Line < LineCount; Line++)
-			{
-				TextLine NewLine;
-
-				Ry::StringView* Words = nullptr;
-				int32 WordCount = Lines[Line].split(" ", &Words);
-				for (int32 Word = 0; Word < WordCount; Word++)
-				{
-					NewLine.Words.Add(Words[Word]);
-				}
-
-				// Add the cached line
-				ComputedTextData.Lines.Add(NewLine);
-
-				delete[] Words;
-			}
-			delete[] Lines;
 		}
 
 		bool bDragging = false;

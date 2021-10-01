@@ -14,6 +14,7 @@ constexpr float MetersToPixels(float Meters) { return Meters * 50.0f; }
 namespace Ry
 {
 	struct TmxMap;
+	class VectorFontAsset;
 
 	class SCENE2D_MODULE CameraController2D
 	{
@@ -67,6 +68,7 @@ namespace Ry
 
 	};
 
-	SCENE2D_MODULE void CreateFromTmx(Ry::World2D* In, const TmxMap& Map);
+	SCENE2D_MODULE void CreateFromTmx(Ry::World2D* In, const TmxMap& Map, VectorFontAsset* FontAsset);
+
 
 }

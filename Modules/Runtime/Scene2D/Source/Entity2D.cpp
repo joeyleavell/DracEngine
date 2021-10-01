@@ -127,5 +127,11 @@ namespace Ry
 	{
 		OnRenderStateDirty.Broadcast(this);
 	}
+
+	Text2DEntity::Text2DEntity(World2D* World, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font, int32 Layer):
+	Entity2D(World)
+	{
+		CreateComponent<Text2DComponent>(Static, Size, Vector2{}, Text, Font, Layer);
+	}
 	
 }

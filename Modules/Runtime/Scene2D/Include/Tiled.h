@@ -4,6 +4,7 @@
 #include "Tiled.gen.h"
 #include "Factory/AssetFactory.h"
 #include "TextureAsset.h"
+#include "Data/Map.h"
 
 namespace Ry
 {
@@ -24,12 +25,55 @@ namespace Ry
 		}
 	};
 
-	struct SCENE2D_MODULE TmxLayer
+	struct TmxPoint
+	{
+		OAHashMap<Ry::String, Ry::String> Properties;
+		Ry::String Name;
+		float X;
+		float Y;
+	};
+
+	struct TmxRect
+	{
+		OAHashMap<Ry::String, Ry::String> Properties;
+		Ry::String Name;
+		float X;
+		float Y;
+		float W;
+		float H;
+	};
+
+	struct TmxText
+	{
+		OAHashMap<Ry::String, Ry::String> Properties;
+		Ry::String Value;
+		float X;
+		float Y;
+		float Width;
+		float Height;
+		int32 FontSize;
+	};
+
+	struct SCENE2D_MODULE TmxObjectLayer
+	{
+		Ry::String Name;
+
+		OAHashMap<Ry::String, Ry::String> Properties;
+
+		Ry::ArrayList<TmxText> TextObjects;
+		Ry::ArrayList<TmxRect> RectObjects;
+		Ry::ArrayList<TmxPoint> PointObjects;
+
+	};
+
+	struct SCENE2D_MODULE TmxTileLayer
 	{
 		Ry::String Name;
 		int32 Width;
 		int32 Height;
 		int32* TileGuids = nullptr;
+
+		OAHashMap<Ry::String, Ry::String> Properties;
 	};
 
 	struct SCENE2D_MODULE TmxMap
@@ -40,7 +84,8 @@ namespace Ry
 		int32 TileWidth;
 		int32 TileHeight;
 
-		Ry::ArrayList<TmxLayer> TmxLayers;
+		Ry::ArrayList<TmxObjectLayer> TmxObjectLayers;
+		Ry::ArrayList<TmxTileLayer> TmxLayers;
 		Ry::ArrayList<TmxTileSheet> TmxTileSheets;
 	};
 

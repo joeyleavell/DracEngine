@@ -140,4 +140,10 @@ namespace Ry
 		return NewEnt;
 	}
 
+	class Text2DEntity : public Entity2D
+	{
+	public:
+		Text2DEntity(World2D* World, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font, int32 Layer);
+	};
+
 }

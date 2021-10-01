@@ -100,7 +100,7 @@ namespace Ry
 
 			// Set the glyph specific parameters
 			NewGlyph->OriginX = X0;
-			NewGlyph->OriginY = Y0;
+			NewGlyph->OriginY = Y1; 
 			NewGlyph->LeftSideBearing = (int32) (LeftSideBearing * Scale);
 			NewGlyph->AdvanceWidth = (int32) (AdvanceWidth * Scale);
 			NewGlyph->Raster = new Bitmap(RasterWidth, RasterHeight, PixelStorage::RED8);
@@ -126,5 +126,12 @@ namespace Ry
 
 		return Result;
 	}
-	
+
+	Ry::BitmapFont* VectorFontAsset::GetOrGenBitmapFont(int32 Size)
+	{
+		if (!GeneratedFonts.contains(Size))
+			return GenerateBitmapFont(Size);
+		else
+			return GetBitmapFont(Size);
+	}
 }

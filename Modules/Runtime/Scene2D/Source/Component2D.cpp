@@ -122,6 +122,7 @@ namespace Ry
 		this->Mobility = Mobility;
 		this->Size = Size;
 		this->Origin = Origin;
+		this->bVisible = true;
 	}
 
 	void Primitive2DComponent::DrawPrimitive()
@@ -158,17 +159,131 @@ namespace Ry
 		return Primitive;
 	}
 
+	void Primitive2DComponent::SetVisibility(bool bVisible)
+	{
+		this->bVisible = bVisible;
+		OnRenderStateDirty.Broadcast();
+	}
+
+	bool Primitive2DComponent::IsVisible() const
+	{
+		return bVisible;
+	}
+
+	Text2DComponent::Text2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size,
+		const Vector2& Origin, Ry::String Text, BitmapFont* Font, int32 Layer):
+	Primitive2DComponent(Owner, Mobility, Size, Origin)
+	{
+		Primitive = MakeShared(new TextScenePrimitive { Mobility, Size, Text, Font});
+		Primitive->SetLayer(Layer);
+	}
+
 	Texture2DComponent::Texture2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size, const Vector2& Origin, TextureRegion Texture):
 	Primitive2DComponent(Owner, Mobility, Size, Origin)
 	{
 		Primitive = MakeShared(new TextureScenePrimitive{ Mobility, Size, Texture});
 	}
 
+	RectComponent::RectComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size,
+		const Vector2& Origin, Color RectColor):
+	Primitive2DComponent(Owner, Mobility, Size, Origin)
+	{
+		Primitive = MakeShared(new RectScenePrimitive{ Mobility, Size, RectColor });
+	}
+	
+
+	AnimationStateComponent::AnimationStateComponent(Entity2D* Owner, Ry::SharedPtr<Animation2DComponent> AnimComp):
+	Component2D(Owner)
+	{
+		this->AnimComp = AnimComp;
+	}
+
+	void AnimationStateComponent::SetAnims(std::initializer_list<AnimPair> Pairs)
+	{
+		for (const AnimPair& Pair : Pairs)
+		{
+			this->Anims.Insert(Pair.Name, Pair.Anim);
+		}
+
+
+		if (Pairs.size() > 0)
+		{
+			Play(Pairs.begin()->Name);
+		}
+		else
+		{
+			std::cerr << "No animations passed into animation state component" << std::endl;
+		}
+	}
+
+	void AnimationStateComponent::Pause(int32 AtFrame)
+	{
+		if (AnimComp.IsValid())
+		{
+			AnimComp->Pause(AtFrame);
+		}
+	}
+
+	void AnimationStateComponent::Play()
+	{
+		if(AnimComp.IsValid())
+		{
+			AnimComp->Play();
+		}
+	}
+
+	void AnimationStateComponent::Play(Ry::String Name)
+	{
+		CurrentAnim = Name;
+
+		SharedPtr<Animation> Anim = Anims.Get(Name);
+		AnimComp->SetAnimation(Anim);
+	}
+
+	void AnimationStateComponent::SetAnimDelay(float Delay)
+	{
+		AnimComp->SetDelay(Delay);
+	}
+
 	Animation2DComponent::Animation2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size,
-		const Vector2& Origin, SharedPtr<Animation> Anim):
+	                                           const Vector2& Origin, SharedPtr<Animation> Anim):
 	Primitive2DComponent(Owner, Mobility, Size, Origin)
 	{
 		Primitive = MakeShared(new AnimationScenePrimitive{Mobility, Size, Anim});
+	}
+
+	void Animation2DComponent::Pause(int32 AtFrame)
+	{
+		if(SharedPtr<AnimationScenePrimitive> Anim = CastShared<AnimationScenePrimitive>(Primitive))
+		{
+			Anim->Pause(AtFrame);
+		}
+	}
+
+	void Animation2DComponent::Play()
+	{
+		if (SharedPtr<AnimationScenePrimitive> Anim = CastShared<AnimationScenePrimitive>(Primitive))
+		{
+			Anim->Play();
+		}
+
+	}
+
+	void Animation2DComponent::SetAnimation(SharedPtr<Animation> Anim)
+	{
+		if (SharedPtr<AnimationScenePrimitive> A = CastShared<AnimationScenePrimitive>(Primitive))
+		{
+			A->SetAnim(Anim);
+			OnRenderStateDirty.Broadcast();
+		}
+	}
+
+	void Animation2DComponent::SetDelay(float Delay)
+	{
+		if (SharedPtr<AnimationScenePrimitive> A = CastShared<AnimationScenePrimitive>(Primitive))
+		{
+			A->SetDelay(Delay);
+		}
 	}
 
 	Physics2DComponent::Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat):
@@ -233,6 +348,34 @@ namespace Ry
 		Body->ApplyForceToCenter(b2Vec2{ X, Y }, true);
 	}
 
+	void Physics2DComponent::ApplyDragForce(float C)
+	{
+		b2Vec2 Vel = Body->GetLinearVelocity();
+		
+		float Mag = Vel.Length();
+		Vel.Normalize();
+
+		float DragMag = C * Mag * Mag;
+		b2Vec2 Drag = DragMag * -Vel;
+		
+		Body->ApplyForceToCenter(Drag, true);
+	}
+
+	float Physics2DComponent::GetSpeed() const
+	{
+		return MetersToPixels(Body->GetLinearVelocity().Length());
+	}
+
+	Vector2 Physics2DComponent::GetVelocity() const
+	{
+		return Ry::Vector2(MetersToPixels(Body->GetLinearVelocity().x), MetersToPixels(Body->GetLinearVelocity().y));
+	}
+
+	void Physics2DComponent::SetLinearVelocity(float X, float Y)
+	{
+		Body->SetLinearVelocity(b2Vec2{ PixelsToMeters(X), PixelsToMeters(Y) });
+	}
+
 	Box2DComponent::Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, float Width, float Height):
 	Physics2DComponent(Owner, Mat)
 	{
@@ -253,6 +396,9 @@ namespace Ry
 		BodyDef.type = Mat.Type == Physics2DType::Dynamic ? b2_dynamicBody : b2_staticBody;
 		BodyDef.position.Set(XMeters, YMeters);
 		BodyDef.fixedRotation = Mat.bFixedRotation;
+		BodyDef.linearDamping = Mat.LinearDamping;
+		BodyDef.angularDamping = Mat.AngularDamping;
+		BodyDef.bullet = Mat.bIsBullet;
 
 		Body = ParentWorld->CreateBody(&BodyDef);
 
