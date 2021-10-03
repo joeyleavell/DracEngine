@@ -238,7 +238,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary)
+	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary, bool bClearAttachment)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -258,9 +258,17 @@ namespace Ry
 		Ry::ArrayList<VkClearValue> ClearValues(2);
 		ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
 		ClearValues[1].depthStencil = { 1.0f, 0};
-		
-		RenderPassInfo.clearValueCount = 2;
-		RenderPassInfo.pClearValues = ClearValues.GetData();
+
+		if(bClearAttachment)
+		{
+			RenderPassInfo.clearValueCount = 2;
+			RenderPassInfo.pClearValues = ClearValues.GetData();
+		}
+		else
+		{
+			RenderPassInfo.clearValueCount = 0;
+			RenderPassInfo.pClearValues = nullptr;
+		}
 
 		if(bUseSecondary)
 		{
@@ -308,12 +316,12 @@ namespace Ry
 	void VulkanCommandBuffer2::RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight)
 	{
 		VkViewport ViewportParams;
-		ViewportParams.x = ViewportX;
-		ViewportParams.y = Swap->GetSwapChainHeight() + ViewportY;// ViewportY;
+		ViewportParams.x = (float) ViewportX;
+		ViewportParams.y = (float) (Swap->GetSwapChainHeight() + ViewportY);// ViewportY;
 		ViewportParams.minDepth = 0.0f;
 		ViewportParams.maxDepth = 1.0f;
-		ViewportParams.width = ViewportWidth;
-		ViewportParams.height = -ViewportHeight;
+		ViewportParams.width = (float) ViewportWidth;
+		ViewportParams.height = (float) -ViewportHeight;
 
 		vkCmdSetViewport(CmdBuffer, 0, 1, &ViewportParams);
 	}
@@ -405,7 +413,7 @@ namespace Ry
 		if (NextOpCode == OP_BEGIN_RENDER_PASS)
 		{
 			BeginRenderPassCommand* BeginCmd = ExtractToken<BeginRenderPassCommand>(Marker, Data);
-			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary);
+			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary, BeginCmd->bClearAttachment);
 		}
 
 		if (NextOpCode == OP_END_RENDER_PASS)

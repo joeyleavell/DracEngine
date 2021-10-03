@@ -48,8 +48,8 @@ namespace Ry
 
 		void CreatePhysicsState();
 
-		virtual void OnBeginOverlap(Entity2D* OtherEnt, Physics2DComponent* OtherComp, Physics2DComponent* ThisComp) {};
-		virtual void OnEndOverlap(Entity2D* OtherEnt, Physics2DComponent* OtherComp, Physics2DComponent* ThisComp) {};
+		virtual void OnBeginOverlap(Entity2D* OtherEnt, Physics2DComponent* OtherComp, Physics2DComponent* ThisComp, PhysicsShape* ThisShape) {};
+		virtual void OnEndOverlap(Entity2D* OtherEnt, Physics2DComponent* OtherComp, Physics2DComponent* ThisComp, PhysicsShape* ThisShape) {};
 
 		virtual void End()
 		{

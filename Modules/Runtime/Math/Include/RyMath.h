@@ -11,5 +11,5 @@
 
 namespace Ry
 {
-
+	bool IsNearlyEqual(float A, float B, float Threshold = 0.0001f);
 }

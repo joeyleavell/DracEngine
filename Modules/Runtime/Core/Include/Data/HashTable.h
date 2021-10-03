@@ -129,7 +129,7 @@ namespace Ry
 
 	// Open addressing table using a specified probe funciton
 	template<typename T, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize)>
-	class OAHashTable
+	class EXPORT_ONLY OAHashTable
 	{
 	public:
 

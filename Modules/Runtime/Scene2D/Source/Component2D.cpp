@@ -103,12 +103,12 @@ namespace Ry
 
 	Vector2 Transform2DComponent::GetWorldScale()
 	{
-		return GetWorldScale();
+		return GetRelativeScale();
 	}
 
 	float Transform2DComponent::GetWorldRotation()
 	{
-		return GetWorldRotation();
+		return GetRelativeRotation();
 	}
 
 	void Transform2DComponent::AttachTo(const SharedPtr<Transform2DComponent>& Parent)
@@ -170,8 +170,78 @@ namespace Ry
 		return bVisible;
 	}
 
+	ParticleEmitter2DComponent::ParticleEmitter2DComponent(Entity2D* Owner, PrimitiveMobility Mobility,
+		const ParticleEmitter& EmitterDef, int32 Layer):
+	Primitive2DComponent(Owner, Mobility, Ry::Vector2{}, Ry::Vector2{})
+	{
+		EmitterPrimitive = MakeShared(new ParticleEmitterPrimitive{ Mobility, EmitterDef.Parent});
+		Primitive = CastShared<ScenePrimitive2D>(EmitterPrimitive);
+		Primitive->SetLayer(Layer);
+
+		this->Emitter = EmitterDef;
+
+		SpawnDelta = 1.0f / EmitterDef.ParticlesPerSecond;
+		bCanUpdate = true;
+		bUpdateEnabled = true;
+	}
+
+	void ParticleEmitter2DComponent::Update(float Delta)
+	{
+		Primitive2DComponent::Update(Delta);
+
+		if(LastPart >= SpawnDelta && Emitter.Defs.GetSize() > 0)
+		{
+			// choose a particle def at random
+			int32 RandIndex = rand() % Emitter.Defs.GetSize();
+			ParticleDef& Def = Emitter.Defs[RandIndex];
+
+			// Update dynamic data further down
+			Ry::SharedPtr<Particle> NewPart = MakeShared(new Particle{});
+			NewPart->Width = Emitter.ParticleBaseWidth;
+			NewPart->Height = Emitter.ParticleBaseHeight;
+			NewPart->Transform.Position = GetWorldTransform().Position;
+			NewPart->Tint = Def.StartingTint;
+
+			float RandX = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) - 0.5f) * 2.0f;
+			float RandY = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) - 0.5f) * 2.0f;
+			float RandSpeed = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX));
+			RandSpeed = RandSpeed * (Emitter.MinSpeed) + (1.0f - RandSpeed) * Emitter.MaxSpeed;
+
+			Ry::Vector2 Vel(RandX, RandY);
+			normalize(Vel);
+			Vel *= RandSpeed;
+
+			NewPart->Vx = Vel.x;
+			NewPart->Vy = Vel.y;
+			NewPart->Opacity = 1.0f;
+
+			Particles.Add(NewPart);
+			EmitterPrimitive->AddParticle(NewPart);
+
+			LastPart = 0.0f;
+		}
+		else
+		{
+			LastPart += Delta;
+		}
+
+		for(SharedPtr<Ry::Particle> Part : Particles)
+		{
+			Part->Transform.Position.x += Part->Vx * Delta;
+			Part->Transform.Position.y += Part->Vy * Delta;
+			Part->TimeAlive += Delta;
+
+			// Try kill particle
+			if(Part->TimeAlive >= Emitter.TimeAlive)
+			{
+				EmitterPrimitive->RemoveParticle(Part);
+				Particles.Remove(Part);
+			}
+		}
+	}
+
 	Text2DComponent::Text2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const Vector2& Size,
-		const Vector2& Origin, Ry::String Text, BitmapFont* Font, int32 Layer):
+	                                 const Vector2& Origin, Ry::String Text, BitmapFont* Font, int32 Layer):
 	Primitive2DComponent(Owner, Mobility, Size, Origin)
 	{
 		Primitive = MakeShared(new TextScenePrimitive { Mobility, Size, Text, Font});
@@ -234,10 +304,13 @@ namespace Ry
 
 	void AnimationStateComponent::Play(Ry::String Name)
 	{
-		CurrentAnim = Name;
+		if(Name != CurrentAnim)
+		{
+			CurrentAnim = Name;
 
-		SharedPtr<Animation> Anim = Anims.Get(Name);
-		AnimComp->SetAnimation(Anim);
+			SharedPtr<Animation> Anim = Anims.Get(Name);
+			AnimComp->SetAnimation(Anim);
+		}
 	}
 
 	void AnimationStateComponent::SetAnimDelay(float Delay)
@@ -286,7 +359,7 @@ namespace Ry
 		}
 	}
 
-	Physics2DComponent::Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat):
+	Physics2DComponent::Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, bool bControl):
 	Transform2DComponent(Owner)
 	{
 		bCanUpdate = true;
@@ -294,6 +367,7 @@ namespace Ry
 
 		this->Mat = Mat;
 		this->Body = nullptr;
+		this->bAuthoritative = bControl;
 	}
 
 	Physics2DComponent::~Physics2DComponent()
@@ -311,7 +385,11 @@ namespace Ry
 
 			GetRelativePos().x = XPixels;
 			GetRelativePos().y = YPixels;
-			GetRelativeRotation() = RAD_TO_DEG(Body->GetAngle());
+
+			if(!Mat.bFixedRotation)
+			{
+				GetRelativeRotation() = RAD_TO_DEG(Body->GetAngle());
+			}
 		}
 	}
 
@@ -333,19 +411,25 @@ namespace Ry
 		}
 	}
 
-	void Physics2DComponent::OnBeginOverlap(Physics2DComponent* Other)
+	void Physics2DComponent::OnBeginOverlap(Physics2DComponent* Other, b2Fixture* ThisFixture)
 	{
-		GetOwner()->OnBeginOverlap(Other->GetOwner(), Other, this);
+		// Find b2Fixture->Shape mapping		
+		GetOwner()->OnBeginOverlap(Other->GetOwner(), Other, this, B2ToGenericShapes.Contains(ThisFixture) ? B2ToGenericShapes.Get(ThisFixture) : nullptr);
 	}
 
-	void Physics2DComponent::OnEndOverlap(Physics2DComponent* Other)
+	void Physics2DComponent::OnEndOverlap(Physics2DComponent* Other, b2Fixture* ThisFixture)
 	{
-		GetOwner()->OnEndOverlap(Other->GetOwner(), Other, this);
+		GetOwner()->OnEndOverlap(Other->GetOwner(), Other, this, B2ToGenericShapes.Contains(ThisFixture) ? B2ToGenericShapes.Get(ThisFixture) : nullptr);
 	}
 
 	void Physics2DComponent::ApplyForceToCenter(float X, float Y)
 	{
 		Body->ApplyForceToCenter(b2Vec2{ X, Y }, true);
+	}
+
+	void Physics2DComponent::ApplyImpulseToCenter(float X, float Y)
+	{
+		Body->ApplyLinearImpulseToCenter(b2Vec2{ X, Y }, true);
 	}
 
 	void Physics2DComponent::ApplyDragForce(float C)
@@ -361,6 +445,30 @@ namespace Ry
 		Body->ApplyForceToCenter(Drag, true);
 	}
 
+	void Physics2DComponent::SetPosition(float X, float Y)
+	{
+		float XMeters = PixelsToMeters(X);
+		float YMeters = PixelsToMeters(Y);
+
+		Body->SetTransform(b2Vec2{ XMeters, YMeters }, Body->GetAngle());
+	}
+
+	void Physics2DComponent::SetPosition(Ry::Vector2 Vec)
+	{
+		SetPosition(Vec.x, Vec.y);
+	}
+
+	void Physics2DComponent::SetBodyType(Physics2DType Type)
+	{
+		if (Type == Physics2DType::Dynamic)
+			Body->SetType(b2_dynamicBody);
+		if (Type == Physics2DType::Static)
+			Body->SetType(b2_staticBody);
+		if (Type == Physics2DType::Kinetmatic)
+			Body->SetType(b2_kinematicBody);
+
+	}
+
 	float Physics2DComponent::GetSpeed() const
 	{
 		return MetersToPixels(Body->GetLinearVelocity().Length());
@@ -373,14 +481,25 @@ namespace Ry
 
 	void Physics2DComponent::SetLinearVelocity(float X, float Y)
 	{
-		Body->SetLinearVelocity(b2Vec2{ PixelsToMeters(X), PixelsToMeters(Y) });
+		if(Body)
+		{
+ 			Body->SetLinearVelocity(b2Vec2{ PixelsToMeters(X), PixelsToMeters(Y) });
+		}
+		else
+		{
+			bLastVelocitySet = true;
+			LastVelocity = Ry::Vector2(X, Y);
+		}
 	}
 
-	Box2DComponent::Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, float Width, float Height):
+	void Physics2DComponent::SetLinearVelocity(Ry::Vector2 Vec)
+	{
+		SetLinearVelocity(Vec.x, Vec.y);
+	}
+
+	Box2DComponent::Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat):
 	Physics2DComponent(Owner, Mat)
 	{
-		this->Width = Width;
-		this->Height = Height;
 	}
 
 	void Box2DComponent::CreatePhysicsState()
@@ -393,7 +512,13 @@ namespace Ry
 		float YMeters = PixelsToMeters(WorldPosition.Position.y);
 
 		b2BodyDef BodyDef;
-		BodyDef.type = Mat.Type == Physics2DType::Dynamic ? b2_dynamicBody : b2_staticBody;
+		if (Mat.Type == Physics2DType::Dynamic)
+			BodyDef.type = b2_dynamicBody;
+		if (Mat.Type == Physics2DType::Static)
+			BodyDef.type = b2_staticBody;
+		if (Mat.Type == Physics2DType::Kinetmatic)
+			BodyDef.type = b2_kinematicBody;
+
 		BodyDef.position.Set(XMeters, YMeters);
 		BodyDef.fixedRotation = Mat.bFixedRotation;
 		BodyDef.linearDamping = Mat.LinearDamping;
@@ -402,19 +527,45 @@ namespace Ry
 
 		Body = ParentWorld->CreateBody(&BodyDef);
 
-		float WMeters = PixelsToMeters(Width / 2);
-		float HMeters = PixelsToMeters(Height / 2);
-		b2PolygonShape BoxShape{};
-		BoxShape.SetAsBox(WMeters, HMeters);
+		for(PhysicsShape* Shape : Mat.PhysicsShapes)
+		{
+			b2Shape* B2Shape = nullptr;
 
-		b2FixtureDef FixtureDef{};
-		FixtureDef.shape = &BoxShape;
-		FixtureDef.density = Mat.Density;
-		FixtureDef.friction = Mat.Friction;
-		FixtureDef.restitution = Mat.Restitution;
-		FixtureDef.userData.pointer = (uintptr_t) this;
+			PhysicsBoxShape* AsBox = dynamic_cast<PhysicsBoxShape*>(Shape);
 
-		Body->CreateFixture(&FixtureDef);
+			if(AsBox)
+			{
+				float XMeters = PixelsToMeters(AsBox->X);
+				float YMeters = PixelsToMeters(AsBox->Y);
+				float WMeters = PixelsToMeters(AsBox->Width / 2);
+				float HMeters = PixelsToMeters(AsBox->Height / 2);
+				b2PolygonShape* B2BoxShape = new b2PolygonShape;
+				B2BoxShape->SetAsBox(WMeters, HMeters, b2Vec2{ XMeters, YMeters }, 0.0f);
+				B2Shape = B2BoxShape;
+			}
+
+			if (B2Shape)
+			{
+				b2FixtureDef FixtureDef{};
+				FixtureDef.shape = B2Shape;
+				FixtureDef.density = Shape->Density;
+				FixtureDef.friction = Shape->Friction;
+				FixtureDef.restitution = Shape->Restitution;
+				FixtureDef.isSensor = Shape->bSensor;
+				FixtureDef.userData.pointer = (uintptr_t)this;
+
+				b2Fixture* Fix = Body->CreateFixture(&FixtureDef);
+				B2ToGenericShapes.Insert(Fix, Shape);
+			}
+		}
+
+		if(bLastVelocitySet)
+		{
+			SetLinearVelocity(LastVelocity);
+			bLastVelocitySet = false;
+		}
+
+
 		
 	}
 	

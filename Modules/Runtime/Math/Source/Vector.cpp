@@ -361,6 +361,17 @@ namespace Ry
 	}
 
 	template <uint32 S>
+	bool Vector<S>::IsNearlyEqual(const Vector<S>& Other, float Threshold)
+	{
+		bool bEqual = true;
+		for (int32 Val = 0; Val < S; Val++)
+			if (!Ry::IsNearlyEqual(data[Val], Other.data[Val]), Threshold)
+				bEqual = false;
+
+		return bEqual;
+	}
+
+	template <uint32 S>
 	Vector<S> Vector<S>::operator*(float s) const
 	{
 		Vector<S> result;

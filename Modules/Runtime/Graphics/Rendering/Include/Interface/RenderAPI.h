@@ -5,7 +5,7 @@
 
 namespace Ry
 {
-	struct VertexFormat;
+	class VertexFormat;
 
 	class CommandBuffer;
 	class SwapChain;

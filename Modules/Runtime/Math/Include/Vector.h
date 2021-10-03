@@ -42,6 +42,8 @@ namespace Ry
 
 		bool operator==(const Vector& o) const;
 
+		bool IsNearlyEqual(const Vector<S>& Other, float Threshold = 0.0001f);
+
 		int32 DataSizeBytes() const;
 
 		template <uint32 R_>

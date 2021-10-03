@@ -53,7 +53,7 @@ WidgetArgsType& Name(Type InAttrib) \
 	return *this; \
 }
 
-#define WidgetEndArgs(ClassName) \
+#define WidgetEndArgs() \
 };
 
 #define NewWidgetAssign(AssignTo, Type) Ry::WidgetDecl<Type>(AssignTo) << Type::Args()

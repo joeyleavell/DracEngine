@@ -50,10 +50,10 @@ namespace Ry
 			{
 				// Text
 				TmxText Text;
-				Text.X = Ry::ParseInt(XAttr->value());
-				Text.Y = Ry::ParseInt(YAttr->value());
-				Text.Width = Ry::ParseInt(WAttr->value());
-				Text.Height = Ry::ParseInt(HAttr->value());
+				Text.X = (float) Ry::ParseInt(XAttr->value());
+				Text.Y = (float)Ry::ParseInt(YAttr->value());
+				Text.Width = (float)Ry::ParseInt(WAttr->value());
+				Text.Height = (float)Ry::ParseInt(HAttr->value());
 				Text.FontSize = Ry::ParseInt(TextNode->first_attribute("pixelsize")->value());
 				Text.Value = TextNode->value();
 
@@ -65,10 +65,10 @@ namespace Ry
 			{
 				// Rect
 				TmxRect Rect;
-				Rect.X = Ry::ParseInt(XAttr->value());
-				Rect.Y = Ry::ParseInt(YAttr->value());
-				Rect.W = Ry::ParseInt(WAttr->value());
-				Rect.H = Ry::ParseInt(HAttr->value());
+				Rect.X = (float)Ry::ParseInt(XAttr->value());
+				Rect.Y = (float)Ry::ParseInt(YAttr->value());
+				Rect.W = (float)Ry::ParseInt(WAttr->value());
+				Rect.H = (float)Ry::ParseInt(HAttr->value());
 
 				LoadProps(Prop, Rect.Properties);
 
@@ -78,8 +78,8 @@ namespace Ry
 			{
 				// Point
 				TmxPoint Point;
-				Point.X = Ry::ParseInt(XAttr->value());
-				Point.Y = Ry::ParseInt(YAttr->value());
+				Point.X = (float) Ry::ParseInt(XAttr->value());
+				Point.Y = (float) Ry::ParseInt(YAttr->value());
 
 				LoadProps(Prop, Point.Properties);
 

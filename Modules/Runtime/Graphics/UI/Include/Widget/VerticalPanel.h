@@ -67,18 +67,21 @@ namespace Ry
 			int32 CurrentX = static_cast<int32>(0);
 			int32 CurrentY = static_cast<int32>(0);
 
-			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
+			for(int32 VBoxIndex = 0; VBoxIndex < ChildrenSlots.GetSize(); VBoxIndex++)
 			{
+				SharedPtr<Slot> ChildSlot = ChildrenSlots[ChildrenSlots.GetSize() - VBoxIndex - 1];
+				
 				SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 				SizeType ContentSize = Widget->ComputeSize();
 
-				CurrentY += static_cast<int32>(ChildSlot->GetPadding().Top);
+				CurrentY += static_cast<int32>(ChildSlot->GetPadding().Bottom);
 
 				// Set the widget's relative position
 				Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left), static_cast<float>(CurrentY));
 				Widget->Arrange();
 				
-				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Bottom);
+				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Top);
+				
 			}
 		}
 
@@ -100,7 +103,7 @@ namespace Ry
 					SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
 					// Add horizontal padding
-					WidgetSize.Width += ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right;
+					WidgetSize.Width += (int32) (ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right);
 
 					// Check if max width
 					if (WidgetSize.Width > MaxChildWidth)

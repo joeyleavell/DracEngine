@@ -47,7 +47,7 @@ namespace Ry
 
 	};
 
-	struct RectScissor
+	struct RENDERING_MODULE RectScissor
 	{
 		int32 X = -1;
 		int32 Y = -1;

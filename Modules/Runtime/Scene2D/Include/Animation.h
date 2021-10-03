@@ -15,24 +15,52 @@ namespace Ry
 		int32 H;
 		Texture* Parent;
 
+		TextureRegion()
+		{
+			this->X = 0;
+			this->Y = 0;
+			this->W = 0;
+			this->H = 0;
+			this->Parent = nullptr;
+		}
+
+		TextureRegion(Texture* Parent)
+		{
+			this->X = 0;
+			this->Y = 0;
+			this->W = Parent->GetWidth();
+			this->H = Parent->GetHeight();
+			this->Parent = Parent;
+		}
+
+
+		TextureRegion(int32 X, int32 Y, int32 W, int32 H, Texture* Parent)
+		{
+			this->X = X;
+			this->Y = Y;
+			this->W = W;
+			this->H = H;
+			this->Parent = Parent;
+		}
+
 		float GetUx()
 		{
-			return (X / (float)Parent->GetWidth()) + 0.01f;
+			return (X / (float)Parent->GetWidth()) + 0.001f;
 		}
 
 		float GetVy()
 		{
-			return (Y / (float)Parent->GetHeight()) + 0.01f;
+			return (Y / (float)Parent->GetHeight()) + 0.001f;
 		}
 
 		float GetUw()
 		{
-			return (W / (float)Parent->GetWidth()) - 2 * 0.01f;
+			return (W / (float)Parent->GetWidth()) - 2 * 0.001f;
 		}
 
 		float GetVh()
 		{
-			return (H / (float)Parent->GetHeight()) - 2 * 0.01f;
+			return (H / (float)Parent->GetHeight()) - 2 * 0.001f;
 		}
 	};
 

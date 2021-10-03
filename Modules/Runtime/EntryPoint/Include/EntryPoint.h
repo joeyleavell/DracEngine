@@ -42,17 +42,51 @@ namespace Ry
 
 		return 0;
 	}
-
-
+	
 #ifdef RYBUILD_DISTRIBUTE
-		/**
-		 * Main entry point definition for windows applications.
-		 */
+
+#ifdef RYBUILD_TARGET_Windows
+
+#include <windows.h>
+/**
+ * Main entry point definition for windows applications.
+ */
+#define IMPLEMENT_GAME(Class, Name) \
+	int WinMain( \
+		HINSTANCE hInstance, \
+		HINSTANCE hPrevInstance, \
+		LPSTR     lpCmdLine, \
+		int       nShowCmd \
+	) \
+	{ \
+		Ry::String CmdAsString = lpCmdLine; \
+		Ry::StringView* ArgVView = nullptr; \
+		int32 ArgC = CmdAsString.split(" ", &ArgVView); \
+		char** ArgV = new char* [ArgC]; \
+		for (int32 Arg = 0; Arg < ArgC; Arg++) \
+		{ \
+			ArgV[Arg] = new char[ArgVView[Arg].getSize()]; \
+			Ry::StringCopy(ArgV[Arg], ArgVView->GetData(), ArgVView->getSize()); \
+		}\
+		delete[] ArgVView; \
+		int32 Return = LaunchStandalone<Class>(ArgC, ArgV, #Name); \
+		for (int32 Arg = 0; Arg < ArgC; Arg++) \
+		{ \
+			delete[] ArgV[Arg]; \
+		}\
+		delete[] ArgV; \
+		return Return; \
+	}
+#else
+	/**
+	 * Main entry point definition for other OS applications.
+	 */
 	#define IMPLEMENT_GAME(Class, Name) \
 	int main(int ArgC, char** ArgV) \
 	{ \
 		return LaunchStandalone<Class>(ArgC, ArgV, #Name); \
 	}
+#endif
 
 #else
 

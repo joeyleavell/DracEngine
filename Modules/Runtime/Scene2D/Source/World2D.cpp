@@ -146,6 +146,11 @@ namespace Ry
 		return PhysicsWorld;
 	}
 
+	void World2D::AddCustomBatch(Batch* Batch)
+	{
+		WorldScene->AddCustomBatch(Batch);
+	}
+
 	void World2D::OnBeginContact(b2Contact* Contact)
 	{
 		Physics2DComponent* A = (Physics2DComponent*) Contact->GetFixtureA()->GetUserData().pointer;
@@ -153,12 +158,12 @@ namespace Ry
 
 		if(A)
 		{
-			A->OnBeginOverlap(B);
+			A->OnBeginOverlap(B, Contact->GetFixtureA());
 		}
 
 		if(B)
 		{
-			B->OnBeginOverlap(A);
+			B->OnBeginOverlap(A, Contact->GetFixtureB());
 		}
 	}
 
@@ -169,12 +174,12 @@ namespace Ry
 
 		if (A)
 		{
-			A->OnEndOverlap(B);
+			A->OnEndOverlap(B, Contact->GetFixtureA());
 		}
 
 		if (B)
 		{
-			B->OnEndOverlap(A);
+			B->OnEndOverlap(A, Contact->GetFixtureB());
 		}
 	}
 

@@ -79,6 +79,7 @@ namespace Ry
 		OutVerts[1] = Transform * V2;
 		OutVerts[2] = Transform * V3;
 		OutVerts[3] = Transform * V4;
+
 	}
 
 	void BatchRectangleTransform(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Color, Ry::Matrix3 Transform,
@@ -358,8 +359,8 @@ namespace Ry
 		const int32 SPACE_ADVANCE = Font->GetGlyph(static_cast<int32>(' '))->AdvanceWidth;
 
 		// Establish origin
-		float CurX = 0;
-		float CurY = 0 - Font->GetAscent();
+		float CurX = XPosition;
+		float CurY = YPosition - Font->GetAscent();
 
 		// Get the advance width of the space character
 
@@ -420,8 +421,6 @@ namespace Ry
 
 						float TR_X = BL_X + RasterWidth;
 						float TR_Y = BL_Y + RasterHeight;
-
-						std::cout << OriginY << " " << CurY << std::endl;
 
 						// Create a batch item for this glyph
 						Ry::SharedPtr<BatchItem> GlyphItem;
@@ -617,7 +616,7 @@ namespace Ry
 
 	void Batch::Resize(int32 Width, int32 Height)
 	{
-		Projection = Ry::ortho4(0, (float) Width, (float)Height, 0, -1, 1);
+		Projection = Ry::ortho4(0.0f, (float) Width, (float)0.0f, (float) Height, -1.0f, 1.0f);
 
 		// Mark all layers as needing recording
 		for(BatchLayer* Layer : Layers)
@@ -958,20 +957,18 @@ namespace Ry
 				// Bind pipeline
 				AtLayer->CommandBuffer->BindPipeline(Key->Pipeline);
 
-				AtLayer->CommandBuffer->SetViewportSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
+				AtLayer->CommandBuffer->SetViewportSize(0, 0, (int32) Swap->GetSwapChainWidth(), (int32)Swap->GetSwapChainHeight());
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
 					RectScissor Scissor = Group->State.Scissor;
 					if(Scissor.IsEnabled())
 					{
-						// Do conversion
-						int32 ConvertedY = Swap->GetSwapChainHeight() - (Scissor.Y + Scissor.Height);
-						AtLayer->CommandBuffer->SetScissorSize(Scissor.X, ConvertedY, Scissor.Width, Scissor.Height);
+						AtLayer->CommandBuffer->SetScissorSize(Scissor.X, Scissor.Y, Scissor.Width, Scissor.Height);
 					}
 					else
 					{
-						AtLayer->CommandBuffer->SetScissorSize(0, 0, (float)Swap->GetSwapChainWidth(), (float)Swap->GetSwapChainHeight());
+						AtLayer->CommandBuffer->SetScissorSize(0, 0, (int32)Swap->GetSwapChainWidth(), (int32)Swap->GetSwapChainHeight());
 					}
 
 					if (!Group->Items.IsEmpty() || !Group->ItemSets.IsEmpty())
@@ -1128,8 +1125,8 @@ namespace Ry
 		{
 			//CommandBuffer->BeginRenderPass();
 			{
-				CommandBuffer->SetViewportSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
-				CommandBuffer->SetScissorSize(0, 0, (float)Ry::GetViewportWidth(), (float)Ry::GetViewportHeight());
+				CommandBuffer->SetViewportSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
+				CommandBuffer->SetScissorSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
 
 				// Bind pipeline
 				CommandBuffer->BindPipeline(Pipeline);

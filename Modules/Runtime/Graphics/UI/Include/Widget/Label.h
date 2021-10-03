@@ -102,7 +102,8 @@ namespace Ry
 			if(IsVisible())
 			{
 				Point Abs = GetAbsolutePosition();
-				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
+				SizeType TextSize = ComputeSize();
+				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + TextSize.Height), static_cast<float>(ComputeSize().Width));
 			}
 
 			//TextBatch->SetTexture(Style.Font->GetAtlasTexture());

@@ -85,7 +85,7 @@ namespace Ry
 			// ASSUMPTION: Any transform component directly attached to the entity will be a root transform
 			if (Transform.IsValid())
 			{				
-				CORE_ASSERT(!RootTransform.IsValid(), "Root component already attached to entity, cannot replace!")
+				CORE_ASSERTF(!RootTransform.IsValid(), "Root component already attached to entity, cannot replace!")
 				RootTransform = Transform;
 
 				Transform->OnHierarchyChanged.AddMemberFunction(this, &Entity::OnChildStructureChanged);

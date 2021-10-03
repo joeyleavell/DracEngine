@@ -11,6 +11,12 @@ namespace Ry
 		Ry::Vector2 Scale{ 1.0f, 1.0f };
 		float Rotation{ 0.0f };
 
+		void FaceDirection(Ry::Vector2 Direction)
+		{
+			Ry::Vector2 Norm = normalized(Direction);
+			Rotation = std::atan2(Direction.y, Direction.x);
+		}
+
 		Ry::Vector2 GetForward()
 		{
 			float Sin = sin(DEG_TO_RAD(Rotation) + PI / 2.0f);

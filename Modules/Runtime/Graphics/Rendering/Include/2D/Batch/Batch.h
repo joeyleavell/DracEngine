@@ -72,6 +72,7 @@ Mesh->GetMeshData()->AddTriangle(i0+2, i0+3, i0+0); \
 
 namespace Ry
 {
+	struct Transform2D;
 	struct BatchPipeline;
 	class RenderPass;
 	class Texture;
@@ -209,6 +210,7 @@ namespace Ry
 	RENDERING_MODULE void BatchStyledBox(Ry::SharedPtr<BatchItemSet> Item, float X, float Y, float W, float H, const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize, float Depth);
 	RENDERING_MODULE void BatchTexture(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, float X, float Y, float U, float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth);
 	RENDERING_MODULE void BatchText(Ry::SharedPtr<BatchItemSet> Item, const Ry::Color& Color, BitmapFont* Font, const PrecomputedTextData& TextData, float XPosition, float YPosition, float LineWidth);
+
 	RENDERING_MODULE void BatchTextureTransform(Ry::SharedPtr<BatchItem> Item, const Ry::Color& Tint, Ry::Matrix3 Transform, float U, float V, float UVWidth, float UVHeight, float OriginX, float OriginY, float Width, float Height, float Depth);
 
 	struct RENDERING_MODULE PipelineState

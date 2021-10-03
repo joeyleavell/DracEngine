@@ -618,7 +618,7 @@ namespace Ry
 
 		for(int32 Row = 0; Row < R; Row++)
 		{
-			int32 Dot = 0;
+			float Dot = 0;
 			for(int32 Col = 0; Col < C; Col++)
 			{
 				Dot += m[Row * C + Col] * v[Col];
@@ -626,11 +626,6 @@ namespace Ry
 			
 			result[Row] = Dot;
 		}
-
-		//result[0] = m[0 * 4 + 0] * v[0] + m[0 * 4 + 1] * v[1] + m[0 * 4 + 2] * v[2] + m[0 * 4 + 3] * v[3];
-		//result[1] = m[1 * 4 + 0] * v[0] + m[1 * 4 + 1] * v[1] + m[1 * 4 + 2] * v[2] + m[1 * 4 + 3] * v[3];
-		//result[2] = m[2 * 4 + 0] * v[0] + m[2 * 4 + 1] * v[1] + m[2 * 4 + 2] * v[2] + m[2 * 4 + 3] * v[3];
-		//result[3] = m[3 * 4 + 0] * v[0] + m[3 * 4 + 1] * v[1] + m[3 * 4 + 2] * v[2] + m[3 * 4 + 3] * v[3];
 
 		return result;
 	}

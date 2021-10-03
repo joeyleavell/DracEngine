@@ -6,6 +6,7 @@
 #include "Transform.h"
 
 class b2Body;
+class b2Fixture;
 
 namespace Ry
 {
@@ -13,19 +14,72 @@ namespace Ry
 	enum class Physics2DType
 	{
 		Static,
+		Kinetmatic,
 		Dynamic
+	};
+
+	struct ParticleDef
+	{
+		Color StartingTint;
+		Color EndingTint;
+		float StartingScale;
+		float EndingScale;
+		float StartingAlpha;
+		float EndingAlpha;
+		float Probability;
+	};
+
+	struct ParticleEmitter
+	{
+		Texture* Parent; // nullptr = solid color particles
+		Ry::ArrayList<ParticleDef> Defs; // Chosen randomly
+		float ParticleBaseWidth;
+		float ParticleBaseHeight;
+
+		float TimeAlive;
+		float ParticlesPerSecond;
+		float MaxSpeed;
+		float MinSpeed;
+	};
+
+	struct PhysicsShape
+	{
+		float Density = 1.0f;
+		float Friction = 0.3f;
+		float Restitution = 0.3f;
+
+		virtual ~PhysicsShape() {};
+
+		bool bSensor = false;
+	};
+
+	struct PhysicsBoxShape : public PhysicsShape
+	{
+		float Width;
+		float Height;
+		float X, Y;
+
+		PhysicsBoxShape(float Den, float Fric, float Rest, float X, float Y, float Width, float Height, bool bSensor = false)
+		{
+			this->X = X;
+			this->Y = Y;
+			this->Density = Den;
+			this->Friction = Fric;
+			this->Restitution = Rest;
+			this->Width = Width;
+			this->Height = Height;
+			this->bSensor = bSensor;
+		}
 	};
 
 	struct PhysicsMaterial2D
 	{
 		Physics2DType Type;
-		float Density = 1.0f;
-		float Friction = 0.3f;
-		float Restitution = 0.3f;
 		bool bFixedRotation = false;
 
 		float LinearDamping = 8.0f;
 		float AngularDamping = 1.0f;
+		Ry::ArrayList<PhysicsShape*> PhysicsShapes;
 		bool bIsBullet = false;
 	};
 
@@ -118,6 +172,29 @@ namespace Ry
 		
 	};
 
+	class SCENE2D_MODULE ParticleEmitter2DComponent : public Primitive2DComponent
+	{
+	public:
+
+		ParticleEmitter2DComponent(Entity2D* Owner, PrimitiveMobility Mobility, const ParticleEmitter& EmitterDef, int32 Layer = 0);
+
+		void Update(float Delta) override;
+
+	private:
+
+		int32 Count{};
+
+		Ry::ArrayList<Ry::SharedPtr<Particle>> Particles;
+
+		float LastPart;
+		float SpawnDelta;
+
+		SharedPtr<ParticleEmitterPrimitive> EmitterPrimitive;
+
+		ParticleEmitter Emitter;
+
+	};
+
 	class SCENE2D_MODULE Text2DComponent : public Primitive2DComponent
 	{
 	public:
@@ -195,7 +272,7 @@ namespace Ry
 
 		float DragCoefficient = 7.0f;
 
-		Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat);
+		Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, bool bControlEnt = true);
 		~Physics2DComponent();
 
 		void Update(float Delta) override;
@@ -205,35 +282,42 @@ namespace Ry
 		virtual void CreatePhysicsState() = 0;
 		void DestroyPhysicsState();
 
-		virtual void OnBeginOverlap(Physics2DComponent* Other);
+		virtual void OnBeginOverlap(Physics2DComponent* Other, b2Fixture* ThisFixture);
 		
-		virtual void OnEndOverlap(Physics2DComponent* Other);
+		virtual void OnEndOverlap(Physics2DComponent* Other, b2Fixture* ThisFixture);
 
 		void ApplyForceToCenter(float X, float Y);
+		void ApplyImpulseToCenter(float X, float Y);
 		void SetLinearVelocity(float X, float Y);
+		void SetLinearVelocity(Ry::Vector2 Vec);
 		void ApplyDragForce(float C);
+		void SetPosition(float X, float Y);
+		void SetPosition(Ry::Vector2 Vec);
+		void SetBodyType(Physics2DType Type);
 
 		float GetSpeed() const;
 		Vector2 GetVelocity() const;
 
 	protected:
 
+		bool bAuthoritative = true;
+
+		Ry::OAHashMap<b2Fixture*, PhysicsShape*> B2ToGenericShapes;
+
 		PhysicsMaterial2D Mat;
 		b2Body* Body;
+
+		bool bLastVelocitySet = false;
+		Ry::Vector2 LastVelocity;
 	};
 
 	class SCENE2D_MODULE Box2DComponent : public Physics2DComponent
 	{
 	public:
 
-		Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, float Width, float Height);
+		Box2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat);
 
 		void CreatePhysicsState() override;
-
-	private:
-
-		float Width;
-		float Height;
 
 	};
 

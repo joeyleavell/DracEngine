@@ -5,6 +5,7 @@
 
 namespace Ry
 {
+	
 	template<class T>
 	class Iterator
 	{
@@ -20,6 +21,12 @@ namespace Ry
 	template<typename Tag>
 	struct TypeTag {};
 
+	template <typename T>
+	uint32 Hash(SharedPtr<T> Object)
+	{
+		return HashImpl<T>(TypeTag<T>{}, Object.Get());
+	}
+
 	// Generic hash impl, must be implemented
 	template <typename T>
 	uint32 HashImpl(TypeTag<T>, const T& Object);
@@ -28,8 +35,10 @@ namespace Ry
 	template <typename T>
 	uint32 HashImpl(TypeTag<T>, const T* Object)
 	{
-		return reinterpret_cast<uint32>(Object);
+		return static_cast<uint32>(reinterpret_cast<uintptr_t>(Object));
 	}
+
+	// Hash imp for shared pointers
 
 	template <>
 	inline uint32 HashImpl<int32>(TypeTag<int32>, const int32& Object)
@@ -74,13 +83,6 @@ namespace Ry
 		return HashImpl<T>(TypeTag<T>{}, Object);
 	}
 
-	template <typename T>
-	uint32 Hash(SharedPtr<T> Object)
-	{
-		return HashImpl<T>(TypeTag<T>{}, Object.Get());
-	}
-
-
 	/**
 	 * Overloaded hashing for object references
 	 */
@@ -89,6 +91,5 @@ namespace Ry
 	{
 		return HashImpl(TypeTag<T>{}, Object);
 	}
-
 
 }

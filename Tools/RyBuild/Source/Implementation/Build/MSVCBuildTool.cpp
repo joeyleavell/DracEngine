@@ -543,6 +543,8 @@ bool MSVCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Obje
 		BuildCmd.push_back("/DEBUG");
 	}
 
+	BuildCmd.push_back("/SUBSYSTEM:WINDOWS");
+
 	// Set up library paths
 	{
 		// Add the passed in intermediate directory so we can add the obj files as input

@@ -46,10 +46,10 @@ namespace Ry
 	public:
 
 		VkSwapchainKHR SwapChain; // The swap chain that we created
-		std::vector<VkImage> SwapChainImages; // The swap chain images we retrieved
+		Ry::ArrayList<VkImage> SwapChainImages; // The swap chain images we retrieved
 		VkFormat SwapChainImageFormat;
 		VkExtent2D SwapChainExtent;
-		std::vector<VkImageView> SwapChainImageViews;
+		Ry::ArrayList<VkImageView> SwapChainImageViews;
 
 		// For storing depth image
 		VkImage DepthImage;

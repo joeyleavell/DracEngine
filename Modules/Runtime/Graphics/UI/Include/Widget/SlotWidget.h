@@ -160,8 +160,7 @@ namespace Ry
 				ChildSize = Child->ComputeSize();
 			}
 
-			// Compute parent size
-			// todo: why the added &&? 
+			// Compute parent size only if we need to
 			if (Parent && (WidthMode == SizeMode::PERCENTAGE || HeightMode == SizeMode::PERCENTAGE))
 			{
 				ParentSize = Parent->ComputeSize();
@@ -218,7 +217,7 @@ namespace Ry
 			{
 				SizeType ChildSize = Child->ComputeSize();
 				float RelX = PaddingLeft;
-				float RelY = PaddingTop;
+				float RelY = PaddingBottom;
 
 				if (WidthMode == SizeMode::PERCENTAGE)
 				{
@@ -246,10 +245,10 @@ namespace Ry
 						RelY = (ThisSize.Height - ChildSize.Height) / 2.0f;
 						break;
 					case (uint32)VAlign::TOP:
-						RelY = PaddingTop;
+						RelY = ThisSize.Height - ChildSize.Height - PaddingTop;
 						break;
 					case (uint32)VAlign::BOTTOM:
-						RelY = ThisSize.Height - ChildSize.Height - PaddingBottom;
+						RelY = PaddingBottom;
 						break;
 					}
 				}

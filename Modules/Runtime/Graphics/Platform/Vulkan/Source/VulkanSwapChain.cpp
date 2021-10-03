@@ -137,11 +137,11 @@ namespace Ry
 		// todo: Figure out best max values
 		VkDescriptorPoolSize UniformPoolSize{};
 		UniformPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		UniformPoolSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
+		UniformPoolSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.GetSize()) * MaxValues;
 
 		VkDescriptorPoolSize CombinedImageSamplerSize{};
 		CombinedImageSamplerSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		CombinedImageSamplerSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
+		CombinedImageSamplerSize.descriptorCount = static_cast<uint32_t>(SwapChainImages.GetSize()) * MaxValues;
 
 		PoolSizes.Add(UniformPoolSize);
 		PoolSizes.Add(CombinedImageSamplerSize);
@@ -150,13 +150,15 @@ namespace Ry
 		PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		PoolInfo.poolSizeCount = PoolSizes.GetSize();
 		PoolInfo.pPoolSizes = PoolSizes.GetData();
-		PoolInfo.maxSets = static_cast<uint32_t>(SwapChainImages.size()) * MaxValues;
+		PoolInfo.maxSets = static_cast<uint32_t>(SwapChainImages.GetSize()) * MaxValues;
 
 		if (vkCreateDescriptorPool(GVulkanContext->GetLogicalDevice(), &PoolInfo, nullptr, &DescriptorPool) != VK_SUCCESS)
 		{
 			Ry::Log->LogError("Failed to create descriptor pool");
 			return false;
 		}
+
+		return true;
 	}
 
 	void VulkanSwapChain::CreateFramesInFlight()
@@ -166,7 +168,7 @@ namespace Ry
 			FramesInFlight.Add(new FrameInFlight);
 		}
 
-		for(int32 SwapChainImage = 0; SwapChainImage < SwapChainImages.size(); SwapChainImage++)
+		for(int32 SwapChainImage = 0; SwapChainImage < SwapChainImages.GetSize(); SwapChainImage++)
 		{
 			ImagesInFlight.Add(VK_NULL_HANDLE);
 		}
@@ -174,7 +176,7 @@ namespace Ry
 
 	void VulkanSwapChain::DeleteImageViews()
 	{
-		for(uint32 Rp = 0; Rp < SwapChainImageViews.size(); Rp++)
+		for(uint32 Rp = 0; Rp < SwapChainImageViews.GetSize(); Rp++)
 		{
 			vkDestroyImageView(GVulkanContext->GetLogicalDevice(), SwapChainImageViews[Rp], nullptr);
 		}
@@ -601,9 +603,11 @@ namespace Ry
 		Ry::Log->Log("Created Vulkan swap chain");
 
 		vkGetSwapchainImagesKHR(GVulkanContext->GetLogicalDevice(), SwapChain, &ImageCount, nullptr);
-		SwapChainImages.resize(ImageCount);
+		SwapChainImages.SetSize(ImageCount);
 
-		vkGetSwapchainImagesKHR(GVulkanContext->GetLogicalDevice(), SwapChain, &ImageCount, SwapChainImages.data());
+		vkGetSwapchainImagesKHR(GVulkanContext->GetLogicalDevice(), SwapChain, &ImageCount, SwapChainImages.GetData());
+
+		return true;
 	}
 
 	bool VulkanSwapChain::CreateSurface(::GLFWwindow* ParentWindow)
@@ -624,13 +628,15 @@ namespace Ry
 			Ry::Log->LogError("Created surface was not compatible with physical device and present family");
 			return false;
 		}
+
+		return true;
 	}
 
 	bool VulkanSwapChain::CreateImageViews()
 	{
-		SwapChainImageViews.resize(SwapChainImages.size());
+		SwapChainImageViews.SetSize(SwapChainImages.GetSize());
 
-		for (size_t i = 0; i < SwapChainImages.size(); i++)
+		for (size_t i = 0; i < SwapChainImages.GetSize(); i++)
 		{
 			VkImageViewCreateInfo CreateInfo{};
 			CreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -665,7 +671,7 @@ namespace Ry
 		//SwapChainFramebuffers.resize(SwapChainImages.size());
 
 		// Create a framebuffer for each image view
-		for (size_t i = 0; i < SwapChainImageViews.size(); i++)
+		for (size_t i = 0; i < SwapChainImageViews.GetSize(); i++)
 		{
 			VulkanFrameBuffer* NewFBO = new VulkanFrameBuffer(SwapChainExtent.width, SwapChainExtent.height);
 			NewFBO->AddAttachment(SwapChainImageViews[i]);

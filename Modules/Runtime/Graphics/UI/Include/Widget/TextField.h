@@ -121,15 +121,16 @@ namespace Ry
 			if (IsVisible())
 			{
 				Point Abs = GetAbsolutePosition();
-				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y), static_cast<float>(ComputeSize().Width));
+				SizeType Size = ComputeSize();
+				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + Size.Height), static_cast<float>(ComputeSize().Width));
 
 				Ry::ArrayList<float> XOffsets;
 				Style.Font->MeasureXOffsets(XOffsets, Text);
 
 				// Draw cursor
 				float CursorX = XOffsets[CursorPos] + Abs.X;
-				float Height = Style.Font->GetAscent() - Style.Font->GetDescent();
-				Ry::BatchRectangle(CursorItem, WHITE, CursorX, Abs.Y, 1.0f, Height, 0.0f);
+				float Height = (float) (Style.Font->GetAscent() - Style.Font->GetDescent());
+				Ry::BatchRectangle(CursorItem, WHITE, CursorX, (float) (Abs.Y + Style.Font->GetDescent()), 1.0f, Height, 0.0f);
 
 				// Draw selection if applicable
 				if(SelectionPos >= 0)
@@ -139,7 +140,7 @@ namespace Ry
 					float Width = std::abs(SelectionX - CursorX);
 					float X = Abs.X + (CursorX < SelectionX ? CursorX : SelectionX);
 
-					Ry::BatchRectangle(SelectionItem, WHITE.ScaleRGB(0.1f), X, Abs.Y, Width, Height, 0.0f);
+					Ry::BatchRectangle(SelectionItem, WHITE.ScaleRGB(0.1f), X, (float) (Abs.Y + Style.Font->GetDescent()), Width, Height, 0.0f);
 				}
 
 			}
@@ -158,7 +159,7 @@ namespace Ry
 			int32 Index = 0;
 			while (Index < XOffsets.GetSize())
 			{
-				int32 Delta = std::abs(Offset - XOffsets[Index]);
+				int32 Delta = (int32) (std::abs(Offset - XOffsets[Index]));
 				if (Delta < SmallestDiff)
 				{
 					SmallestDiff = Delta;
@@ -176,13 +177,11 @@ namespace Ry
 			if(MouseEv.ButtonID == 0 && MouseEv.bDoubleClick && IsHovered())
 			{
 				Point Abs = GetAbsolutePosition();
-				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+				int32 MouseXOffset = (int32) (MouseEv.MouseX - Abs.X);
 				
 				int32 Initial = FindClosestCursorIndex(MouseXOffset);
 				CursorPos = CursorAdvanceRight(Initial);
 				SelectionPos = CursorAdvanceLeft(Initial);
-
-				std::cout << "dc cursor " << CursorPos << " selection " << SelectionPos << std::endl;
 
 				if(HasSelection())
 					ShowSelection();
@@ -201,7 +200,7 @@ namespace Ry
 			if(MouseEv.ButtonID == 0 && bDragging)
 			{
 				Point Abs = GetAbsolutePosition();
-				int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+				int32 MouseXOffset = (int32) (MouseEv.MouseX - Abs.X);
 				CursorPos = FindClosestCursorIndex(MouseXOffset);
 
 				Draw();
@@ -232,7 +231,7 @@ namespace Ry
 
 						// Find closest offset
 						Point Abs = GetAbsolutePosition();
-						int32 MouseXOffset = MouseEv.MouseX - Abs.X;
+						int32 MouseXOffset = (int32) (MouseEv.MouseX - Abs.X);
 						SelectionPos = FindClosestCursorIndex(MouseXOffset);
 						CursorPos = SelectionPos;
 
@@ -561,7 +560,6 @@ namespace Ry
 			if (Bat)
 			{
 				Bat->AddItem(SelectionItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
-				//std::cout << "show sel" << std::endl;
 			}
 		}
 
@@ -570,7 +568,6 @@ namespace Ry
 			if(Bat)
 			{
 				Bat->RemoveItem(SelectionItem);
-				std::cout << "hide sel" << std::endl;
 			}
 		}
 

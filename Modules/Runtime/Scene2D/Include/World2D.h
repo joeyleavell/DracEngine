@@ -47,6 +47,8 @@ namespace Ry
 
 		b2World* GetPhysicsWorld() const;
 
+		void AddCustomBatch(Batch* Batch);
+
 	private:
 
 		Ry::Camera2D* Camera;

@@ -54,7 +54,7 @@ namespace Ry
 	};
 
 	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
-	class OASet
+	class EXPORT_ONLY OASet
 	{
 	public:
 		friend class OASetIterator<V, ProbeFunc>;

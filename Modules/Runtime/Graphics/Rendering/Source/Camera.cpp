@@ -48,7 +48,7 @@ namespace Ry
 
 	void Camera2D::Resize(int32 Width, int32 Height)
 	{
-		Projection = ortho4(-Width/2, static_cast<float>(Width/2), -Height/2, static_cast<float>(Height/2), 1.0f, -1.0f);
+		Projection = ortho4(-Width/2.0f, static_cast<float>(Width/2.0f), -Height/2.0f, static_cast<float>(Height/2.0f), 1.0f, -1.0f);
 	}
 
 	Matrix4 Camera2D::GetView() const

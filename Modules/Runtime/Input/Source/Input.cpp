@@ -135,7 +135,7 @@ namespace Ry
 	
 	void InputHandler::addKeyListener(KeyListener* listener)
 	{
-		keyListeners.insert(listener);
+		keyListeners.Add(listener);
 	}
 	
 	void InputHandler::removeKeyListener(KeyListener* listener)
@@ -165,11 +165,11 @@ namespace Ry
 
 	void InputHandler::addScrollListener(ScrollListener* listener)
 	{
-		scrollListeners.insert(listener);
+		scrollListeners.Insert(listener);
 	}
 
 	void InputHandler::removeScrollListener(ScrollListener* listener)
 	{
-		scrollListeners.erase(listener);
+		scrollListeners.Remove(listener);
 	}
 }

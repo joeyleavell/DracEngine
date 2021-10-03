@@ -8,6 +8,7 @@
 
 namespace Ry
 {
+	
 	ScenePrimitive2D::ScenePrimitive2D(PrimitiveMobility Mobility)
 	{
 		ItemSet = MakeItemSet();
@@ -50,6 +51,110 @@ namespace Ry
 	ScenePrimitive2D(Mobility)
 	{
 		this->Size = Size;
+	}
+
+	ParticleEmitterPrimitive::ParticleEmitterPrimitive(PrimitiveMobility Mobility, Texture* ParticleTexture):
+	ScenePrimitive2D(Mobility)
+	{
+		this->ParticleTexture = ParticleTexture;
+
+		if(ParticleTexture)
+		{
+			PipelineId = "Texture";
+		}
+		else
+		{
+			PipelineId = "Shape";
+		}
+		
+	}
+
+	Texture* ParticleEmitterPrimitive::GetTexture()
+	{
+		return ParticleTexture;
+	}
+
+	void ParticleEmitterPrimitive::Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin)
+	{		
+		OAPairIterator<Particle*, Ry::SharedPtr<BatchItem>> PartItr = Particles.CreatePairIterator();
+		while(PartItr)
+		{
+			Particle* Part = PartItr.GetKey();
+			Ry::SharedPtr<BatchItem> PartItem = PartItr.GetValue();
+
+			PartItem->Clear();
+
+			if(ParticleTexture)
+			{
+				Ry::BatchTextureTransform(PartItem, Part->Tint, Part->Transform.AsMatrix(),
+					Part->Texture.GetUx(),
+					Part->Texture.GetVy(),
+					Part->Texture.GetUw(),
+					Part->Texture.GetVh(),
+					0.5, // assume particles always rotate/scale around their center for now
+					0.5,
+					Part->Width,
+					Part->Height,
+					0.0f);
+			}
+			else
+			{
+				Ry::BatchRectangleTransform(PartItem, Part->Tint, Part->Transform.AsMatrix(),
+					Part->Width, // assume particles always rotate/scale around their center for now
+					Part->Height,
+					0.5,
+					0.5f,
+					0.0f);
+			}
+			
+			++PartItr;
+		}
+	}
+
+	void ParticleEmitterPrimitive::AddParticle(SharedPtr<Particle> Part)
+	{
+		// Acquire batch item
+		if(!Particles.Contains(Part.Get()))
+		{
+			Ry::SharedPtr<BatchItem> Result;
+			if(FreeItems.GetSize() <= 0)
+			{
+				// Create new item
+				Result = MakeItem();
+			}
+			else
+			{
+				Result = FreeItems[FreeItems.GetSize() - 1];
+				FreeItems.RemoveAt(FreeItems.GetSize() - 1);
+			}
+
+			ItemSet->AddItem(Result);
+
+			if(Result)
+			{
+				Particles.Insert(Part.Get(), Result);
+			}
+			else
+			{
+				std::cerr << "ERR" << std::endl;
+			}
+		}
+	}
+
+	void ParticleEmitterPrimitive::RemoveParticle(SharedPtr<Particle> Part)
+	{
+		if(Particles.Contains(Part.Get()))
+		{
+			Ry::SharedPtr<BatchItem> Item = Particles.Get(Part.Get());
+			ItemSet->Items.Remove(Item);
+
+			Item->Clear();
+
+
+			FreeItems.Add(Item);
+
+			Particles.Remove(Part.Get());
+		}
 	}
 
 	TextScenePrimitive::TextScenePrimitive(PrimitiveMobility Mobility, Ry::Vector2 Size, Ry::String Text, BitmapFont* Font):
@@ -316,6 +421,11 @@ namespace Ry
 		StaticBatch->Update();
 	}
 
+	void Scene2D::AddCustomBatch(Batch* Batch)
+	{
+		CustomBatches.Add(Batch);
+	}
+
 	void Scene2D::RecordCommands()
 	{
 		Cmd->Reset();
@@ -325,8 +435,13 @@ namespace Ry
 			Cmd->BeginRenderPass(SC->GetDefaultRenderPass());
 			{
 				int32 Layer = 0;
+
+				int32 MaxCustomLength = 0;
+				for (Batch* Custom : CustomBatches)
+					if (Custom->GetLayerCount() > MaxCustomLength)
+						MaxCustomLength = Custom->GetLayerCount();
 			
-				while(Layer < StaticBatch->GetLayerCount() && Layer < DynamicBatch->GetLayerCount())
+				while(Layer < StaticBatch->GetLayerCount() && Layer < DynamicBatch->GetLayerCount() && Layer < MaxCustomLength)
 				{
 					// Draw static and dynamic batches
 					CommandBuffer* StaticBatBuffer  = StaticBatch->GetCommandBuffer(Layer);
@@ -337,20 +452,38 @@ namespace Ry
 					if (StaticBatBuffer)
 						Cmd->DrawCommandBuffer(StaticBatBuffer);
 
+					for(Batch* Custom : CustomBatches)
+					{
+						Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
+					}
+
 					Layer++;
 				}
 
 				while (Layer < StaticBatch->GetLayerCount())
 				{
+					for (Batch* Custom : CustomBatches)
+					{
+						if (Layer < Custom->GetLayerCount())
+							Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
+					}
+
 					// Draw static and dynamic batches
 					CommandBuffer* StaticBatBuffer = StaticBatch->GetCommandBuffer(Layer);
 					if (StaticBatBuffer)
 						Cmd->DrawCommandBuffer(StaticBatBuffer);
 					Layer++;
+
 				}
 
 				while (Layer < DynamicBatch->GetLayerCount())
 				{
+					for (Batch* Custom : CustomBatches)
+					{
+						if (Layer < Custom->GetLayerCount())
+							Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
+					}
+
 					// Draw static and dynamic batches
 					CommandBuffer* DynamicBatBuffer = DynamicBatch->GetCommandBuffer(Layer);
 					if (DynamicBatBuffer)

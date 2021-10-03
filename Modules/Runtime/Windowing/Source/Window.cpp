@@ -9,6 +9,9 @@
 #include "VulkanSwapChain.h"
 #include "SwapChain.h"
 #include "Input.h"
+#include "Event.h"
+#include "Keys.h"
+#include "Timer.h"
 
 namespace Ry
 {
@@ -38,6 +41,7 @@ namespace Ry
 			return false;
 		}
 
+		return true;
 	}
 
 	void WindowingErrorCallback(int Error, const char* Desc)
@@ -45,9 +49,26 @@ namespace Ry
 		Ry::Log->LogError("GLFW: " + Ry::to_string(Error) + ": " + Ry::String(Desc));
 	}
 
+	MouseEventInfo::MouseEventInfo()
+	{
+		ClickTimer = new Timer{ 0.5f };
+	}
+
+	MouseEventInfo::~MouseEventInfo()
+	{
+		delete ClickTimer;
+	}
+
 	Window::Window(Ry::RenderingPlatform Plat)
 	{
 		this->Platform = Plat;
+
+		ButtonsInfo = new MouseEventInfo[MAX_BUTTONS];
+	}
+
+	Window::~Window()
+	{
+		delete[] ButtonsInfo;
 	}
 
 	bool Window::CreateWindow(int32 Width, int32 Height)
@@ -199,10 +220,144 @@ namespace Ry
 		
 	}
 
+	void Window::FireClick(int32 Button, double XPos, double YPos)
+	{
+		// Fire double press event
+		MouseClickEvent ClickEvent{};
+		ClickEvent.Type = EVENT_MOUSE_CLICK;
+		ClickEvent.ButtonID = Button;
+		ClickEvent.bDoubleClick = false;
+		ClickEvent.MouseX = XPos;
+		ClickEvent.MouseY = YPos;
+
+		OnEvent.Broadcast(ClickEvent);
+	}
+
+	void Window::FireDoubleClick(int32 Button, double XPos, double YPos)
+	{
+		// Fire double press event
+		MouseClickEvent DoubleClickEvent{};
+		DoubleClickEvent.Type = EVENT_MOUSE_CLICK;
+		DoubleClickEvent.ButtonID = Button;
+		DoubleClickEvent.bDoubleClick = true;
+		DoubleClickEvent.MouseX = XPos;
+		DoubleClickEvent.MouseY = YPos;
+
+		OnEvent.Broadcast(DoubleClickEvent);
+	}
+
+	void Window::FireDragEvent(int32 Button, float XPos, float YPos)
+	{
+		MouseDragEvent DragEvent{};
+		DragEvent.Type = EVENT_MOUSE_DRAG;
+		DragEvent.ButtonID = Button;
+		DragEvent.MouseX = XPos;
+		DragEvent.MouseY = YPos;
+
+		OnEvent.Broadcast(DragEvent);
+	}
+
+	void Window::FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed)
+	{
+		MouseButtonEvent ButtonEvent{};
+		ButtonEvent.Type = EVENT_MOUSE_BUTTON;
+		ButtonEvent.ButtonID = Button;
+		ButtonEvent.MouseX = XPos;
+		ButtonEvent.MouseY = YPos;
+		ButtonEvent.bPressed = bPressed;
+
+		OnEvent.Broadcast(ButtonEvent);
+	}
+
+	void Window::FireKeyEvent(int32 KeyCode, KeyAction Action, int32 Mods)
+	{
+		Ry::KeyEvent Ev;
+		Ev.Type = EVENT_KEY;
+		Ev.Action = Action;
+		Ev.KeyCode = KeyCode;
+		Ev.bCtrl = (Mods & MOD_CONTROL) == MOD_CONTROL;
+		Ev.bShift = (Mods & MOD_SHIFT) == MOD_SHIFT;
+		Ev.bAlt = (Mods & MOD_ALT) == MOD_ALT;
+
+		OnEvent.Broadcast(Ev);
+	}
+
+	void Window::FireCharEvent(int32 Codepoint)
+	{
+		CharEvent Ev;
+		Ev.Type = EVENT_CHAR;
+		Ev.Codepoint = Codepoint;
+
+		OnEvent.Broadcast(Ev);
+	}
+
+	void Window::FireScrollEvent(float ScrollX, float ScrollY)
+	{
+		MouseScrollEvent ScrollEvent{};
+		ScrollEvent.Type = EVENT_MOUSE_SCROLL;
+		ScrollEvent.ScrollX = ScrollX;
+		ScrollEvent.ScrollY = ScrollY;
+
+		OnEvent.Broadcast(ScrollEvent);
+	}
+
+
 	void Window::Update()
 	{
 		// Poll window events
 		glfwPollEvents();
+
+		double MouseX, MouseY;
+		GetCursorPos(MouseX, MouseY);
+		MouseY = GetWindowHeight() - MouseY - 1;
+
+		// Send mouse pos event
+		{
+
+			MouseEvent Ev;
+			Ev.Type = EVENT_MOUSE;
+			Ev.MouseX = (float)MouseX;
+			Ev.MouseY = (float)MouseY;
+			Ev.MouseDeltaX = 0.0f;
+			Ev.MouseDeltaY = 0.0f;
+
+			OnEvent.Broadcast(Ev);
+		}
+
+		// Handle drag events
+		for (int32 Index = 0; Index < MAX_BUTTONS; Index++)
+		{
+			MouseEventInfo& Info = ButtonsInfo[Index];
+
+			// Check if click event is still applicable
+			if (Info.bIsPressed)
+			{
+				if (!Info.bDrag)
+				{
+					// Distance factor
+					double DX = MouseX - Info.StartX;
+					double DY = MouseY - Info.StartY;
+					double Dist = sqrt(DX * DX + DY * DY);
+
+					if (Dist >= ClickDistThreshold)
+					{
+						Info.bDrag = true;
+					}
+				}
+
+				// Fire drag event
+				if (Info.bDrag)
+				{
+					FireDragEvent(Index, MouseX, MouseY);
+				}
+			}
+			else
+			{
+				// No longer pressed, means stop firing drag event
+				Info.bDrag = false;
+			}
+
+		}
 	}
 
 	void Window::Destroy()
@@ -279,6 +434,15 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
+			KeyAction EngineAction;
+			if (Action == GLFW_PRESS)
+				EngineAction = PRESS;
+			if (Action == GLFW_RELEASE)
+				EngineAction = RELEASE;
+			if (Action == GLFW_REPEAT)
+				EngineAction = REPEAT;
+			AssociatedWindow->FireKeyEvent(Key, EngineAction, Mods);
+
 			for (const Delegate<void, int32, KeyAction, int32>& Callback : AssociatedWindow->KeyCallbacks)
 			{
 				if (Action == GLFW_PRESS)
@@ -304,6 +468,68 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
+			MouseEventInfo& EventInfo = AssociatedWindow->ButtonsInfo[Button];
+
+			EventInfo.bIsPressed = (Action == GLFW_PRESS);
+
+			double CurX, CurY;
+			AssociatedWindow->GetCursorPos(CurX, CurY);
+			CurY = AssociatedWindow->GetWindowHeight() - CurY - 1;
+
+			// TODO: Fire raw mouse pressed/released event
+			AssociatedWindow->FireButtonEvent(Button, CurX, CurY, EventInfo.bIsPressed);
+
+			// Calc distance
+			float Dx = CurX - EventInfo.StartX;
+			float Dy = CurY - EventInfo.StartY;
+			float Dist = std::sqrt(Dx * Dx + Dy * Dy);
+
+			// Upon the first press, double click events become eligible
+			if (EventInfo.bIsPressed)
+			{
+				// Record start pos
+				EventInfo.StartX = (int32)CurX;
+				EventInfo.StartY = (int32)CurY;
+
+				// Reset click count if enough time has passed, or passed distance threshold
+				if (Dist >= AssociatedWindow->ClickDistThreshold || EventInfo.ClickTimer->is_ready())
+				{
+					EventInfo.ClickCount = 0;
+				}
+
+				EventInfo.ClickTimer->restart();
+			}
+			else
+			{
+				// Distance and time check
+				if (Dist <= AssociatedWindow->ClickDistThreshold && !EventInfo.ClickTimer->is_ready())
+				{
+					EventInfo.ClickCount++;
+
+					if (EventInfo.ClickCount == 1)
+					{
+						// Fire mouse click, 
+						AssociatedWindow->FireClick(Button, CurX, CurY);
+					}
+					else if (EventInfo.ClickCount == 2)
+					{
+						AssociatedWindow->FireDoubleClick(Button, CurX, CurY);
+					}
+					else if (EventInfo.ClickCount == 3) // Triple click
+					{
+						//FireDoubleClick(Button, CurX, CurY);
+						EventInfo.ClickCount = 0;
+					}
+					else
+					{
+						// Higher order clicks not supported, reset clicks
+						EventInfo.ClickCount = 0;
+					}
+
+				}
+
+			}
+			
 			for (const Delegate<void, int32, bool>& Callback : AssociatedWindow->MouseButtonCallbacks)
 			{
 				if (Action == GLFW_PRESS)
@@ -328,6 +554,8 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
+			AssociatedWindow->FireScrollEvent(XOff, YOff);
+
 			for (const Delegate<void, double, double>& Callback : AssociatedWindow->ScrollCallbacks)
 			{
 				Callback.Execute(XOff, YOff);
@@ -341,6 +569,8 @@ namespace Ry
 
 		if (AssociatedWindow)
 		{
+			AssociatedWindow->FireCharEvent(Codepoint);
+
 			for (const Delegate<void, uint32>& Callback : AssociatedWindow->CharacterCallbacks)
 			{
 				Callback.Execute(Codepoint);

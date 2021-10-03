@@ -344,7 +344,7 @@ namespace Ry
 				Size = NewSize;
 			}
 
-			if(AllocatedSize > 0)
+			if (AllocatedSize > 0)
 			{
 				delete[] Data;
 			}
@@ -352,6 +352,17 @@ namespace Ry
 			// Reassign to new array
 			this->Data = NewArray;
 			this->AllocatedSize = NewSize;
+		}
+
+		// Reserves an amount of space and counts the elements towards the array's total size
+		void SetSize(int32 NewSize)
+		{
+			if(NewSize > AllocatedSize)
+			{
+				Resize((int32)(AllocatedSize * 1.5) + 1);
+			}
+
+			this->Size = NewSize;
 		}
 
 	private:

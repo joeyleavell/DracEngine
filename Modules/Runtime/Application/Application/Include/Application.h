@@ -6,6 +6,7 @@
 
 namespace Ry
 {
+	struct Event;
 
 	enum class RenderingPlatform;
 	class SwapChain;
@@ -45,6 +46,8 @@ namespace Ry
 		 * The application should free its resources and perform necessary cleanup in this function.
 		 */
 		virtual void Quit() = 0;
+
+		virtual void OnEvent(const Event& Ev) {};
 
 	};
 

@@ -18,6 +18,7 @@ namespace Ry
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
 		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());
+		//Bat->SetProjection(Ry::ortho4(0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight(), 0, -1.0f, -1.0f));
 
 		//Bat->SetLayerScissor(6, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
@@ -51,8 +52,8 @@ namespace Ry
 		.FillY(1.0f)
 		[
 			NewWidget(Ry::BorderWidget)
-//			.DefaultBox(Default)
-//			.HoveredBox(Hovered)
+			.DefaultBox(Default)
+			.HoveredBox(Hovered)
 			.Padding(10.0f)
 			.FillX(1.0f)
 			[
@@ -108,7 +109,7 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
-			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass());
+			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass(), false);
 			{
 
 				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)

@@ -241,7 +241,7 @@ namespace Ry
 
 		delete[] Lines;
 
-		MeasuredWidth.Insert(String, MaxLineWidth);
+		MeasuredWidth.Insert(String, static_cast<float>(MaxLineWidth));
 
 		return (float) MaxLineWidth;
 	}
@@ -258,7 +258,7 @@ namespace Ry
 			int32 Codepoint = static_cast<int32>(String[Char]);
 			BitmapGlyph* Glyph = GetGlyph(Codepoint);
 
-			OutOffsets.Add(CursorPosition);
+			OutOffsets.Add((float) CursorPosition);
 
 			if (!Glyph)
 			{

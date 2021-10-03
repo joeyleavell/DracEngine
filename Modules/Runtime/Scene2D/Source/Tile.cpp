@@ -135,8 +135,9 @@ namespace Ry
 
 		for(int32 TileX = 0; TileX < Layer->GetWidth(); TileX++)
 		{
-			for (int32 TileY = 0; TileY < Layer->GetWidth(); TileY++)
+			for (int32 TileY = 0; TileY < Layer->GetHeight(); TileY++)
 			{
+				
 				Ry::SharedPtr<BatchItem> TileItem = TileItems[TileX + TileY * Layer->GetWidth()];
 
 				int32 TileID = Layer->GetTile(TileX, TileY);
@@ -151,7 +152,7 @@ namespace Ry
 						TileRegion.GetUx(), TileRegion.GetVy(),
 						TileRegion.GetUw(), TileRegion.GetVh(),
 						0.0f, 0.0f,
-						WorldWidth, WorldHeight,
+						(float) WorldWidth, (float)WorldHeight,
 						0.0f);
 
 					ItemSet->AddItem(TileItem);
@@ -353,8 +354,8 @@ namespace Ry
 		auto PlaceNode = [this, &Verts](int32 X, int32 Y)
 		{
 			// Place current node
-			float XMeters = PixelsToMeters(X * WorldWidth);
-			float YMeters = PixelsToMeters(Y * WorldHeight);
+			float XMeters = PixelsToMeters((float) (X * WorldWidth));
+			float YMeters = PixelsToMeters((float) (Y * WorldHeight));
 
 			Verts.Add(b2Vec2{ XMeters, YMeters });
 		};

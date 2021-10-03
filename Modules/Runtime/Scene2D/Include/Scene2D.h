@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Data/Map.h"
+#include "Algorithm/Algorithm.h"
 #include "Data/ArrayList.h"
 #include "Core/Memory/SharedPtr.h"
 #include "Scene2D.gen.h"
 #include "2D/Batch/Batch.h"
 #include "Animation.h"
+#include "Transform.h"
 
 namespace Ry
 {
@@ -17,6 +20,19 @@ namespace Ry
 	{
 		Static,
 		Movable
+	};
+
+	struct Particle
+	{
+		Ry::Transform2D Transform;
+		float Vx, Vy;
+		float Width;
+		float Height;
+		float Opacity;
+		Color Tint;
+		TextureRegion Texture;
+
+		float TimeAlive;
 	};
 
 	class SCENE2D_MODULE ScenePrimitive2D
@@ -61,6 +77,30 @@ namespace Ry
 	protected:
 
 		Ry::Vector2 Size;
+	};
+
+	class SCENE2D_MODULE ParticleEmitterPrimitive : public ScenePrimitive2D
+	{
+	public:
+
+		ParticleEmitterPrimitive(PrimitiveMobility Mobility, Texture* ParticleTexture);
+
+		Texture* GetTexture() override;
+
+		void Draw(Ry::Matrix3 Transform, Ry::Vector2 Origin) override;
+
+		void AddParticle(SharedPtr<Particle> Part);
+		void RemoveParticle(SharedPtr<Particle> Part);
+
+	private:
+
+		Texture* ParticleTexture = nullptr;
+
+		// Pool of batch items for particles to use
+		Ry::ArrayList<Ry::SharedPtr<BatchItem>> FreeItems;
+
+		Ry::OAHashMap<Particle*, Ry::SharedPtr<BatchItem>> Particles;
+
 	};
 
 	class SCENE2D_MODULE TextScenePrimitive : public ScenePrimitive2D
@@ -160,6 +200,8 @@ namespace Ry
 
 		void UpdateStatic();
 
+		void AddCustomBatch(Batch* Batch);
+
 	private:
 
 		Ry::SwapChain* SC;
@@ -180,7 +222,8 @@ namespace Ry
 		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> DynamicPrimitives;
 
 		Ry::Batch* StaticBatch;
-		Ry::Batch* DynamicBatch; 
+		Ry::Batch* DynamicBatch;
+		Ry::ArrayList<Batch*> CustomBatches;
 		
 	};
 

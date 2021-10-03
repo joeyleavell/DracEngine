@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include <set>
+#include "Data/Set.h"
 #include "InputGen.h"
 
 #define MAX_KEYS 256
@@ -182,10 +182,10 @@ namespace Ry
 
 	private:
 
-		std::set<KeyListener*> keyListeners;
+		Ry::ArrayList<KeyListener*> keyListeners;
 		//std::set<ButtonListener*> buttonListeners;
 		//std::set<CharListener*> charListeners;
-		std::set<ScrollListener*> scrollListeners;
+		Ry::OASet<ScrollListener*> scrollListeners;
 
 		bool keys_down[MAX_KEYS];
 		bool buttons_down[MAX_BUTTONS];

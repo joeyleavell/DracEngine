@@ -94,7 +94,7 @@ namespace Ry
 		void VerticalScroll(float Pixels)
 		{
 			SizeType ChildrenSize = ComputeChildrenSize();
-			float HiddenAmountY = ChildrenSize.Height - Size.Height;
+			float HiddenAmountY = (float) (ChildrenSize.Height - Size.Height);
 
 			SetVerticalScrollAmount(VerticalScrollAmount + Pixels / HiddenAmountY);
 		}
@@ -102,7 +102,7 @@ namespace Ry
 		void HorizontalScroll(float Pixels)
 		{
 			SizeType ChildrenSize = ComputeChildrenSize();
-			float HiddenAmountX = ChildrenSize.Width - Size.Width;
+			float HiddenAmountX = (float) (ChildrenSize.Width - Size.Width);
 
 			SetHorizontalScrollAmount(HorizontalScrollAmount + Pixels / HiddenAmountX);
 		}
@@ -171,8 +171,8 @@ namespace Ry
 			GetVertScrollBarBounds(VertLoc, VertSize);
 			GetHorScrollBarBounds(HorLoc, HorSize);
 
-			VerticalScrollBar->Draw(VertLoc.X, VertLoc.Y, VertSize.Width, VertSize.Height);
-			HorizontalScrollBar->Draw(HorLoc.X, HorLoc.Y, HorSize.Width, HorSize.Height);
+			VerticalScrollBar->Draw((float) VertLoc.X, (float) VertLoc.Y, (float) VertSize.Width, (float) VertSize.Height);
+			HorizontalScrollBar->Draw((float) HorLoc.X, (float) HorLoc.Y, (float) HorSize.Width, (float) HorSize.Height);
 
 			Ry::PanelWidget::Draw();
 		}
@@ -191,10 +191,10 @@ namespace Ry
 			
 			// Calculate scroll amount
 			SizeType ChildrenSize = ComputeChildrenSize();
-			float HiddenAmountX = ChildrenSize.Width - Size.Width;
-			float HiddenAmountY = ChildrenSize.Height - Size.Height;
-			int32 OffsetX = HiddenAmountX * HorizontalScrollAmount;
-			int32 OffsetY = HiddenAmountY * VerticalScrollAmount;
+			float HiddenAmountX = (float)(ChildrenSize.Width - Size.Width);
+			float HiddenAmountY = (float)(ChildrenSize.Height - Size.Height);
+			int32 OffsetX = (int32) (HiddenAmountX * HorizontalScrollAmount);
+			int32 OffsetY = (int32)(HiddenAmountY * VerticalScrollAmount);
 			if (OffsetX < 0)
 				OffsetX = 0;
 			if (OffsetY < 0)
@@ -232,7 +232,7 @@ namespace Ry
 		}
 
 		virtual RectScissor GetClipSpace() const override
-		{			
+		{
 			Point Position = GetAbsolutePosition();
 
 			RectScissor Res;
@@ -310,8 +310,6 @@ namespace Ry
 			{
 				float ScrollY = MouseEv.ScrollY;
 
-				std::cout << ScrollY << std::endl;
-
 				VerticalScroll(-ScrollY * 30.0f);
 
 				return true;
@@ -347,7 +345,7 @@ namespace Ry
 						bVerticalBarPressed = true;
 
 						// Store the initial delta Y position
-						RelativeScrollBarPressed.Y = MouseEv.MouseY - VertLoc.Y;
+						RelativeScrollBarPressed.Y = (int32) (MouseEv.MouseY - VertLoc.Y);
 					}
 					else if(bHorBoundsTest && !bHorizontalBarPressed)
 					{
@@ -355,7 +353,7 @@ namespace Ry
 						bHorizontalBarPressed = true;
 
 						// Store the initial delta Y position
-						RelativeScrollBarPressed.X = MouseEv.MouseX - HorLoc.X;
+						RelativeScrollBarPressed.X = (int32) (MouseEv.MouseX - HorLoc.X);
 					}
 				}
 
@@ -379,7 +377,7 @@ namespace Ry
 				Point VertAbs;
 				SizeType VertSize;
 				GetVertScrollBarBounds(VertAbs, VertSize);
-				float ScrollRange = Size.Height - VertSize.Height;
+				float ScrollRange = (float) (Size.Height - VertSize.Height);
 
 				// get new location
 				float CurY = MouseEv.MouseY;
@@ -433,24 +431,24 @@ namespace Ry
 		{
 			Point Abs = GetAbsolutePosition();
 			SizeType ChildrenSize = ComputeChildrenSize();
-			OutSize.Width = ScrollBarThickness;
-			OutSize.Height = Size.Height * std::min(Size.Height / (float)ChildrenSize.Height, 1.0f);
+			OutSize.Width = (int32) ScrollBarThickness;
+			OutSize.Height = (int32) (Size.Height * std::min(Size.Height / (float)ChildrenSize.Height, 1.0f));
 
-			float ScrollRange = Size.Height - OutSize.Height;
-			OutPos.X = Abs.X + Size.Width - ScrollBarThickness;
-			OutPos.Y = Abs.Y + ScrollRange * VerticalScrollAmount;
+			float ScrollRange = (float) (Size.Height - OutSize.Height);
+			OutPos.X = (int32) (Abs.X + Size.Width - ScrollBarThickness);
+			OutPos.Y = (int32) (Abs.Y + ScrollRange * VerticalScrollAmount);
 		}
 
 		void GetHorScrollBarBounds(Point& OutPos, SizeType& OutSize)
 		{
 			Point Abs = GetAbsolutePosition();
 			SizeType ChildrenSize = ComputeChildrenSize();
-			OutSize.Width = (Size.Width - ScrollBarThickness) * std::min((Size.Width - ScrollBarThickness) / (float)ChildrenSize.Width, 1.0f);
-			OutSize.Height = ScrollBarThickness;
+			OutSize.Width = (int32) ((Size.Width - ScrollBarThickness) * std::min((Size.Width - ScrollBarThickness) / (float)ChildrenSize.Width, 1.0f));
+			OutSize.Height = (int32) (ScrollBarThickness);
 
 			float ScrollRange = (Size.Width - ScrollBarThickness) - OutSize.Width;
-			OutPos.X = Abs.X + ScrollRange * HorizontalScrollAmount;
-			OutPos.Y = Abs.Y + Size.Height - ScrollBarThickness;
+			OutPos.X = (int32) (Abs.X + ScrollRange * HorizontalScrollAmount);
+			OutPos.Y = (int32) (Abs.Y + Size.Height - ScrollBarThickness);
 		}
 
 		// Utility to compute the size of the children embedded within the scroll pane
@@ -472,7 +470,7 @@ namespace Ry
 					SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
 					// Add horizontal padding
-					WidgetSize.Width += ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right;
+					WidgetSize.Width += (int32) (ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right);
 
 					// Check if max width
 					if (WidgetSize.Width > MaxChildWidth)

@@ -214,6 +214,14 @@ namespace Ry
 		return AverageFPS;
 	}
 
+	void DesktopApp::OnEvent(const Event& Ev)
+	{
+		if(Game)
+		{
+			Game->OnEvent(Ev);
+		}
+	}
+
 	bool DesktopApp::InitEngine(const DesktopConfig& Conf)
 	{
 		// Set singleton
@@ -369,6 +377,8 @@ namespace Ry
 		GameWindow->AddKeyCharDelegate(Ry::Delegate<void, uint32>::CreateMemberFunctionDelegate(this, &DesktopApp::OnCharPressed));
 		GameWindow->AddScrollDelegate(Ry::Delegate<void, double, double>::CreateMemberFunctionDelegate(this, &DesktopApp::OnScroll));
 
+		GameWindow->OnEvent.AddMemberFunction(this, &DesktopApp::OnEvent);
+
 		// todo: make this platform agnostic
 		//GameWindow->SetVSyncEnabled(false);
 	
@@ -396,6 +406,7 @@ namespace Ry
 			}
 		}
 
+		return true;
 	}
 
 	void DesktopApp::LoadConfig(const Ry::String& Name, Ry::DesktopConfig& Conf)

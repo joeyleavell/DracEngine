@@ -59,10 +59,11 @@ namespace Ry
 				CurrentX += static_cast<int32>(ChildSlot->GetPadding().Left);
 
 				// Set the widget's relative position
-				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(ChildSlot->GetPadding().Top));
+				Widget->SetRelativePosition(static_cast<float>(CurrentX), static_cast<float>(ChildSlot->GetPadding().Bottom));
 				Widget->Arrange();
 
 				CurrentX += static_cast<int32>(ContentSize.Width + ChildSlot->GetPadding().Right);
+
 			}
 		}
 
@@ -82,7 +83,7 @@ namespace Ry
 					SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
 					// Add vertical padding
-					WidgetSize.Height += ChildSlot->GetPadding().Top + ChildSlot->GetPadding().Bottom;
+					WidgetSize.Height += (int32) (ChildSlot->GetPadding().Top + ChildSlot->GetPadding().Bottom);
 					
 					if (WidgetSize.Height > MaxChildHeight)
 					{

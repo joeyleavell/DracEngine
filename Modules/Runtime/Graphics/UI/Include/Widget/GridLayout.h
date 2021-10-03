@@ -141,7 +141,7 @@ namespace Ry
 		virtual void Arrange() override
 		{
 			// Default margin: 5px
-			int32 CurrentY = static_cast<int32>(0);
+			float CurrentY = static_cast<int32>(0);
 
 			// For each row, determine max width. That is the width of each cell.
 			// Apply the same logic for height
@@ -154,7 +154,7 @@ namespace Ry
 			{
 				bRowExists = false;
 
-				int32 CurrentX = static_cast<int32>(0);
+				float CurrentX = static_cast<int32>(0);
 
 				for (int32 Col = 0; Col < MaxCols; Col++)
 				{
@@ -186,17 +186,17 @@ namespace Ry
 							//int32 WidgetX = CellMX - (int32)(ContentSize.Width / 2);
 							//int32 WidgetY = CellMY - (int32)(ContentSize.Height / 2);
 
-							int32 WidgetX = CurrentX;
-							int32 WidgetY = CurrentY;
+							float WidgetX = CurrentX;
+							float WidgetY = CurrentY;
 							
 							// Place the widget in the middle of the cell
 
 							// Set the widget's relative position
-							Widget->SetRelativePosition(static_cast<float>(WidgetX + FoundSlot->GetPadding().Left), static_cast<float>(WidgetY + FoundSlot->GetPadding().Top));
+							Widget->SetRelativePosition(static_cast<float>(WidgetX + FoundSlot->GetPadding().Left), static_cast<float>(WidgetY + FoundSlot->GetPadding().Bottom));
 							Widget->Arrange();
 
 							CurrentX += FoundSlot->GetPadding().Right;
-							CurrentY += FoundSlot->GetPadding().Bottom;
+							CurrentY += FoundSlot->GetPadding().Top;
 						}
 
 						bRowExists = true;
@@ -228,7 +228,7 @@ namespace Ry
 			{
 				bRowExists = false;
 
-				int32 CurrentX = static_cast<int32>(0.0f);
+				float CurrentX = 0.0f;
 
 				for (int32 Col = 0; Col < MaxCols; Col++, CurrentX += CellWidth)
 				{
@@ -240,7 +240,7 @@ namespace Ry
 
 				if(bRowExists)
 				{
-					SizeY += CellHeight;
+					SizeY += (int32) CellHeight;
 				}
 
 				MaxRow++;

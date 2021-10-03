@@ -60,7 +60,8 @@ namespace Ry
 		int32 GetAverageFPS() const override;
 
 	private:
-		
+
+		void OnEvent(const Event& Ev);
 		void OnMouseButtonPressed(int32 Key, bool bPressed);
 		void OnKeyPressed(int32 Key, Ry::KeyAction Action, int32 Mods);
 		void OnCharPressed(uint32 Codepoint);

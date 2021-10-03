@@ -8,8 +8,7 @@
 
 namespace Ry
 {
-	struct VertexFormat;
-
+	class VertexFormat;
 	struct VertexAttrib;
 	class VertexArray2;
 	struct BoundingBox;

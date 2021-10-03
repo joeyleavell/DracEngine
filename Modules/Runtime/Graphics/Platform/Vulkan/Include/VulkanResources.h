@@ -157,7 +157,7 @@ namespace Ry
 	{
 	public:
 
-		std::vector<VkDescriptorSet> DescriptorSets;
+		Ry::ArrayList<VkDescriptorSet> DescriptorSets;
 
 		VulkanResourceSet(const ResourceLayout* CreateInfo, SwapChain* SC);
 
@@ -197,8 +197,8 @@ namespace Ry
 
 		void SetShaderFlags(VkDescriptorSetLayoutBinding& Binding);
 
-		Ry::Map<Ry::String, MappedConstantBuffer*> MappedConstantBuffers;
-		Ry::Map<Ry::String, MappedTexture*> MappedTextures;
+		Ry::OAHashMap<Ry::String, MappedConstantBuffer*> MappedConstantBuffers;
+		Ry::OAHashMap<Ry::String, MappedTexture*> MappedTextures;
 
 	};
 	

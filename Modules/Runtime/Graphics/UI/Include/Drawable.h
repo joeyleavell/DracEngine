@@ -69,7 +69,7 @@ namespace Ry
 				X, Y,
 				0.0f, 0.0f,
 				1.0f, 1.0f,
-				0.0f, 1.0f,
+				0.0f, 0.0f,
 				Width, Height,
 				0.0f
 			);

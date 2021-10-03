@@ -77,6 +77,7 @@ namespace Ry
 					[
 						// Up directory
 						NewWidgetAssign(UpArrow, Ry::Button)
+
 						[
 							NewWidget(BorderWidget)
 							.DefaultImage(UpArrowTexture)
@@ -92,6 +93,7 @@ namespace Ry
 					// Current Directory
 					+
 					HorizontalLayout::MakeSlot()
+					.SetBottomPadding(10.0f)
 					[
 						NewWidgetAssign(CurDirLabel, TextField)
 						.Color(WHITE)

@@ -143,6 +143,10 @@ namespace Ry
 			return LargestAlignment;
 		}
 
+		// This is an error
+		CORE_ASSERT(false);
+
+		return -1;
 	}
 
 	int32 GLCalcAlignmentRequirement(ShaderPrimitiveDataType Primitive)

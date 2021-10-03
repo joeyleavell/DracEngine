@@ -35,19 +35,19 @@ namespace Ry
 
 	StringView StringSubstring(const char* String, uint32 StringLength, uint32 BeginIndex, uint32 EndIndex)
 	{
-		CORE_ASSERT(BeginIndex >= 0, "String::substring beg must be greater than or equal to zero");
-		CORE_ASSERT(BeginIndex < StringLength, "String::substring beg must be less than string size");
-		CORE_ASSERT(EndIndex >= 0, "String::substring end must be greater than or equal to zero");
-		CORE_ASSERT(EndIndex <= StringLength, "String::substring end must be less than or equal to string size");
-		CORE_ASSERT(BeginIndex <= EndIndex, "String::substring beg must be less than or equal to end");
+		CORE_ASSERTF(BeginIndex >= 0, "String::substring beg must be greater than or equal to zero");
+		CORE_ASSERTF(BeginIndex < StringLength, "String::substring beg must be less than string size");
+		CORE_ASSERTF(EndIndex >= 0, "String::substring end must be greater than or equal to zero");
+		CORE_ASSERTF(EndIndex <= StringLength, "String::substring end must be less than or equal to string size");
+		CORE_ASSERTF(BeginIndex <= EndIndex, "String::substring beg must be less than or equal to end");
 
 		return { String, StringLength, BeginIndex, EndIndex };
 	}
 
 	int32 StringFindFirst(const char* String, uint32 StringLength, const char* SearchString, uint32 SearchStringLength, uint32 BegIndex)
 	{
-		CORE_ASSERT(BegIndex >= 0, "find_first index must be greater than or equal to zero");
-		CORE_ASSERT(BegIndex < StringLength, "find_first index must be less than string size");
+		CORE_ASSERTF(BegIndex >= 0, "find_first index must be greater than or equal to zero");
+		CORE_ASSERTF(BegIndex < StringLength, "find_first index must be less than string size");
 
 		/************************************************************************/
 		/* Shortcuts                                                            */
@@ -101,7 +101,7 @@ namespace Ry
 
 	int32 StringSplit(const char* String, uint32 StringLength, const char* Delim, uint32 DelimLength, StringView** Result)
 	{
-		CORE_ASSERT(DelimLength > 0, "String::split size of delimiter must be greater than zero");
+		CORE_ASSERTF(DelimLength > 0, "String::split size of delimiter must be greater than zero");
 
 		if (StringLength == 0)
 		{
@@ -569,7 +569,7 @@ namespace Ry
 
 	String String::right_most(uint32 count) const
 	{
-		CORE_ASSERT(count <= getSize(), "right_most count must be less than or equal to string size");
+		CORE_ASSERTF(count <= getSize(), "right_most count must be less than or equal to string size");
 
 		if (count == getSize())
 			return *this;
@@ -584,7 +584,7 @@ namespace Ry
 
 	String String::left_most(uint32 count) const
 	{
-		CORE_ASSERT(count <= getSize(), "left_most count must be less than or equal to string size");
+		CORE_ASSERTF(count <= getSize(), "left_most count must be less than or equal to string size");
 
 		if (count == getSize())
 			return *this;

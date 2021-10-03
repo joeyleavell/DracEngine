@@ -403,29 +403,6 @@ namespace Ry
 		int32 offset;
 	};
 
-	// position
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P[1];
-	
-	// position, color
-	// position, uv
-	// position, normal
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C[2];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV[2];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N[2];
-
-	// position, uv, color
-	// position, color, uv
-	// position, uv, normal
-	// position, normal, uv
-	// position, color, normal
-	// position, normal, color
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1C[3];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1UV[3];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1UV1N[3];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1UV[3];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1C1N[3];
-	// extern RENDERING_MODULE VertexAttrib ATTRIB_ARRAY_1P1N1C[3];
-
 	extern RENDERING_MODULE VertexFormat VF1P;
 	extern RENDERING_MODULE VertexFormat VF1P1C;
 	extern RENDERING_MODULE VertexFormat VF1P1UV;

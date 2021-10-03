@@ -39,7 +39,7 @@ namespace Ry
 		{
 			Ry::String IdName = Info->TextureBindings[TextureBinding]->Name;
 
-			if(!MappedTextures.contains(IdName))
+			if(!MappedTextures.Contains(IdName))
 			{
 				Ry::Log->LogWarnf("Texture %s was not bound!", *IdName);
 			}
@@ -55,13 +55,12 @@ namespace Ry
 		assert(VkSC != nullptr);
 		VkSC->ResourceSets.Remove(this);
 
-		Ry::KeyIterator<Ry::String, MappedConstantBuffer*> Itr = MappedConstantBuffers.CreateKeyIterator();
-
+		Ry::OAPairIterator<Ry::String, MappedConstantBuffer*> Itr = MappedConstantBuffers.CreatePairIterator();
 		while(Itr)
 		{
-			(*Itr.Value())->Cleanup();
+			Itr.GetValue()->Cleanup();
 
-			delete (*Itr.Value());
+			delete (Itr.GetValue());
 			
 			++Itr;
 		}
@@ -106,7 +105,7 @@ namespace Ry
 		for(const ConstantBuffer* ConstantBuffer : Info->ConstantBuffers)
 		{
 			// Get the mapped buffer
-			MappedConstantBuffer* Mapped = *MappedConstantBuffers.get(ConstantBuffer->Name);
+			MappedConstantBuffer* Mapped = MappedConstantBuffers.Get(ConstantBuffer->Name);
 
 			// Update the buffer data
 			VulkanBuffer* UniformBuffForFrame = Mapped->VulkanBuffers[Frame];
@@ -121,14 +120,14 @@ namespace Ry
 
 		MappedTexture* Map = nullptr;
 
-		if(MappedTextures.contains(TextureName))
+		if(MappedTextures.Contains(TextureName))
 		{
-			Map = *MappedTextures.get(TextureName);
+			Map = MappedTextures.Get(TextureName);
 		}
 		else
 		{
 			Map = new MappedTexture;
-			MappedTextures.insert(TextureName, Map);
+			MappedTextures.Insert(TextureName, Map);
 		}
 
 		if(Map)
@@ -138,7 +137,7 @@ namespace Ry
 		}
 
 		// Update descriptor sets if we've already created them
-		if(DescriptorSets.size() > 0)
+		if(DescriptorSets.GetSize() > 0)
 		{
 			VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 			int FlightIndex = VkSC->GetCurrentImageIndex();
@@ -148,7 +147,7 @@ namespace Ry
 				// Device wait, not in a frame so we have to update all (not efficient)			
 				vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
-				for(int32 Index = 0; Index < VkSC->SwapChainImages.size(); Index++)
+				for(int32 Index = 0; Index < VkSC->SwapChainImages.GetSize(); Index++)
 				{
 					UpdateDescriptorSet(VkSC, Index);
 				}
@@ -158,7 +157,7 @@ namespace Ry
 				// Update this frame, mark others as dirty
 				UpdateDescriptorSet(VkSC, FlightIndex);
 
-				for (int32 Index = 0; Index < VkSC->SwapChainImages.size(); Index++)
+				for (int32 Index = 0; Index < VkSC->SwapChainImages.GetSize(); Index++)
 				{
 					if(Index != FlightIndex && !DirtyFrames.Contains(Index))
 					{
@@ -175,13 +174,13 @@ namespace Ry
 
 	void VulkanResourceSet::SetConstant(Ry::String BufferName, Ry::String Id, const void* Data)
 	{
-		if(!MappedConstantBuffers.contains(BufferName))
+		if(!MappedConstantBuffers.Contains(BufferName))
 		{
 			Ry::Log->LogErrorf("Constant buffer named %s does not exist", *BufferName);
 			return;
 		}
 		
-		MappedConstantBuffer* Buff = *MappedConstantBuffers.get(BufferName);
+		MappedConstantBuffer* Buff = MappedConstantBuffers.Get(BufferName);
 
 		if(!Buff->UniformRefs.contains(Id))
 		{
@@ -194,7 +193,7 @@ namespace Ry
 
 		// Dirty the uniform frames
 		VulkanSwapChain* VkSwap = dynamic_cast<VulkanSwapChain*>(Swap);
-		for (int32 Frame = 0; Frame < VkSwap->SwapChainImages.size(); Frame++)
+		for (int32 Frame = 0; Frame < VkSwap->SwapChainImages.GetSize(); Frame++)
 		{
 			if (!UniformDirtyFrames.Contains(Frame))
 			{
@@ -333,7 +332,11 @@ namespace Ry
 
 			return LargestAlignment;
 		}
-		
+
+		// This is an error
+		CORE_ASSERT(false);
+
+		return -1;		
 	}
 		
 	int32 CalcAlignmentRequirement(ShaderPrimitiveDataType Primitive)
@@ -383,16 +386,16 @@ namespace Ry
 	{
 		for(const ConstantBuffer* ConstBuffer : Info->ConstantBuffers)
 		{
-			if (!MappedConstantBuffers.contains(ConstBuffer->Name))
+			if (!MappedConstantBuffers.Contains(ConstBuffer->Name))
 			{
 				Ry::Log->LogErrorf("Mapped constant buffer not yet created for %s", *ConstBuffer->Name);
 				return;
 			}
 
-			MappedConstantBuffer* Buffer = *MappedConstantBuffers.get(ConstBuffer->Name);
+			MappedConstantBuffer* Buffer = MappedConstantBuffers.Get(ConstBuffer->Name);
 			
 			// Create a uniform buffer per swap chain image since each command buffer will reference it
-			for (size_t BufferIndex = 0; BufferIndex < SwapChain->SwapChainImages.size(); BufferIndex++)
+			for (size_t BufferIndex = 0; BufferIndex < SwapChain->SwapChainImages.GetSize(); BufferIndex++)
 			{
 				VulkanBuffer* UniformBuffer = new VulkanBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Buffer->HostBufferSize);
 
@@ -480,7 +483,7 @@ namespace Ry
 
 			MapData(MappedBuffer, Buff);
 
-			MappedConstantBuffers.insert(Buff->Name, MappedBuffer);
+			MappedConstantBuffers.Insert(Buff->Name, MappedBuffer);
 		}
 		
 
@@ -632,24 +635,24 @@ namespace Ry
 		assert(VkResDesc != nullptr);
 		
 		// Use the same layout for each descriptor set
-		std::vector<VkDescriptorSetLayout> Layouts(SwapChain->SwapChainImages.size(), VkResDesc->GetVkLayout());
+		std::vector<VkDescriptorSetLayout> Layouts(SwapChain->SwapChainImages.GetSize(), VkResDesc->GetVkLayout());
 
 		// Create a descriptor set for each frame in the swap chain
 		VkDescriptorSetAllocateInfo AllocInfo{};
 		AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		AllocInfo.descriptorPool = SwapChain->DescriptorPool;
-		AllocInfo.descriptorSetCount = static_cast<uint32_t>(SwapChain->SwapChainImages.size());
+		AllocInfo.descriptorSetCount = static_cast<uint32_t>(SwapChain->SwapChainImages.GetSize());
 		AllocInfo.pSetLayouts = Layouts.data();
 
-		DescriptorSets.resize(SwapChain->SwapChainImages.size());
-		if (vkAllocateDescriptorSets(GVulkanContext->GetLogicalDevice(), &AllocInfo, DescriptorSets.data()) != VK_SUCCESS)
+		DescriptorSets.SetSize(SwapChain->SwapChainImages.GetSize());
+		if (vkAllocateDescriptorSets(GVulkanContext->GetLogicalDevice(), &AllocInfo, DescriptorSets.GetData()) != VK_SUCCESS)
 		{
 			Ry::Log->LogErrorf("Failed to allocate descriptor sets");
 		}
 
 		// Update each descriptor set image
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
-		for(int32 SwapChainImage = 0; SwapChainImage < VkSC->SwapChainImages.size(); SwapChainImage++)
+		for(int32 SwapChainImage = 0; SwapChainImage < VkSC->SwapChainImages.GetSize(); SwapChainImage++)
 		{
 			UpdateDescriptorSet(VkSC, SwapChainImage);
 		}
@@ -664,7 +667,7 @@ namespace Ry
 
 		for (const ConstantBuffer* ConstBuffer : Info->ConstantBuffers)
 		{
-			MappedConstantBuffer* Mapped = *MappedConstantBuffers.get(ConstBuffer->Name);
+			MappedConstantBuffer* Mapped = MappedConstantBuffers.Get(ConstBuffer->Name);
 
 			VkDescriptorBufferInfo BufferInfo{};
 			BufferInfo.buffer = Mapped->VulkanBuffers[SwapChainImageIndex]->GetBufferObject();
@@ -688,12 +691,12 @@ namespace Ry
 		{
 			const TextureBinding* Binding = Info->TextureBindings[TextureBindingIndex];
 
-			if (!MappedTextures.contains(Binding->Name))
+			if (!MappedTextures.Contains(Binding->Name))
 			{
 				continue;
 			}
 
-			MappedTexture* Mapping = *MappedTextures.get(Binding->Name);
+			MappedTexture* Mapping = MappedTextures.Get(Binding->Name);
 
 			VkDescriptorImageInfo ImageInfo{};
 			ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

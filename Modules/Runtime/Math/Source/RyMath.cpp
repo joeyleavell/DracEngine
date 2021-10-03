@@ -6,5 +6,9 @@ namespace Ry
 	{
 
 	}*/
-	
+
+	bool IsNearlyEqual(float A, float B, float Threshold)
+	{
+		return std::abs(A - B) <= Threshold;
+	}
 }
