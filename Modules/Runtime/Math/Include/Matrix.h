@@ -15,7 +15,7 @@ namespace Ry
 
 		Matrix();
 		Matrix(double a);
-		Matrix(double a, double b, ...);
+		Matrix(std::initializer_list<double> Values);
 		~Matrix();
 
 		// Matrix initial setup

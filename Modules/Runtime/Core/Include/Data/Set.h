@@ -198,12 +198,12 @@ namespace Ry
 			return CurrentEntry != nullptr;
 		}
 
-		bool operator!=(const typename SetIterator<K>& Other) const
+		bool operator!=(const SetIterator<K>& Other) const
 		{
 			return !(*this == Other);
 		}
 
-		bool operator==(const typename SetIterator<K>& Other) const
+		bool operator==(const SetIterator<K>& Other) const
 		{
 			if(CurrentEntry && Other.CurrentEntry)
 			{
@@ -498,12 +498,12 @@ namespace Ry
 			return *this;
 		}
 
-		typename SetIterator<K> begin()
+		SetIterator<K> begin()
 		{
 			return SetIterator<K>(Table);
 		}
 
-		typename SetIterator<K> end()
+		SetIterator<K> end()
 		{
 			return SetIterator<K>();
 		}

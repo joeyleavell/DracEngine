@@ -13,7 +13,7 @@ struct GLFWmonitor;
 namespace Ry
 {
 	
-	enum KeyAction;
+	enum class KeyAction;
 	
 	class CommandBuffer;
 	class SwapChain;

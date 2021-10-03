@@ -51,9 +51,9 @@ namespace Ry
 	};
 
 	template <>
-	inline uint32 HashImpl<Ry::AssetRef>(TypeTag<Ry::AssetRef>, const Ry::AssetRef& Object)
+	inline uint32 HashImpl<Ry::AssetRef>(HashTypeTag<Ry::AssetRef>, const Ry::AssetRef& Object)
 	{
-		return HashImpl<Ry::String>(TypeTag<Ry::String>{}, Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
+		return HashImpl<Ry::String>(HashTypeTag<Ry::String>{}, Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
 	}
 
 	

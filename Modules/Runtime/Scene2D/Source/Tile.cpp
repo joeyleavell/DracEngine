@@ -202,7 +202,7 @@ namespace Ry
 	}
 
 	TileLayerPhysicsComponent::TileLayerPhysicsComponent(Entity2D* Owner, TileLayer* Layer, int32 WorldWidth, int32 WorldHeight):
-	Physics2DComponent(Owner, PhysicsMaterial2D{Physics2DType::Static, 0.0f, 0.0f, 0.0f})
+	Physics2DComponent(Owner, PhysicsMaterial2D{ Physics2DType::Static, true, 0.0f, 0.0f, {}, false})
 	{
 		this->Layer = Layer;
 		Layer->OnTileChanged.AddMemberFunction(this, &TileLayerPhysicsComponent::OnTileChanged);

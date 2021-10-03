@@ -2,6 +2,7 @@
 
 #include "SceneRenderer.h"
 #include "Data/Map.h"
+#include "ForwardSceneRenderer.gen.h"
 
 namespace Ry
 {

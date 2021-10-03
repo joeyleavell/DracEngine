@@ -10,7 +10,7 @@
 namespace Ry
 {
 
-	enum KeyAction
+	enum class KeyAction
 	{
 		PRESS, RELEASE, REPEAT
 	};

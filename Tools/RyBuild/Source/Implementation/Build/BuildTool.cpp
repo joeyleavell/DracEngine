@@ -118,6 +118,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				std::ofstream Tap;
 				Tap.open(FullGeneratedPath.string());
 				Tap << "#include \"Core/Reflection.h\"" << std::endl;
+				Tap << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n";
 				Tap.close();
 			}
 		}
@@ -132,50 +133,24 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	for (std::string Path : SourcesNeedingGeneration)
 	{
 		Filesystem::path SourcePath = Path;
+		std::string SourceStem = SourcePath.stem().string();
 
+		// Print friendly message
+		std::cout << "Generating source for " << SourceStem << ".h" << std::endl;
 
-		std::string HeaderName = SourcePath.stem().string() + ".gen.h";
+		std::string HeaderName = SourceStem + ".gen.h";
 		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
 
-		if (Filesystem::exists(GenPath))
+		std::string GeneratedSource;
+		if(!Ry::GenerateReflectionCode(ModuleNameCaps, SourcePath.string(), ModuleIncludes, GeneratedSource))
 		{
-			std::error_code Error;
-			Filesystem::remove(GenPath, Error);
-
-			if (Error != std::error_code())
-			{
-				std::cerr << "Failed to delete generated header: " << GenPath.string() << std::endl;
-			}
+			return false;
 		}
 
-		// Generate the source code
 		std::ofstream OutputGenerated(GenPath.string());
 		{
-			// Load the header source
-			// std::string InputFile;
-			// std::ifstream Input(Path.path().string());
-			// std::string Line;
-			//
-			// while (std::getline(Input, Line))
-			// {
-			// 	InputFile += Line + "\n";
-			// }
-
-			// If current generated exists, delete it otherwise we'll fail trying to generate it
-			
-			std::string GeneratedSource;
-
-			// TODO: Commented for now until after ludum dare
-			//if(!Ry::GenerateReflectionCode(SourcePath.string(), ModuleIncludes, GeneratedSource))
-			{
-				//return false;
-			}
-
-			// Append an include for the base module generated file
-			GeneratedSource = "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n" + GeneratedSource;
-
-			// TODO: include base generated module include as well
-			OutputGenerated << GeneratedSource;
+			OutputGenerated << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"" << std::endl;
+			OutputGenerated << GeneratedSource << std::endl;
 		}
 		OutputGenerated.close();
 

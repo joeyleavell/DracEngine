@@ -200,7 +200,7 @@ namespace Ry
 
 	};
 
-	bool GenerateReflectionCode(std::string SourcePath, std::vector<std::string> Includes, std::string& GeneratedSource)
+	bool GenerateReflectionCode(std::string ModuleNameCaps, std::string SourcePath, std::vector<std::string> Includes, std::string& GeneratedSource)
 	{
 		
 		MatchFinder Finder;
@@ -235,6 +235,10 @@ namespace Ry
 			Args.push_back("--include-directory");
 			Args.push_back(IncludePath);
 		}
+
+		// Tell clang our module name
+		Args.push_back("-D");
+		Args.push_back("COMPILE_MODULE_" + ModuleNameCaps);
 
 		Args.push_back("-xc++");
 

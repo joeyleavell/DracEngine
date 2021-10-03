@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Factory/ObjMeshFactory.h"
 #include "MeshAsset.h"
 #include "Factory/ObjMtlFactory.h"

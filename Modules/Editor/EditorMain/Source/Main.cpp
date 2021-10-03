@@ -55,7 +55,7 @@ Ry::Application* LoadApplication(const Ry::String& DLLLocation, Ry::RenderingPla
 		}
 		else
 		{
-			std::cerr << "Game module not found in library " << *DllName << " " << Function << std::endl;
+			std::cerr << "Game module not found in library " << *DllName << " " << std::endl;
 			return nullptr;
 		}
 	}

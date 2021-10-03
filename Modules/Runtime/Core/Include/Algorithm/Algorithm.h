@@ -19,21 +19,21 @@ namespace Ry
 	};
 
 	template<typename Tag>
-	struct TypeTag {};
+	struct HashTypeTag {};
 
 	template <typename T>
 	uint32 Hash(SharedPtr<T> Object)
 	{
-		return HashImpl<T>(TypeTag<T>{}, Object.Get());
+		return HashImpl<T>(HashTypeTag<T>{}, Object.Get());
 	}
 
 	// Generic hash impl, must be implemented
 	template <typename T>
-	uint32 HashImpl(TypeTag<T>, const T& Object);
+	uint32 HashImpl(HashTypeTag <T>, const T& Object);
 	
 	// Hash impl for pointer types
 	template <typename T>
-	uint32 HashImpl(TypeTag<T>, const T* Object)
+	uint32 HashImpl(HashTypeTag <T>, const T* Object)
 	{
 		return static_cast<uint32>(reinterpret_cast<uintptr_t>(Object));
 	}
@@ -41,20 +41,20 @@ namespace Ry
 	// Hash imp for shared pointers
 
 	template <>
-	inline uint32 HashImpl<int32>(TypeTag<int32>, const int32& Object)
+	inline uint32 HashImpl<int32>(HashTypeTag <int32>, const int32& Object)
 	{
 		return Object;
 	}
 
 	template <>
-	inline uint32 HashImpl<uint32>(TypeTag<uint32>, const uint32& Object)
+	inline uint32 HashImpl<uint32>(HashTypeTag <uint32>, const uint32& Object)
 	{
 		return Object;
 	}
 
 	// Specialize hash function for string
 	template <>
-	inline uint32 HashImpl<Ry::String>(TypeTag<Ry::String>, const Ry::String& Object)
+	inline uint32 HashImpl<Ry::String>(HashTypeTag <Ry::String>, const Ry::String& Object)
 	{
 		const int32 p = 31;
 		const int32 m = (uint32)1e9 + 9;
@@ -80,7 +80,7 @@ namespace Ry
 	template <typename T>
 	uint32 Hash(T* Object)
 	{
-		return HashImpl<T>(TypeTag<T>{}, Object);
+		return HashImpl<T>(HashTypeTag<T>{}, Object);
 	}
 
 	/**
@@ -89,7 +89,7 @@ namespace Ry
 	template <typename T>
 	uint32 Hash(const T& Object)
 	{
-		return HashImpl(TypeTag<T>{}, Object);
+		return HashImpl(HashTypeTag<T>{}, Object);
 	}
 
 }

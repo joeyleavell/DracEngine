@@ -12,7 +12,7 @@ namespace Ry
 	/**
 	 * Specifies a pixel format for textures.
 	 */
-	enum class RENDERING_MODULE PixelFormat
+	enum class PixelFormat
 	{
 		NONE, RGB, RGBA, GRAYSCALE, DEPTH
 	};
@@ -26,7 +26,7 @@ namespace Ry
 	{
 	public:
 		PixelBuffer(int32 Width, int32 Height, PixelFormat Format, PixelStorage Storage): Width(Width),Height(Height), Data(nullptr), Format(Format), Storage(Storage) {};
-		virtual ~PixelBuffer() { delete[] Data; };
+		virtual ~PixelBuffer() {};
 
 		int32 GetWidth() const { return Width; }
 		int32 GetHeight() const { return Height; }
@@ -95,6 +95,7 @@ namespace Ry
 	{
 	public:
 		PixelBufferFourByteRGBA(int32 Width, int32 Height);
+		~PixelBufferFourByteRGBA() { delete[] (reinterpret_cast<uint8*>(Data)); };
 
 		uint32 GetPixel(int32 X, int32 Y) const override;
 		void SetPixel(int32 X, int32 Y, uint32 Value) override;
@@ -104,6 +105,7 @@ namespace Ry
 	{
 	public:
 		PixelBufferThreeByteRGB(int32 Width, int32 Height);
+		~PixelBufferThreeByteRGB(){ delete[](reinterpret_cast<uint8*>(Data)); };
 
 		uint32 GetPixel(int32 X, int32 Y) const override;
 		void SetPixel(int32 X, int32 Y, uint32 Value) override;
@@ -113,6 +115,7 @@ namespace Ry
 	{
 	public:
 		PixelBufferRed8(int32 Width, int32 Height);
+		~PixelBufferRed8() { delete[](reinterpret_cast<uint8*>(Data)); };
 
 		uint32 GetPixel(int32 X, int32 Y) const override;
 		void SetPixel(int32 X, int32 Y, uint32 Value) override;

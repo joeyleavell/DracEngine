@@ -46,11 +46,11 @@ namespace Ry
 
 	void DesktopApp::OnKeyPressed(int32 Key, Ry::KeyAction Action, int32 Mods)
 	{
-		if(Action == PRESS)
+		if(Action == KeyAction::PRESS)
 		{
 			Ry::input_handler->setKey(Key, true);
 		}
-		else if(Action == RELEASE)
+		else if(Action == KeyAction::RELEASE)
 		{
 			Ry::input_handler->setKey(Key, false);
 		}

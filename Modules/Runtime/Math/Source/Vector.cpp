@@ -365,7 +365,7 @@ namespace Ry
 	{
 		bool bEqual = true;
 		for (int32 Val = 0; Val < S; Val++)
-			if (!Ry::IsNearlyEqual(data[Val], Other.data[Val]), Threshold)
+			if (!Ry::IsNearlyEqual(data[Val], Other.data[Val], Threshold))
 				bEqual = false;
 
 		return bEqual;
@@ -549,9 +549,9 @@ namespace Ry
 	}
 
 	// Vectors
-	template MATH_MODULE class Vector<4>;
-	template MATH_MODULE class Vector<3>;
-	template MATH_MODULE class Vector<2>;
+	template class MATH_MODULE Vector<4>;
+	template class MATH_MODULE Vector<3>;
+	template class MATH_MODULE Vector<2>;
 
 	// Vector to string
 	template MATH_MODULE String to_string(const Vector<2>& a);

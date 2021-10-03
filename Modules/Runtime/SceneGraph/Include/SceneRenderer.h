@@ -1,9 +1,9 @@
 #pragma once
 
-#include "SceneRenderer.gen.h"
 #include "Core/Core.h"
 #include "Data/Map.h"
 #include "Transform.h"
+#include "SceneRenderer.gen.h"
 
 namespace Ry
 {

@@ -24,21 +24,19 @@ namespace Ry
 	}
 
 	template <uint32 R, uint32 C>
-	Matrix<R, C>::Matrix(double a, double b, ...)
+	Matrix<R, C>::Matrix(std::initializer_list<double> Values)
 	{
-		data[0] = a;
-		data[1] = b;
-
-		va_list vargs;
-		va_start(vargs, b);
-
-		for (uint32 i = 2; i < R * C; i++)
+		int32 Index = 0;
+		for(double Val : Values)
 		{
-			data[i] = (double)va_arg(vargs, double);
+			if (Index < R * C)
+			{
+				data[Index] = Val;
+			}
+
+			Index++;
 		}
-
-		va_end(vargs);
-
+		
 	}
 
 	template <uint32 R, uint32 C>
@@ -631,22 +629,22 @@ namespace Ry
 	}
 
 
-	template MATH_MODULE class Matrix<1, 1>;
-	template MATH_MODULE class Matrix<1, 2>;
-	template MATH_MODULE class Matrix<1, 3>;
-	template MATH_MODULE class Matrix<1, 4>;
-	template MATH_MODULE class Matrix<2, 1>;
-	template MATH_MODULE class Matrix<2, 2>;
-	template MATH_MODULE class Matrix<2, 3>;
-	template MATH_MODULE class Matrix<2, 4>;
-	template MATH_MODULE class Matrix<3, 1>;
-	template MATH_MODULE class Matrix<3, 2>;
-	template MATH_MODULE class Matrix<3, 3>;
-	template MATH_MODULE class Matrix<3, 4>;
-	template MATH_MODULE class Matrix<4, 1>;
-	template MATH_MODULE class Matrix<4, 2>;
-	template MATH_MODULE class Matrix<4, 3>;
-	template MATH_MODULE class Matrix<4, 4>;
+	template class MATH_MODULE Matrix<1, 1>;
+	template class MATH_MODULE Matrix<1, 2>;
+	template class MATH_MODULE Matrix<1, 3>;
+	template class MATH_MODULE Matrix<1, 4>;
+	template class MATH_MODULE Matrix<2, 1>;
+	template class MATH_MODULE Matrix<2, 2>;
+	template class MATH_MODULE Matrix<2, 3>;
+	template class MATH_MODULE Matrix<2, 4>;
+	template class MATH_MODULE Matrix<3, 1>;
+	template class MATH_MODULE Matrix<3, 2>;
+	template class MATH_MODULE Matrix<3, 3>;
+	template class MATH_MODULE Matrix<3, 4>;
+	template class MATH_MODULE Matrix<4, 1>;
+	template class MATH_MODULE Matrix<4, 2>;
+	template class MATH_MODULE Matrix<4, 3>;
+	template class MATH_MODULE Matrix<4, 4>;
 
 	// Matrix-Matrix multiplication
 	template MATH_MODULE Matrix4 operator*(const Matrix4& a, const Matrix4& b);

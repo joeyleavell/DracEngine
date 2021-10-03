@@ -66,12 +66,14 @@ namespace Ry
 			}
 		}
 
-		StructBufferMember& CreatePrimitiveMember(Ry::String Id, ShaderPrimitiveDataType Primitive, int32 ArraySize = 1)
+		PrimitiveBufferMember& CreatePrimitiveMember(Ry::String Id, ShaderPrimitiveDataType Primitive, int32 ArraySize = 1)
 		{
 			PrimitiveBufferMember* Prim = new PrimitiveBufferMember;
 			Prim->Id = Id;
 			Prim->ArraySize = ArraySize;
 			Prim->DataType = Primitive;
+
+			return *Prim;
 		}
 
 		StructBufferMember& CreateStructMember(Ry::String Id, int32 ArraySize)
@@ -148,6 +150,8 @@ namespace Ry
 			this->SetIndex = SetIndex;
 			this->Stages = Stages;
 		}
+
+		virtual ~ResourceLayout() {};
 
 		void AddConstantBuffer(ConstantBuffer* Buffer)
 		{

@@ -88,6 +88,7 @@ namespace Ry
 		Margin& operator=(float Pad)
 		{
 			this->Left = Right = Top = Bottom = Pad;
+			return *this;
 		}
 		
 	};
@@ -194,18 +195,18 @@ namespace Ry
 		}
 	};
 
-	enum class UI_MODULE SizeMode
+	enum class SizeMode
 	{
 		AUTO,
 		PERCENTAGE
 	};
 
-	enum class UI_MODULE VAlign
+	enum class VAlign
 	{
 		TOP, CENTER, BOTTOM
 	};
 
-	enum class UI_MODULE HAlign
+	enum class HAlign
 	{
 		LEFT, CENTER, RIGHT
 	};

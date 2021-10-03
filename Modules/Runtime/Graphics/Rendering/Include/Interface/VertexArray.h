@@ -9,7 +9,7 @@ namespace Ry
 	/**
 	 * Hints that specify how the buffer is intended to be used.
 	 */
-	enum class RENDERING_MODULE BufferHint
+	enum class BufferHint
 	{
 		STREAM, DYNAMIC, STATIC
 	};

@@ -11,7 +11,7 @@ struct GLFWmonitor;
 namespace Ry
 {
 	enum class RenderingPlatform;
-	enum KeyAction;
+	enum class KeyAction;
 
 	class Window;
 

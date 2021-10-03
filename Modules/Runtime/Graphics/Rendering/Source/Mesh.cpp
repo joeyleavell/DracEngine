@@ -13,7 +13,7 @@ namespace Ry
 		
 	Mesh::Mesh(const VertexFormat& Format)
 	{
-		this->Hint = Hint;
+		this->Hint = BufferHint::DYNAMIC;
 		this->VertArray = RendAPI->CreateVertexArray(Format);
 		this->Data = new MeshData;
 		this->Data->SetVertFormat(Format);

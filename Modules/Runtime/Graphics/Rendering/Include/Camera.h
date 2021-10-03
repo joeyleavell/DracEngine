@@ -15,6 +15,8 @@ namespace Ry
 
 	public:
 
+		virtual ~Camera() {};
+
 		/**
 		 * @return Matrix4 The projection matrix of this camera.
 		 */
@@ -48,8 +50,8 @@ namespace Ry
 		Camera2D(float Left, float Right, float Bottom, float Top);
 
 		virtual Vector2 ScreenToWorld(Vector2 Screen) const;
-		virtual void Update();
-		virtual void Resize(int32 Width, int32 Height);
+		void Update() override;
+		void Resize(int32 Width, int32 Height) override;
 
 		Matrix4 GetView() const override;
 

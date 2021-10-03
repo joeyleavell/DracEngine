@@ -273,7 +273,7 @@ namespace Ry
 		float DragCoefficient = 7.0f;
 
 		Physics2DComponent(Entity2D* Owner, PhysicsMaterial2D Mat, bool bControlEnt = true);
-		~Physics2DComponent();
+		virtual ~Physics2DComponent();
 
 		void Update(float Delta) override;
 

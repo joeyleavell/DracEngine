@@ -83,7 +83,7 @@ namespace Ry
 
 	bool Window::CreateWindow(Ry::String Title, int32 Width, int32 Height, int32 FSMonitor)
 	{
-		this->FullscreenMonitor = FullscreenMonitor;
+		this->FullscreenMonitor = FSMonitor;
 
 		SetupWindowHints();
 
@@ -436,11 +436,11 @@ namespace Ry
 		{
 			KeyAction EngineAction;
 			if (Action == GLFW_PRESS)
-				EngineAction = PRESS;
+				EngineAction = KeyAction::PRESS;
 			if (Action == GLFW_RELEASE)
-				EngineAction = RELEASE;
+				EngineAction = KeyAction::RELEASE;
 			if (Action == GLFW_REPEAT)
-				EngineAction = REPEAT;
+				EngineAction = KeyAction::REPEAT;
 			AssociatedWindow->FireKeyEvent(Key, EngineAction, Mods);
 
 			for (const Delegate<void, int32, KeyAction, int32>& Callback : AssociatedWindow->KeyCallbacks)

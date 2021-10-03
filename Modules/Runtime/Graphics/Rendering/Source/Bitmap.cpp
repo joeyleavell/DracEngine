@@ -81,6 +81,8 @@ namespace Ry
 			break;
 		case PixelStorage::RED8:
 			this->Buffer = new PixelBufferRed8(Width, Height);
+		default:
+			std::cerr << "Bitmap type not supported" << std::endl;
 			break;
 		}
 	}

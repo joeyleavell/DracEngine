@@ -43,6 +43,7 @@ namespace Ry
 		bool bPrimitiveStateDirty;
 
 		ScenePrimitive2D(PrimitiveMobility Mobility);
+		virtual ~ScenePrimitive2D() {};
 
 		Ry::SharedPtr<BatchItemSet> GetItemSet();
 

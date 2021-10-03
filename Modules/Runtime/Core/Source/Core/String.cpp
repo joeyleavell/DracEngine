@@ -16,7 +16,7 @@ namespace Ry
 
 	void StringCopy(char* Dst, const char* Src, uint64 DstSize)
 	{
-#ifdef MSVC_IMPLEMENTATION
+#ifdef MSVC_COMPILER
 		strcpy_s(Dst, DstSize, Src);
 #else
 		strncpy(Dst, Src, DstSize);

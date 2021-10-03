@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Factory/FbxFactory.h"
 #include "Core/Globals.h"
 #include "fbxsdk.h"
