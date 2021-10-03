@@ -101,6 +101,9 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 
 	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
 
+	std::vector<std::string> HeadersNeedingGeneration;
+	FindOutOfDateHeaders(TheModule, GeneratedDirectory, HeadersNeedingGeneration);
+
 	// Pre create all .gen.h files in case they don't exist so pre build doesn't fail
 	{
 		std::vector<std::string> AllSource;
@@ -123,26 +126,35 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 			}
 		}
 	}	
-
-	bool bNeedsFullRebuild = false; // Ignore this
-	std::vector<std::string> SourcesNeedingGeneration;
-	FindOutOfDateSourceFiles(TheModule, ObjectDirectory, SourcesNeedingGeneration, bNeedsFullRebuild);
-
+		
 	// Generate reflection data for source files
 	//Filesystem::recursive_directory_iterator HeaderItr(TheModule.GetSourceDir());
-	for (std::string Path : SourcesNeedingGeneration)
+	for (std::string Path : HeadersNeedingGeneration)
 	{
-		Filesystem::path SourcePath = Path;
-		std::string SourceStem = SourcePath.stem().string();
+		Filesystem::path HeaderPath = Path;
+		std::string HeaderStem = HeaderPath.stem().string();
+		auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
+		auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
+		if (!Filesystem::exists(SourceLoc))// If source doesn't exist, assume header only file
+		{
+			if(HeaderPath.extension() == ".hpp")
+			{
+				SourceLoc = HeaderPath;
+			}
+			else
+			{
+				continue;
+			}
+		}
 
 		// Print friendly message
-		std::cout << "Generating source for " << SourceStem << ".h" << std::endl;
+		std::cout << "Generating source for " << HeaderStem << ".h" << std::endl;
 
-		std::string HeaderName = SourceStem + ".gen.h";
+		std::string HeaderName = HeaderStem + ".gen.h";
 		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
 
 		std::string GeneratedSource;
-		if(!Ry::GenerateReflectionCode(ModuleNameCaps, SourcePath.string(), ModuleIncludes, GeneratedSource))
+		if(!Ry::GenerateReflectionCode(ModuleNameCaps, SourceLoc.string(), HeaderPath.stem().string() + ".h", ModuleIncludes, GeneratedSource))
 		{
 			return false;
 		}
@@ -157,6 +169,51 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	}
 
 	return true;
+}
+
+void AbstractBuildTool::FindOutOfDateHeaders(const Module& Module, std::string GeneratedDir, std::vector<std::string>& OutFiles)
+{
+	std::error_code FileErrorCode;
+
+	// These are files that we need to check against ALL obj timestamps. 
+	std::vector<std::string> CheckAgainstAllStamps;
+
+	Filesystem::recursive_directory_iterator IncludeDirectoryItr(Module.GetIncludeDir());
+
+	for(auto Itr : IncludeDirectoryItr)
+	{
+		auto File = Itr.path();
+
+		bool bIsHeader = File.extension() == ".hpp" || File.extension() == ".h";
+
+		if (bIsHeader)
+		{
+			// Get the filename without the extension
+			std::string FileStem = File.stem().string();
+
+			// Find the corresponding .gen.h file
+			std::string GeneratedPath = (Filesystem::path(GeneratedDir) / (FileStem + ".gen.h")).string();
+
+			// Figure out when that obj file was last written to
+			Filesystem::file_time_type LastGenWriteTime = Filesystem::last_write_time(GeneratedPath, FileErrorCode);
+
+			// Figure out when this source was last written to
+			Filesystem::file_time_type LastHeaderWriteTime = Filesystem::last_write_time(File, FileErrorCode);
+
+			// Header only file, we need to check against all obj timestamps later.
+			if (!Filesystem::exists(GeneratedPath) )
+			{
+				// Generated header didn't exist
+				OutFiles.push_back(File.string());
+			} else if (FileErrorCode || LastHeaderWriteTime >= LastGenWriteTime)
+			{
+				OutFiles.push_back(File.string());
+			}
+
+		}
+	}
+
+
 }
 
 void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles, bool& bHeaderChanged)
@@ -183,7 +240,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 	Filesystem::file_time_type EarliestChangedObj = Filesystem::file_time_type::max();
 
 	Filesystem::recursive_directory_iterator SourceDirectoryItr(Module.GetCppDir());
-	Filesystem::recursive_directory_iterator IncludeDirectoryItr (Module.GetIncludeDir());
+	Filesystem::recursive_directory_iterator IncludeDirectoryItr(Module.GetIncludeDir());
 
 	auto ProcessFile = [this,
 		IntDir,
@@ -273,7 +330,7 @@ void AbstractBuildTool::FindOutOfDateSourceFiles(const Module& Module, std::stri
 	}
 
 	// No point in doing this computation if we already know we need to rebuild all
-	if(!bHeaderChanged)
+	if (!bHeaderChanged)
 	{
 		// Iterate through the check against list to see if a full recompilation is required
 		for (const std::string& CheckAgainstAllFile : CheckAgainstAllStamps)

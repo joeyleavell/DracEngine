@@ -11,8 +11,7 @@
 #define SMALL_STRING_SIZE 200
 
 namespace Ry
-{
-	
+{	
 	class CORE_MODULE StringView;
 
 	void StringCopy(char* Dst, const char* Src, uint64 DstSize);

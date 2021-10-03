@@ -97,6 +97,12 @@ Filesystem::path PathRelativeTo_UnRelated(Filesystem::path Base, Filesystem::pat
 		
 	}
 
+	if(ParentCounter == 1)
+	{
+		AccumPath = "." / AccumPath;
+		ParentCounter--;
+	}
+	
 	// Add the parent path markers
 	// This goes up until we have a common base, then we can go until we reached the other path
 	for(int ParentUp = 0; ParentUp < ParentCounter; ParentUp++)
@@ -111,35 +117,6 @@ Filesystem::path PathRelativeTo_UnRelated(Filesystem::path Base, Filesystem::pat
 Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other)
 {
 	return PathRelativeTo_UnRelated(Base, Other);
-	
-	// Filesystem::path BaseAbs = Filesystem::absolute(Base);
-	// Filesystem::path OtherAbs = Filesystem::absolute(Other);
-	//
-	//
-	// if(IsParentOf(BaseAbs, OtherAbs))
-	// {
-	// 	Filesystem::path Relative;
-	//
-	// 	while (OtherAbs.has_parent_path() && OtherAbs != BaseAbs)
-	// 	{
-	// 		Filesystem::path FileName = OtherAbs.filename();
-	// 		Relative = FileName / Relative;
-	//
-	// 		OtherAbs = OtherAbs.parent_path();
-	// 	}
-	//
-	// 	return Relative;
-	// }
-	// else if(IsParentOf(OtherAbs, BaseAbs))
-	// {
-	// 	
-	// }
-	// else
-	// {
-	// 	// Most difficult case
-	// }
-	//
-
 }
 
 bool HasOption(std::vector<std::string>& Args, std::string Option)

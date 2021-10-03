@@ -15,6 +15,11 @@ namespace Ry
 	EditorUI::EditorUI(SwapChain* Parent):
 	Layer(Parent)
 	{
+		TestReflection Refl;
+		std::cout << "Value " << Refl.TestField << std::endl;
+		Refl.GetPropertyRef<int32>("TestField") = 10;
+		std::cout << "Value " << Refl.TestField << std::endl;
+		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
 		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());

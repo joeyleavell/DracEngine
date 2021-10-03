@@ -107,6 +107,7 @@ protected:
 	 */
 	unsigned int CompileThreadCount;
 
+	void FindOutOfDateHeaders(const Module& Module, std::string GeneratedDir, std::vector<std::string>& OutFiles);
 	void FindOutOfDateSourceFiles(const Module& Module, std::string IntDir, std::vector<std::string>& OutFiles, bool& bHeaderChanged);
 
 	std::string RootPath;
