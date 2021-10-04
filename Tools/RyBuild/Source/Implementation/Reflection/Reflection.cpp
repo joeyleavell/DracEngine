@@ -3,6 +3,7 @@
 #include "clang/Tooling/Tooling.h"
 #include "clang/Frontend/ASTConsumers.h"
 #include "clang/Tooling/CommonOptionsParser.h"
+#include "clang/AST/RecursiveASTVisitor.h"
 
 #include <iostream>
 #include "Reflection/Reflection.h"
@@ -14,6 +15,8 @@ using namespace clang::ast_matchers;
 
 namespace Ry
 {
+	static std::string CanonArrayList = "class Ry::ArrayList";
+	
 	enum RecordType
 	{
 		Class,
@@ -23,6 +26,7 @@ namespace Ry
 	
 	struct ReflectedRecord
 	{
+		const CXXRecordDecl* Decl;
 		RecordType Type;
 		std::string Name;
 		
@@ -34,59 +38,70 @@ namespace Ry
 	{
 	public:
 
-		void GenerateReflectedRecord(const ReflectedRecord& Record)
+		void LogErr(FullSourceLoc Location, std::string Err)
 		{
-			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
-			GeneratedSource << "#define GeneratedBody() \\" << std::endl;
-			GeneratedSource << "inline const Ry::ReflectedClass* \\" << std::endl;
-			GeneratedSource << "GetClass() \\" << std::endl;
-			GeneratedSource << "{ \\" << std::endl;
-			{
-				// Declare class
-				GeneratedSource << "\tstatic Ry::ReflectedClass C; \\" << std::endl;
-
-				// Reflected class name
-				GeneratedSource << "\tC.Name = \"" << Record.Name << "\"; \\" << std::endl;
-
-				// Resize fields member
-				GeneratedSource << "\tC.Fields.SetSize(" << Record.Fields.size() << "); \\" << std::endl;
-
-				// Reflect all fields
-				for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
-				{
-					const FieldDecl* Decl = Record.Fields[FieldIndex];
-					std::string FieldType = Decl->getType().getAsString();
-					std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
-
-					GeneratedSource << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">(); \\" << std::endl;
-					GeneratedSource << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\"; \\" << std::endl;
-					GeneratedSource << "\t" << FieldsVar << ".Offset = offsetof(" << Record.Name << ", " << Decl->getNameAsString() << "); \\" << std::endl;
-				}
-
-				// Reflect all functions/methods
-				for (int FunctionIndex = 0; FunctionIndex < Record.Functions.size(); FunctionIndex++)
-				{
-					const FunctionDecl* Decl = Record.Functions[FunctionIndex];
-				}
-
-				GeneratedSource << "\treturn &C; \\" << std::endl;
-
-			}
-			GeneratedSource << "}" << std::endl << std::endl;
-
-
+			std::string SourceLoc = "[line " + std::to_string(Location.getLineNumber()) + ", column " + std::to_string(Location.getColumnNumber()) + "]";
+			ErrorMsg = SourceLoc + ": " + Err + "\n";
 		}
-		
-		virtual void run(const MatchFinder::MatchResult& Result)
-		{
-			std::cout << "Matched" << std::endl;
-			const Decl* Declaration = Result.Nodes.getNodeAs<clang::Decl>("id");
-			const TranslationUnitDecl* TUnitDecl = Declaration->getTranslationUnitDecl();
-			
-			bool bReflectDecl = false;
 
+		bool IsValidReflectionClass(const CXXRecordDecl* Record)
+		{
+			// Check class doesn't use multiple inheritance
+			int BaseClassCount = Record->getNumBases();
+			if (BaseClassCount > 1)
+				return false;
+
+			// Check class has a parent
+			if (BaseClassCount == 0)
+				return false;
+
+			// Check class is a child of Ry::Object
+			if (BaseClassCount == 1)
+			{
+				std::string BaseName = Record->bases_begin()->getType().getCanonicalType().getAsString();
+				if (BaseName != "class Ry::Object")
+					return false;
+			}
+
+			return true;
+		}
+
+		void CheckClassWithLog(FullSourceLoc Loc, const CXXRecordDecl* Record)
+		{			
+			// Check class doesn't use multiple inheritance
+			int BaseClassCount = Record->getNumBases();
+			if (BaseClassCount > 1)
+			{
+				ErrorMsg = "Multiple inheritance for reflected objects not allowed";
+			}
+
+			// Check class has a parent
+			if (BaseClassCount == 0)
+			{
+				ErrorMsg = "Reflected object must inherit from Ry::Object";
+			}
+
+			// Check class is a child of Ry::Object
+			if(BaseClassCount == 1)
+			{
+				std::string BaseName = Record->bases_begin()->getType().getCanonicalType().getAsString();
+				if (BaseName != "class Ry::Object")
+				{
+					ErrorMsg = "Reflected object must inherit from Ry::Object";
+				}
+			}
+
+			if(!ErrorMsg.empty())
+			{
+				LogErr(Loc, ErrorMsg);
+			}
+			
+		}
+
+		bool IsDeclReflected(const Decl* Declaration)
+		{
 			// Look for reflection annotation
-			if(Declaration->hasAttrs())
+			if (Declaration->hasAttrs())
 			{
 				Decl::attr_iterator AttribItr = Declaration->attr_begin();
 
@@ -98,9 +113,9 @@ namespace Ry
 					{
 						AnnotateAttr* AnnotationAttrib = static_cast<AnnotateAttr*>(Attrib);
 
-						if(AnnotationAttrib->getAnnotation().str() == "Reflect")
+						if (AnnotationAttrib->getAnnotation().str() == "Reflect")
 						{
-							bReflectDecl = true;
+							return true;
 						}
 
 					}
@@ -109,65 +124,261 @@ namespace Ry
 				}
 			}
 
-			if(bReflectDecl)
+			return false;
+		}
+
+		bool IsArrayList(QualType Type)
+		{
+			return Type.getCanonicalType().getAsString().find(CanonArrayList) == 0;
+		}
+
+		bool IsValidContainerType(QualType Type)
+		{
+			if (Type->isIntegerType() || Type->isFloatingType())
+				return true;
+
+			if (const CXXRecordDecl* Record = Type->getAsCXXRecordDecl())
+				if (IsValidReflectionClass(Record))
+					return true;
+			
+			return false;
+		}
+		
+		bool IsValidReflectionType(const clang::ASTContext* Context, const FieldDecl* InField = nullptr)
+		{
+			QualType Type = InField->getType();
+			if (Type->isIntegerType())
+				return true;
+
+			if (Type->isFloatingType())
+				return true;
+
+			if(Type->isStructureOrClassType())
 			{
-				bool bIsRecord = Declaration->getKind() == Decl::CXXRecord;
-				bool bIsFunction = Declaration->getKind() == Decl::CXXMethod;
-				bool bIsField = Declaration->getKind() == Decl::Field;
-
-				if (bIsRecord)
+				// todo: support reflected strings
+				if(IsArrayList(Type))
 				{
-					const CXXRecordDecl* AsRecord = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("id");
 
-					//const CXXRecordDecl* AsRecord = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("id");
-
-					// Start new record
-					ReflectedRecord NewRecord;
-					NewRecord.Name = AsRecord->getNameAsString();
-
-					ReflectedRecords.push_back(NewRecord);
-
-					return;
-				}
-
-				if(!bIsFunction && !bIsField)
-				{
-					std::cerr << "Unexpected reflection declaration " << Declaration->getDeclKindName() << std::endl;
-					return;
-				}
-
-				if(ReflectedRecords.size() > 0)
-				{
-					ReflectedRecord& CurRecord = ReflectedRecords[ReflectedRecords.size() - 1];
-
-					if (bIsField)
+					// Create an AST visitor for the template parameters
+					struct SpecificationArgumentVisitor : public clang::RecursiveASTVisitor<SpecificationArgumentVisitor>
 					{
-						const FieldDecl* AsField = Result.Nodes.getNodeAs<clang::FieldDecl>("id");
+						bool bError = false;
+						const SourceManager& SM;
+						ReflectionCodeGenerator& CodeGen;
 
-						CurRecord.Fields.push_back(AsField);
+						SpecificationArgumentVisitor(const SourceManager& Man, ReflectionCodeGenerator& Gen): SM(Man), CodeGen(Gen){}
+
+						bool VisitTemplateSpecializationTypeLoc(clang::TemplateSpecializationTypeLoc Specialization)
+						{
+							if(Specialization.getNumArgs() != 1)
+							{
+								bError = true;
+							}
+							else
+							{
+								TemplateArgumentLoc ArgLoc = Specialization.getArgLoc(0);
+								bError = !CodeGen.IsValidContainerType(ArgLoc.getTypeSourceInfo()->getType());
+							}
+							
+							return true;
+						}
+					};
+
+
+					// Traverse the template parameters
+					TypeLoc Loc = InField->getTypeSourceInfo()->getTypeLoc();
+					SpecificationArgumentVisitor ArgumentVisitor(Context->getSourceManager(), *this);					
+					ArgumentVisitor.TraverseDecl(const_cast<FieldDecl*>(InField));
+
+					return !ArgumentVisitor.bError;
+				}
+			}
+
+			if(const CXXRecordDecl* PointerTo = Type->getPointeeCXXRecordDecl())
+			{
+				if (IsValidReflectionClass(PointerTo))
+					return true;
+			}
+
+			return false;
+		}
+
+		void GenerateReflectedRecord(const ReflectedRecord& Record)
+		{
+
+			std::string QualifiedName = Record.Decl->getQualifiedNameAsString();
+
+			// Create generated body that should be manually placed inside of the reflected class
+			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
+			GeneratedSource << "#define GeneratedBody() \\" << std::endl;
+			GeneratedSource << "static const Ry::ReflectedClass* \\" << std::endl;
+			GeneratedSource << "GetStaticClass() \\" << std::endl;
+			GeneratedSource << "{ \\" << std::endl;
+			{
+				// Declare class
+				GeneratedSource << "\tstatic Ry::ReflectedClass C; \\" << std::endl;
+
+				// Reflected class name
+				GeneratedSource << "\tC.Name = \"" << Record.Name << "\";\\" << std::endl;
+
+				// Resize fields member
+				GeneratedSource << "\tC.Fields.SetSize(" << Record.Fields.size() << ");\\" << std::endl;
+
+				// Reflect all fields
+				for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
+				{
+					const FieldDecl* Decl = Record.Fields[FieldIndex];
+
+					std::string FieldType = Decl->getType().getAsString();
+
+					std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
+
+					GeneratedSource << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";\\" << std::endl;
+					GeneratedSource << "\t" << FieldsVar << ".Offset = offsetof(" << QualifiedName << ", " << Decl->getNameAsString() << ");\\" << std::endl;
+					
+					if(Decl->getType()->isIntegerType() || Decl->getType()->isFloatingType() || IsArrayList(Decl->getType()))
+					{
+						GeneratedSource << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();\\" << std::endl;
+						GeneratedSource << "\t" << FieldsVar << ".ObjectClass = nullptr;\\" << std::endl;
 					}
-					else if (bIsFunction)
+					else if(Decl->getType()->isPointerType())
 					{
-						const FunctionDecl* AsFunction = Result.Nodes.getNodeAs<clang::FunctionDecl>("id");
-
-						CurRecord.Functions.push_back(AsFunction);
+						if(const CXXRecordDecl* PointerTo = Decl->getType()->getPointeeCXXRecordDecl())
+						{
+							// Pointer type was already determined to have a valid pointer-to
+							std::string DeclQualifiedType = PointerTo->getQualifiedNameAsString();
+							GeneratedSource << "\t" << FieldsVar << ".Type = " << DeclQualifiedType << "::GetStaticType();\\" << std::endl;
+							GeneratedSource << "\t" << FieldsVar << ".ObjectClass = " << DeclQualifiedType << "::GetStaticClass();\\" << std::endl;
+						}
 					}
 					
-				}
-				else if(bIsFunction)
-				{
-					const FunctionDecl* AsFunction = Result.Nodes.getNodeAs<clang::FunctionDecl>("id");
 
-					std::cerr << "Unexpected function before record " << AsFunction->getNameAsString() << std::endl;
 				}
-				else if(bIsField)
+
+				// Reflect all functions/methods
+				for (int FunctionIndex = 0; FunctionIndex < Record.Functions.size(); FunctionIndex++)
+				{
+					const FunctionDecl* Decl = Record.Functions[FunctionIndex];
+				}
+
+				GeneratedSource << "\treturn &C;\\" << std::endl;
+			}
+			GeneratedSource << "}\\" << std::endl;
+
+			GeneratedSource << "virtual const Ry::ReflectedClass* \\" << std::endl;
+			GeneratedSource << "GetClass() \\" << std::endl;
+			GeneratedSource << "{ \\" << std::endl;
+			{
+				GeneratedSource << "\treturn " << QualifiedName << "::GetStaticClass();\\" << std::endl;
+			}
+			GeneratedSource << "}\\" << std::endl;
+
+			// Generate GetTypeImpl for reflected class
+			// This is used so all fields of a class can be stored in an array of types
+			GeneratedSource << "static const Ry::DataType*\\" << std::endl;
+			GeneratedSource << "GetStaticType()\\" << std::endl;
+			GeneratedSource << "{\\" << std::endl;
+			{
+				// Declare class
+				GeneratedSource << "\tstatic Ry::DataType Result;\\" << std::endl;
+				GeneratedSource << "\tResult.Size = sizeof(" <<  QualifiedName << ");\\" << std::endl;
+				GeneratedSource << "\tResult.Name = \"" << QualifiedName << "\";\\" << std::endl;
+				GeneratedSource << "\tResult.Class = Ry::TypeClass::Object;\\" << std::endl;
+				GeneratedSource << "\treturn &Result;\\" << std::endl;
+			}
+			GeneratedSource << "}" << std::endl << std::endl;
+
+			// Generate template specialization of GetClassImpl
+			// This is needed so the class of a certain object can be retrieved even without an instance to that object
+			// However a convenience function GetClass() is generated in the Object itself
+			// GeneratedSource << "template <>" << std::endl;
+			// GeneratedSource << "inline const Ry::ReflectedClass*" << std::endl;
+			// GeneratedSource << "GetClassImpl<" << QualifiedName << ">(Ry::TypeTag<" << QualifiedName << ">) " << std::endl;
+			// GeneratedSource << "{" << std::endl;
+			// {
+			//
+			//
+			// }
+			// GeneratedSource << "}" << std::endl << std::endl;
+		}
+		
+		virtual void run(const MatchFinder::MatchResult& Result)
+		{
+			const Decl* Declaration = Result.Nodes.getNodeAs<clang::Decl>("id");
+			const TranslationUnitDecl* TUnitDecl = Declaration->getTranslationUnitDecl();
+
+			if (!IsDeclReflected(Declaration))
+				return;
+			
+			bool bIsRecord = Declaration->getKind() == Decl::CXXRecord;
+			bool bIsMethod = Declaration->getKind() == Decl::CXXMethod;
+			bool bIsField = Declaration->getKind() == Decl::Field;
+
+			FullSourceLoc Loc = Result.Context->getFullLoc(Declaration->getLocation());
+
+			if (bIsRecord)
+			{
+				const CXXRecordDecl* AsRecord = Result.Nodes.getNodeAs<clang::CXXRecordDecl>("id");
+
+				// Ensure proper inheritance
+				CheckClassWithLog(Loc, AsRecord);
+				if (ProducedError())
+					return;
+
+				// Start new record
+				ReflectedRecord NewRecord;
+				NewRecord.Name = AsRecord->getNameAsString();
+				NewRecord.Decl = AsRecord;
+
+				ReflectedRecords.push_back(NewRecord);
+				RecordDecls.insert(AsRecord);
+			}
+			else
+			{
+				if (!bIsMethod && !bIsField)
+				{
+					LogErr(Loc, std::string("Unexpected reflection declaration ") + Declaration->getDeclKindName());
+					return;
+				}
+
+				ReflectedRecord& CurRecord = ReflectedRecords[ReflectedRecords.size() - 1];
+
+				if (bIsField)
 				{
 					const FieldDecl* AsField = Result.Nodes.getNodeAs<clang::FieldDecl>("id");
 
-					std::cerr << "Unexpected field before record " << AsField->getNameAsString() << std::endl;
+					// Check that this field's record has been reflected properly
+					const RecordDecl* ContainingRecord = AsField->getParent();
+					if (RecordDecls.find(ContainingRecord) == RecordDecls.end())
+						return;
+
+					std::string FieldType = AsField->getType().getCanonicalType().getAsString();
+
+					// Check valid type names
+					if (IsValidReflectionType(Result.Context, AsField))
+					{
+						CurRecord.Fields.push_back(AsField);
+					}
+					else
+					{
+						LogErr(Loc, "Not a valid type to reflect: " + FieldType);
+					}
+
+				}
+				else if (bIsMethod)
+				{
+					const CXXMethodDecl* AsMethod = Result.Nodes.getNodeAs<clang::CXXMethodDecl>("id");
+
+					// Check that this functions's record has been reflected properly
+					const RecordDecl* ContainingRecord = AsMethod->getParent();
+					if (RecordDecls.find(ContainingRecord) == RecordDecls.end())
+						return;
+
+					CurRecord.Functions.push_back(AsMethod);
 				}
 
 			}
+
 			
 		}
 
@@ -193,6 +404,21 @@ namespace Ry
 			return ReflectedRecords;
 		}
 
+		std::string GetError()
+		{
+			return ErrorMsg;
+		}
+
+		std::string GetErrorMsg()
+		{
+			return ErrorMsg;
+		}
+
+		bool ProducedError()
+		{
+			return !ErrorMsg.empty();
+		}
+
 		std::string GetGeneratedCode()
 		{
 			return GeneratedSource.str();
@@ -200,13 +426,21 @@ namespace Ry
 		
 	private:
 
+		std::string ErrorMsg;
+
 		std::vector<ReflectedRecord> ReflectedRecords;
+		std::set<const RecordDecl*> RecordDecls;
 
 		std::ostringstream GeneratedSource;
 
 	};
 
-	bool GenerateReflectionCode(std::string ModuleNameCaps, std::string SourcePath, std::string Include, std::vector<std::string> Includes, std::string& GeneratedSource)
+	bool GenerateReflectionCode(std::string ModuleNameCaps, 
+		std::string SourcePath, 
+		std::string Include, 
+		std::vector<std::string> Includes, 
+		std::string& GeneratedSource, 
+		std::string& ErrorMsg)
 	{
 
 		MatchFinder Finder;
@@ -219,7 +453,7 @@ namespace Ry
 			= fieldDecl(decl().bind("id"), hasAttr(attr::Annotate), isExpansionInFileMatching(Include));
 
 		DeclarationMatcher FunctionMatcher
-			= functionDecl(decl().bind("id"), hasAttr(attr::Annotate), isExpansionInFileMatching(Include));
+			= cxxMethodDecl(decl().bind("id"), hasAttr(attr::Annotate), isExpansionInFileMatching(Include));
 
 		Finder.addMatcher(ClassMatcher, &CodeGenerator);
 		Finder.addMatcher(PropertyMatcher, &CodeGenerator);
@@ -287,18 +521,16 @@ namespace Ry
 		
 		delete[] ClangOptions;
 
-		// Return generated code
+		// Set generated code and error message
 		GeneratedSource = CodeGenerator.GetGeneratedCode();
+		ErrorMsg = CodeGenerator.GetErrorMsg();
 
 		// Zero is success code
-		if(Result == 0)
-		{
-			return true;
-		}
-		else
-		{
+		if (Result != 0 || CodeGenerator.ProducedError())
 			return false;
-		}
+		else
+			return true;
+		
 	}
 	
 }

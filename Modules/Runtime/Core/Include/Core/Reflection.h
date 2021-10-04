@@ -4,11 +4,21 @@
 #include "Data/ArrayList.h"
 #include "CoreGen.h"
 
-#define REFLECT_PRIMITIVE(Name)template<> \
-inline DataType CORE_MODULE GetTypeImpl<Name>(TypeTag<Name>) { return DataType{ #Name, sizeof(Name) }; };
+#define REFLECT_PRIMITIVE(InTypeName, InTypeClass) \
+template<> \
+inline const Ry::DataType* GetTypeImpl<InTypeName>(Ry::TypeTag<InTypeName>) \
+{ \
+	static Ry::DataType Result; \
+	Result.Size = sizeof(InTypeName); \
+	Result.Name = #InTypeName; \
+	Result.Class = InTypeClass; \
+	return &Result; \
+};
 
 namespace Ry
 {
+
+	class ReflectedClass;
 
 	template<typename T>
 	struct TypeTag {};
@@ -16,51 +26,104 @@ namespace Ry
 	template<typename T>
 	struct ClassTag {};
 
+	enum class TypeClass
+	{
+		UInt8,
+		UInt16,
+		UInt32,
+		UInt64,
+		Int8,
+		Int16,
+		Int32,
+		Int64,
+		Bool,
+		Float,
+		Double,
+
+		ArrayList,
+		Object
+	};
+	
+	class Property
+	{
+		Ry::String Name;
+		Ry::String Type;
+
+
+	};
+
 	class DataType
 	{
 	public:
+		Ry::TypeClass Class;
 		Ry::String Name;
 		uint64 Size;
 
-		DataType()
+		bool IsObject()
 		{
-			Size = 0;
-			Name = "";
+			return Class == TypeClass::Object;
 		}
 
-		DataType(Ry::String Name, uint64 Size)
+		bool IsFloating()
 		{
-			this->Name = Name;
-			this->Size = Size;
+			switch (Class)
+			{
+			case TypeClass::Double:
+			case TypeClass::Float:
+				return true;
+			default:
+				return false;
+			}
 		}
+
+		bool IsInteger()
+		{
+			switch (Class)
+			{
+			case TypeClass::ArrayList:
+			case TypeClass::Object:
+			case TypeClass::Double:
+			case TypeClass::Float:
+				return false;
+			default:
+				return true;
+			}
+		}
+
 	};
 
-	class ReflectedField
+	class Field
 	{
 	public:
-		DataType Type;
+		const DataType* Type;
 		Ry::String Name;
 		uint64 Offset;
+		const Ry::ReflectedClass* ObjectClass; // If this type is an object, this value represents the class of he object
 
-		ReflectedField()
+		// Only applicable for ArrayLists at the moment
+		Ry::ArrayList<DataType> TemplateType;
+
+		Field()
 		{
 			Name = "";
 			Offset = 0;
+			this->Type = nullptr;
+			this->ObjectClass = nullptr;
 		}
 	};
 
-	class ReflectedFunction
+	class Function
 	{
 	public:
 
-		ReflectedField RetVal;
-		Ry::ArrayList<ReflectedField> Parameters;
+		Field RetVal;
+		Ry::ArrayList<Field> Parameters;
 
-		ReflectedFunction()
+		Function()
 		{
-			
+
 		}
-		
+
 	};
 
 	class ReflectedClass
@@ -69,49 +132,60 @@ namespace Ry
 
 		Ry::String Name;
 
-		Ry::ArrayList<Ry::ReflectedField> Fields;
-		Ry::ArrayList<Ry::ReflectedFunction> Functions;
-
+		Ry::ArrayList<Ry::Field> Fields;
+		Ry::ArrayList<Ry::Function> Functions;
 	};
 
-	template<typename T>
-	DataType GetTypeImpl(TypeTag<T>)
-	{
-		return DataType{ "none", 0 };
-	}
-
-	// Create GetTypeImpl for arrays lists, maps, sets, etc.
-	
-	template<typename T>
-	DataType GetType()
-	{
-		return GetTypeImpl(TypeTag<T>{});
-	};
-
-	template<typename T>
-	const ReflectedClass* GetClassImpl(ClassTag<T>)
-	{
-		return nullptr;
-	}
-
-	// Create GetTypeImpl for arrays lists, maps, sets, etc.
-
-	template<typename T>
-	const ReflectedClass* GetClass()
-	{
-		return GetClassImpl(ClassTag<T>{});
-	};
-
-	REFLECT_PRIMITIVE(uint8)
-	REFLECT_PRIMITIVE(uint16)
-	REFLECT_PRIMITIVE(uint32)
-	REFLECT_PRIMITIVE(uint64)
-	REFLECT_PRIMITIVE(int8)
-	REFLECT_PRIMITIVE(int16)
-	REFLECT_PRIMITIVE(int32)
-	REFLECT_PRIMITIVE(int64)
-	REFLECT_PRIMITIVE(float)
-	REFLECT_PRIMITIVE(double)
-	REFLECT_PRIMITIVE(char*)
-	
 }
+
+// This implementation is generated for each reflected class/struct
+template<typename T>
+const Ry::ReflectedClass* GetClassImpl(Ry::TypeTag<T>)
+{
+	return nullptr;
+}
+
+template<typename T>
+const Ry::ReflectedClass* GetClass()
+{
+	return GetClassImpl<T>();
+}
+
+template<typename T>
+const Ry::DataType* GetTypeImpl(Ry::TypeTag<T>)
+{
+	static Ry::DataType Default{};
+	return &Default;
+}
+
+template<typename T>
+const Ry::DataType* GetType()
+{
+	return GetTypeImpl(Ry::TypeTag<T>{});
+};
+
+template<typename T>
+const Ry::DataType* GetType(Ry::ArrayList<T> ArrayList)
+{
+	static Ry::DataType InnerType = GetType<T>();
+	static Ry::DataType Result;
+
+	Result.Size = sizeof(ArrayList);
+	Result.Name = "Ry::ArrayList<" + InnerType.Name + ">";
+	Result.Class = Ry::TypeClass::ArrayList;
+	Result.TemplateType.Add(InnerType);
+
+	return &Result;
+};
+
+
+REFLECT_PRIMITIVE(uint8, Ry::TypeClass::UInt8)
+REFLECT_PRIMITIVE(uint16, Ry::TypeClass::UInt16)
+REFLECT_PRIMITIVE(uint32, Ry::TypeClass::UInt32)
+REFLECT_PRIMITIVE(uint64, Ry::TypeClass::UInt64)
+REFLECT_PRIMITIVE(int8, Ry::TypeClass::Int8)
+REFLECT_PRIMITIVE(int16, Ry::TypeClass::Int16)
+REFLECT_PRIMITIVE(int32, Ry::TypeClass::Int32)
+REFLECT_PRIMITIVE(int64, Ry::TypeClass::Int64)
+REFLECT_PRIMITIVE(float, Ry::TypeClass::Float)
+REFLECT_PRIMITIVE(double, Ry::TypeClass::Double)

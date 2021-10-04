@@ -3,10 +3,27 @@
 #include "Core/Core.h"
 #include "Core/String.h"
 #include "Vector.h"
-#include "MathGen.h"
+#include "Core/Object.h"
+#include "Matrix.gen.h"
 
 namespace Ry
 {
+
+	class TestRefl : public Ry::Object
+	{
+	public:
+		GeneratedBody()
+
+		RefField()
+		Ry::ArrayList<int32> TestField{};
+
+		RefField()
+		float TestField2{};
+
+		RefField()
+		int64 TestField3 {};
+				
+	} RefClass();
 	
 	template <uint32 R, uint32 C>
 	class MATH_MODULE Matrix

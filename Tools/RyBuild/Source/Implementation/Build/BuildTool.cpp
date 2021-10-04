@@ -17,6 +17,8 @@
 
 bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
 {
+	std::cout << "Generating source for module " << TheModule.Name << std::endl;
+	
 	constexpr int BUFFER_SIZE = 1024 * 5;
 	char GeneratedCodeBuffer[BUFFER_SIZE];
 
@@ -104,38 +106,45 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	std::vector<std::string> HeadersNeedingGeneration;
 	FindOutOfDateHeaders(TheModule, GeneratedDirectory, HeadersNeedingGeneration);
 
-	// Pre create all .gen.h files in case they don't exist so pre build doesn't fail
+	// Pre-create all .gen.h files
+	for (std::string Path : HeadersNeedingGeneration)
 	{
-		std::vector<std::string> AllSource;
-		TheModule.DiscoverSource(AllSource, false);
+		Filesystem::path HeaderPath = Path;
+		std::string HeaderStem = HeaderPath.stem().string();
+		std::string GenHeaderName = HeaderStem + ".gen.h";
+		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / GenHeaderName;
 
-		for(std::string& SourceFile : AllSource)
+		std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
+		Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
+
+		// Rename current file to prevent changing the file last modified time, need this file in case the code generation fails
+		if(Filesystem::exists(GenPath))
 		{
-			Filesystem::path AsPath = SourceFile;
-			std::string HeaderName = AsPath.stem().string() + ".gen.h";
-
-			Filesystem::path FullGeneratedPath = Filesystem::path(GeneratedDirectory) / HeaderName;
-
-			if(!Filesystem::exists(FullGeneratedPath))
-			{
-				std::ofstream Tap;
-				Tap.open(FullGeneratedPath.string());
-				Tap << "#include \"Core/Reflection.h\"" << std::endl;
-				Tap << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n";
-				Tap.close();
-			}
+			Filesystem::rename(GenPath, GenPathTmp);
 		}
-	}	
 		
+		// Create simple generated file so clang gets the proper includes/macros to start
+		std::ofstream Tap;
+		Tap.open(GenPath.string());
+		Tap << "#include \"Core/Reflection.h\"" << std::endl;
+		Tap << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n";
+		Tap.close();
+	}
+	
 	// Generate reflection data for source files
-	//Filesystem::recursive_directory_iterator HeaderItr(TheModule.GetSourceDir());
 	for (std::string Path : HeadersNeedingGeneration)
 	{
 		Filesystem::path HeaderPath = Path;
 		std::string HeaderStem = HeaderPath.stem().string();
 		auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
 		auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
-		if (!Filesystem::exists(SourceLoc))// If source doesn't exist, assume header only file
+		std::string HeaderName = HeaderStem + ".gen.h";
+		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+
+		std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
+		Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
+
+		if (!Filesystem::exists(SourceLoc)) // If source doesn't exist, assume header only file
 		{
 			if(HeaderPath.extension() == ".hpp")
 			{
@@ -147,16 +156,36 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 			}
 		}
 
-		// Print friendly message
-		std::cout << "Generating source for " << HeaderStem << ".h" << std::endl;
-
-		std::string HeaderName = HeaderStem + ".gen.h";
-		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
-
+		// Generate reflection code
 		std::string GeneratedSource;
-		if(!Ry::GenerateReflectionCode(ModuleNameCaps, SourceLoc.string(), HeaderPath.stem().string() + ".h", ModuleIncludes, GeneratedSource))
+		std::string ErrorMsg;
+		bool bFail = !Ry::GenerateReflectionCode(ModuleNameCaps, 
+			SourceLoc.string(), 
+			HeaderPath.stem().string() + ".h", 
+			ModuleIncludes, 
+			GeneratedSource, 
+			ErrorMsg
+		);
+
+		// Print friendly message for current source file
+		std::cout << "\t" << HeaderStem << ".h";
+
+		if(bFail)
 		{
+			std::cout << " [fail]: " << ErrorMsg << std::endl;
+
+			// Restore the old file so the build system doesn't think it was updated
+			if (Filesystem::exists(GenPathTmp))
+			{
+				Filesystem::remove(GenPath);
+				Filesystem::rename(GenPathTmp, GenPath);
+			}
+
 			return false;
+		}
+		else
+		{
+			std::cout << std::endl;
 		}
 
 		std::ofstream OutputGenerated(GenPath.string());

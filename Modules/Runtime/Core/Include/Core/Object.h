@@ -3,7 +3,9 @@
 #include "Object.gen.h"
 
 #ifndef GeneratedBody
-	#define GeneratedBody()
+	#define GeneratedBody()\
+	static const ReflectedClass* GetStaticClass(){return nullptr;}; \
+	static const DataType* GetStaticDataType(){return nullptr; };
 #endif
 
 namespace Ry
@@ -21,9 +23,9 @@ namespace Ry
 		{
 			const ReflectedClass* Class = GetClass();
 
-			const ReflectedField* FoundField = nullptr;
+			const Ry::Field* FoundField = nullptr;
 
-			for(const ReflectedField& Field : Class->Fields)
+			for(const Ry::Field& Field : Class->Fields)
 			{
 				if(Field.Name == Name)
 				{

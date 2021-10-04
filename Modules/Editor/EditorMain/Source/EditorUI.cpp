@@ -16,9 +16,9 @@ namespace Ry
 	Layer(Parent)
 	{
 		TestReflection Refl;
-		std::cout << "Value " << Refl.TestField << std::endl;
-		Refl.GetPropertyRef<int32>("TestField") = 10;
-		std::cout << "Value " << Refl.TestField << std::endl;
+		//std::cout << "Value " << Refl.TestField << std::endl;
+		TestRefl* Other = Refl.GetPropertyRef<TestRefl*>("Other");
+		//std::cout << "Value " << Refl.TestField << std::endl;
 		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);

@@ -18,15 +18,9 @@ namespace Ry
 	{
 	public:
 		GeneratedBody()
-		
-		RefField()
-		int32 TestField{};
 
 		RefField()
-		float TestField2 {};
-
-		RefField()
-		double TestField3{};
+		Ry::TestRefl* Other;
 
 		RefFunction()
 		void TestFunction();
