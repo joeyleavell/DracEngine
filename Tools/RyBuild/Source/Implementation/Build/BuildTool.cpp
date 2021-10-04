@@ -17,7 +17,6 @@
 
 bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
 {
-	std::cout << "Generating source for module " << TheModule.Name << std::endl;
 	
 	constexpr int BUFFER_SIZE = 1024 * 5;
 	char GeneratedCodeBuffer[BUFFER_SIZE];
@@ -106,6 +105,11 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	std::vector<std::string> HeadersNeedingGeneration;
 	FindOutOfDateHeaders(TheModule, GeneratedDirectory, HeadersNeedingGeneration);
 
+	if(HeadersNeedingGeneration.size() > 0)
+	{
+		std::cout << "Generating source for module " << TheModule.Name << std::endl;
+	}
+
 	// Pre-create all .gen.h files
 	for (std::string Path : HeadersNeedingGeneration)
 	{
@@ -185,6 +189,9 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 		}
 		else
 		{
+			if(Filesystem::exists(GenPathTmp))
+				Filesystem::remove(GenPathTmp);
+
 			std::cout << std::endl;
 		}
 
@@ -1293,21 +1300,18 @@ bool CleanAll(std::string RootDir)
 	std::string BinaryDir = Filesystem::absolute(ModulesRootParent / "Binary").string();
 	std::string LibsDir = Filesystem::absolute(ModulesRootParent / "Intermediate" / "Libraries").string();
 	std::string ObjectFilesDir = Filesystem::absolute(ModulesRootParent / "Intermediate" / "Object").string();
+	std::string GeneratedDir = Filesystem::absolute(ModulesRootParent / "Intermediate" / "Generated").string();
 
 	std::error_code FileError;
 
-	// Delete module generated directories
-	std::vector<Module*> DiscoveredModules;
-	DiscoverModules(ModulesRootParent, DiscoveredModules);
+	Filesystem::remove_all(GeneratedDir, FileError);
 
-	// Clean data put in module folders
-	// Todo: move this out of module sub directory
-	for(const Module* FoundModule : DiscoveredModules)
+	if (FileError)
 	{
-		std::string IntermediatePath = FoundModule->GetGeneratedDir();
-		Filesystem::remove_all(IntermediatePath);
+		std::cerr << "Failed to clean generated directory" << std::endl;
 	}
 
+	// Clean data put in module folders
 	Filesystem::remove_all(BinaryDir, FileError);
 
 	if (FileError)
