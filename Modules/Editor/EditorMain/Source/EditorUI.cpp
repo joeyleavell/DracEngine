@@ -17,8 +17,10 @@ namespace Ry
 	{
 		TestReflection Refl;
 		//std::cout << "Value " << Refl.TestField << std::endl;
-		TestRefl* Other = Refl.GetPropertyRef<TestRefl*>("Other");
+		TestRefl* Other = Refl.GetPropertyRef<TestRefl*>("Other2");
 		//std::cout << "Value " << Refl.TestField << std::endl;
+
+		std::cout << Other->TestField2 << std::endl;
 		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);

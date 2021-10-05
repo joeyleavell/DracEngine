@@ -5,7 +5,7 @@
 #ifndef GeneratedBody
 	#define GeneratedBody()\
 	static const ReflectedClass* GetStaticClass(){return nullptr;}; \
-	static const DataType* GetStaticDataType(){return nullptr; };
+	static const DataType* GetStaticType(){return nullptr; };
 #endif
 
 namespace Ry

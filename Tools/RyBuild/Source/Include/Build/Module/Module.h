@@ -202,6 +202,31 @@ public:
 		}
 	}
 
+	void GatherIncludes(const std::map<std::string, Module*>& AllModules, std::vector<std::string>& OutIncludes)
+	{
+		//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), TheModule.GetIncludeDir()).string());
+		OutIncludes.push_back(GetIncludeDir());
+		OutIncludes.push_back(GetGeneratedDir());
+
+		for (ExternDependency& ExternDep : ExternDependencies)
+		{
+			//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ExternDep.GetIncludePath()).string());
+			OutIncludes.push_back(ExternDep.GetIncludePath());
+		}
+		
+		for (std::string& ModuleDep : ModuleDependencies)
+		{
+			Module* ModDep = AllModules.at(ModuleDep);
+
+			if (ModDep)
+			{
+				//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ModDep->GetIncludeDir()).string());
+				OutIncludes.push_back(ModDep->GetIncludeDir());
+				OutIncludes.push_back(ModDep->GetGeneratedDir());
+			}
+		}
+	}
+
 	std::string GetRootDir() const
 	{
 		return Filesystem::absolute(RootDir).string() + (char) Filesystem::path::preferred_separator;
@@ -228,7 +253,8 @@ public:
 	}
 
 	std::string GetGeneratedDir() const;
-	
+	std::string GetGeneratedSourcePath() const;
+
 	std::string GetArtifactName() const
 	{
 		return std::string("RyRuntime-") + Name;

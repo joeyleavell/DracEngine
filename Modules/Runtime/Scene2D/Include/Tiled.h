@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Asset.h"
-#include "Tiled.gen.h"
 #include "Factory/AssetFactory.h"
 #include "TextureAsset.h"
 #include "Data/Map.h"
+#include "Tiled.gen.h"
 
 namespace Ry
 {

@@ -18,7 +18,7 @@ namespace Ry
 		Ry::ArrayList<int32> TestField{};
 
 		RefField()
-		float TestField2{};
+		float TestField2{20.2f};
 
 		RefField()
 		int64 TestField3 {};

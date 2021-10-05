@@ -860,3 +860,10 @@ std::string Module::GetGeneratedDir() const
 {
 	return (Filesystem::path(GetEngineIntermediateDir()) / "Generated" / (Name + (char)Filesystem::path::preferred_separator)).string();
 }
+
+std::string Module::GetGeneratedSourcePath() const
+{
+	std::string GeneratedModuleSource = (Filesystem::path(GetGeneratedDir()) / (Name + "Gen.h")).string();
+
+	return GeneratedModuleSource;
+}

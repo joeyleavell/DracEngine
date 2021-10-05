@@ -30,4 +30,8 @@ std::string GetEngineObjectDir();
 std::string GetEngineLibraryDir();
 std::string GetEngineResourcesDir();
 
+std::string GetRyBuildPath();
+std::string GetRyReflectPath();
+
+
 std::string GetTimestamp(std::string Format);

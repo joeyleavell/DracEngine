@@ -10,14 +10,13 @@
 #include <fstream>
 #include <cstdarg>
 #include <Json/json.hpp>
+#include <sstream>
 #include "Util/Util.h"
 #include "Build/MSVCBuildTool.h"
 #include "Build/GCCBuildTool.h"
-#include "Reflection/Reflection.h"
 
-bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
+void AbstractBuildTool::CreateBaseModuleSource(const Module& TheModule)
 {
-	
 	constexpr int BUFFER_SIZE = 1024 * 5;
 	char GeneratedCodeBuffer[BUFFER_SIZE];
 
@@ -51,160 +50,267 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 
 	std::string ModuleNameCaps = ToUpper(TheModule.Name);
 
-	FormatString(GeneratedCodeBuffer, BUFFER_SIZE, GeneratedSourceFormat.c_str(), 
-		ModuleNameCaps.c_str(), 
-		ModuleNameCaps.c_str(), 
-		ModuleNameCaps.c_str(), 
+	FormatString(GeneratedCodeBuffer, BUFFER_SIZE, GeneratedSourceFormat.c_str(),
+		ModuleNameCaps.c_str(),
+		ModuleNameCaps.c_str(),
+		ModuleNameCaps.c_str(),
 		ModuleNameCaps.c_str(),
 		ModuleNameCaps.c_str(),
 		ModuleNameCaps.c_str(),
 		ModuleNameCaps.c_str(),
 		ModuleNameCaps.c_str());
 
-	std::string GeneratedDir = TheModule.GetGeneratedDir();
-	std::string GeneratedModuleSource = (Filesystem::path(GeneratedDir) / (TheModule.Name + "Gen.h")).string();
-
-	Filesystem::create_directories(GeneratedDir);
-
-	std::ofstream ModuleSourceOut (GeneratedModuleSource);
-
-	ModuleSourceOut << GeneratedCodeBuffer << std::endl;
-
-	ModuleSourceOut.close();
-
-	// Now generate reflection data for each class
-
-	// Determine includes for module
-	// TODO: since all of the compilers use this, should probably separate it into a function
-	std::vector<std::string> ModuleIncludes;
+	Filesystem::create_directories(TheModule.GetGeneratedDir());
+	std::ofstream ModuleSourceOut(TheModule.GetGeneratedSourcePath());
 	{
-		//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), TheModule.GetIncludeDir()).string());
-		ModuleIncludes.push_back(TheModule.GetIncludeDir());
-		ModuleIncludes.push_back(TheModule.GetGeneratedDir());
-
-		for (ExternDependency& ExternDep : TheModule.ExternDependencies)
-		{
-			//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ExternDep.GetIncludePath()).string());
-			ModuleIncludes.push_back(ExternDep.GetIncludePath());
-		}
-		for (std::string& ModuleDep : TheModule.ModuleDependencies)
-		{
-			Module* ModDep = Modules.at(ModuleDep);
-
-			if (ModDep)
-			{
-				//ModuleIncludes.push_back(PathRelativeTo(Filesystem::absolute("."), ModDep->GetIncludeDir()).string());
-				ModuleIncludes.push_back(ModDep->GetIncludeDir());
-				ModuleIncludes.push_back(ModDep->GetGeneratedDir());
-			}
-		}
+		ModuleSourceOut << GeneratedCodeBuffer << std::endl;
 	}
+	ModuleSourceOut.close();
+}
+
+bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
+{
+	std::string ModuleNameCaps = ToUpper(TheModule.Name);
+	CreateBaseModuleSource(TheModule);
+
+	std::vector<std::string> ModuleIncludes;
+	TheModule.GatherIncludes(Modules, ModuleIncludes);
 
 	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
 
-	std::vector<std::string> HeadersNeedingGeneration;
-	FindOutOfDateHeaders(TheModule, GeneratedDirectory, HeadersNeedingGeneration);
+	std::vector<std::string>* HeadersNeedingGeneration = new std::vector<std::string>;
+	FindOutOfDateHeaders(TheModule, GeneratedDirectory, *HeadersNeedingGeneration);
+	std::unordered_map<int32_t, bool>* GenerationResult = new std::unordered_map<int32_t, bool>;
+	std::vector<std::string>  GenPathsNew;
+	std::vector<std::string>  GenPathsTmp;
+	std::vector<std::string>  GenPathsOld;
 
-	if(HeadersNeedingGeneration.size() > 0)
+	if(!HeadersNeedingGeneration->empty())
 	{
 		std::cout << "Generating source for module " << TheModule.Name << std::endl;
 	}
 
-	// Pre-create all .gen.h files
-	for (std::string Path : HeadersNeedingGeneration)
+	// Pre-create all .gen.h files for headers that need to be re-created
+	for (int32_t HeaderIndex = 0; HeaderIndex < HeadersNeedingGeneration->size(); HeaderIndex++)
 	{
+		std::string Path = (*HeadersNeedingGeneration)[HeaderIndex];
+		
 		Filesystem::path HeaderPath = Path;
 		std::string HeaderStem = HeaderPath.stem().string();
-		std::string GenHeaderName = HeaderStem + ".gen.h";
-		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / GenHeaderName;
 
-		std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
-		Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
+		std::string GenPathNew = HeaderStem + ".gen.h";
+		Filesystem::path FullGenPathNew = Filesystem::path(GeneratedDirectory) / GenPathNew;
+
+		std::string GenPathTmp = HeaderStem + ".gen.tmp.h";
+		Filesystem::path FullGenPathTmp = Filesystem::path(GeneratedDirectory) / GenPathTmp;
+
+		std::string GenPathOld = HeaderStem + ".gen.old.h";
+		Filesystem::path FullGenPathOld = Filesystem::path(GeneratedDirectory) / GenPathOld;
+
+		GenPathsNew.push_back(FullGenPathNew.string());
+		GenPathsTmp.push_back(FullGenPathTmp.string());
+		GenPathsOld.push_back(FullGenPathOld.string());
 
 		// Rename current file to prevent changing the file last modified time, need this file in case the code generation fails
-		if(Filesystem::exists(GenPath))
+		if(Filesystem::exists(FullGenPathNew))
 		{
-			Filesystem::rename(GenPath, GenPathTmp);
+			Filesystem::rename(FullGenPathNew, FullGenPathOld);
 		}
 		
 		// Create simple generated file so clang gets the proper includes/macros to start
 		std::ofstream Tap;
-		Tap.open(GenPath.string());
+		Tap.open(FullGenPathNew.string());
 		Tap << "#include \"Core/Reflection.h\"" << std::endl;
-		Tap << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"\n";
+		Tap << "#include \"" + Filesystem::path(TheModule.GetGeneratedSourcePath()).filename().string() + "\"\n";
 		Tap.close();
 	}
-	
-	// Generate reflection data for source files
-	for (std::string Path : HeadersNeedingGeneration)
+
+
+	std::mutex HeaderAcquisitionLock;
+	std::mutex OutWriteLock;
+	unsigned int* CurrentHeaderIndex = new unsigned int(0);
+	unsigned int* CompletionIndex = new unsigned int(0);
+	std::vector<std::thread*> ThreadPool;
+	bool bGenerationSuccess = true;
+	for (unsigned int ThreadSpawn = 0; ThreadSpawn < CompileThreadCount && ThreadSpawn < HeadersNeedingGeneration->size(); ThreadSpawn++)
 	{
-		Filesystem::path HeaderPath = Path;
-		std::string HeaderStem = HeaderPath.stem().string();
-		auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
-		auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
-		std::string HeaderName = HeaderStem + ".gen.h";
-		Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
-
-		std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
-		Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
-
-		if (!Filesystem::exists(SourceLoc)) // If source doesn't exist, assume header only file
+		std::thread* NewThread = new std::thread([this, 
+			&TheModule,
+			&OutWriteLock,
+			&bGenerationSuccess,
+			&HeaderAcquisitionLock,
+			GeneratedDirectory,
+			HeadersNeedingGeneration,
+			CompletionIndex, 
+			CurrentHeaderIndex,
+			ModuleNameCaps,
+			ModuleIncludes,
+			GenerationResult
+		]()
 		{
-			if(HeaderPath.extension() == ".hpp")
+			while (true)
 			{
-				SourceLoc = HeaderPath;
+				std::string HeaderNeedingGeneration;
+
+				int32_t RetrievedIndex = 0;
+
+				bool bContinue = false;
+				HeaderAcquisitionLock.lock();
+				{
+					if (*CurrentHeaderIndex < HeadersNeedingGeneration->size())
+					{
+						RetrievedIndex = *CurrentHeaderIndex;
+						HeaderNeedingGeneration = (*HeadersNeedingGeneration)[*CurrentHeaderIndex];
+						(*CurrentHeaderIndex)++;
+						bContinue = true;
+					}
+				}
+				HeaderAcquisitionLock.unlock();
+
+				if (!bContinue)
+					break;
+
+				//std::cout << "got " << HeaderNeedingGeneration << " at " << RetrievedIndex << std::endl;
+				Filesystem::path HeaderPath = HeaderNeedingGeneration;
+				//std::cout << "hp " << HeaderPath << std::endl;
+
+				std::string HeaderStem = HeaderPath.stem().string();
+				auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
+				auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
+				std::string HeaderName = HeaderStem + ".gen.h";
+				Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+
+				std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
+				Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
+
+				if (!Filesystem::exists(SourceLoc)) // If source doesn't exist, assume header only file
+				{
+					if (HeaderPath.extension() == ".hpp")
+					{
+						SourceLoc = HeaderPath;
+					}
+					else
+					{
+						GenerationResult->insert(std::make_pair(RetrievedIndex, true));
+						continue;
+					}
+				}
+
+
+				// Build arguments to pass into reflection code generator
+				std::string RyReflectPath = GetRyReflectPath();
+				std::vector<std::string> Args;
+				Args.push_back(SourceLoc.string());
+				Args.push_back(HeaderPath.stem().string() + ".h"); // todo: change to just .filename?
+				Args.push_back(ModuleNameCaps);
+				Args.push_back(GenPathTmp.string());
+				Args.push_back(std::to_string(ModuleIncludes.size()));
+				for (const std::string& ModInc : ModuleIncludes)
+					Args.push_back(ModInc);
+				
+
+				int StdOutSize = 1024 * 1000;
+				char* StdOutBuffer = new char[StdOutSize];
+				char* StdErrBuffer = new char[StdOutSize];
+				bool bResult = ExecProc(RyReflectPath, Args, StdOutSize, StdOutBuffer, StdOutSize, StdErrBuffer);
+				std::string StdOutAsString = StdOutBuffer;
+				std::string StdErrAsString = StdErrBuffer;
+
+
+				// Mutex output writing so they don't stomp on each other
+				OutWriteLock.lock();
+				{
+					// Insert the result of this module file
+					GenerationResult->insert(std::make_pair(RetrievedIndex, bResult));
+
+					// Print out header that source was just generated for
+					std::cout << "\t[" << (*CompletionIndex + 1) << " of " << HeadersNeedingGeneration->size() << "] " << HeaderPath.filename().string();
+					(*CompletionIndex)++;
+					if (!bResult && !StdOutAsString.empty())
+						std::cout << " [fail]: " << StdOutBuffer;
+					if (!bResult && !StdErrAsString.empty())
+						std::cout << " [fail]: " << StdErrAsString;
+					else
+						std::cout << std::endl;
+				}
+				OutWriteLock.unlock();
+
+				if(!bResult)
+				{
+					bGenerationSuccess = false;
+				}
+
 			}
-			else
-			{
-				continue;
-			}
-		}
+		});
 
-		// Generate reflection code
-		std::string GeneratedSource;
-		std::string ErrorMsg;
-		bool bFail = !Ry::GenerateReflectionCode(ModuleNameCaps, 
-			SourceLoc.string(), 
-			HeaderPath.stem().string() + ".h", 
-			ModuleIncludes, 
-			GeneratedSource, 
-			ErrorMsg
-		);
+		ThreadPool.push_back(NewThread);
+	}
 
-		// Print friendly message for current source file
-		std::cout << "\t" << HeaderStem << ".h";
+	// Cleanup threads
+	for (std::thread* Thread : ThreadPool)
+	{
+		Thread->join();
+		delete Thread;
+	}
 
-		if(bFail)
+	// Final output to file
+	for (int32_t GenIndex = 0; GenIndex < HeadersNeedingGeneration->size(); GenIndex++)
+	{
+		std::string GenPathNew = GenPathsNew.at(GenIndex);
+		std::string GenPathTmp = GenPathsTmp.at(GenIndex);
+		std::string GenPathOld = GenPathsOld.at(GenIndex);
+
+		bool bSuccess = GenerationResult->at(GenIndex);
+
+		if (bSuccess)
 		{
-			std::cout << " [fail]: " << ErrorMsg << std::endl;
+			// Replace GenNew with GenTmp, delete GenOld
+			Filesystem::remove(GenPathOld);
 
-			// Restore the old file so the build system doesn't think it was updated
 			if (Filesystem::exists(GenPathTmp))
 			{
-				Filesystem::remove(GenPath);
-				Filesystem::rename(GenPathTmp, GenPath);
-			}
+				std::string NextLine = "";
+				std::ostringstream OutString;
+				std::ifstream FileIn(GenPathTmp);
+				while (std::getline(FileIn, NextLine))
+				{
+					OutString << NextLine << "\n";
+				}
+				FileIn.close();
 
-			return false;
+				std::string SourcePrefix = "#include \"" + Filesystem::path(TheModule.GetGeneratedSourcePath()).filename().string() + "\"\n";
+				std::string FinalSource = SourcePrefix + OutString.str();
+
+				Filesystem::remove(GenPathTmp);
+
+				std::ofstream OutStream(GenPathNew);
+				{
+					OutStream << FinalSource;
+				}
+				OutStream.close();
+			}
 		}
 		else
 		{
-			if(Filesystem::exists(GenPathTmp))
-				Filesystem::remove(GenPathTmp);
+			// Delete GenPathNew and GenPathTmp, restore GenPathOld
+			Filesystem::remove(GenPathTmp);
+			Filesystem::remove(GenPathNew);
 
-			std::cout << std::endl;
+			if(Filesystem::exists(GenPathOld))
+			{
+				Filesystem::rename(GenPathOld, GenPathNew);
+			}
 		}
-
-		std::ofstream OutputGenerated(GenPath.string());
-		{
-			OutputGenerated << "#include \"" + Filesystem::path(GeneratedModuleSource).filename().string() + "\"" << std::endl;
-			OutputGenerated << GeneratedSource << std::endl;
-		}
-		OutputGenerated.close();
 
 	}
 
-	return true;
+	// Cleanup multi-threading variables
+	delete CurrentHeaderIndex;
+	delete CompletionIndex;
+	delete HeadersNeedingGeneration;
+	delete GenerationResult;
+
+	return bGenerationSuccess;
 }
 
 void AbstractBuildTool::FindOutOfDateHeaders(const Module& Module, std::string GeneratedDir, std::vector<std::string>& OutFiles)

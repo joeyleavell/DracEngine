@@ -6,7 +6,7 @@
 #include "clang/AST/RecursiveASTVisitor.h"
 
 #include <iostream>
-#include "Reflection/Reflection.h"
+#include "Reflection.h"
 #include <fstream>
 
 using namespace clang;
@@ -435,12 +435,15 @@ namespace Ry
 
 	};
 
+	static llvm::cl::OptionCategory MyToolCategory("my-tool options");
+
 	bool GenerateReflectionCode(std::string ModuleNameCaps, 
 		std::string SourcePath, 
 		std::string Include, 
 		std::vector<std::string> Includes, 
 		std::string& GeneratedSource, 
-		std::string& ErrorMsg)
+		std::string& ErrorMsg,
+		int Thread)
 	{
 
 		MatchFinder Finder;
@@ -497,28 +500,32 @@ namespace Ry
 		
 		int ArgC = Args.size();
 		char** ClangOptions = new char* [Args.size()];
-		for(int Arg = 0; Arg < Args.size(); Arg++)
+		for(uint32_t Arg = 0; Arg < Args.size(); Arg++)
 		{
-			//std::cout << Args[Arg] << std::endl;
 			ClangOptions[Arg] = new char[Args[Arg].size() + 1];
-			strcpy(ClangOptions[Arg], Args[Arg].c_str());			
+			strcpy_s(ClangOptions[Arg], Args[Arg].size() + 1, Args[Arg].c_str());			
 		}
 
 		std::vector<std::string> Sources = { SourcePath };
-		
-		llvm::cl::OptionCategory MyToolCategory("my-tool options");
-		clang::tooling::CommonOptionsParser Parser (ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
-		clang::tooling::ClangTool Tool (Parser.getCompilations(), Sources);
-		//Tool.appendArgumentsAdjuster(Parser.getArgumentsAdjuster());
 
+		// for (std::string Arg : Args)
+		// 	std::cout << Arg << std::endl;
+		// std::cout << std::endl;
+
+		clang::tooling::CommonOptionsParser* Parser = new CommonOptionsParser(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
+		clang::tooling::ClangTool* Tool = new ClangTool(Parser->getCompilations(), Sources);
+		Tool->setRestoreWorkingDir(false);
+		//Tool.appendArgumentsAdjuster(Parser.getArgumentsAdjuster());
 		
 		std::unique_ptr<FrontendActionFactory> Fac = newFrontendActionFactory(&Finder);
-		int Result = Tool.run(Fac.get());
+		int Result = Tool->run(Fac.get());
 
 		//int Result = runToolOnCodeWithArgs(Fac->create(), SourcePath, Args);
 
 		//std::unique_ptr<ASTUnit> AST = buildASTFromCodeWithArgs(SourcePath, Args);
-		
+
+		for (int Arg = 0; Arg < Args.size(); Arg++)
+			delete[] ClangOptions[Arg];
 		delete[] ClangOptions;
 
 		// Set generated code and error message
@@ -530,7 +537,62 @@ namespace Ry
 			return false;
 		else
 			return true;
-		
 	}
+
 	
+}
+
+int main(int ArgC, char** ArgV)
+{
+	int32_t NumIncludes = 0;
+	std::vector<std::string> IncludeDirs;
+	std::string SourcePath;
+	std::string IncludePath;
+	std::string ModuleNameCaps;
+	std::string GenOutPath;
+
+	std::string GeneratedSource;
+	std::string ErrorMsg;
+
+	if (ArgC < 6)
+	{
+		std::cout << "Too few arguments" << std::endl;
+		return 1;
+	}
+
+	SourcePath = ArgV[1];
+	IncludePath = ArgV[2];
+	ModuleNameCaps = ArgV[3];
+	GenOutPath = ArgV[4];
+	NumIncludes = std::atoi(ArgV[5]);
+
+	for (int32_t Include = 0; Include < NumIncludes; Include++)
+		IncludeDirs.push_back(ArgV[6 + Include]);
+
+	bool bResult = Ry::GenerateReflectionCode(ModuleNameCaps,
+		SourcePath,
+		IncludePath,
+		IncludeDirs,
+		GeneratedSource,
+		ErrorMsg,
+		0
+	);
+
+	if (!ErrorMsg.empty())
+	{
+		std::cout << ErrorMsg << std::endl;
+	}
+	else if (bResult)
+	{
+		std::ofstream OutFile(GenOutPath);
+		{
+			OutFile << GeneratedSource << std::endl;
+		}
+		OutFile.close();
+	}
+
+	if (bResult)
+		return 0;
+	else
+		return 1;
 }

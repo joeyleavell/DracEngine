@@ -23,12 +23,12 @@
 #include <iostream>
 #include <fstream>
 #include "Window.h"
+#include "Tiled.h"
 
 // Json
 #include "nlohmann/json.hpp"
 #include "Core/PlatformProcess.h"
 #include "Factory/FbxFactory.h"
-#include "Tiled.h"
 typedef nlohmann::json Json;
 
 namespace Ry

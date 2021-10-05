@@ -284,6 +284,34 @@ std::string GetEngineResourcesDir()
 	return EngineResPathCache;
 }
 
+std::string GetRyBuildPath()
+{
+	std::string RyBuildRoot = Filesystem::path(GetModulePath()).parent_path().string();
+	std::string BuildDir;
+
+#ifdef RYBUILD_WINDOWS
+	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild.exe").string();
+#elif defined(RYBUILD_LINUX)
+	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild").string();
+#endif
+
+	return RyBuildModule;
+}
+
+std::string GetRyReflectPath()
+{
+	std::string RyReflectRoot = Filesystem::path(GetModulePath()).parent_path().string();
+	std::string BuildDir;
+
+#ifdef RYBUILD_WINDOWS
+	std::string RyReflectModule = (Filesystem::path(RyReflectRoot) / "RyReflect.exe").string();
+#elif defined(RYBUILD_LINUX)
+	std::string RyReflectModule = (Filesystem::path(RyReflectRoot) / "RyReflect").string();
+#endif
+
+	return RyReflectModule;
+}
+
 #ifdef RYBUILD_WINDOWS
 #include <windows.h>
 

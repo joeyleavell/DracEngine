@@ -8,7 +8,8 @@ namespace Ry
 		std::string Include, 
 		std::vector<std::string> Includes, 
 		std::string& OutGeneratedSource, 
-		std::string& ErrorMsg
+		std::string& ErrorMsg,
+		int Thread
 	);
 
 	 

@@ -6,7 +6,6 @@
 #include "Util/Util.h"
 #include "Build/BuildTool.h"
 #include "Deps/BuildDeps.h"
-#include "Reflection/Reflection.h"
 
 #ifdef RYBUILD_WINDOWS
 	#include "Generate/Windows/WindowsProject.h"

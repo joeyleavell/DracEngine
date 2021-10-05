@@ -20,7 +20,10 @@ namespace Ry
 		GeneratedBody()
 
 		RefField()
-		Ry::TestRefl* Other;
+		Ry::TestRefl* Other = new Ry::TestRefl;
+
+		RefField()
+		Ry::TestRefl* Other2 = new Ry::TestRefl;
 
 		RefFunction()
 		void TestFunction();

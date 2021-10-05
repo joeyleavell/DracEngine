@@ -130,6 +130,8 @@ protected:
 
 private:
 
+	void CreateBaseModuleSource(const Module& TheModule);
+
 	struct CircularHelper
 	{
 		CircularHelper* Parent;
