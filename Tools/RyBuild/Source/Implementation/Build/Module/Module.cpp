@@ -440,13 +440,6 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 		NewModule->Name = NewModule->Name.substr(0, FirstDot);
 	}
 
-	// Set system path for python libs
-	Filesystem::path LibsPath = Filesystem::absolute(Filesystem::path(GetModulePath()).parent_path() / "PythonLib");
-	Py_SetPath(LibsPath.wstring().c_str());
-
-	// Initialize python
-	Py_Initialize();
-
 	PyObject* Globals = PyModule_GetDict(PyImport_AddModule("__main__"));
 	PyObject* Locals = PyDict_New();
 
@@ -588,8 +581,6 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 		return nullptr;
 	}
 
-	Py_Finalize();
-
 	return NewModule;
 }
 
@@ -639,7 +630,7 @@ void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 	}
 }
 
-void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings)
+void LoadModules_Helper(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings)
 {
 	Filesystem::path FoundModuleFile;
 	Filesystem::directory_iterator NewDirectoryItr(RootDir);
@@ -696,10 +687,21 @@ void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, con
 			// Only go into directories
 			if (Filesystem::is_directory(File))
 			{
-				LoadModules(Filesystem::absolute(File), OutModules, Settings);
+				LoadModules_Helper(Filesystem::absolute(File), OutModules, Settings);
 			}
 		}
 	}
+}
+
+void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings)
+{
+	// Set system path for python libs
+	Filesystem::path LibsPath = Filesystem::absolute(Filesystem::path(GetModulePath()).parent_path() / "PythonLib");
+	Py_SetPath(LibsPath.wstring().c_str());
+
+	Py_Initialize();
+	LoadModules_Helper(RootDir, OutModules, Settings);
+	Py_Finalize();
 }
 
 bool VerifyModules(std::vector<Module*>& OutModules)
