@@ -96,6 +96,9 @@ namespace Ry
 			{
 				const GLFWvidmode* Mode = glfwGetVideoMode(Monitor);
 				WindowResource = glfwCreateWindow(Width, Height, *Title, Monitor, nullptr);
+
+				
+			//	glfwSetWindowPos(WindowResource, GLFW_WINDO)
 			}
 			else
 			{
@@ -126,6 +129,8 @@ namespace Ry
 		glfwSetScrollCallback(WindowResource, &ScrollCallback);
 		glfwSetWindowSizeCallback(WindowResource, &WindowSizeCallback);
 		glfwSetFramebufferSizeCallback(WindowResource, &FrameBufferSizeCallback);
+		glfwSetCursorPosCallback(WindowResource, &CursorPosCallback);
+		glfwSetWindowPosCallback(WindowResource, &WindowPosCallback);
 
 		// Insert window into static map
 		Windows.insert(WindowResource, this);
@@ -174,7 +179,7 @@ namespace Ry
 			GLFWmonitor* Monitor = GetMonitorByIndex(MonitorIndex);
 			const GLFWvidmode* mode = glfwGetVideoMode(Monitor);
 			WindowSizeCallback(WindowResource, mode->width, mode->height); // Notify of new viewport size previous to full screen
-
+			
 			// switch to full screen
 			glfwSetWindowMonitor(WindowResource, Monitor, 0, 0, mode->width, mode->height, 0);
 
@@ -309,7 +314,100 @@ namespace Ry
 
 		double MouseX, MouseY;
 		GetCursorPos(MouseX, MouseY);
+
+		int32 WindowSizeX, WindowSizeY;
+		glfwGetWindowSize(WindowResource, &WindowSizeX, &WindowSizeY);
+
+		bool bShowVertCursor = (MouseY >= WindowSizeY - 5.0f) || (MouseY <= 5.0f);
+		if(bShowVertCursor && !CurCursor)
+		{
+			// Create re-size cursor
+			CurCursor = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+			glfwSetCursor(WindowResource, CurCursor);
+		}
+		else if(!bShowVertCursor && CurCursor)
+		{
+			glfwDestroyCursor(CurCursor);
+			glfwSetCursor(WindowResource, NULL);
+			CurCursor = nullptr;
+		}
+
+		// Handle window manipulation events
+		int32 LeftButtonState = glfwGetMouseButton(WindowResource, 0);
+		if(LeftButtonState == 0 && ManipData.IsManipulating())
+		{			
+			ManipData.StopManip();
+		}
+		else if(LeftButtonState == 1 && !ManipData.IsManipulating())
+		{
+			// Set these values here to reduce code duplication across the below if's
+			ManipData.InitialWindowXSize = WindowSizeX;
+			ManipData.InitialWindowYSize = WindowSizeY;
+			ManipData.InitialX = MouseX + ManipData.InitialWindowXPos;
+			ManipData.InitialY = MouseY + ManipData.InitialWindowYPos;
+
+			if (MouseY <= 5.0f)
+			{
+				ManipData.bIsResizingTop = true;
+			}
+			else if(MouseY >= WindowSizeY - 5.0f)
+			{
+				ManipData.bIsResizingBottom = true;
+			}
+			else if(MouseY <= 20.0f)
+			{
+				ManipData.bIsDragging = true;
+				glfwGetWindowPos(WindowResource, &ManipData.InitialWindowXPos, &ManipData.InitialWindowYPos);
+			}
+		}
+		else if(!ManipData.IsManipulating())
+		{
+			glfwGetWindowPos(WindowResource, &ManipData.InitialWindowXPos, &ManipData.InitialWindowYPos);
+			ManipData.InitialX = MouseX + ManipData.InitialWindowXPos;
+			ManipData.InitialY = MouseY + ManipData.InitialWindowYPos;
+		}
+
+		int32 WPosX, WPosY;
+		int32 WSizeX, WSizeY;
+		glfwGetWindowPos(WindowResource, &WPosX, &WPosY);
+		glfwGetWindowSize(WindowResource, &WSizeX, &WSizeY);
+
+		double CurPosX = MouseX + WPosX;
+		double CurPosY = MouseY + WPosY;
+		double DeltaX = CurPosX - ManipData.InitialX;
+		double DeltaY = CurPosY - ManipData.InitialY;
+
+		std::cout << DeltaX << " " << DeltaY << std::endl;
+
+		if (ManipData.bIsDragging)
+		{
+			glfwSetWindowPos(WindowResource, (int32)(ManipData.InitialWindowXPos + DeltaX), (int32)(ManipData.InitialWindowYPos + DeltaY));
+		}
+
+		if (ManipData.bIsResizingBottom)
+		{
+			int32 NewHeight = (int32)(ManipData.InitialWindowYSize + DeltaY);
+			if (NewHeight < 20.0f)
+				NewHeight = 20.0f;
+
+			glfwSetWindowSize(WindowResource, WSizeX, NewHeight);
+		}
+
+		if (ManipData.bIsResizingTop)
+		{
+			int32 StartY = ManipData.InitialWindowYPos + DeltaY;
+			int32 EndY = ManipData.InitialWindowYPos + ManipData.InitialWindowYSize;
+			int32 NewHeight = (int32) (EndY - StartY);
+			if (NewHeight < 20.0f)
+				NewHeight = 20.0f;
+
+			glfwSetWindowSize(WindowResource, WSizeX, NewHeight);
+			glfwSetWindowPos(WindowResource, WPosX, (int32)(ManipData.InitialWindowYPos + DeltaY));
+		}
+
+		// Adjust mouse Y to be relative to bottom left
 		MouseY = GetWindowHeight() - MouseY - 1;
+
 
 		// Send mouse pos event
 		{
@@ -358,6 +456,7 @@ namespace Ry
 			}
 
 		}
+
 	}
 
 	void Window::Destroy()
@@ -578,6 +677,26 @@ namespace Ry
 		}
 	}
 
+	void Window::CursorPosCallback(::GLFWwindow* Window, double PosX, double PosY)
+	{
+		Ry::Window* AssociatedWindow = FindWindow(Window);
+
+		if (AssociatedWindow)
+		{
+		}
+	}
+
+	void Window::WindowPosCallback(::GLFWwindow* Window, int32 PosX, int32 PosY)
+	{
+		Ry::Window* AssociatedWindow = FindWindow(Window);
+
+		if (AssociatedWindow)
+		{
+			AssociatedWindow->WindowPosX = PosX;
+			AssociatedWindow->WindowPosY = PosY;
+		}
+	}
+
 	void Window::WindowSizeCallback(::GLFWwindow* Window, int NewWidth, int NewHeight)
 	{
 		Ry::Window* AssociatedWindow = FindWindow(Window);
@@ -674,7 +793,7 @@ namespace Ry
 	void Window::SetupWindowHints()
 	{
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-		//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 		if (Platform == RenderingPlatform::OpenGL)
 		{

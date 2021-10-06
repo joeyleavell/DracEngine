@@ -9,6 +9,7 @@
 
 struct GLFWwindow;
 struct GLFWmonitor;
+struct GLFWcursor;
 
 namespace Ry
 {
@@ -49,6 +50,39 @@ namespace Ry
 		MouseEventInfo();
 		virtual ~MouseEventInfo();
 
+	};
+
+	struct WindowManipData
+	{
+		bool bIsResizingX{ false };
+		bool bIsResizingTop{ false };
+		bool bIsResizingBottom{ false };
+		bool bIsResizingLeft{ false };
+		bool bIsResizingRight { false };
+
+		bool bIsDragging{false};
+
+		int32 InitialWindowXSize{};
+		int32 InitialWindowYSize{};
+		int32 InitialWindowXPos{};
+		int32 InitialWindowYPos{};
+		double InitialX{};
+		double InitialY{};
+
+		bool IsManipulating()
+		{
+			return bIsDragging || bIsResizingTop || bIsResizingBottom || bIsResizingLeft || bIsResizingRight;
+		}
+
+		void StopManip()
+		{
+			bIsDragging = false;
+			bIsResizingTop = false;
+			bIsResizingBottom = false;
+			bIsResizingLeft = false;
+			bIsResizingRight = false;
+
+		}
 	};
 
 	class WINDOWING_MODULE Window
@@ -100,6 +134,12 @@ namespace Ry
 
 	private:
 
+		GLFWcursor* CurCursor;
+
+		double WindowPosX{};
+		double WindowPosY{};
+
+		WindowManipData ManipData;
 		MouseEventInfo* ButtonsInfo;
 
 		float HigherOrderClickInterval = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press, etc.)
@@ -148,7 +188,10 @@ namespace Ry
 		static void KeyCallback(::GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods);
 		static void MouseButtonCallback(::GLFWwindow* Window, int Button, int Action, int Mods);
 		static void ScrollCallback(::GLFWwindow* Window, double XOff, double YOff);
-		static void CharacterEntryCallback(::GLFWwindow* Window, unsigned int Codepoint);		
+		static void CharacterEntryCallback(::GLFWwindow* Window, unsigned int Codepoint);
+		static void CursorPosCallback(::GLFWwindow* Window, double PosX, double PosY);
+		static void WindowPosCallback(::GLFWwindow* Window, int32 PosX, int32 PosY);
+
 	};
-	
+
 }
