@@ -242,6 +242,11 @@ namespace Ry
 
 		int LastIndexCount = -1;
 
+		~BatchGroup()
+		{
+			delete BatchMesh;
+		}
+
 	};
 
 	struct RENDERING_MODULE BatchPipeline

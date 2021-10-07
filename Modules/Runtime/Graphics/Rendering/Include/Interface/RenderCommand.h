@@ -80,7 +80,6 @@ namespace Ry
 	{
 		Ry::RenderPass* RenderPass;
 		bool bUseSecondary;
-		bool bClearAttachment;
 	};
 
 	class RENDERING_MODULE RenderCommand
@@ -153,7 +152,7 @@ namespace Ry
 			return ExtractedCmd;
 		}
 
-		virtual void BeginRenderPass(bool bUseSecondary = false, bool bClearAttachment = true)
+		virtual void BeginRenderPass(bool bUseSecondary = false)
 		{
 			if(!Swap)
 			{
@@ -161,7 +160,7 @@ namespace Ry
 				return;
 			}
 			
-			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), bUseSecondary, bClearAttachment};
+			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		

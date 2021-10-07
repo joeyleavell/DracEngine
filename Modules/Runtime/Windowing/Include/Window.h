@@ -134,7 +134,7 @@ namespace Ry
 
 	private:
 
-		GLFWcursor* CurCursor;
+		GLFWcursor* CurCursor{};
 
 		double WindowPosX{};
 		double WindowPosY{};

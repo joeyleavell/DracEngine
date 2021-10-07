@@ -604,9 +604,16 @@ namespace Ry
 	void Batch::Clear()
 	{
 		for (BatchLayer* Layer : Layers)
-			delete Layer;
+		{
+			Ry::OAPairIterator<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Itr = Layer->Groups.CreatePairIterator();
+			while(Itr)
+			{
+				Itr.GetValue().Contains()
+
+				++Itr;
+			}
+		}
 		
-		Layers.Clear();
 	}
 
 	void Batch::SetView(const Matrix4& View)

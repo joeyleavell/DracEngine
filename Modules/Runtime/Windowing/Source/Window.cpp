@@ -319,17 +319,25 @@ namespace Ry
 		glfwGetWindowSize(WindowResource, &WindowSizeX, &WindowSizeY);
 
 		bool bShowVertCursor = (MouseY >= WindowSizeY - 5.0f) || (MouseY <= 5.0f);
+		bool bShowHorCursor = (MouseX >= WindowSizeX - 5.0f) || (MouseX <= 5.0f);
+
+		if (!bShowVertCursor && !bShowHorCursor && CurCursor)
+		{
+			glfwDestroyCursor(CurCursor);
+			glfwSetCursor(WindowResource, NULL);
+			CurCursor = nullptr;
+		}
+
 		if(bShowVertCursor && !CurCursor)
 		{
 			// Create re-size cursor
 			CurCursor = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
 			glfwSetCursor(WindowResource, CurCursor);
-		}
-		else if(!bShowVertCursor && CurCursor)
+		} else if (bShowHorCursor && !CurCursor)
 		{
-			glfwDestroyCursor(CurCursor);
-			glfwSetCursor(WindowResource, NULL);
-			CurCursor = nullptr;
+			// Create re-size cursor
+			CurCursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+			glfwSetCursor(WindowResource, CurCursor);
 		}
 
 		// Handle window manipulation events
@@ -359,6 +367,14 @@ namespace Ry
 				ManipData.bIsDragging = true;
 				glfwGetWindowPos(WindowResource, &ManipData.InitialWindowXPos, &ManipData.InitialWindowYPos);
 			}
+			if (MouseX <= 5.0f)
+			{
+				ManipData.bIsResizingLeft = true;
+			}
+			else if (MouseX >= WindowSizeX - 5.0f)
+			{
+				ManipData.bIsResizingRight = true;
+			}
 		}
 		else if(!ManipData.IsManipulating())
 		{
@@ -376,8 +392,6 @@ namespace Ry
 		double CurPosY = MouseY + WPosY;
 		double DeltaX = CurPosX - ManipData.InitialX;
 		double DeltaY = CurPosY - ManipData.InitialY;
-
-		std::cout << DeltaX << " " << DeltaY << std::endl;
 
 		if (ManipData.bIsDragging)
 		{
@@ -404,6 +418,28 @@ namespace Ry
 			glfwSetWindowSize(WindowResource, WSizeX, NewHeight);
 			glfwSetWindowPos(WindowResource, WPosX, (int32)(ManipData.InitialWindowYPos + DeltaY));
 		}
+
+		if(ManipData.bIsResizingLeft)
+		{
+			int32 StartX = ManipData.InitialWindowXPos + DeltaX;
+			int32 EndX = ManipData.InitialWindowXPos + ManipData.InitialWindowXSize;
+			int32 NewWidth = (int32)(EndX - StartX);
+			if (NewWidth < 20.0f)
+				NewWidth = 20.0f;
+
+			glfwSetWindowSize(WindowResource, NewWidth, WSizeY);
+			glfwSetWindowPos(WindowResource, (int32)(ManipData.InitialWindowXPos + DeltaX), WPosY);
+		}
+
+		if (ManipData.bIsResizingRight)
+		{
+			int32 NewWidth = (int32)(ManipData.InitialWindowXSize + DeltaX);
+			if (NewWidth < 20.0f)
+				NewWidth = 20.0f;
+
+			glfwSetWindowSize(WindowResource, NewWidth, WSizeY);
+		}
+
 
 		// Adjust mouse Y to be relative to bottom left
 		MouseY = GetWindowHeight() - MouseY - 1;

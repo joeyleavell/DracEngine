@@ -22,17 +22,6 @@ namespace Ry
 	 */
 	Ry::VulkanContext* GVulkanContext = nullptr;
 
-	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData) {
-
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-
-		return VK_FALSE;
-	}
-
 	bool VulkanContext::PreWindowCreation(::GLFWwindow* Window)
 	{
 
@@ -207,14 +196,22 @@ namespace Ry
 		return true;
 	}
 
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData) {
+	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT MessageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT MessageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* CallbackData,
+		void* UserData)
+	{
 
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+		if (MessageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+		{
+			std::cerr << "[Vulkan Error]: " << CallbackData->pMessage << std::endl;
+		}
 
+		if (MessageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+		{
+			std::cerr << "[Vulkan Warning]: " << CallbackData->pMessage << std::endl;
+		}
 		return VK_FALSE;
 	}
 
@@ -236,7 +233,7 @@ namespace Ry
 		CreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 		CreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 		CreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		CreateInfo.pfnUserCallback = &debugCallback;
+		CreateInfo.pfnUserCallback = &DebugCallback;
 		CreateInfo.pUserData = nullptr; // Optional
 		
 		if (CreateDebugUtilsMessengerEXT(VulkanInstance, &CreateInfo, nullptr, &DebugMessenger) != VK_SUCCESS)

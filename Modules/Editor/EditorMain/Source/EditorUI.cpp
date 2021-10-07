@@ -116,7 +116,7 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
-			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass(), false);
+			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass(), true);
 			{
 
 				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)

@@ -110,11 +110,8 @@ namespace Ry
 		// Force scissor test off for clearing screen
 		glDisable(GL_SCISSOR_TEST);
 
-		if(Cmd->bClearAttachment)
-		{
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		}
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	void GLCommandBuffer::GLEndRenderPass()

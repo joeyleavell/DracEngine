@@ -238,7 +238,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary, bool bClearAttachment)
+	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -405,7 +405,7 @@ namespace Ry
 		if (NextOpCode == OP_BEGIN_RENDER_PASS)
 		{
 			BeginRenderPassCommand* BeginCmd = ExtractToken<BeginRenderPassCommand>(Marker, Data);
-			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary, BeginCmd->bClearAttachment);
+			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary);
 		}
 
 		if (NextOpCode == OP_END_RENDER_PASS)

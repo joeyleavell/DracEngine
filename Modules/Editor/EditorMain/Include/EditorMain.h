@@ -305,7 +305,7 @@ namespace Ry
 		{
 			CommandBuffer->BeginCmd();
 			{
-				CommandBuffer->BeginRenderPass();
+				CommandBuffer->BeginRenderPass(true);
 				{
 					CommandBuffer->SetViewportSize(0, 0, EditorMainWindow->GetWindowWidth(), EditorMainWindow->GetWindowHeight());
 					CommandBuffer->SetScissorSize(0, 0, EditorMainWindow->GetWindowWidth(), EditorMainWindow->GetWindowHeight());

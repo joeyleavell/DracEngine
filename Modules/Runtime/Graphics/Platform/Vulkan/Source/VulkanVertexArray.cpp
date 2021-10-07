@@ -27,7 +27,7 @@ namespace Ry
 		if(StagingVertexBuffer && Size > StagingVertexBuffer->GetBufferSize())
 		{
 			delete StagingVertexBuffer;
-			delete DeviceVertexBuffer;
+			//delete DeviceVertexBuffer;
 
 			StagingVertexBuffer = nullptr;
 			DeviceVertexBuffer = nullptr;
@@ -36,12 +36,12 @@ namespace Ry
 		if(!StagingVertexBuffer && Size > 0)
 		{
 			this->StagingVertexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Size);
-			this->DeviceVertexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, Size);
+			//this->DeviceVertexBuffer = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, Size);
 		}
 		
 		this->VertCount = Vertices;
 
-		if(StagingVertexBuffer && DeviceVertexBuffer && VertCount > 0)
+		if(StagingVertexBuffer && VertCount > 0)
 		{			
 			// Map the memory to the staging buffer
 			StagingVertexBuffer->UploadVertData(Data, Vertices, Format.GetElementCount());

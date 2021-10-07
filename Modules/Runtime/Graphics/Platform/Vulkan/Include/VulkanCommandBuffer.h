@@ -40,7 +40,7 @@ namespace Ry
 		VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {});
 		virtual ~VulkanCommandBuffer2();
 
-		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary, bool bClearAttachment);
+		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary);
 		void RecordEndRenderPass(VkCommandBuffer CmdBuffer);
 		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline);
 		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight);
