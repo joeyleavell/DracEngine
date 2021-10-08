@@ -227,7 +227,7 @@ namespace Ry
 			Marker = 0;
 			bDirty = true;
 
-			SecondaryBuffers.Clear();
+			SecondaryBuffers.SoftClear();
 		}
 
 		virtual bool CheckDirty() = 0;

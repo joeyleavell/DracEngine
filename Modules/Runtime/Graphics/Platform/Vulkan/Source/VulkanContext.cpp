@@ -218,10 +218,12 @@ namespace Ry
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger)
 	{
 		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-		if (func != nullptr) {
+		if (func != nullptr) 
+		{
 			return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
 		}
-		else {
+		else 
+		{
 			return VK_ERROR_EXTENSION_NOT_PRESENT;
 		}
 	}
@@ -341,8 +343,16 @@ namespace Ry
 		CreateInfo.ppEnabledExtensionNames = DeviceExtensionsAsCString;
 
 #ifndef RYBUILD_DISTRIBUTE
-		CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
-		CreateInfo.ppEnabledLayerNames = ValidationLayers;
+		if(false)
+		{
+			CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
+			CreateInfo.ppEnabledLayerNames = ValidationLayers;
+		}
+		else
+		{
+			CreateInfo.enabledLayerCount = 0;
+			CreateInfo.ppEnabledLayerNames = nullptr;
+		}
 #else
 		CreateInfo.enabledLayerCount = 0;
 #endif
@@ -470,18 +480,27 @@ namespace Ry
 		CreateInfo.ppEnabledExtensionNames = InstanceExtCString;
 
 #ifndef RYBUILD_DISTRIBUTE
-		// Create the c string array of validation layers as these will also be used later in device creation
-		ValidationLayers = new char* [RequiredValidationLayers.GetSize()];
-		NumValidationLayers = RequiredValidationLayers.GetSize();
-		for (int32 ValLayerIndex = 0; ValLayerIndex < RequiredValidationLayers.GetSize(); ValLayerIndex++)
+		if(false)
 		{
-			Ry::String ValLayer = RequiredValidationLayers[ValLayerIndex];
-			ValidationLayers[ValLayerIndex] = new char[ValLayer.getSize() + 1];
-			MemCpy(ValidationLayers[ValLayerIndex], ValLayer.getSize() + 1, *ValLayer, ValLayer.getSize() + 1);
+			// Create the c string array of validation layers as these will also be used later in device creation
+			ValidationLayers = new char* [RequiredValidationLayers.GetSize()];
+			NumValidationLayers = RequiredValidationLayers.GetSize();
+			for (int32 ValLayerIndex = 0; ValLayerIndex < RequiredValidationLayers.GetSize(); ValLayerIndex++)
+			{
+				Ry::String ValLayer = RequiredValidationLayers[ValLayerIndex];
+				ValidationLayers[ValLayerIndex] = new char[ValLayer.getSize() + 1];
+				MemCpy(ValidationLayers[ValLayerIndex], ValLayer.getSize() + 1, *ValLayer, ValLayer.getSize() + 1);
+			}
+
+			CreateInfo.enabledLayerCount = RequiredValidationLayers.GetSize();
+			CreateInfo.ppEnabledLayerNames = ValidationLayers;
+		}
+		else
+		{
+			CreateInfo.enabledLayerCount = 0;
+			CreateInfo.ppEnabledLayerNames = nullptr;
 		}
 
-		CreateInfo.enabledLayerCount = RequiredValidationLayers.GetSize();
-		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else
 		CreateInfo.enabledLayerCount = 0;
 #endif

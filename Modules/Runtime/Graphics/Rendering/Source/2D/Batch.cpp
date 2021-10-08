@@ -530,7 +530,7 @@ namespace Ry
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
 	{
 		if (Layer < 0)
-			Layer = Layers.GetSize() + 1;
+			Layer = Layers.GetSize() - 1;
 
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Text, Layer);
 
@@ -546,7 +546,7 @@ namespace Ry
 	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, PipelineState Scissor, Texture* Text, int32 Layer)
 	{
 		if (Layer < 0)
-			Layer = Layers.GetSize() + 1;
+			Layer = Layers.GetSize() - 1;
 
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
 		if(Group)
@@ -608,12 +608,19 @@ namespace Ry
 			Ry::OAPairIterator<BatchPipeline*, Ry::ArrayList<BatchGroup*>> Itr = Layer->Groups.CreatePairIterator();
 			while(Itr)
 			{
-				Itr.GetValue().Contains()
+				for(int32 GroupIndex = 0; GroupIndex < Itr.GetValue().GetSize(); GroupIndex++)
+				{
+					BatchGroup* Group = Itr.GetValue()[GroupIndex];
+
+					Group->Items.Clear();
+					Group->ItemSets.Clear();
+				}
 
 				++Itr;
 			}
 		}
-		
+
+		Update();		
 	}
 
 	void Batch::SetView(const Matrix4& View)

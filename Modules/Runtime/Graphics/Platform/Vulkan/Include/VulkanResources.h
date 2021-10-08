@@ -118,7 +118,7 @@ namespace Ry
 	{
 		int32 HostBufferSize;
 		uint8* HostDataBuffer;
-		Ry::Map<Ry::String, BufferRef> UniformRefs;
+		Ry::OAHashMap<Ry::String, BufferRef> UniformRefs;
 
 		/** The associated vulkan buffers for this constant buffer */
 		Ry::ArrayList<VulkanBuffer*> VulkanBuffers;

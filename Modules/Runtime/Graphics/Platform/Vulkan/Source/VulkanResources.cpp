@@ -182,13 +182,13 @@ namespace Ry
 		
 		MappedConstantBuffer* Buff = MappedConstantBuffers.Get(BufferName);
 
-		if(!Buff->UniformRefs.contains(Id))
+		if(!Buff->UniformRefs.Contains(Id))
 		{
 			Ry::Log->LogErrorf("Uniform %s in constant buffer %s does not exist", *Id, *BufferName);
 			return;
 		}
 
-		const BufferRef& Ref = *Buff->UniformRefs.get(Id);
+		const BufferRef& Ref = Buff->UniformRefs.Get(Id);
 		MemCpy(Buff->HostDataBuffer + Ref.Offset, Ref.SlotSize, Data, Ref.SlotSize);
 
 		// Dirty the uniform frames
@@ -467,7 +467,7 @@ namespace Ry
 				}
 			}
 
-			Dst->UniformRefs.insert(FullId, URef);
+			Dst->UniformRefs.Insert(FullId, URef);
 		}
 
 	}

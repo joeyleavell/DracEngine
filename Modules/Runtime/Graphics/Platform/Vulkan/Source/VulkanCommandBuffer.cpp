@@ -486,8 +486,8 @@ namespace Ry
 		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
 		// Recreate command buffers (swap chain image count could have changed for all we know)
-		FreeBuffers();
-		CreateBuffers();
+		//FreeBuffers();
+		//CreateBuffers();
 
 		// Re-record all children buffers 
 
