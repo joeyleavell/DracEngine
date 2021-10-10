@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Core.h"
+#include "Core/Memory/SharedPtr.h"
 #include "Core/String.h"
 
 namespace Ry

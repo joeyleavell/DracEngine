@@ -27,6 +27,11 @@ namespace Ry
 		this->Class = Class;
 	}
 
+	void Widget::SetStyleName(const Ry::String& StyleName)
+	{
+		this->StyleName = StyleName;
+	}
+
 	const Ry::String& Widget::GetId() const
 	{
 		return Id;
@@ -35,6 +40,11 @@ namespace Ry
 	const Ry::String& Widget::GetClass() const
 	{
 		return Class;
+	}
+
+	const Ry::String& Widget::GetStyleName() const
+	{
+		return StyleName;
 	}
 
 	bool Widget::OnMouseEvent(const MouseEvent& MouseEv)

@@ -2,6 +2,7 @@
 
 #include "String.h"
 #include "Data/ArrayList.h"
+#include "Data/Map.h"
 #include "CoreGen.h"
 
 #define REFLECT_PRIMITIVE(InTypeName, InTypeClass) \
@@ -134,6 +135,32 @@ namespace Ry
 
 		Ry::ArrayList<Ry::Field> Fields;
 		Ry::ArrayList<Ry::Function> Functions;
+	};
+
+	// Singleton
+	class CORE_MODULE ReflectionDatabase
+	{
+	public:
+
+		void RegisterClass(const Ry::String& Name, const Ry::ReflectedClass* Class);
+		const Ry::ReflectedClass* GetReflectedClass(const Ry::String& Name);
+		const Ry::ReflectedClass* GetReflectedClass(Ry::String&& Name);
+
+		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> GetClassIterator();
+	private:
+
+
+	};
+
+	CORE_MODULE extern ReflectionDatabase RefDB;
+
+	class ReflectionInitializer
+	{
+	public:
+		ReflectionInitializer(Ry::String ClassName, const Ry::ReflectedClass* Class)
+		{
+			RefDB.RegisterClass(ClassName, Class);
+		}
 	};
 
 }

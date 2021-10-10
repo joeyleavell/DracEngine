@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core/Core.h"
+#include "Core/Platform.h"
+#include "CoreGen.h"
 
 #define TABLE_SIZE 10
 #define LOAD_FACTOR 0.75

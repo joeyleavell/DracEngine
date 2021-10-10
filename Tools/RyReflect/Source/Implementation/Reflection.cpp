@@ -211,6 +211,7 @@ namespace Ry
 			// Create generated body that should be manually placed inside of the reflected class
 			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
 			GeneratedSource << "#define GeneratedBody() \\" << std::endl;
+
 			GeneratedSource << "static const Ry::ReflectedClass* \\" << std::endl;
 			GeneratedSource << "GetStaticClass() \\" << std::endl;
 			GeneratedSource << "{ \\" << std::endl;
@@ -286,8 +287,12 @@ namespace Ry
 				GeneratedSource << "\tResult.Class = Ry::TypeClass::Object;\\" << std::endl;
 				GeneratedSource << "\treturn &Result;\\" << std::endl;
 			}
-			GeneratedSource << "}" << std::endl << std::endl;
+			GeneratedSource << "} \\" << std::endl;
 
+			// Create reflection initializer so this class can register itself to the global database
+			GeneratedSource << "inline static const Ry::ReflectionInitializer RefInit {\"" << QualifiedName << "\", " << QualifiedName << "::GetStaticClass()};" << std::endl;
+
+			GeneratedSource << std::endl;
 			// Generate template specialization of GetClassImpl
 			// This is needed so the class of a certain object can be retrieved even without an instance to that object
 			// However a convenience function GetClass() is generated in the Object itself

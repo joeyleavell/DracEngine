@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Assert.h"
+#include "Core/Platform.h"
 
 namespace Ry
 {

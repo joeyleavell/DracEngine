@@ -229,8 +229,10 @@ namespace Ry
 
 		void SetId(const Ry::String& Id);
 		void SetClass(const Ry::String& Class);
+		void SetStyleName(const Ry::String& StyleName);
 		const Ry::String& GetId() const;
 		const Ry::String& GetClass() const;
+		const Ry::String& GetStyleName() const;
 
 		bool IsHovered()
 		{
@@ -442,7 +444,8 @@ namespace Ry
 		// Attributes used for identifying widgets from a parent
 		Ry::String Id;
 		Ry::String Class;
-		
+		Ry::String StyleName;
+
 		SizeType CachedSize;
 		Widget* Parent;
 		SizeType MaxSize;

@@ -4,6 +4,7 @@
 #include "Data/ArrayList.h"
 #include "Data/Map.h"
 #include "Algorithm/Algorithm.h"
+#include "Core/Core.h"
 #include "WindowingGen.h"
 //#include "Core/Delegate.h"
 

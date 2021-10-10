@@ -17,6 +17,7 @@ namespace Ry
 	class TestReflection : public Object
 	{
 	public:
+
 		GeneratedBody()
 
 		RefField()

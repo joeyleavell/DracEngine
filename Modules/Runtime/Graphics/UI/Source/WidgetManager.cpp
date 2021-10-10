@@ -100,8 +100,23 @@ namespace Ry
 		if (Name == "TextField")
 			Result = LoadWidgetTextField(Node);
 
-		// Set generic arguments (id, style)
-		
+		// Id attribute
+		if(xml_attribute<>* IdAttrib = Node->first_attribute("Id"))
+		{
+			Result->SetId(IdAttrib->value());
+		}
+
+		// Class attribute
+		if (xml_attribute<>* ClassAttrib = Node->first_attribute("Class"))
+		{
+			Result->SetClass(ClassAttrib->value());
+		}
+
+		// Style attribute
+		if (xml_attribute<>* StyleAttrib = Node->first_attribute("Style"))
+		{
+			Result->SetStyleName(StyleAttrib->value());
+		}
 
 		return Result;
 	}

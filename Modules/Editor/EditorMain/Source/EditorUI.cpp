@@ -20,7 +20,12 @@ namespace Ry
 		TestRefl* Other = Refl.GetPropertyRef<TestRefl*>("Other2");
 		//std::cout << "Value " << Refl.TestField << std::endl;
 
-		std::cout << Other->TestField2 << std::endl;
+		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
+		while(Itr)
+		{
+			std::cout << *Itr.GetKey() << std::endl;
+			++Itr;
+		}
 		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
