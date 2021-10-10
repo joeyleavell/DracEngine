@@ -4,8 +4,8 @@
 #include "VulkanSwapChain.h"
 #include "vulkan/vulkan.h"
 #include <vector>
-#include "VulkanGen.h"
 #include "SwapChain.h"
+#include "VulkanGen.h"
 
 struct GLFWwindow;
 

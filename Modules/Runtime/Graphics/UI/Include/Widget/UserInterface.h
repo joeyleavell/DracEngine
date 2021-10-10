@@ -55,30 +55,11 @@ namespace Ry
 		{
 			RootWidgets.Add(Widget);
 
-			// Set the widget's batches
-			Widget->SetBatch(Bat);
+			Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 
 			Widget->SetVisible(true, true);
-
-			Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 			
 			Draw();
-		}
-
-		/**
-		 * Renders the entire user interface.
-		 */
-		void Render()
-		{
-			// Render the UI to the screen
-			// Ry::ShapeBatcher->Render();
-			//
-			// Ry::TextPass->BeginPass();
-			// {
-			// 	Ry::TextBatcher->Render();
-			// }
-			// Ry::TextPass->EndPass();
-
 		}
 
 		void Redraw()
@@ -88,14 +69,13 @@ namespace Ry
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
 				RootWidget->Arrange();
-				RootWidget->Draw();
+				RootWidget->Draw(nullptr);
 
 				RootWidget->SetVisible(false, true);
 				RootWidget->SetVisible(true, true);
 			}
 
 			Bat->Update();
-			//Bat->Render();
 		}
 
 		void Draw()
@@ -106,7 +86,7 @@ namespace Ry
 				RootWidget->Arrange();
 
 				// Create the geometry for the elements
-				RootWidget->Draw();
+				RootWidget->Draw(nullptr);
 			}
 
 			Bat->Update();
@@ -114,9 +94,27 @@ namespace Ry
 
 	private:
 
-		void RenderStateDirty()
+		void RenderStateDirty(Widget* Wid, bool bFullRefresh)
 		{
-			Draw();
+			// Takes care of widget visibility changes and widget swapping elements
+			Wid->OnHide(Bat);
+			if (Wid->IsVisible())
+				Wid->OnShow(Bat);
+
+			// Correctly places widget
+			Wid->Arrange();
+
+			// Takes care of position changes, element changes, etc.
+			Wid->Draw(nullptr);
+
+			// Takes care of scissor changes
+			Bat->UpdatePipelineState(Wid->GetPipelineState());
+
+			if(bFullRefresh)
+				Draw(); // Re-arrange everything, will also update batch
+			else
+				Bat->Update(); // Just update batch
+
 		}
 
 		Ry::Batch* Bat;

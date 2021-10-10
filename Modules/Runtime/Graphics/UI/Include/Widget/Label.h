@@ -54,7 +54,7 @@ namespace Ry
 			// Pre compute text data
 			ComputeTextData();
 
-			RenderStateDirty.Broadcast();
+			MarkDirty(this);
 			
 			return *this;
 		}
@@ -71,8 +71,8 @@ namespace Ry
 		{
 			Style.SetFont(Font);
 			bTextSizeDirty = true;
-			
-			RenderStateDirty.Broadcast();
+
+			MarkDirty(this);
 			return *this;
 		}
 
@@ -81,23 +81,17 @@ namespace Ry
 			return Text;
 		}
 
-		void OnShow() override
+		void OnShow(Ry::Batch* Batch) override
 		{
-			if(Bat)
-			{
-				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
-			}
+			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
 		}
 
-		void OnHide() override
+		void OnHide(Ry::Batch* Batch) override
 		{
- 			if(Bat)
-			{
-				Bat->RemoveItemSet(ItemSet);
-			}
+			Batch->RemoveItemSet(ItemSet);
 		}
 
-		void Draw() override
+		void Draw(StyleSet* TheStyle) override
 		{
 			if(IsVisible())
 			{

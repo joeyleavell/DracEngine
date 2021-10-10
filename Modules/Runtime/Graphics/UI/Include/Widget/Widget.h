@@ -66,6 +66,7 @@ namespace Ry
 	struct Event;
 
 	class Batch;
+	class StyleSet;
 
 	struct Margin
 	{
@@ -217,17 +218,19 @@ namespace Ry
 
 		/**
 		 * Delegates
+		 *
+		 * @param Ry::Widget* The widget whose render state is dirty
 		 */
-		MulticastDelegate<> RenderStateDirty;
+		MulticastDelegate<Ry::Widget*, bool> RenderStateDirty;
 
 		Widget();
 		
 		virtual ~Widget() = default;
 
-		void MarkDirty()
-		{
-			RenderStateDirty.Broadcast();
-		}
+		void SetId(const Ry::String& Id);
+		void SetClass(const Ry::String& Class);
+		const Ry::String& GetId() const;
+		const Ry::String& GetClass() const;
 
 		bool IsHovered()
 		{
@@ -292,12 +295,7 @@ namespace Ry
 				Temp = Temp->Parent;
 			}
 
-			// Hide and show the widget so it's added to the correct layer
-			if(WidgetLayer != PreviousDepth && IsVisible())
-			{
-				OnHide();
-				OnShow();
-			}
+			MarkDirty(this);
 		}
 
 		virtual PipelineState GetPipelineState() const
@@ -336,16 +334,6 @@ namespace Ry
 		virtual Widget& operator[](SharedPtr<Ry::Widget> Child)
 		{
 			return *this;
-		}
-
-		virtual void SetBatch(Batch* Bat)
-		{
-			this->Bat = Bat;
-
-			if(Bat && bVisible)
-			{
-			//	OnShow();
-			}
 		}
 
 		virtual void Arrange()
@@ -428,42 +416,41 @@ namespace Ry
 		{
 			this->bVisible = bVisibility;
 
-			// Check parent visibility
-			if(bVisibility)
-			{
-				OnShow();
-			}				
-			else
-			{
-				OnHide();
-			}
+			MarkDirty(this);
 		}
 		
-		virtual void Draw() {};
+		virtual void Draw(StyleSet* Style) {};
 		virtual SizeType ComputeSize() const { return SizeType{}; };
 
-		virtual void OnShow() {}
-		virtual void OnHide() {};
+		virtual void OnShow(Ry::Batch* Batch) {}
+		virtual void OnHide(Ry::Batch* Batch) {};
+
+		void MarkDirty(Widget* Self, bool bFullRefresh = false)
+		{
+			if (Parent)
+			{
+				Parent->MarkDirty(Self, bFullRefresh);
+			}
+			else
+			{
+				RenderStateDirty.Broadcast(Self, bFullRefresh);
+			}
+		}
 
 	protected:
+
+		// Attributes used for identifying widgets from a parent
+		Ry::String Id;
+		Ry::String Class;
 		
 		SizeType CachedSize;
 		Widget* Parent;
 		SizeType MaxSize;
 
-		Ry::Batch* Bat;
-
 		int32 WidgetLayer;
 
 	protected:
 
-		void UpdatePipelineState()
-		{
-			if(Bat)
-			{
-				Bat->UpdatePipelineState(GetPipelineState());
-			}
-		}
 
 		/*bool IsParentHidden()
 		{

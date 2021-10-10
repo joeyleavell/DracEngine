@@ -12,13 +12,11 @@ namespace Ry
 	{
 	public:
 
-		Ry::Batch* Bat   = nullptr;
-
 		Drawable() = default;
 		virtual ~Drawable() = default;
 
-		virtual void Show(int32 Layer, PipelineState State) = 0;
-		virtual void Hide() = 0;
+		virtual void Show(Ry::Batch* Batch, int32 Layer, PipelineState State) = 0;
+		virtual void Hide(Ry::Batch* Batch) = 0;
 		virtual void Draw(float X, float Y, float Width, float Height) = 0;
 	};
 
@@ -46,20 +44,14 @@ namespace Ry
 			return *this;
 		}
 
-		void Show(int32 Layer, PipelineState State) override
+		void Show(Ry::Batch* Batch, int32 Layer, PipelineState State) override
 		{
-			if(Bat)
-			{
-				Bat->AddItem(Item, "Texture", State, ParentTexture, Layer);
-			}
+			Batch->AddItem(Item, "Texture", State, ParentTexture, Layer);
 		}
 
-		void Hide() override
+		void Hide(Ry::Batch* Batch) override
 		{
-			if(Bat)
-			{
-				Bat->RemoveItem(Item);
-			}
+			Batch->RemoveItem(Item);
 		}
 
 		// todo: make use this texture regions
@@ -132,20 +124,14 @@ namespace Ry
 			this->BorderSize = Other.BorderSize;
 		}
 
-		void Show(int32 Layer, PipelineState State) override
+		void Show(Ry::Batch* Batch, int32 Layer, PipelineState State) override
 		{
-			if(Bat)
-			{
-				Bat->AddItemSet(ItemSet, "Shape", State, nullptr, Layer);
-			}
+			Batch->AddItemSet(ItemSet, "Shape", State, nullptr, Layer);
 		}
 
-		void Hide() override
+		void Hide(Ry::Batch* Batch) override
 		{
-			if(Bat)
-			{
-				Bat->RemoveItemSet(ItemSet);
-			}
+			Batch->RemoveItemSet(ItemSet);
 		}
 
 		void Draw(float X, float Y, float Width, float Height) override

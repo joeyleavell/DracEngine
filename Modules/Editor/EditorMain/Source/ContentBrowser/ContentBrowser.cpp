@@ -71,7 +71,7 @@ namespace Ry
 
 		}
 
-		Browser->MarkDirty();
+		Browser->MarkDirty(Browser.Get());
 		
 	}
 

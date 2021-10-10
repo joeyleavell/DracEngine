@@ -64,7 +64,7 @@ namespace Ry
 
 			// Pre compute text data
 			ComputeTextData(ComputedTextData, Text);
-			MarkDirty();
+			MarkDirty(this);
 
 			return *this;
 		}
@@ -82,7 +82,7 @@ namespace Ry
 			Style.SetFont(Font);
 			bTextSizeDirty = true;
 
-			RenderStateDirty.Broadcast();
+			MarkDirty(this);
 			return *this;
 		}
 
@@ -91,32 +91,24 @@ namespace Ry
 			return Text;
 		}
 
-		void OnShow() override
+		void OnShow(Ry::Batch* Batch) override
 		{
-			if (Bat)
-			{
-				Bat->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
-
-				Bat->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer + 1);
-			}
+			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
+			Batch->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer + 1);
 
 			if (CursorPos != SelectionPos && SelectionPos >= 0)
-				ShowSelection();
+				Batch->AddItem(SelectionItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
+			
 		}
 
-		void OnHide() override
+		void OnHide(Ry::Batch* Batch) override
 		{
-			if (Bat)
-			{
-				Bat->RemoveItemSet(ItemSet);
-
-				Bat->RemoveItem(CursorItem);
-			}
-
-			HideSelection();
+			Batch->RemoveItemSet(ItemSet);
+			Batch->RemoveItem(CursorItem);
+			Batch->RemoveItem(SelectionItem);
 		}
 
-		void Draw() override
+		void Draw(StyleSet* TheStyle) override
 		{
 			if (IsVisible())
 			{
@@ -183,11 +175,7 @@ namespace Ry
 				CursorPos = CursorAdvanceRight(Initial);
 				SelectionPos = CursorAdvanceLeft(Initial);
 
-				if(HasSelection())
-					ShowSelection();
-
-				Draw();
-				Bat->Update();
+				MarkDirty(this);
 
 				return true;
 			}
@@ -203,17 +191,7 @@ namespace Ry
 				int32 MouseXOffset = (int32) (MouseEv.MouseX - Abs.X);
 				CursorPos = FindClosestCursorIndex(MouseXOffset);
 
-				Draw();
-				Bat->Update();
-
-				if(CursorPos != SelectionPos && SelectionPos >= 0)
-				{
-					ShowSelection();
-				}
-				else
-				{
-					HideSelection();
-				}
+				MarkDirty(this);
 			}
 
 			return true;
@@ -241,16 +219,15 @@ namespace Ry
 						SelectionPos = -1;
 					}
 
-					HideSelection();			
+					MarkDirty(this);
 				}
 				else
 				{
 					bDragging = false;
 				}
 			}
-			
-			Draw();
-			Bat->Update();
+
+			MarkDirty(this);
 
 			return true;
 		}
@@ -297,7 +274,7 @@ namespace Ry
 				int32 Start = CursorPos < SelectionPos ? CursorPos : SelectionPos;
 				int32 End = CursorPos < SelectionPos ? SelectionPos : CursorPos;
 
-				HideSelection();
+				MarkDirty(this, true);
 				RemoveSubstring(Start, End);
 			}
 		}
@@ -327,13 +304,13 @@ namespace Ry
 					{
 						// We had a selection but it was broken
 						SelectionPos = -1;
-						HideSelection();
+						MarkDirty(this);
 					}
 					else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 					{
 						// We didn't have a selection, create one
 						SelectionPos = InitialCursor;
-						ShowSelection();
+						MarkDirty(this);
 					}
 				}
 
@@ -344,7 +321,7 @@ namespace Ry
 				if (SelectionPos < 0 || SelectionPos == CursorPos)
 				{
 					SelectionPos = CursorPos;
-					ShowSelection();
+					MarkDirty(this);
 				}
 				
 				// Simply decrement cursor pos
@@ -364,7 +341,7 @@ namespace Ry
 					SelectionPos = -1;
 				}
 
-				HideSelection();
+				MarkDirty(this);
 			}
 
 			if (CursorPos < 0)
@@ -423,13 +400,13 @@ namespace Ry
 					{
 						// We had a selection but it was broken
 						SelectionPos = -1;
-						HideSelection();
+						MarkDirty(this);
 					}
 					else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 					{
 						// We didn't have a selection, create one
 						SelectionPos = InitialCursor;
-						ShowSelection();
+						MarkDirty(this);
 					}
 				}
 			}
@@ -438,7 +415,7 @@ namespace Ry
 				if (SelectionPos < 0 || SelectionPos == CursorPos)
 				{
 					SelectionPos = CursorPos;
-					ShowSelection();
+					MarkDirty(this);
 				}
 
 				// Simply increment cursor pos
@@ -457,7 +434,7 @@ namespace Ry
 					SelectionPos = -1;
 				}
 
-				HideSelection();
+				MarkDirty(this);
 			}
 
 
@@ -488,7 +465,7 @@ namespace Ry
 
 			CursorPos += Insert.getSize();
 			SelectionPos = -1; // Selection immediately goes away on type
-			HideSelection();
+			MarkDirty(this);
 		}
 
 		bool OnKey(const KeyEvent& KeyEv) override
@@ -511,7 +488,8 @@ namespace Ry
 					{
 						SelectionPos = 0;
 						CursorPos = Text.getSize();
-						ShowSelection();
+
+						MarkDirty(this);
 					}
 
 					// Pasting text
@@ -536,7 +514,7 @@ namespace Ry
 					HandleRightArrow(KeyEv);
 				}
 
-				MarkDirty();
+				MarkDirty(this);
 			}
 
 			return true;
@@ -546,30 +524,13 @@ namespace Ry
 		{			
 			// Modify the text
 			InsertText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
-			
-			Draw();
-			Bat->Update();
 
+			MarkDirty(this, true);
+			
 			return true;
 		}
 
 	private:
-
-		void ShowSelection()
-		{
-			if (Bat)
-			{
-				Bat->AddItem(SelectionItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
-			}
-		}
-
-		void HideSelection()
-		{
-			if(Bat)
-			{
-				Bat->RemoveItem(SelectionItem);
-			}
-		}
 
 		bool bDragging = false;
 		bool bShowCursor;

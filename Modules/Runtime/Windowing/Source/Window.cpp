@@ -216,6 +216,8 @@ namespace Ry
 
 			int Width, Height;
 			glfwGetFramebufferSize(WindowResource, &Width, &Height);
+
+			std::cout << "fb width " << Width << std::endl;
 			
 			for (const Delegate<void, int32, int32>& Callback : WindowResizedDelegates)
 			{
@@ -318,8 +320,10 @@ namespace Ry
 		int32 WindowSizeX, WindowSizeY;
 		glfwGetWindowSize(WindowResource, &WindowSizeX, &WindowSizeY);
 
-		bool bShowVertCursor = (MouseY >= WindowSizeY - 5.0f) || (MouseY <= 5.0f);
-		bool bShowHorCursor = (MouseX >= WindowSizeX - 5.0f) || (MouseX <= 5.0f);
+	//	std::cout << "width: " << WindowSizeX << std::endl;
+
+	/*	bool bShowVertCursor = (MouseY >= WindowSizeY - 5.0f) || (MouseY <= 5.0f);
+		bool bShowHorCursor = (MouseX >= WindowSizeX - 5.0f) || (MouseX <= 100.0f);
 
 		if (!bShowVertCursor && !bShowHorCursor && CurCursor)
 		{
@@ -333,7 +337,8 @@ namespace Ry
 			// Create re-size cursor
 			CurCursor = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
 			glfwSetCursor(WindowResource, CurCursor);
-		} else if (bShowHorCursor && !CurCursor)
+		}
+		else if (bShowHorCursor && !CurCursor)
 		{
 			// Create re-size cursor
 			CurCursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
@@ -367,7 +372,7 @@ namespace Ry
 				ManipData.bIsDragging = true;
 				glfwGetWindowPos(WindowResource, &ManipData.InitialWindowXPos, &ManipData.InitialWindowYPos);
 			}
-			if (MouseX <= 5.0f)
+			if (MouseX <= 100.0f)
 			{
 				ManipData.bIsResizingLeft = true;
 			}
@@ -415,8 +420,8 @@ namespace Ry
 			if (NewHeight < 20.0f)
 				NewHeight = 20.0f;
 
-			glfwSetWindowSize(WindowResource, WSizeX, NewHeight);
 			glfwSetWindowPos(WindowResource, WPosX, (int32)(ManipData.InitialWindowYPos + DeltaY));
+			glfwSetWindowSize(WindowResource, WSizeX, NewHeight);
 		}
 
 		if(ManipData.bIsResizingLeft)
@@ -427,8 +432,8 @@ namespace Ry
 			if (NewWidth < 20.0f)
 				NewWidth = 20.0f;
 
-			glfwSetWindowSize(WindowResource, NewWidth, WSizeY);
 			glfwSetWindowPos(WindowResource, (int32)(ManipData.InitialWindowXPos + DeltaX), WPosY);
+			glfwSetWindowSize(WindowResource, NewWidth, WSizeY);
 		}
 
 		if (ManipData.bIsResizingRight)
@@ -438,7 +443,7 @@ namespace Ry
 				NewWidth = 20.0f;
 
 			glfwSetWindowSize(WindowResource, NewWidth, WSizeY);
-		}
+		}*/
 
 
 		// Adjust mouse Y to be relative to bottom left
@@ -829,7 +834,7 @@ namespace Ry
 	void Window::SetupWindowHints()
 	{
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	//	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 		if (Platform == RenderingPlatform::OpenGL)
 		{

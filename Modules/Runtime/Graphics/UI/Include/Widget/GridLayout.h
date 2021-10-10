@@ -119,8 +119,6 @@ namespace Ry
 
 		virtual Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Widget> Widget) override
 		{
-			PanelWidget::AppendSlot(Widget);
-
 			// Create widget
 			SharedPtr<GridLayout::Slot> PanelSlot = MakeShared(new GridLayout::Slot(Widget));
 
@@ -131,6 +129,10 @@ namespace Ry
 
 			Occupied.Insert(Next);
 			ChildrenSlots.Add(PanelSlot);
+
+			PanelWidget::AppendSlot(Widget);
+
+			MarkDirty(this);
 
 			return PanelSlot;
 		}

@@ -9,14 +9,33 @@ namespace Ry
 		RelativePosition{ 0, 0 },
 		MaxSize{ -1, -1 },
 		Parent(nullptr),
-		Bat(nullptr),
 		bPressed(false),
 		bHovered(false),
 		bVisible(true),
 		WidgetLayer(0)
 	{
 		this->WidgetID = IDCounter++;
-	};
+	}
+
+	void Widget::SetId(const Ry::String& Id)
+	{
+		this->Id = Id;
+	}
+
+	void Widget::SetClass(const Ry::String& Class)
+	{
+		this->Class = Class;
+	}
+
+	const Ry::String& Widget::GetId() const
+	{
+		return Id;
+	}
+
+	const Ry::String& Widget::GetClass() const
+	{
+		return Class;
+	}
 
 	bool Widget::OnMouseEvent(const MouseEvent& MouseEv)
 	{

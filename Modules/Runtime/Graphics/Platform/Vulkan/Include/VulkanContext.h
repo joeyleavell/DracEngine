@@ -1,5 +1,7 @@
 #pragma once
 
+#define VULKAN_VALIDATION 1
+
 #include "Core/Core.h"
 #include "VulkanGen.h"
 #include <vector>
@@ -72,7 +74,7 @@ namespace Ry
 		void DeleteDummySurface();
 		bool IsDeviceSuitable(VkPhysicalDevice PhysicalDev);
 
-#ifndef RYBUILD_CONFIG_SHIPPING
+#if !defined(RYBUILD_CONFIG_SHIPPING) && defined(VULKAN_VALIDATION)
 		char** ValidationLayers = nullptr;
 		int32 NumValidationLayers = 0;
 		bool SetupVulkanDebug();

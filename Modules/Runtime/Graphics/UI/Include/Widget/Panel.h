@@ -119,7 +119,7 @@ namespace Ry
 			{
 				if(Widget.IsValid())
 				{
-					Widget->MarkDirty();
+					Widget->MarkDirty(Widget.Get());
 				}
 			}
 
@@ -134,26 +134,12 @@ namespace Ry
 
 		PanelWidget()
 		{
-		}
-		
-		void OnChildSizeDirty()
-		{
-			// Rearrange all widgets with respect to the panel
-			Arrange();
-
-			MarkDirty();
+			
 		}
 
 		virtual SharedPtr<Slot> AppendSlot(SharedPtr<Widget> Widget)
 		{
-			// Listen for size changes
-			Widget->RenderStateDirty.AddMemberFunction(this, &PanelWidget::OnChildSizeDirty);
-
 			Children.Add(Widget);
-
-			// Set existing batches
-			// TODO: this should just be a pointer back up to user interface
-			Widget->SetBatch(Bat);
 
 			// Set the widget's parent
 			Widget->SetParent(this);
@@ -162,11 +148,11 @@ namespace Ry
 			return SharedPtr<Slot>();
 		}
 
-		virtual void OnShow() override
+		virtual void OnShow(Ry::Batch* Batch) override
 		{
 		}
 
-		virtual void OnHide() override
+		virtual void OnHide(Ry::Batch* Batch) override
 		{
 		}
 
@@ -181,7 +167,7 @@ namespace Ry
 			}
 		}
 
-		virtual void Draw() override
+		virtual void Draw(StyleSet* Style) override
 		{
 			RectScissor ClipSpace = GetClipSpace();
 
@@ -203,7 +189,7 @@ namespace Ry
 						bUpdateBatch = true;
 					}
 					
-					Child->Draw();
+					Child->Draw(Style);
 				}
 				else
 				{
@@ -218,8 +204,7 @@ namespace Ry
 
 			if(bUpdateBatch)
 			{
-				Bat->Update();
-				Bat->Render();
+				MarkDirty(this);
 			}
 
 		}
@@ -229,16 +214,6 @@ namespace Ry
 			AppendSlot(Widget);
 
 			return *this;
-		}
-
-		void SetBatch(Batch* Bat) override
-		{
-			Widget::SetBatch(Bat);
-
-			for(SharedPtr<Widget> Sl : Children)
-			{
-				Sl->SetBatch(Bat);
-			}
 		}
 
 		void SetVisible(bool bVisibility, bool bPropagate) override

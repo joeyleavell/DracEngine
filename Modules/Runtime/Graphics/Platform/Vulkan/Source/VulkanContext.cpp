@@ -228,7 +228,7 @@ namespace Ry
 		}
 	}
 
-#ifndef RYBUILD_CONFIG_SHIPPING
+#if !defined(RYBUILD_CONFIG_SHIPPING) && defined(VULKAN_VALIDATION)
 	bool VulkanContext::SetupVulkanDebug()
 	{
 		VkDebugUtilsMessengerCreateInfoEXT CreateInfo{};
@@ -342,17 +342,9 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredDeviceExtensions.GetSize());
 		CreateInfo.ppEnabledExtensionNames = DeviceExtensionsAsCString;
 
-#ifndef RYBUILD_DISTRIBUTE
-		if(false)
-		{
-			CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
-			CreateInfo.ppEnabledLayerNames = ValidationLayers;
-		}
-		else
-		{
-			CreateInfo.enabledLayerCount = 0;
-			CreateInfo.ppEnabledLayerNames = nullptr;
-		}
+#if !defined(RYBUILD_DISTRIBUTE) and defined(VULKAN_VALIDATION)
+		CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
+		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else
 		CreateInfo.enabledLayerCount = 0;
 #endif
@@ -407,7 +399,7 @@ namespace Ry
 	{
 		Ry::ArrayList<Ry::String> SupportedExtensions;
 
-#ifndef RYBUILD_DISTRIBUTE
+#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
 		if (!CheckValidationLayerSupport(RequiredValidationLayers))
 		{
 			Ry::Log->LogError("Requested validation layers not available");
@@ -479,7 +471,7 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = RequiredInstanceExtensions.GetSize();
 		CreateInfo.ppEnabledExtensionNames = InstanceExtCString;
 
-#ifndef RYBUILD_DISTRIBUTE
+#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
 		if(false)
 		{
 			// Create the c string array of validation layers as these will also be used later in device creation

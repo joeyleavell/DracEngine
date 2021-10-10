@@ -36,8 +36,6 @@ namespace Ry
 			WidgetProp(BoxDrawable, PressedBox)
 		WidgetEndArgs()
 		
-//BorderWidget& DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
-
 		void Construct(Args& In)
 		{
 			SlotWidget::Args ParentArgs;
@@ -127,7 +125,7 @@ namespace Ry
 			return *this;
 		}
 
-		void OnShow() override
+		void OnShow(Ry::Batch* Batch) override
 		{
 			if(IsHovered())
 			{
@@ -135,26 +133,26 @@ namespace Ry
 				{
 					if(Style.Pressed)
 					{
-						Style.Pressed->Show(WidgetLayer, GetPipelineState());
+						Style.Pressed->Show(Batch, WidgetLayer, GetPipelineState());
 					}
 					else if(Style.Hovered)
 					{
-						Style.Hovered->Show(WidgetLayer, GetPipelineState());
+						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState());
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(WidgetLayer, GetPipelineState());
+						Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
 					}
 				}
 				else
 				{
 					if(Style.Hovered)
 					{
-						Style.Hovered->Show(WidgetLayer, GetPipelineState());
+						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState());
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(WidgetLayer, GetPipelineState());
+						Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
 					}
 				}
 			}
@@ -162,30 +160,30 @@ namespace Ry
 			{
 				if(Style.Default)
 				{
-					Style.Default->Show(WidgetLayer, GetPipelineState());
+					Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
 				}
 			}
 		}
 		
-		void OnHide() override
+		void OnHide(Ry::Batch* Batch) override
 		{
 			if(Style.Default)
 			{
-				Style.Default->Hide();
+				Style.Default->Hide(Batch);
 			}
 
 			if(Style.Pressed)
 			{
-				Style.Pressed->Hide();
+				Style.Pressed->Hide(Batch);
 			}
 
 			if(Style.Hovered)
 			{
-				Style.Hovered->Hide();
+				Style.Hovered->Hide(Batch);
 			}
 		}
 
-		void Draw() override
+		void Draw(StyleSet* TheStyle) override
 		{
 			// Note: super function is called later on
 
@@ -194,6 +192,7 @@ namespace Ry
 				Point Abs = GetAbsolutePosition();
 				SizeType ComputedSize = ComputeSize();
 
+				// choose from :default :hovered and :pressed styles
 				if (IsHovered())
 				{
 					if (IsPressed() && Style.Pressed)
@@ -212,7 +211,7 @@ namespace Ry
 
 			}
 
-			SlotWidget::Draw();
+			SlotWidget::Draw(TheStyle);
 		}
 
 		bool HasVisual()
@@ -220,39 +219,39 @@ namespace Ry
 			return Style.Default || Style.Hovered || Style.Pressed;
 		}
 
-		void SetBatch(Ry::Batch* Bat) override
-		{
-			SlotWidget::SetBatch(Bat);
-
-			if(Style.Default.IsValid())
-			{
-				Style.Default->Bat = Bat;
-			}
-
-			if(Style.Hovered.IsValid())
-			{
-				Style.Hovered->Bat = Bat;
-			}
-
-			if(Style.Pressed.IsValid())
-			{
-				Style.Pressed->Bat = Bat;
-			}
-
-		}
+		// void SetBatch(Ry::Batch* Bat) override
+		// {
+		// 	SlotWidget::SetBatch(Bat);
+		//
+		// 	if(Style.Default.IsValid())
+		// 	{
+		// 		Style.Default->Bat = Bat;
+		// 	}
+		//
+		// 	if(Style.Hovered.IsValid())
+		// 	{
+		// 		Style.Hovered->Bat = Bat;
+		// 	}
+		//
+		// 	if(Style.Pressed.IsValid())
+		// 	{
+		// 		Style.Pressed->Bat = Bat;
+		// 	}
+		//
+		// }
 
 		void OnHovered(const MouseEvent& MouseEv) override
 		{
 			SlotWidget::OnHovered(MouseEv);
 
-			Refresh();
+			MarkDirty(this);
 		}
 
 		void OnUnhovered(const MouseEvent& MouseEv) override
 		{
 			SlotWidget::OnUnhovered(MouseEv);
 
-			Refresh();
+			MarkDirty(this);
 
 		}
 
@@ -260,7 +259,7 @@ namespace Ry
 		{
 			SlotWidget::OnPressed(MouseEv);
 
-			Refresh();
+			MarkDirty(this);
 
 			return true;
 		}
@@ -269,14 +268,14 @@ namespace Ry
 		{
 			SlotWidget::OnReleased(MouseEv);
 
-			Refresh();
-
+			MarkDirty(this);
+			
 			return true;
 		}
 
 	private:
 
-		void Refresh()
+	/*	void Refresh()
 		{
 			// Ensures the correct border graphic is displayed
 			if(IsVisible())
@@ -285,12 +284,14 @@ namespace Ry
 				OnShow();
 			}
 
+			// todo: fix these
+
 			// Construct border graphic mesh
-			Draw();
+			Draw(nullptr);
 
 			// Update the batch
 			Bat->Update();
-		}
+		}*/
 
 		/**
 		 * The styling for various states of this box element.

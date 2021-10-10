@@ -25,6 +25,9 @@ namespace Ry
 	{
 		GCurrentSwapChain = this;
 
+		//if (bWindowDirty)
+		//	Recreate(Window);
+
 		// Wait for the current frame to finish before continuing
 		// This ensures we're not spamming the GPU with more submits than necessary
 		//
@@ -35,7 +38,9 @@ namespace Ry
 
 		// Clear out the command buffers - we have to call submit each frame
 		// This allows for consistency among rendering APIs
-		BuffersToSubmit.Clear();
+		BuffersToSubmit.SoftClear();
+
+		//std::cout << "window dirty: " << bWindowDirty << std::endl;
 
 		// Acquire the next image for this frame
 		AcquireImage(Window, bWindowDirty);
@@ -391,6 +396,7 @@ namespace Ry
 
 		if (PresentResult == VK_ERROR_OUT_OF_DATE_KHR || PresentResult == VK_SUBOPTIMAL_KHR)
 		{
+			//std::cout << "out of date present" << std::endl;
 			bNeedsRecreationAfterPresent = true;
 		}
 		else if (PresentResult != VK_SUCCESS) 
@@ -600,7 +606,7 @@ namespace Ry
 			return false;
 		}
 
-		Ry::Log->Log("Created Vulkan swap chain");
+	//	Ry::Log->Log("Created Vulkan swap chain");
 
 		vkGetSwapchainImagesKHR(GVulkanContext->GetLogicalDevice(), SwapChain, &ImageCount, nullptr);
 		SwapChainImages.SetSize(ImageCount);

@@ -202,12 +202,12 @@ namespace Ry
 			}
 		}
 
-		void Draw() override
+		void Draw(StyleSet* Style) override
 		{			
 			// Render child
 			if (Child && Child->IsVisible())
 			{
-				Child->Draw();
+				Child->Draw(Style);
 			}
 		}
 
@@ -258,12 +258,12 @@ namespace Ry
 			}
 		}
 
-		void ChildStateDirty()
+/*		void ChildStateDirty(Widget* Wid, bool bFullRefresh)
 		{
 			Arrange();
 
 			MarkDirty();
-		}
+		}*/
 
 		void SetChild(Ry::SharedPtr<Ry::Widget> Child)
 		{
@@ -274,22 +274,17 @@ namespace Ry
 			{
 				this->Child->SetVisible(false, true);
 			}
-
-			// Set existing batches
-			// TODO: this should just be a pointer back up to user interface
-			Child->SetBatch(Bat);
 			
 			// Setup the parent/child relationship
 			this->Child = Child;
 			Child->SetParent(this);
 			Child->SetVisible(IsVisible(), true); // Child matches our visibility
-			Child->RenderStateDirty.AddMemberFunction(this, &SlotWidget::ChildStateDirty);
 
 			// Automatically rearrange
 			Arrange();
 
 			// Recompute cached size
-			MarkDirty();
+			MarkDirty(this);
 		}
 
 		bool OnMouseEvent(const MouseEvent& MouseEv) override
@@ -371,17 +366,6 @@ namespace Ry
 			SetChild(Child);
 
 			return *this;
-		}
-
-		void SetBatch(Batch* Bat) override
-		{
-			Widget::SetBatch(Bat);
-
-			if (Child)
-			{
-				Child->SetBatch(Bat);
-			}
-
 		}
 
 		void OnHovered(const MouseEvent& MouseEv) override

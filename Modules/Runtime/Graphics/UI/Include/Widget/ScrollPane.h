@@ -8,7 +8,6 @@
 namespace Ry
 {
 
-	// todo: cull widgets whose bounds are outside of scroll pane visibility
 	class UI_MODULE ScrollPane : public PanelWidget
 	{
 	public:
@@ -70,17 +69,6 @@ namespace Ry
 			DebugRect = Ry::MakeItem();
 		}
 
-		void SetBatch(Batch* Bat) override
-		{
-			PanelWidget::SetBatch(Bat);
-			
-			if(Bat)
-			{
-				VerticalScrollBar->Bat = Bat;
-				HorizontalScrollBar->Bat = Bat;
-			}
-		}
-
 		float GetVerticalScrollAmount()
 		{
 			return VerticalScrollAmount;
@@ -120,7 +108,7 @@ namespace Ry
 			if (std::abs(Prev - Scroll) >= 0.000001f)
 			{
 				// Scroll amount has changed, mark widget as dirty	
-				MarkDirty();
+				MarkDirty(this);
 			}
 		}
 
@@ -137,7 +125,7 @@ namespace Ry
 			if(std::abs(Prev - Scroll) >= 0.000001f)
 			{
 				// Scroll amount has changed, mark widget as dirty	
-				MarkDirty();
+				MarkDirty(this);
 			}
 		}
 
@@ -158,7 +146,7 @@ namespace Ry
 			return ScrollSlot;
 		}
 
-		void Draw() override
+		void Draw(StyleSet* Style) override
 		{
 			Point Abs = GetAbsolutePosition();
 			Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X + 2.0f, Abs.Y + 2.0f, Size.Width - 4.0f, Size.Height - 4.0f, 2.0f, 0.0f);
@@ -174,7 +162,7 @@ namespace Ry
 			VerticalScrollBar->Draw((float) VertLoc.X, (float) VertLoc.Y, (float) VertSize.Width, (float) VertSize.Height);
 			HorizontalScrollBar->Draw((float) HorLoc.X, (float) HorLoc.Y, (float) HorSize.Width, (float) HorSize.Height);
 
-			Ry::PanelWidget::Draw();
+			Ry::PanelWidget::Draw(Style);
 		}
 
 		/**
@@ -183,11 +171,13 @@ namespace Ry
 		virtual void Arrange() override
 		{
 			RectScissor Clip = GetClipSpace();
+
+			// Check if clip space has changed
 			if(!(Clip == LastClip))
 			{
-				UpdatePipelineState();
+				LastClip = Clip;
+				MarkDirty(this);
 			}
-			LastClip = Clip;
 			
 			// Calculate scroll amount
 			SizeType ChildrenSize = ComputeChildrenSize();
@@ -261,33 +251,27 @@ namespace Ry
 			return Res;
 		}
 
-		virtual void OnShow() override
+		virtual void OnShow(Ry::Batch* Batch) override
 		{
-			Widget::OnShow();
+			Widget::OnShow(Batch);
 
-			if(Bat)
-			{
-				Bat->AddItem(DebugRect, "Shape", GetPipelineState());
-			}
+			Batch->AddItem(DebugRect, "Shape", GetPipelineState());
 
 			// Push scroll bar to last layer
 			// todo: come up with better way than this
 			RectScissor Scissor;
-			HorizontalScrollBar->Show(-1, GetPipelineState());
-			VerticalScrollBar->Show(-1, GetPipelineState());
+			HorizontalScrollBar->Show(Batch, -1, GetPipelineState());
+			VerticalScrollBar->Show(Batch, -1, GetPipelineState());
 		}
 
-		virtual void OnHide() override
+		virtual void OnHide(Ry::Batch* Batch) override
 		{
-			Widget::OnHide();
+			Widget::OnHide(Batch);
 
-			if(Bat)
-			{
-				Bat->RemoveItem(DebugRect);
-			}
+			Batch->RemoveItem(DebugRect);
 
-			VerticalScrollBar->Hide();
-			HorizontalScrollBar->Hide();
+			VerticalScrollBar->Hide(Batch);
+			HorizontalScrollBar->Hide(Batch);
 		}
 
 		SizeType ComputeSize() const override
