@@ -212,6 +212,14 @@ namespace Ry
 			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
 			GeneratedSource << "#define GeneratedBody() \\" << std::endl;
 
+			GeneratedSource << "static void* \\" << std::endl;
+			GeneratedSource << "CreateInstance() \\" << std::endl; // Todo: create version with 
+			GeneratedSource << "{ \\" << std::endl;
+			{
+				GeneratedSource << "\treturn new " << QualifiedName << "; \\" << std::endl; // Instantiate
+			}
+			GeneratedSource << "}\\" << std::endl;
+
 			GeneratedSource << "static const Ry::ReflectedClass* \\" << std::endl;
 			GeneratedSource << "GetStaticClass() \\" << std::endl;
 			GeneratedSource << "{ \\" << std::endl;
@@ -221,6 +229,12 @@ namespace Ry
 
 				// Reflected class name
 				GeneratedSource << "\tC.Name = \"" << Record.Name << "\";\\" << std::endl;
+
+				// Static size of class
+				GeneratedSource << "\tC.Size = sizeof(" << QualifiedName << ");\\" << std::endl;
+
+				// Register create instance function
+				GeneratedSource << "\tC.CreateInstanceFunction = &" << QualifiedName << "::CreateInstance;\\" << std::endl;
 
 				// Resize fields member
 				GeneratedSource << "\tC.Fields.SetSize(" << Record.Fields.size() << ");\\" << std::endl;

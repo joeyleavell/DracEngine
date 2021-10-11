@@ -26,5 +26,15 @@ namespace Ry
 	{
 		return ReflectedClasses.CreatePairIterator();
 	}
+
+	const Ry::ReflectedClass* GetReflectedClass(const Ry::String& Name)
+	{
+		return RefDB.GetReflectedClass(Name);
+	}
+
+	const Ry::ReflectedClass* GetReflectedClass(Ry::String&& Name)
+	{
+		return RefDB.GetReflectedClass(Name);
+	}
 	
 }

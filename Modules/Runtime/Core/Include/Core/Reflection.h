@@ -132,9 +132,18 @@ namespace Ry
 	public:
 
 		Ry::String Name;
+		uint64_t Size;
 
 		Ry::ArrayList<Ry::Field> Fields;
 		Ry::ArrayList<Ry::Function> Functions;
+
+		template<typename T>
+		T* CreateInstance() const
+		{
+			return reinterpret_cast<T*>(CreateInstanceFunction());
+		}
+
+		void* (*CreateInstanceFunction)(void);		
 	};
 
 	// Singleton
@@ -162,6 +171,10 @@ namespace Ry
 			RefDB.RegisterClass(ClassName, Class);
 		}
 	};
+
+	CORE_MODULE const Ry::ReflectedClass* GetReflectedClass(const Ry::String& Name);
+	CORE_MODULE const Ry::ReflectedClass* GetReflectedClass(Ry::String&& Name);
+
 
 }
 

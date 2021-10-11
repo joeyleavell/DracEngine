@@ -15,17 +15,22 @@ namespace Ry
 	EditorUI::EditorUI(SwapChain* Parent):
 	Layer(Parent)
 	{
-		TestReflection Refl;
-		//std::cout << "Value " << Refl.TestField << std::endl;
-		TestRefl* Other = Refl.GetPropertyRef<TestRefl*>("Other2");
-		//std::cout << "Value " << Refl.TestField << std::endl;
-
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
-		while(Itr)
+		while (Itr)
 		{
+			const Ry::ReflectedClass* Cl = Itr.GetValue();
 			std::cout << *Itr.GetKey() << std::endl;
+			for (const Ry::Field Field : Cl->Fields)
+			{
+				std::cout << "\t" << *Field.Name << " " << *Field.Type->Name << std::endl;
+			}
 			++Itr;
 		}
+		
+		TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
+//		std::cout << "Value " << NewRefl->Other << std::endl;
+		TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
+		//std::cout << "Value " << Refl.TestField << std::endl;
 		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
