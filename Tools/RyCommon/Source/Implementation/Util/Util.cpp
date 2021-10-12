@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdarg>
 #include <string>
+#include "Windows.h"
 
 static std::string ModulePathCache;
 static std::string ModPathCache;
@@ -417,6 +418,9 @@ bool ExecProc(std::string Program, std::vector<std::string>& CmdLineVec, int Out
 		DWORD ExitCode;
 		BOOL Result = GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode);
 
+		//std::cout << "exit " << std::hex << ExitCode << " " << Result << std::endl;
+		//#include "winerror.h"
+		
 		if (!Result)
 		{
 			bExecSuccessful = false;

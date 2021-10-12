@@ -2,10 +2,10 @@
 
 #include "Core/Core.h"
 #include "Core/Delegate.h"
-#include "UIGen.h"
 #include "Event.h"
 #include "Interface/Pipeline.h"
 #include "2D/Batch/Batch.h"
+#include "Widget.gen.h"
 
 #define WidgetBeginArgsSlot(ClassName) \
 public: \
@@ -212,9 +212,11 @@ namespace Ry
 		LEFT, CENTER, RIGHT
 	};
 
-	class UI_MODULE Widget
+	class UI_MODULE Widget : public Ry::Object
 	{
 	public:
+
+		GeneratedBody()
 
 		/**
 		 * Delegates
@@ -485,7 +487,7 @@ namespace Ry
 
 		uint32 WidgetID;
 
-	};
+	} RefClass();
 
 	template<typename WidgetClass>
 	struct WidgetDecl

@@ -16,7 +16,8 @@ using namespace clang::ast_matchers;
 namespace Ry
 {
 	static std::string CanonArrayList = "class Ry::ArrayList";
-	
+	static std::string CanonRyString = "class Ry::String";
+
 	enum RecordType
 	{
 		Class,
@@ -48,54 +49,67 @@ namespace Ry
 		{
 			// Check class doesn't use multiple inheritance
 			int BaseClassCount = Record->getNumBases();
+			std::string ClassName = Record->getCanonicalDecl()->getQualifiedNameAsString();
+
 			if (BaseClassCount > 1)
-				return false;
-
-			// Check class has a parent
-			if (BaseClassCount == 0)
-				return false;
-
-			// Check class is a child of Ry::Object
-			if (BaseClassCount == 1)
 			{
-				std::string BaseName = Record->bases_begin()->getType().getCanonicalType().getAsString();
-				if (BaseName != "class Ry::Object")
+				// There can only be one parent
+				return false;
+			}
+			if (BaseClassCount == 0)
+			{
+				// Eventual parent must always be object class
+				if (ClassName == "class Ry::Object")
+					return true;
+				else
+					return false;
+			} else
+			{
+				const CXXRecordDecl* ParentDecl = Record->bases_begin()->getType()->getAsCXXRecordDecl();
+				if (!ParentDecl)
+					return false;
+				
+				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::Object
+				if (IsDeclReflected(Record) && IsValidReflectionClass(ParentDecl))
+					return true;
+				else
 					return false;
 			}
-
-			return true;
 		}
 
 		void CheckClassWithLog(FullSourceLoc Loc, const CXXRecordDecl* Record)
-		{			
+		{
 			// Check class doesn't use multiple inheritance
 			int BaseClassCount = Record->getNumBases();
+			std::string ClassName = Record->getTypeForDecl()->getCanonicalTypeInternal().getAsString();
+
 			if (BaseClassCount > 1)
 			{
+				// There can only be one parent
 				ErrorMsg = "Multiple inheritance for reflected objects not allowed";
 			}
-
-			// Check class has a parent
 			if (BaseClassCount == 0)
 			{
-				ErrorMsg = "Reflected object must inherit from Ry::Object";
-			}
-
-			// Check class is a child of Ry::Object
-			if(BaseClassCount == 1)
-			{
-				std::string BaseName = Record->bases_begin()->getType().getCanonicalType().getAsString();
-				if (BaseName != "class Ry::Object")
-				{
+				// Eventual parent must always be object class
+				if (ClassName != "class Ry::Object")
 					ErrorMsg = "Reflected object must inherit from Ry::Object";
-				}
+			}
+			else
+			{
+				const CXXRecordDecl* ParentDecl = Record->bases_begin()->getType().getCanonicalType()->getAsCXXRecordDecl();
+				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::Object
+				if (!IsDeclReflected(Record))
+					ErrorMsg = "Reflected object's parent must be reflected";
+				else if(!ParentDecl)
+					ErrorMsg = "Reflected object must inherit from Ry::Object";
+				else
+					CheckClassWithLog(Loc, ParentDecl);
 			}
 
 			if(!ErrorMsg.empty())
 			{
 				LogErr(Loc, ErrorMsg);
 			}
-			
 		}
 
 		bool IsDeclReflected(const Decl* Declaration)
@@ -127,6 +141,11 @@ namespace Ry
 			return false;
 		}
 
+		bool IsRyString(QualType Type)
+		{
+			return Type.getCanonicalType().getAsString().find(CanonRyString) == 0;
+		}
+
 		bool IsArrayList(QualType Type)
 		{
 			return Type.getCanonicalType().getAsString().find(CanonArrayList) == 0;
@@ -147,6 +166,8 @@ namespace Ry
 		bool IsValidReflectionType(const clang::ASTContext* Context, const FieldDecl* InField = nullptr)
 		{
 			QualType Type = InField->getType();
+			QualType CanonType = InField->getType().getCanonicalType();
+
 			if (Type->isIntegerType())
 				return true;
 
@@ -155,8 +176,11 @@ namespace Ry
 
 			if(Type->isStructureOrClassType())
 			{
-				// todo: support reflected strings
-				if(IsArrayList(Type))
+				if(IsRyString(CanonType))
+				{
+					return true;
+				}
+				else if(IsArrayList(Type))
 				{
 
 					// Create an AST visitor for the template parameters
@@ -205,8 +229,13 @@ namespace Ry
 
 		void GenerateReflectedRecord(const ReflectedRecord& Record)
 		{
-
 			std::string QualifiedName = Record.Decl->getQualifiedNameAsString();
+
+			// Assume NumBases == 1
+			bool bHasParent = Record.Decl->getNumBases() == 1;
+			std::string ParentType;
+			if(bHasParent)
+				ParentType = Record.Decl->bases_begin()->getType().getAsString();
 
 			// Create generated body that should be manually placed inside of the reflected class
 			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
@@ -236,6 +265,12 @@ namespace Ry
 				// Register create instance function
 				GeneratedSource << "\tC.CreateInstanceFunction = &" << QualifiedName << "::CreateInstance;\\" << std::endl;
 
+				// Parent class
+				if(bHasParent)
+					GeneratedSource << "\tC.ParentClass = " << ParentType << "::GetStaticClass();\\" << std::endl;
+				else
+					GeneratedSource << "\tC.ParentClass = nullptr;\\" << std::endl;
+
 				// Resize fields member
 				GeneratedSource << "\tC.Fields.SetSize(" << Record.Fields.size() << ");\\" << std::endl;
 
@@ -251,7 +286,10 @@ namespace Ry
 					GeneratedSource << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";\\" << std::endl;
 					GeneratedSource << "\t" << FieldsVar << ".Offset = offsetof(" << QualifiedName << ", " << Decl->getNameAsString() << ");\\" << std::endl;
 					
-					if(Decl->getType()->isIntegerType() || Decl->getType()->isFloatingType() || IsArrayList(Decl->getType()))
+					if(Decl->getType()->isIntegerType() 
+						|| Decl->getType()->isFloatingType() 
+						|| IsArrayList(Decl->getType()) 
+						|| IsRyString(Decl->getType()))
 					{
 						GeneratedSource << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();\\" << std::endl;
 						GeneratedSource << "\t" << FieldsVar << ".ObjectClass = nullptr;\\" << std::endl;
@@ -527,13 +565,12 @@ namespace Ry
 
 		std::vector<std::string> Sources = { SourcePath };
 
-		// for (std::string Arg : Args)
-		// 	std::cout << Arg << std::endl;
-		// std::cout << std::endl;
+		for (std::string Arg : Args)
+		 std::cout << Arg << std::endl;
+		std::cout << std::endl;
 
 		clang::tooling::CommonOptionsParser* Parser = new CommonOptionsParser(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
 		clang::tooling::ClangTool* Tool = new ClangTool(Parser->getCompilations(), Sources);
-		Tool->setRestoreWorkingDir(false);
 		//Tool.appendArgumentsAdjuster(Parser.getArgumentsAdjuster());
 		
 		std::unique_ptr<FrontendActionFactory> Fac = newFrontendActionFactory(&Finder);

@@ -1,13 +1,33 @@
 #pragma once
+
 #include "Layer.h"
 #include "2D/Batch/Batch.h"
 #include "Widget/UserInterface.h"
 #include "Widget/GridLayout.h"
 #include "ContentBrowser/ContentBrowser.h"
+#include "EditorUI.gen.h"
 
 namespace Ry
 {
+	class TestRefl : public Ry::Widget
+	{
+	public:
+		GeneratedBody()
 
+		RefField()
+		Ry::String TestString;
+		
+		RefField()
+		Ry::ArrayList<int32> TestField{};
+
+		RefField()
+		float TestField2{ 20.2f };
+
+		RefField()
+		int64 TestField3 {};
+
+	} RefClass();
+	
 	class EditorUI : public Layer
 	{
 	public:

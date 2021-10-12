@@ -21,7 +21,7 @@ namespace Ry
 		WidgetManager();
 		~WidgetManager();
 
-		SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef& Path);
+		SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path);
 
 	private:
 
@@ -46,5 +46,10 @@ namespace Ry
 
 		Ry::OAHashMap<Ry::String, SharedPtr<CachedWidget>> CachedWidgets;
 	};
-	
+
+	extern WidgetManager Manager;
+
+	UI_MODULE SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path);
+	UI_MODULE SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path);
+
 }

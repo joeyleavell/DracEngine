@@ -33,6 +33,7 @@ namespace Ry
 		AssetRef();
 		AssetRef(const char* Data);
 		AssetRef(const Ry::String& Path);
+		AssetRef(Ry::String&& Path);
 		AssetRef(const AssetRef& Other);
 
 		AssetRef& operator=(const AssetRef& Other);

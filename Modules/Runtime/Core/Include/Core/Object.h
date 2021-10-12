@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Core.h"
 #include "Object.gen.h"
 
 #ifndef GeneratedBody
@@ -17,6 +18,17 @@ namespace Ry
 	public:
 		virtual ~Object();
 		virtual const ReflectedClass* GetClass();
+
+		static const Ry::ReflectedClass* GetStaticClass()
+		{
+			static Ry::ReflectedClass C;
+			C.Name = "Object";
+			C.Size = sizeof(Ry::Object);
+			C.CreateInstanceFunction = nullptr; // Should never create objects directly
+			C.ParentClass = nullptr;
+			C.Fields.SetSize(0);
+			return &C;
+		}
 
 		template<typename T>
 		T& GetPropertyRef(Ry::String Name)

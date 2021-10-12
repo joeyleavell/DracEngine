@@ -19,7 +19,12 @@ namespace Ry
 	{
 		this->Path = Path;
 	}
-	
+
+	AssetRef::AssetRef(Ry::String&& Path)
+	{
+		this->Path = Path;
+	}
+
 	AssetRef::AssetRef(const AssetRef& Other)
 	{
 		this->Path = Other.Path;

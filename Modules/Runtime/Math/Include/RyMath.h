@@ -14,7 +14,7 @@
 namespace Ry
 {
 	
-	class TestReflection : public Object
+	/*class TestReflection : public Object
 	{
 	public:
 
@@ -28,7 +28,7 @@ namespace Ry
 
 		RefFunction()
 		void TestFunction();
-	}RefClass();
+	}RefClass();*/
 
 	bool IsNearlyEqual(float A, float B, float Threshold = 0.0001f);
 }

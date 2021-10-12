@@ -41,6 +41,8 @@ namespace Ry
 		Float,
 		Double,
 
+		String,
+
 		ArrayList,
 		Object
 	};
@@ -104,6 +106,15 @@ namespace Ry
 		// Only applicable for ArrayLists at the moment
 		Ry::ArrayList<DataType> TemplateType;
 
+		template<typename T, typename Object>
+		T* GetPtrToField(Object* Obj) const
+		{
+			uint8* AsByte     = reinterpret_cast<uint8*>(Obj);
+			uint8* ByteOffset = AsByte + Offset;
+
+			return reinterpret_cast<T*>(ByteOffset);
+		}
+
 		Field()
 		{
 			Name = "";
@@ -127,12 +138,16 @@ namespace Ry
 
 	};
 
-	class ReflectedClass
+	class CORE_MODULE ReflectedClass
 	{
 	public:
 
+		const ReflectedClass* ParentClass;
+
 		Ry::String Name;
 		uint64_t Size;
+
+		const Ry::Field* FindFieldByName(const Ry::String& Name) const;
 
 		Ry::ArrayList<Ry::Field> Fields;
 		Ry::ArrayList<Ry::Function> Functions;
@@ -163,7 +178,7 @@ namespace Ry
 
 	CORE_MODULE extern ReflectionDatabase RefDB;
 
-	class ReflectionInitializer
+	class CORE_MODULE ReflectionInitializer
 	{
 	public:
 		ReflectionInitializer(Ry::String ClassName, const Ry::ReflectedClass* Class)
@@ -229,3 +244,4 @@ REFLECT_PRIMITIVE(int32, Ry::TypeClass::Int32)
 REFLECT_PRIMITIVE(int64, Ry::TypeClass::Int64)
 REFLECT_PRIMITIVE(float, Ry::TypeClass::Float)
 REFLECT_PRIMITIVE(double, Ry::TypeClass::Double)
+REFLECT_PRIMITIVE(Ry::String, Ry::TypeClass::String)

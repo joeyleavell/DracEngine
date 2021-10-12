@@ -15,6 +15,8 @@ using namespace rapidxml;
 
 namespace Ry
 {
+	WidgetManager Manager;
+
 	WidgetManager::WidgetManager()
 	{
 		
@@ -25,7 +27,7 @@ namespace Ry
 		
 	}
 
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidget(Ry::AssetRef& Path)
+	SharedPtr<Ry::Widget> WidgetManager::LoadWidget(const Ry::AssetRef& Path)
 	{
 		Ry::String AsVirtual = Path.GetVirtual();
 		if (CachedWidgets.Contains(AsVirtual))
@@ -44,7 +46,7 @@ namespace Ry
 			{
 				AltDoc.parse<0>(*NewCache->XmlContents);
 			}
-			catch(parse_error E)
+			catch(const parse_error& E)
 			{
 				// Failed to parse, don't cache
 				Ry::Log->LogErrorf("Failed to load widget from XML file due to parse error: %s", E.what());
@@ -69,53 +71,45 @@ namespace Ry
 
 	SharedPtr<Ry::Widget> WidgetManager::LoadWidget_Internal(rapidxml::xml_node<>* Node)
 	{
-		Widget* Result = nullptr;
-
-		// TODO: load stuff
-
-		return MakeShared(Result);
+		Ry::SharedPtr<Widget> Result = LoadWidgetSingle(Node);
+		return Result;
 	}
 
 	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetSingle(rapidxml::xml_node<>* Node)
 	{
 		Ry::String Name = Node->name();
+
 		Ry::SharedPtr<Widget> Result;
-
-		if (Name == "VerticalBox")
-			Result = LoadWidgetVerticalBox(Node);
-		if (Name == "HorizontalBox")
-			Result = LoadWidgetHorizontalBox(Node);
-		if (Name == "ScrollBox")
-			Result = LoadWidgetScrollBox(Node);
-		if (Name == "GridBox")
-			Result = LoadWidgetGridBox(Node);
-		if (Name == "Slot")
-			Result = LoadWidgetSlot(Node);
-		if (Name == "Border")
-			Result = LoadWidgetBorder(Node);
-		if (Name == "Button")
-			Result = LoadWidgetButton(Node);
-		if (Name == "Label")
-			Result = LoadWidgetButton(Node);
-		if (Name == "TextField")
-			Result = LoadWidgetTextField(Node);
-
-		// Id attribute
-		if(xml_attribute<>* IdAttrib = Node->first_attribute("Id"))
+		if(const Ry::ReflectedClass* WidgetClass = GetReflectedClass(Name))
 		{
-			Result->SetId(IdAttrib->value());
-		}
+			// Create new widget
+			Result = MakeShared(WidgetClass->CreateInstance<Ry::Widget>());
 
-		// Class attribute
-		if (xml_attribute<>* ClassAttrib = Node->first_attribute("Class"))
-		{
-			Result->SetClass(ClassAttrib->value());
-		}
+			if(Result.IsValid())
+			{
+				xml_attribute<>* Attrib = Node->first_attribute();
+				while (Attrib)
+				{
+					Ry::String AttribName = Attrib->name();
 
-		// Style attribute
-		if (xml_attribute<>* StyleAttrib = Node->first_attribute("Style"))
-		{
-			Result->SetStyleName(StyleAttrib->value());
+					if (const Ry::Field* Field = WidgetClass->FindFieldByName(AttribName))
+					{
+						// Assign string property
+						if(Field->Type->Name == "Ry::String")
+							(*Field->GetPtrToField<Ry::String>(Result.Get())) = Attrib->value();
+					}
+					else
+					{
+						Ry::Log->LogErrorf("Failed to find field with name %s in widget of class %s", *AttribName, *Name);
+					}
+
+					Attrib = Attrib->next_attribute();
+				}
+			}
+			else
+			{
+				Ry::Log->LogErrorf("Failed to create widget of class %s", *Name);
+			}
 		}
 
 		return Result;
@@ -182,6 +176,16 @@ namespace Ry
 		Ry::SharedPtr<Ry::TextField> Res = NewWidget(Ry::TextField);
 
 		return Res;
+	}
+
+	SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path)
+	{
+		return Manager.LoadWidget(Path);
+	}
+
+	SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path)
+	{
+		return Manager.LoadWidget(Path);
 	}
 	
 }

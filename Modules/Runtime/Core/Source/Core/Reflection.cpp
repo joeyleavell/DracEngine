@@ -7,6 +7,17 @@ namespace Ry
 	
 	ReflectionDatabase RefDB;
 
+	const Ry::Field* ReflectedClass::FindFieldByName(const Ry::String& Name) const
+	{
+		for(const Field& Field : Fields)
+		{
+			if (Field.Name == Name)
+				return &Field;
+		}
+		
+		return nullptr;
+	}
+
 	void ReflectionDatabase::RegisterClass(const Ry::String& Name, const Ry::ReflectedClass* Class)
 	{
 		ReflectedClasses.Insert(Name, Class);

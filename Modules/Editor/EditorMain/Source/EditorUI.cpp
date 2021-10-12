@@ -9,6 +9,7 @@
 #include "Widget/Label.h"
 #include "Interface/RenderCommand.h"
 #include "ContentBrowser/ContentBrowserWidget.h"
+#include "WidgetManager.h"
 
 namespace Ry
 {
@@ -26,10 +27,12 @@ namespace Ry
 			}
 			++Itr;
 		}
+
+		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget("/Engine/UI/TestUI.ui");
 		
-		TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
+		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
 //		std::cout << "Value " << NewRefl->Other << std::endl;
-		TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
+		//TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
 		//std::cout << "Value " << Refl.TestField << std::endl;
 		
 		// Initialize primary command buffer
