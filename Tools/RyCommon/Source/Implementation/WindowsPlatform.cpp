@@ -3,6 +3,11 @@
 #ifdef RYBUILD_WINDOWS
 #include <windows.h>
 
+std::string GetPlatformExecutableExt()
+{
+	return ".exe";
+}
+
 std::string GetModulePath()
 {
 	if (ModulePathCache.empty())

@@ -2,6 +2,11 @@
 
 #if defined(RYBUILD_LINUX)
 
+std::string GetPlatformExecutableExt()
+{
+	return "";
+}
+
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
