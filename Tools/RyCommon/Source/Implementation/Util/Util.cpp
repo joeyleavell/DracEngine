@@ -3,7 +3,6 @@
 #include <iostream>
 #include <cstdarg>
 #include <string>
-#include "Windows.h"
 
 void IncorrectUsage(std::string Usage)
 {
