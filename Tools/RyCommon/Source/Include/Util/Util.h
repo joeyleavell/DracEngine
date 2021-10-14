@@ -14,8 +14,6 @@ Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other);
 
 void FormatString(char* OutBuffer, int OutBufferSize, const char* Format, ...);
 
-bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize = 0, char* StdOut = nullptr, int ErrorBuffSize = 0, char* StdErr = nullptr);
-
 std::string GetModulePath();
 std::string GetEngineRootDir();
 std::string GetEngineModulesDir();
