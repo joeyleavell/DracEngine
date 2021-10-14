@@ -277,13 +277,7 @@ std::string GetEngineResourcesDir()
 std::string GetRyBuildPath()
 {
 	std::string RyBuildRoot = Filesystem::path(GetModulePath()).parent_path().string();
-	std::string BuildDir;
-
-#ifdef RYBUILD_WINDOWS
-	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild.exe").string();
-#elif defined(RYBUILD_LINUX)
-	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild").string();
-#endif
+	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / ("RyBuild" + GetPlatformExecutableExt())).string();
 
 	return RyBuildModule;
 }
@@ -291,13 +285,7 @@ std::string GetRyBuildPath()
 std::string GetRyReflectPath()
 {
 	std::string RyReflectRoot = Filesystem::path(GetModulePath()).parent_path().string();
-	std::string BuildDir;
-
-#ifdef RYBUILD_WINDOWS
-	std::string RyReflectModule = (Filesystem::path(RyReflectRoot) / "RyReflect.exe").string();
-#elif defined(RYBUILD_LINUX)
-	std::string RyReflectModule = (Filesystem::path(RyReflectRoot) / "RyReflect").string();
-#endif
+	std::string RyReflectModule = (Filesystem::path(RyReflectRoot) / ("RyReflect" + GetPlatformExecutableExt())).string();
 
 	return RyReflectModule;
 }
