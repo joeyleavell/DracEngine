@@ -12,7 +12,7 @@ git checkout tags/v3.11.0a1
 # Universal2 specifies x86_64 and arm64
 # Use the GCC version 11 C++ compiler
 # Install the files in the same directory
-./configure --enable-universalsdk -with-universal-archs=universal2 --with-cxx-main=g++-11 --enable-optimizations --prefix=$1
+./configure --prefix=$1
 
 # Build python using 8 jobs
 make -j 8

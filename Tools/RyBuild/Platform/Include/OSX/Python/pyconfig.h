@@ -215,6 +215,18 @@
 /* Define if you have the 'wchgat' function. */
 #define HAVE_CURSES_WCHGAT 1
 
+/* Define to 1 if you have the declaration of `isfinite', and to 0 if you
+   don't. */
+#define HAVE_DECL_ISFINITE 1
+
+/* Define to 1 if you have the declaration of `isinf', and to 0 if you don't.
+   */
+#define HAVE_DECL_ISINF 1
+
+/* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
+   */
+#define HAVE_DECL_ISNAN 1
+
 /* Define to 1 if you have the declaration of `RTLD_DEEPBIND', and to 0 if you
    don't. */
 #define HAVE_DECL_RTLD_DEEPBIND 0
@@ -1428,7 +1440,7 @@
 /* #undef Py_ENABLE_SHARED */
 
 /* Define hash algorithm for str, bytes and memoryview. SipHash24: 1, FNV: 2,
-   SipHash13: 3, externally defined: 0 */
+   externally defined: 0 */
 /* #undef Py_HASH_ALGORITHM */
 
 /* Define if you want to enable tracing references for debugging purpose */

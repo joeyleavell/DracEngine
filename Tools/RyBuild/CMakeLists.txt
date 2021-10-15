@@ -31,10 +31,13 @@ endif()
 # Platform includes
 if(WIN32)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows/Python)
 elseif(UNIX AND NOT APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Linux)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Linux/Python)
 elseif(APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX)
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX/Python)
 endif()
 
 add_executable(RyBuild ${SOURCES})
