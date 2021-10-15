@@ -1,6 +1,6 @@
 #include "Common.h"
 
-#if defined(RYBUILD_LINUX)
+#if defined(RYBUILD_LINUX) || defined(RYBUILD_OSX)
 
 std::string GetPlatformExecutableExt()
 {
