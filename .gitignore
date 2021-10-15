@@ -1,6 +1,7 @@
 # VS files
 *.sln
 .vs/
+.vscode/
 *.suo
 *.opensdf
 *.vcxproj

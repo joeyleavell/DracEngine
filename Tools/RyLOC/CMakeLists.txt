@@ -6,6 +6,9 @@ set (SOURCES
 
 add_executable(RyLOC ${SOURCES})
 
+set_property(TARGET RyCommon PROPERTY CXX_STANDARD 17)
+target_link_libraries(RyLOC PRIVATE -lstdc++fs)
+
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyLOC PRIVATE -lstdc++fs)
 endif()

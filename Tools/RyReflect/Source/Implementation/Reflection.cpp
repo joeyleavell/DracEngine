@@ -5,9 +5,10 @@
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 
-#include <iostream>
 #include "Reflection.h"
+#include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace clang;
 using namespace clang::tooling;
@@ -38,6 +39,11 @@ namespace Ry
 	class ReflectionCodeGenerator : public MatchFinder::MatchCallback
 	{
 	public:
+
+		ReflectionCodeGenerator()
+		{
+			
+		}
 
 		void LogErr(FullSourceLoc Location, std::string Err)
 		{
@@ -359,7 +365,7 @@ namespace Ry
 			// GeneratedSource << "}" << std::endl << std::endl;
 		}
 		
-		virtual void run(const MatchFinder::MatchResult& Result)
+		void run(const MatchFinder::MatchResult& Result) override
 		{
 			const Decl* Declaration = Result.Nodes.getNodeAs<clang::Decl>("id");
 			const TranslationUnitDecl* TUnitDecl = Declaration->getTranslationUnitDecl();
@@ -439,12 +445,12 @@ namespace Ry
 			
 		}
 
-		virtual void onStartOfTranslationUnit()
+		void onStartOfTranslationUnit() override
 		{
 			
 		}
 
-		virtual void onEndOfTranslationUnit()
+		void onEndOfTranslationUnit()
 		{
 			// Generate reflection source
 			GeneratedSource << "#include \"Core/Reflection.h\"" << std::endl;
@@ -515,9 +521,9 @@ namespace Ry
 		DeclarationMatcher FunctionMatcher
 			= cxxMethodDecl(decl().bind("id"), hasAttr(attr::Annotate), isExpansionInFileMatching(Include));
 
-		Finder.addMatcher(ClassMatcher, &CodeGenerator);
-		Finder.addMatcher(PropertyMatcher, &CodeGenerator);
-		Finder.addMatcher(FunctionMatcher, &CodeGenerator);
+		//Finder.addMatcher(ClassMatcher, &CodeGenerator);
+		//Finder.addMatcher(PropertyMatcher, &CodeGenerator);
+		//Finder.addMatcher(FunctionMatcher, &CodeGenerator);
 
 		std::vector<std::string> Args;
 
@@ -560,7 +566,7 @@ namespace Ry
 		for(uint32_t Arg = 0; Arg < Args.size(); Arg++)
 		{
 			ClangOptions[Arg] = new char[Args[Arg].size() + 1];
-			strcpy_s(ClangOptions[Arg], Args[Arg].size() + 1, Args[Arg].c_str());			
+			strcpy(ClangOptions[Arg], Args[Arg].c_str());	
 		}
 
 		std::vector<std::string> Sources = { SourcePath };
@@ -569,10 +575,12 @@ namespace Ry
 		 std::cout << Arg << std::endl;
 		std::cout << std::endl;
 
-		clang::tooling::CommonOptionsParser* Parser = new CommonOptionsParser(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
+		llvm::Expected<CommonOptionsParser> Parser = CommonOptionsParser::create(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
 		clang::tooling::ClangTool* Tool = new ClangTool(Parser->getCompilations(), Sources);
 		//Tool.appendArgumentsAdjuster(Parser.getArgumentsAdjuster());
-		
+
+		//std::unique_ptr<FrontendActionFactory> Fac2 = newFrontendActionFactory<SyntaxOnlyAction>();
+
 		std::unique_ptr<FrontendActionFactory> Fac = newFrontendActionFactory(&Finder);
 		int Result = Tool->run(Fac.get());
 

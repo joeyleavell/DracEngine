@@ -23,12 +23,7 @@ int main(int ArgC, char** ArgV)
 	std::string RyBuildRoot = Filesystem::path(GetModulePath()).parent_path().string();
 	std::string BuildDir;
 
-#ifdef RYBUILD_WINDOWS
-	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild.exe").string();
-#elif defined(RYBUILD_LINUX)
-	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / "RyBuild").string();
-#endif
-
+	std::string RyBuildModule = (Filesystem::path(RyBuildRoot) / ("RyBuild" + GetPlatformExecutableExt())).string();
 
 	std::vector<std::string> BuildArgs;
 	BuildArgs.push_back("rebuild");	
@@ -48,7 +43,7 @@ int main(int ArgC, char** ArgV)
 		// Otherwise, pick it based on the OS
 #ifdef RYBUILD_WINDOWS
 		BuildArgs.push_back("-MSVC");
-#elif defined(RYBUILD_LINUX)
+#elif defined(RYBUILD_LINUX) || defined(RYBUILD_MAC)
 		BuildArgs.push_back("-GCC");
 #endif
 	}

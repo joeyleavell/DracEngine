@@ -2,13 +2,10 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
-
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
 #include <set>
-#undef _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <filesystem>
 
-namespace Filesystem = std::experimental::filesystem;
+namespace Filesystem = std::filesystem;
 
 struct FileLOC
 {
@@ -21,7 +18,6 @@ bool FilterDirectory(Filesystem::path Dir)
 	std::set<std::string> FilterOutDirs = {"ThirdParty", "Generated", "Intermediate", "Binary", "RapidXML", "Json", "Python", "mingw-std-threads", "Binary", "External"};
 	
 	std::string DirName = Dir.filename().string();
-
 	if(FilterOutDirs.find(DirName) != FilterOutDirs.end())
 	{
 		return false;

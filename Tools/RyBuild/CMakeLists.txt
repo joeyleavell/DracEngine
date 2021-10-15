@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.8)
 
 set (SOURCES
 	Source/Implementation/Entry.cpp
@@ -15,8 +15,8 @@ set (SOURCES
 )
 
 # External includes
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include/Python)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include/Python)
 include_directories(Source/Include ../RyCommon/Source/Include)
 
 # Todo: Determine best way to switch architectures, probably using a flag
@@ -27,7 +27,7 @@ elseif(MinGW)
 elseif(UNIX AND NOT APPLE)
 	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/x64/Linux/GCC")
 elseif(APPLE)
-	# Todo: Apple libs
+	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/ARM64/OSX/GCC")
 endif()
 
 # Platform includes
@@ -36,7 +36,8 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Linux)
 elseif(APPLE)
-	# Todo: apple includes
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX)
+	message(STATUS "test")
 endif()
 
 add_executable(RyBuild ${SOURCES})
@@ -58,17 +59,18 @@ if(MinGW)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator)
 endif()
 
-# Windows specific links
+# Operating system specific links
 if(MinGW OR WIN32)
 	target_link_libraries(RyBuild PRIVATE rpcrt4)
 	target_link_libraries(RyBuild PRIVATE python310)
-endif()
-
-# Linux specific libraries
-if(UNIX AND NOT APPLE)
+elseif(UNIX AND NOT APPLE)
+	# Linux specific libraries
 	target_link_libraries(RyBuild PRIVATE python3.10)
 	target_link_libraries(RyBuild PRIVATE dl)
 	target_link_libraries(RyBuild PRIVATE util)
+elseif(APPLE)
+	# Apple specific libraries
+	target_link_libraries(RyBuild PRIVATE python3.11)
 endif()
 
 # GCC specific libraries

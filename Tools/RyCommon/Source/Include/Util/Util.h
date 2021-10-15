@@ -14,7 +14,6 @@ Filesystem::path PathRelativeTo(Filesystem::path Base, Filesystem::path Other);
 
 void FormatString(char* OutBuffer, int OutBufferSize, const char* Format, ...);
 
-std::string GetModulePath();
 std::string GetEngineRootDir();
 std::string GetEngineModulesDir();
 std::string GetEngineRuntimeModulesDir();
