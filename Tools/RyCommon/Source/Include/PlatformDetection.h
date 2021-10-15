@@ -3,7 +3,9 @@
 
 // Detect host architecture
 // Note: atm these are only for gcc/msvc
-#if defined(_M_AMD64) || defined(__amd64__) // amd64/x86_64
+#if defined(__aarch64__) // arm64
+    #define RYBUILD_Arch_Arm64
+#elif defined(_M_AMD64) || defined(__amd64__) // amd64/x86_64
     #define RYBUILD_Arch_x86_64
 #elif defined(_M_IX86) ||defined(__i686__) // i686/x86
     #define RYBUILD_Arch_x86

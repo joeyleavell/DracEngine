@@ -1180,31 +1180,33 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 	Settings.Config = BuildConfiguration::Development;
 	Settings.Type = BuildType::Modular;
 
-	// First, determine default build settings depending on the platform
+// Detect host architecture
+#if defined(RYBUILD_Arch_Amd64)
+	Settings.HostPlatform.Arch = TargetArchitecture::x86_64;
+#elif defined(RYBUILD_Arch_x86)
+	Settings.HostPlatform.Arch = TargetArchitecture::x86;
+#elif defined(RYBUILD_Arch_Arm)
+	Settings.HostPlatform.Arch = TargetArchitecture::Arm;
+#elif defined(RYBUILD_Arch_Arm64)
+	Settings.HostPlatform.Arch = TargetArchitecture::Arm64;
+#endif
+
+// Detect host OS
 #if defined(RYBUILD_WINDOWS)
 	Settings.HostPlatform.OS = TargetOS::Windows;
-	Settings.Toolset = BuildToolset::MSVC;
-	
-	#if _WIN64
-		Settings.HostPlatform.Arch = TargetArchitecture::x86_64;
-	#elif defined(_WIN32)
-		Settings.HostPlatform.Arch = TargetArchitecture::x86;
-	#elif defined(_M_ARM)
-		Settings.HostPlatform.Arch = TargetArchitecture::Arm;
-	#endif
-
 #elif defined(RYBUILD_LINUX)
 	Settings.HostPlatform.OS = TargetOS::Linux;
-	Settings.Toolset = BuildToolset::GCC;
+#elif defined(RYBUILD_OSX)
+	Settings.HostPlatform.OS = TargetOS::Mac;	
+#endif
 
-	#ifdef __x86_64__
-		Settings.HostPlatform.Arch = TargetArchitecture::x86_64;
-	#elif defined(__i386__)
-		Settings.HostPlatform.Arch = TargetArchitecture::x86;
-	#elif defined(__arm__)
-		Settings.HostPlatform.Arch = TargetArchitecture::Arm;
-	#endif
-	
+// Detect host toolset
+#if defined(RYBUILD_Toolset_GCC)
+	Settings.Toolset = BuildToolset::GCC;
+#elif defined(RYBUILD_Toolset_MSVC)
+	Settings.Toolset = BuildToolset::MSVC;
+#elif defined(RYBUILD_Toolset_Clang)
+	Settings.Toolset = BuildToolset::Clang;
 #endif
 
 	// Initialize the target platform to the host platform by default
@@ -1226,6 +1228,10 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 		else if (TargetArch == "Arm")
 		{
 			Settings.TargetPlatform.Arch = TargetArchitecture::Arm;
+		}
+		else if (TargetArch == "Arm64")
+		{
+			Settings.TargetPlatform.Arch = TargetArchitecture::Arm64;
 		}
 		else
 		{

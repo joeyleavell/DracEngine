@@ -43,7 +43,10 @@ enum TargetArchitecture
 	x86_64,
 
 	/** Target arm instruction set */
-	Arm
+	Arm,
+
+	/** Target arm64 instruction set */
+	Arm64
 };
 
 enum TargetOS
@@ -230,10 +233,6 @@ struct BuildSettings
 	std::string CheckCompatability()
 	{
 		// The following code is spaghetti, but that's the nature of determining compatibility with cross compilation
-		if (TargetPlatform.Arch != TargetArchitecture::x86_64)
-		{
-			return "Only x86_64 targets are supported";
-		}
 
 		if(HostPlatform.OS == TargetOS::Windows)
 		{
@@ -255,10 +254,18 @@ struct BuildSettings
 				return "Linux can only cross compile to Windows";
 			}
 		}
-		else
+		else if(HostPlatform.OS == TargetOS::Mac)
 		{
-			// No other platforms are supported at the moment
-			return "Only Windows and Linux hosts are supported at the moment";
+			if (Toolset != BuildToolset::GCC)
+			{
+				return "Mac compilation is only supported with GCC";
+			}
+
+			if(TargetPlatform.OS != TargetOS::Mac)
+			{
+				return "Cross compilation on Mac is not supported";
+			}
+
 		}
 
 		return "";
