@@ -1,14 +1,9 @@
 cmake_minimum_required (VERSION 3.8)
 
 set (SOURCES
-	Source/Implementation/Reflection.cpp
+	Source/Reflection.cpp
 )
 
-# External includes
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
-include_directories(Source/Include ../RyCommon/Source/Include)
-
-# Todo: Determine best way to switch architectures, probably using a flag
 if(MSVC)
 	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/x64/Windows/MSVC")
 elseif(MinGW)
@@ -36,9 +31,8 @@ set_target_properties(RyReflect PROPERTIES
             CXX_EXTENSIONS OFF)
 
 # Link with RyCommon
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include ../RyCommon/Source/Include)
 target_link_libraries(RyReflect PUBLIC RyCommon)
-
-set_property(TARGET RyReflect PROPERTY CXX_STANDARD 17)
 
 # Have to use separate threads library for MinGW builds
 if(MinGW)
@@ -87,8 +81,8 @@ target_link_libraries(RyReflect PRIVATE LLVMBinaryFormat)
 target_link_libraries(RyReflect PRIVATE LLVMMC)
 target_link_libraries(RyReflect PRIVATE LLVMOption)
 target_link_libraries(RyReflect PRIVATE LLVMSupport)
-target_link_libraries(RyReflect PRIVATE z)
-target_link_libraries(RyReflect PRIVATE curses)
+#target_link_libraries(RyReflect PRIVATE z)
+#target_link_libraries(RyReflect PRIVATE curses)
 target_link_libraries(RyReflect PRIVATE LLVMDemangle)
 
 target_link_libraries(RyReflect PRIVATE clangHandleCXX)
@@ -103,8 +97,6 @@ target_link_libraries(RyReflect PRIVATE LLVMObject)
 target_link_libraries(RyReflect PRIVATE LLVMMCA)
 target_link_libraries(RyReflect PRIVATE LLVMSparcInfo)
 
-target_compile_options(RyReflect PUBLIC -fno-rtti)
-
 # Linux specific libraries
 if(UNIX AND NOT APPLE)
 	target_link_libraries(RyReflect PRIVATE dl)
@@ -115,6 +107,7 @@ endif()
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyReflect PRIVATE -lstdc++fs)
 	target_link_libraries(RyReflect PRIVATE -lpthread)
+	target_compile_options(RyReflect PUBLIC -fno-rtti) # Llvm suite is compiled without rtti
 endif()
 
 install(TARGETS RyReflect DESTINATION .)

@@ -133,6 +133,12 @@
     const auto *SA = cast<BuiltinAttr>(A); (void)SA;
     OS << " " << SA->getID();
   }
+  void VisitBuiltinAliasAttr(const BuiltinAliasAttr *A) {
+    const auto *SA = cast<BuiltinAliasAttr>(A); (void)SA;
+    OS << " " << A->getSpelling();
+    if (SA->getBuiltinName())
+      OS << " " << SA->getBuiltinName()->getName();
+  }
   void VisitCFGuardAttr(const CFGuardAttr *A) {
     const auto *SA = cast<CFGuardAttr>(A); (void)SA;
     switch(SA->getGuard()) {
@@ -358,6 +364,10 @@
       OS << " Full";
       break;
     }
+  }
+  void VisitM68kInterruptAttr(const M68kInterruptAttr *A) {
+    const auto *SA = cast<M68kInterruptAttr>(A); (void)SA;
+    OS << " " << SA->getNumber();
   }
   void VisitMSInheritanceAttr(const MSInheritanceAttr *A) {
     const auto *SA = cast<MSInheritanceAttr>(A); (void)SA;
@@ -775,6 +785,24 @@
     }
     if (SA->getCompletionHandlerIndex().isValid())
       OS << " " << SA->getCompletionHandlerIndex().getSourceIndex();
+  }
+  void VisitSwiftAsyncErrorAttr(const SwiftAsyncErrorAttr *A) {
+    const auto *SA = cast<SwiftAsyncErrorAttr>(A); (void)SA;
+    switch(SA->getConvention()) {
+    case SwiftAsyncErrorAttr::None:
+      OS << " None";
+      break;
+    case SwiftAsyncErrorAttr::NonNullError:
+      OS << " NonNullError";
+      break;
+    case SwiftAsyncErrorAttr::ZeroArgument:
+      OS << " ZeroArgument";
+      break;
+    case SwiftAsyncErrorAttr::NonZeroArgument:
+      OS << " NonZeroArgument";
+      break;
+    }
+    OS << " " << SA->getHandlerParamIdx();
   }
   void VisitSwiftAsyncNameAttr(const SwiftAsyncNameAttr *A) {
     const auto *SA = cast<SwiftAsyncNameAttr>(A); (void)SA;

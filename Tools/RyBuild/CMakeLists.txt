@@ -15,8 +15,6 @@ set (SOURCES
 )
 
 # External includes
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Include/Python)
 include_directories(Source/Include ../RyCommon/Source/Include)
 
 # Todo: Determine best way to switch architectures, probably using a flag
@@ -37,7 +35,6 @@ elseif(UNIX AND NOT APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Linux)
 elseif(APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX)
-	message(STATUS "test")
 endif()
 
 add_executable(RyBuild ${SOURCES})
@@ -81,7 +78,7 @@ endif()
 
 install(TARGETS RyBuild DESTINATION .)
 
-#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/PythonLib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/PythonLib)
 
 if(MSVC)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python310.dll DESTINATION ${CMAKE_INSTALL_PREFIX})

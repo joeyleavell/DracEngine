@@ -6,6 +6,13 @@
 |*                                                                            *|
 \*===----------------------------------------------------------------------===*/
 
+static inline void DelimitAttributeArgument(raw_ostream& OS, bool& IsFirst) {
+  if (IsFirst) {
+    IsFirst = false;
+    OS << "(";
+  } else
+    OS << ", ";
+}
 
 // AArch64VectorPcsAttr implementation
 
@@ -49,20 +56,25 @@ AArch64VectorPcsAttr *AArch64VectorPcsAttr::clone(ASTContext &C) const {
 }
 
 void AArch64VectorPcsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((aarch64_vector_pcs))";
+    OS << " __attribute__((aarch64_vector_pcs";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::aarch64_vector_pcs]]";
+    OS << " [[clang::aarch64_vector_pcs";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::aarch64_vector_pcs]]";
+    OS << " [[clang::aarch64_vector_pcs";
+    OS << "]]";
     break;
   }
 }
@@ -133,16 +145,32 @@ AMDGPUFlatWorkGroupSizeAttr *AMDGPUFlatWorkGroupSizeAttr::clone(ASTContext &C) c
 }
 
 void AMDGPUFlatWorkGroupSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((amdgpu_flat_work_group_size(" << getMin() << ", " << getMax() << ")))";
+    OS << " __attribute__((amdgpu_flat_work_group_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMin() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMax() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::amdgpu_flat_work_group_size(" << getMin() << ", " << getMax() << ")]]";
+    OS << " [[clang::amdgpu_flat_work_group_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMin() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMax() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -207,16 +235,28 @@ AMDGPUNumSGPRAttr *AMDGPUNumSGPRAttr::clone(ASTContext &C) const {
 }
 
 void AMDGPUNumSGPRAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((amdgpu_num_sgpr(" << getNumSGPR() << ")))";
+    OS << " __attribute__((amdgpu_num_sgpr";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumSGPR() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::amdgpu_num_sgpr(" << getNumSGPR() << ")]]";
+    OS << " [[clang::amdgpu_num_sgpr";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumSGPR() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -281,16 +321,28 @@ AMDGPUNumVGPRAttr *AMDGPUNumVGPRAttr::clone(ASTContext &C) const {
 }
 
 void AMDGPUNumVGPRAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((amdgpu_num_vgpr(" << getNumVGPR() << ")))";
+    OS << " __attribute__((amdgpu_num_vgpr";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumVGPR() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::amdgpu_num_vgpr(" << getNumVGPR() << ")]]";
+    OS << " [[clang::amdgpu_num_vgpr";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumVGPR() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -368,16 +420,32 @@ AMDGPUWavesPerEUAttr *AMDGPUWavesPerEUAttr::clone(ASTContext &C) const {
 }
 
 void AMDGPUWavesPerEUAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((amdgpu_waves_per_eu(" << getMin() << ", " << getMax() << ")))";
+    OS << " __attribute__((amdgpu_waves_per_eu";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMin() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMax() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::amdgpu_waves_per_eu(" << getMin() << ", " << getMax() << ")]]";
+    OS << " [[clang::amdgpu_waves_per_eu";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMin() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMax() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -476,20 +544,37 @@ ARMInterruptAttr *ARMInterruptAttr::clone(ASTContext &C) const {
 }
 
 void ARMInterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt(\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")))";
+    OS << " __attribute__((interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt(\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt(\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ARMInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -552,20 +637,25 @@ AVRInterruptAttr *AVRInterruptAttr::clone(ASTContext &C) const {
 }
 
 void AVRInterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt))";
+    OS << " __attribute__((interrupt";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt]]";
+    OS << " [[gnu::interrupt";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt]]";
+    OS << " [[gnu::interrupt";
+    OS << "]]";
     break;
   }
 }
@@ -628,20 +718,25 @@ AVRSignalAttr *AVRSignalAttr::clone(ASTContext &C) const {
 }
 
 void AVRSignalAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((signal))";
+    OS << " __attribute__((signal";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::signal]]";
+    OS << " [[gnu::signal";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::signal]]";
+    OS << " [[gnu::signal";
+    OS << "]]";
     break;
   }
 }
@@ -724,30 +819,36 @@ AbiTagAttr *AbiTagAttr::clone(ASTContext &C) const {
 }
 
 void AbiTagAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((abi_tag(";
-  bool isFirst = true;
+    OS << " __attribute__((abi_tag";
+    OS << "";
   for (const auto &Val : tags()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::abi_tag(";
-  bool isFirst = true;
+    OS << " [[gnu::abi_tag";
+    OS << "";
   for (const auto &Val : tags()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -829,74 +930,88 @@ AcquireCapabilityAttr *AcquireCapabilityAttr::clone(ASTContext &C) const {
 }
 
 void AcquireCapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((acquire_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((acquire_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::acquire_capability(";
-  bool isFirst = true;
+    OS << " [[clang::acquire_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((acquire_shared_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((acquire_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::acquire_shared_capability(";
-  bool isFirst = true;
+    OS << " [[clang::acquire_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " __attribute__((exclusive_lock_function(";
-  bool isFirst = true;
+    OS << " __attribute__((exclusive_lock_function";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 5 : {
-    OS << " __attribute__((shared_lock_function(";
-  bool isFirst = true;
+    OS << " __attribute__((shared_lock_function";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -971,20 +1086,37 @@ AcquireHandleAttr *AcquireHandleAttr::clone(ASTContext &C) const {
 }
 
 void AcquireHandleAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((acquire_handle(\"" << getHandleType() << "\")))";
+    OS << " __attribute__((acquire_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::acquire_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::acquire_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::acquire_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::acquire_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -1059,19 +1191,23 @@ AcquiredAfterAttr *AcquiredAfterAttr::clone(ASTContext &C) const {
 }
 
 void AcquiredAfterAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((acquired_after(";
-  bool isFirst = true;
+    OS << " __attribute__((acquired_after";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -1142,19 +1278,23 @@ AcquiredBeforeAttr *AcquiredBeforeAttr::clone(ASTContext &C) const {
 }
 
 void AcquiredBeforeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((acquired_before(";
-  bool isFirst = true;
+    OS << " __attribute__((acquired_before";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -1217,20 +1357,37 @@ AddressSpaceAttr *AddressSpaceAttr::clone(ASTContext &C) const {
 }
 
 void AddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((address_space(" << getAddressSpace() << ")))";
+    OS << " __attribute__((address_space";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAddressSpace() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::address_space(" << getAddressSpace() << ")]]";
+    OS << " [[clang::address_space";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAddressSpace() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::address_space(" << getAddressSpace() << ")]]";
+    OS << " [[clang::address_space";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAddressSpace() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -1299,20 +1456,37 @@ AliasAttr *AliasAttr::clone(ASTContext &C) const {
 }
 
 void AliasAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((alias(\"" << getAliasee() << "\")))";
+    OS << " __attribute__((alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::alias(\"" << getAliasee() << "\")]]";
+    OS << " [[gnu::alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::alias(\"" << getAliasee() << "\")]]";
+    OS << " [[gnu::alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -1477,12 +1651,19 @@ AlignValueAttr *AlignValueAttr::clone(ASTContext &C) const {
 }
 
 void AlignValueAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((align_value(" << getAlignment() << ")))";
+    OS << " __attribute__((align_value";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAlignment() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -1583,127 +1764,99 @@ AlignedAttr *AlignedAttr::clone(ASTContext &C) const {
 }
 
 void AlignedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __attribute__((aligned";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "))";
     break;
   }
   case 1 : {
     OS << " [[gnu::aligned";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
   case 2 : {
     OS << " [[gnu::aligned";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
   case 3 : {
     OS << " __declspec(align";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << ")";
     break;
   }
   case 4 : {
     OS << " alignas";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "";
     break;
   }
   case 5 : {
     OS << " _Alignas";
-    unsigned TrailingOmittedArgs = 0;
     if (!isalignmentExpr || !alignmentExpr)
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!isalignmentExpr || !alignmentExpr)) {
-      OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "";
     alignmentExpr->printPretty(OS, nullptr, Policy);
     OS << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "";
     break;
   }
@@ -1777,20 +1930,37 @@ AllocAlignAttr *AllocAlignAttr::clone(ASTContext &C) const {
 }
 
 void AllocAlignAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((alloc_align(" << getParamIndex().getSourceIndex() << ")))";
+    OS << " __attribute__((alloc_align";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getParamIndex().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::alloc_align(" << getParamIndex().getSourceIndex() << ")]]";
+    OS << " [[gnu::alloc_align";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getParamIndex().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::alloc_align(" << getParamIndex().getSourceIndex() << ")]]";
+    OS << " [[gnu::alloc_align";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getParamIndex().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -1870,53 +2040,55 @@ AllocSizeAttr *AllocSizeAttr::clone(ASTContext &C) const {
 }
 
 void AllocSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __attribute__((alloc_size";
-    unsigned TrailingOmittedArgs = 0;
     if (!getNumElemsParam().isValid())
       ++TrailingOmittedArgs;
-    OS << "(" << getElemSizeParam().getSourceIndex() << "";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getElemSizeParam().getSourceIndex() << "";
     if (!(!getNumElemsParam().isValid())) {
-      OS << "" << getNumElemsParam().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumElemsParam().getSourceIndex() << "";
     }
-    OS << ")))";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
     OS << " [[gnu::alloc_size";
-    unsigned TrailingOmittedArgs = 0;
     if (!getNumElemsParam().isValid())
       ++TrailingOmittedArgs;
-    OS << "(" << getElemSizeParam().getSourceIndex() << "";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getElemSizeParam().getSourceIndex() << "";
     if (!(!getNumElemsParam().isValid())) {
-      OS << "" << getNumElemsParam().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumElemsParam().getSourceIndex() << "";
     }
-    OS << ")]]";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
     OS << " [[gnu::alloc_size";
-    unsigned TrailingOmittedArgs = 0;
     if (!getNumElemsParam().isValid())
       ++TrailingOmittedArgs;
-    OS << "(" << getElemSizeParam().getSourceIndex() << "";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getElemSizeParam().getSourceIndex() << "";
     if (!(!getNumElemsParam().isValid())) {
-      OS << "" << getNumElemsParam().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumElemsParam().getSourceIndex() << "";
     }
-    OS << ")]]";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -1979,16 +2151,20 @@ AlwaysDestroyAttr *AlwaysDestroyAttr::clone(ASTContext &C) const {
 }
 
 void AlwaysDestroyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((always_destroy))";
+    OS << " __attribute__((always_destroy";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::always_destroy]]";
+    OS << " [[clang::always_destroy";
+    OS << "]]";
     break;
   }
 }
@@ -2056,24 +2232,30 @@ AlwaysInlineAttr *AlwaysInlineAttr::clone(ASTContext &C) const {
 }
 
 void AlwaysInlineAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((always_inline))";
+    OS << " __attribute__((always_inline";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::always_inline]]";
+    OS << " [[gnu::always_inline";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::always_inline]]";
+    OS << " [[gnu::always_inline";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __forceinline";
+    OS << "";
     break;
   }
 }
@@ -2138,12 +2320,15 @@ AnalyzerNoReturnAttr *AnalyzerNoReturnAttr::clone(ASTContext &C) const {
 }
 
 void AnalyzerNoReturnAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((analyzer_noreturn))";
+    OS << " __attribute__((analyzer_noreturn";
+    OS << "))";
     break;
   }
 }
@@ -2224,41 +2409,55 @@ AnnotateAttr *AnnotateAttr::clone(ASTContext &C) const {
 }
 
 void AnnotateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((annotate(\"" << getAnnotation() << "\", ";
-  bool isFirst = true;
+    OS << " __attribute__((annotate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAnnotation() << "\"";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::annotate(\"" << getAnnotation() << "\", ";
-  bool isFirst = true;
+    OS << " [[clang::annotate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAnnotation() << "\"";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::annotate(\"" << getAnnotation() << "\", ";
-  bool isFirst = true;
+    OS << " [[clang::annotate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAnnotation() << "\"";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -2321,20 +2520,25 @@ AnyX86InterruptAttr *AnyX86InterruptAttr::clone(ASTContext &C) const {
 }
 
 void AnyX86InterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt))";
+    OS << " __attribute__((interrupt";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt]]";
+    OS << " [[gnu::interrupt";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt]]";
+    OS << " [[gnu::interrupt";
+    OS << "]]";
     break;
   }
 }
@@ -2397,20 +2601,25 @@ AnyX86NoCallerSavedRegistersAttr *AnyX86NoCallerSavedRegistersAttr::clone(ASTCon
 }
 
 void AnyX86NoCallerSavedRegistersAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_caller_saved_registers))";
+    OS << " __attribute__((no_caller_saved_registers";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::no_caller_saved_registers]]";
+    OS << " [[gnu::no_caller_saved_registers";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::no_caller_saved_registers]]";
+    OS << " [[gnu::no_caller_saved_registers";
+    OS << "]]";
     break;
   }
 }
@@ -2473,20 +2682,25 @@ AnyX86NoCfCheckAttr *AnyX86NoCfCheckAttr::clone(ASTContext &C) const {
 }
 
 void AnyX86NoCfCheckAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nocf_check))";
+    OS << " __attribute__((nocf_check";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nocf_check]]";
+    OS << " [[gnu::nocf_check";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nocf_check]]";
+    OS << " [[gnu::nocf_check";
+    OS << "]]";
     break;
   }
 }
@@ -2549,20 +2763,25 @@ ArcWeakrefUnavailableAttr *ArcWeakrefUnavailableAttr::clone(ASTContext &C) const
 }
 
 void ArcWeakrefUnavailableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_arc_weak_reference_unavailable))";
+    OS << " __attribute__((objc_arc_weak_reference_unavailable";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_arc_weak_reference_unavailable]]";
+    OS << " [[clang::objc_arc_weak_reference_unavailable";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_arc_weak_reference_unavailable]]";
+    OS << " [[clang::objc_arc_weak_reference_unavailable";
+    OS << "]]";
     break;
   }
 }
@@ -2686,32 +2905,88 @@ ArgumentWithTypeTagAttr *ArgumentWithTypeTagAttr::clone(ASTContext &C) const {
 }
 
 void ArgumentWithTypeTagAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((argument_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")))";
+    OS << " __attribute__((argument_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::argument_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")]]";
+    OS << " [[clang::argument_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::argument_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")]]";
+    OS << " [[clang::argument_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((pointer_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")))";
+    OS << " __attribute__((pointer_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[clang::pointer_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")]]";
+    OS << " [[clang::pointer_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[clang::pointer_with_type_tag(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getArgumentIdx().getSourceIndex() << ", " << getTypeTagIdx().getSourceIndex() << ")]]";
+    OS << " [[clang::pointer_with_type_tag";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentIdx().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeTagIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -2784,20 +3059,37 @@ ArmBuiltinAliasAttr *ArmBuiltinAliasAttr::clone(ASTContext &C) const {
 }
 
 void ArmBuiltinAliasAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((__clang_arm_builtin_alias(" << (getBuiltinName() ? getBuiltinName()->getName() : "") << ")))";
+    OS << " __attribute__((__clang_arm_builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::__clang_arm_builtin_alias(" << (getBuiltinName() ? getBuiltinName()->getName() : "") << ")]]";
+    OS << " [[clang::__clang_arm_builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::__clang_arm_builtin_alias(" << (getBuiltinName() ? getBuiltinName()->getName() : "") << ")]]";
+    OS << " [[clang::__clang_arm_builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -2860,20 +3152,25 @@ ArmMveStrictPolymorphismAttr *ArmMveStrictPolymorphismAttr::clone(ASTContext &C)
 }
 
 void ArmMveStrictPolymorphismAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((__clang_arm_mve_strict_polymorphism))";
+    OS << " __attribute__((__clang_arm_mve_strict_polymorphism";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::__clang_arm_mve_strict_polymorphism]]";
+    OS << " [[clang::__clang_arm_mve_strict_polymorphism";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::__clang_arm_mve_strict_polymorphism]]";
+    OS << " [[clang::__clang_arm_mve_strict_polymorphism";
+    OS << "]]";
     break;
   }
 }
@@ -2936,20 +3233,25 @@ ArtificialAttr *ArtificialAttr::clone(ASTContext &C) const {
 }
 
 void ArtificialAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((artificial))";
+    OS << " __attribute__((artificial";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::artificial]]";
+    OS << " [[gnu::artificial";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::artificial]]";
+    OS << " [[gnu::artificial";
+    OS << "]]";
     break;
   }
 }
@@ -3058,16 +3360,28 @@ AsmLabelAttr *AsmLabelAttr::clone(ASTContext &C) const {
 }
 
 void AsmLabelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " asm(\"" << getLabel() << "\")";
+    OS << " asm";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getLabel() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "";
     break;
   }
   case 1 : {
-    OS << " __asm__(\"" << getLabel() << "\")";
+    OS << " __asm__";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getLabel() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "";
     break;
   }
 }
@@ -3147,52 +3461,62 @@ AssertCapabilityAttr *AssertCapabilityAttr::clone(ASTContext &C) const {
 }
 
 void AssertCapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((assert_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((assert_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::assert_capability(";
-  bool isFirst = true;
+    OS << " [[clang::assert_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((assert_shared_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((assert_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::assert_shared_capability(";
-  bool isFirst = true;
+    OS << " [[clang::assert_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -3269,19 +3593,23 @@ AssertExclusiveLockAttr *AssertExclusiveLockAttr::clone(ASTContext &C) const {
 }
 
 void AssertExclusiveLockAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((assert_exclusive_lock(";
-  bool isFirst = true;
+    OS << " __attribute__((assert_exclusive_lock";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -3352,19 +3680,23 @@ AssertSharedLockAttr *AssertSharedLockAttr::clone(ASTContext &C) const {
 }
 
 void AssertSharedLockAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((assert_shared_lock(";
-  bool isFirst = true;
+    OS << " __attribute__((assert_shared_lock";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -3440,20 +3772,43 @@ AssumeAlignedAttr *AssumeAlignedAttr::clone(ASTContext &C) const {
 }
 
 void AssumeAlignedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((assume_aligned(" << getAlignment() << ", " << getOffset() << ")))";
+    OS << " __attribute__((assume_aligned";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAlignment() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::assume_aligned(" << getAlignment() << ", " << getOffset() << ")]]";
+    OS << " [[gnu::assume_aligned";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAlignment() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::assume_aligned(" << getAlignment() << ", " << getOffset() << ")]]";
+    OS << " [[gnu::assume_aligned";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getAlignment() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -3522,20 +3877,37 @@ AssumptionAttr *AssumptionAttr::clone(ASTContext &C) const {
 }
 
 void AssumptionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((assume(\"" << getAssumption() << "\")))";
+    OS << " __attribute__((assume";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAssumption() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::assume(\"" << getAssumption() << "\")]]";
+    OS << " [[clang::assume";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAssumption() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::assume(\"" << getAssumption() << "\")]]";
+    OS << " [[clang::assume";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAssumption() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -3638,26 +4010,72 @@ AvailabilityAttr *AvailabilityAttr::clone(ASTContext &C) const {
 }
 
 void AvailabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((availability(" << getPlatform()->getName();
+    OS << " __attribute__((availability";
+    OS << "(" << getPlatform()->getName();
   if (getStrict()) OS << ", strict";
   if (!getIntroduced().empty()) OS << ", introduced=" << getIntroduced();
   if (!getDeprecated().empty()) OS << ", deprecated=" << getDeprecated();
   if (!getObsoleted().empty()) OS << ", obsoleted=" << getObsoleted();
   if (getUnavailable()) OS << ", unavailable";
-  OS << ")))";
+  OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::availability(" << (getPlatform() ? getPlatform()->getName() : "") << ", introduced=" << getIntroduced() << ", deprecated=" << getDeprecated() << ", obsoleted=" << getObsoleted() << ", " << getUnavailable() << ", \"" << getMessage() << "\", " << getStrict() << ", \"" << getReplacement() << "\", " << getPriority() << ")]]";
+    OS << " [[clang::availability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getPlatform() ? getPlatform()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "introduced=" << getIntroduced() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "deprecated=" << getDeprecated() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "obsoleted=" << getObsoleted() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getUnavailable() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getStrict() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getReplacement() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::availability(" << (getPlatform() ? getPlatform()->getName() : "") << ", introduced=" << getIntroduced() << ", deprecated=" << getDeprecated() << ", obsoleted=" << getObsoleted() << ", " << getUnavailable() << ", \"" << getMessage() << "\", " << getStrict() << ", \"" << getReplacement() << "\", " << getPriority() << ")]]";
+    OS << " [[clang::availability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getPlatform() ? getPlatform()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "introduced=" << getIntroduced() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "deprecated=" << getDeprecated() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "obsoleted=" << getObsoleted() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getUnavailable() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getStrict() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getReplacement() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -3720,20 +4138,25 @@ BPFPreserveAccessIndexAttr *BPFPreserveAccessIndexAttr::clone(ASTContext &C) con
 }
 
 void BPFPreserveAccessIndexAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((preserve_access_index))";
+    OS << " __attribute__((preserve_access_index";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::preserve_access_index]]";
+    OS << " [[clang::preserve_access_index";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::preserve_access_index]]";
+    OS << " [[clang::preserve_access_index";
+    OS << "]]";
     break;
   }
 }
@@ -3817,20 +4240,37 @@ BlocksAttr *BlocksAttr::clone(ASTContext &C) const {
 }
 
 void BlocksAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((blocks(\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\")))";
+    OS << " __attribute__((blocks";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::blocks(\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\")]]";
+    OS << " [[clang::blocks";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::blocks(\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\")]]";
+    OS << " [[clang::blocks";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << BlocksAttr::ConvertBlockTypeToStr(getType()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -3904,6 +4344,109 @@ const char *BuiltinAttr::getSpelling() const {
 }
 
 
+// BuiltinAliasAttr implementation
+
+BuiltinAliasAttr *BuiltinAliasAttr::CreateImplicit(ASTContext &Ctx, IdentifierInfo * BuiltinName, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) BuiltinAliasAttr(Ctx, CommonInfo, BuiltinName);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+BuiltinAliasAttr *BuiltinAliasAttr::Create(ASTContext &Ctx, IdentifierInfo * BuiltinName, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) BuiltinAliasAttr(Ctx, CommonInfo, BuiltinName);
+  return A;
+}
+
+BuiltinAliasAttr *BuiltinAliasAttr::CreateImplicit(ASTContext &Ctx, IdentifierInfo * BuiltinName, SourceRange Range, AttributeCommonInfo::Syntax Syntax, BuiltinAliasAttr::Spelling S) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax, S);
+  return CreateImplicit(Ctx, BuiltinName, I);
+}
+
+BuiltinAliasAttr *BuiltinAliasAttr::Create(ASTContext &Ctx, IdentifierInfo * BuiltinName, SourceRange Range, AttributeCommonInfo::Syntax Syntax, BuiltinAliasAttr::Spelling S) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax, S);
+  return Create(Ctx, BuiltinName, I);
+}
+
+BuiltinAliasAttr::BuiltinAliasAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+              , IdentifierInfo * BuiltinName
+             )
+  : Attr(Ctx, CommonInfo, attr::BuiltinAlias, false)
+              , builtinName(BuiltinName)
+  {
+}
+
+BuiltinAliasAttr::Spelling BuiltinAliasAttr::getSemanticSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+    default: llvm_unreachable("Unknown spelling list index");
+    case 0: return CXX11_clang_builtin_alias;
+    case 1: return C2x_clang_builtin_alias;
+    case 2: return GNU_clang_builtin_alias;
+  }
+}
+
+
+BuiltinAliasAttr *BuiltinAliasAttr::clone(ASTContext &C) const {
+  auto *A = new (C) BuiltinAliasAttr(C, *this, builtinName);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void BuiltinAliasAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " [[clang::builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " __attribute__((clang_builtin_alias";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBuiltinName() ? getBuiltinName()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
+    break;
+  }
+}
+}
+
+const char *BuiltinAliasAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "builtin_alias";
+  case 1:
+    return "builtin_alias";
+  case 2:
+    return "clang_builtin_alias";
+  }
+}
+
+
 // C11NoReturnAttr implementation
 
 C11NoReturnAttr *C11NoReturnAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
@@ -3946,12 +4489,15 @@ C11NoReturnAttr *C11NoReturnAttr::clone(ASTContext &C) const {
 }
 
 void C11NoReturnAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " _Noreturn";
+    OS << "";
     break;
   }
 }
@@ -4010,28 +4556,35 @@ CDeclAttr *CDeclAttr::clone(ASTContext &C) const {
 }
 
 void CDeclAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cdecl))";
+    OS << " __attribute__((cdecl";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::cdecl]]";
+    OS << " [[gnu::cdecl";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::cdecl]]";
+    OS << " [[gnu::cdecl";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __cdecl";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _cdecl";
+    OS << "";
     break;
   }
 }
@@ -4098,20 +4651,25 @@ CFAuditedTransferAttr *CFAuditedTransferAttr::clone(ASTContext &C) const {
 }
 
 void CFAuditedTransferAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cf_audited_transfer))";
+    OS << " __attribute__((cf_audited_transfer";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cf_audited_transfer]]";
+    OS << " [[clang::cf_audited_transfer";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cf_audited_transfer]]";
+    OS << " [[clang::cf_audited_transfer";
+    OS << "]]";
     break;
   }
 }
@@ -4174,20 +4732,25 @@ CFConsumedAttr *CFConsumedAttr::clone(ASTContext &C) const {
 }
 
 void CFConsumedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cf_consumed))";
+    OS << " __attribute__((cf_consumed";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cf_consumed]]";
+    OS << " [[clang::cf_consumed";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cf_consumed]]";
+    OS << " [[clang::cf_consumed";
+    OS << "]]";
     break;
   }
 }
@@ -4271,12 +4834,19 @@ CFGuardAttr *CFGuardAttr::clone(ASTContext &C) const {
 }
 
 void CFGuardAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(guard(\"" << CFGuardAttr::ConvertGuardArgToStr(getGuard()) << "\"))";
+    OS << " __declspec(guard";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << CFGuardAttr::ConvertGuardArgToStr(getGuard()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -4335,20 +4905,25 @@ CFICanonicalJumpTableAttr *CFICanonicalJumpTableAttr::clone(ASTContext &C) const
 }
 
 void CFICanonicalJumpTableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cfi_canonical_jump_table))";
+    OS << " __attribute__((cfi_canonical_jump_table";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cfi_canonical_jump_table]]";
+    OS << " [[clang::cfi_canonical_jump_table";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cfi_canonical_jump_table]]";
+    OS << " [[clang::cfi_canonical_jump_table";
+    OS << "]]";
     break;
   }
 }
@@ -4411,20 +4986,25 @@ CFReturnsNotRetainedAttr *CFReturnsNotRetainedAttr::clone(ASTContext &C) const {
 }
 
 void CFReturnsNotRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cf_returns_not_retained))";
+    OS << " __attribute__((cf_returns_not_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cf_returns_not_retained]]";
+    OS << " [[clang::cf_returns_not_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cf_returns_not_retained]]";
+    OS << " [[clang::cf_returns_not_retained";
+    OS << "]]";
     break;
   }
 }
@@ -4487,20 +5067,25 @@ CFReturnsRetainedAttr *CFReturnsRetainedAttr::clone(ASTContext &C) const {
 }
 
 void CFReturnsRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cf_returns_retained))";
+    OS << " __attribute__((cf_returns_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cf_returns_retained]]";
+    OS << " [[clang::cf_returns_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cf_returns_retained]]";
+    OS << " [[clang::cf_returns_retained";
+    OS << "]]";
     break;
   }
 }
@@ -4563,20 +5148,25 @@ CFUnknownTransferAttr *CFUnknownTransferAttr::clone(ASTContext &C) const {
 }
 
 void CFUnknownTransferAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cf_unknown_transfer))";
+    OS << " __attribute__((cf_unknown_transfer";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cf_unknown_transfer]]";
+    OS << " [[clang::cf_unknown_transfer";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cf_unknown_transfer]]";
+    OS << " [[clang::cf_unknown_transfer";
+    OS << "]]";
     break;
   }
 }
@@ -4651,52 +5241,62 @@ CPUDispatchAttr *CPUDispatchAttr::clone(ASTContext &C) const {
 }
 
 void CPUDispatchAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cpu_dispatch(";
-  bool isFirst = true;
+    OS << " __attribute__((cpu_dispatch";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cpu_dispatch(";
-  bool isFirst = true;
+    OS << " [[clang::cpu_dispatch";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cpu_dispatch(";
-  bool isFirst = true;
+    OS << " [[clang::cpu_dispatch";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(cpu_dispatch(";
-  bool isFirst = true;
+    OS << " __declspec(cpu_dispatch";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << "))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -4773,52 +5373,62 @@ CPUSpecificAttr *CPUSpecificAttr::clone(ASTContext &C) const {
 }
 
 void CPUSpecificAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cpu_specific(";
-  bool isFirst = true;
+    OS << " __attribute__((cpu_specific";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::cpu_specific(";
-  bool isFirst = true;
+    OS << " [[clang::cpu_specific";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::cpu_specific(";
-  bool isFirst = true;
+    OS << " [[clang::cpu_specific";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(cpu_specific(";
-  bool isFirst = true;
+    OS << " __declspec(cpu_specific";
+    OS << "";
   for (const auto &Val : cpus()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << "))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -4883,16 +5493,20 @@ CUDAConstantAttr *CUDAConstantAttr::clone(ASTContext &C) const {
 }
 
 void CUDAConstantAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((constant))";
+    OS << " __attribute__((constant";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__constant__)";
+    OS << " __declspec(__constant__";
+    OS << ")";
     break;
   }
 }
@@ -4953,16 +5567,20 @@ CUDADeviceAttr *CUDADeviceAttr::clone(ASTContext &C) const {
 }
 
 void CUDADeviceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((device))";
+    OS << " __attribute__((device";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__device__)";
+    OS << " __declspec(__device__";
+    OS << ")";
     break;
   }
 }
@@ -5023,16 +5641,20 @@ CUDADeviceBuiltinSurfaceTypeAttr *CUDADeviceBuiltinSurfaceTypeAttr::clone(ASTCon
 }
 
 void CUDADeviceBuiltinSurfaceTypeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((device_builtin_surface_type))";
+    OS << " __attribute__((device_builtin_surface_type";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__device_builtin_surface_type__)";
+    OS << " __declspec(__device_builtin_surface_type__";
+    OS << ")";
     break;
   }
 }
@@ -5093,16 +5715,20 @@ CUDADeviceBuiltinTextureTypeAttr *CUDADeviceBuiltinTextureTypeAttr::clone(ASTCon
 }
 
 void CUDADeviceBuiltinTextureTypeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((device_builtin_texture_type))";
+    OS << " __attribute__((device_builtin_texture_type";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__device_builtin_texture_type__)";
+    OS << " __declspec(__device_builtin_texture_type__";
+    OS << ")";
     break;
   }
 }
@@ -5163,16 +5789,20 @@ CUDAGlobalAttr *CUDAGlobalAttr::clone(ASTContext &C) const {
 }
 
 void CUDAGlobalAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((global))";
+    OS << " __attribute__((global";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__global__)";
+    OS << " __declspec(__global__";
+    OS << ")";
     break;
   }
 }
@@ -5233,16 +5863,20 @@ CUDAHostAttr *CUDAHostAttr::clone(ASTContext &C) const {
 }
 
 void CUDAHostAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((host))";
+    OS << " __attribute__((host";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__host__)";
+    OS << " __declspec(__host__";
+    OS << ")";
     break;
   }
 }
@@ -5369,16 +6003,32 @@ CUDALaunchBoundsAttr *CUDALaunchBoundsAttr::clone(ASTContext &C) const {
 }
 
 void CUDALaunchBoundsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((launch_bounds(" << getMaxThreads() << ", " << getMinBlocks() << ")))";
+    OS << " __attribute__((launch_bounds";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMaxThreads() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMinBlocks() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__launch_bounds__(" << getMaxThreads() << ", " << getMinBlocks() << "))";
+    OS << " __declspec(__launch_bounds__";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMaxThreads() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMinBlocks() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -5439,16 +6089,20 @@ CUDASharedAttr *CUDASharedAttr::clone(ASTContext &C) const {
 }
 
 void CUDASharedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((shared))";
+    OS << " __attribute__((shared";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__shared__)";
+    OS << " __declspec(__shared__";
+    OS << ")";
     break;
   }
 }
@@ -5509,12 +6163,15 @@ CXX11NoReturnAttr *CXX11NoReturnAttr::clone(ASTContext &C) const {
 }
 
 void CXX11NoReturnAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[noreturn]]";
+    OS << " [[noreturn";
+    OS << "]]";
     break;
   }
 }
@@ -5606,30 +6263,36 @@ CallableWhenAttr *CallableWhenAttr::clone(ASTContext &C) const {
 }
 
 void CallableWhenAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((callable_when(";
-  bool isFirst = true;
+    OS << " __attribute__((callable_when";
+    OS << "";
   for (const auto &Val : callableStates()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << CallableWhenAttr::ConvertConsumedStateToStr(Val)<< "\"";
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::callable_when(";
-  bool isFirst = true;
+    OS << " [[clang::callable_when";
+    OS << "";
   for (const auto &Val : callableStates()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << CallableWhenAttr::ConvertConsumedStateToStr(Val)<< "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -5702,41 +6365,49 @@ CallbackAttr *CallbackAttr::clone(ASTContext &C) const {
 }
 
 void CallbackAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((callback(";
-  bool isFirst = true;
+    OS << " __attribute__((callback";
+    OS << "";
   for (const auto &Val : encoding()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::callback(";
-  bool isFirst = true;
+    OS << " [[clang::callback";
+    OS << "";
   for (const auto &Val : encoding()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::callback(";
-  bool isFirst = true;
+    OS << " [[clang::callback";
+    OS << "";
   for (const auto &Val : encoding()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -5799,20 +6470,25 @@ CalledOnceAttr *CalledOnceAttr::clone(ASTContext &C) const {
 }
 
 void CalledOnceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((called_once))";
+    OS << " __attribute__((called_once";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::called_once]]";
+    OS << " [[clang::called_once";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::called_once]]";
+    OS << " [[clang::called_once";
+    OS << "]]";
     break;
   }
 }
@@ -5888,24 +6564,46 @@ CapabilityAttr *CapabilityAttr::clone(ASTContext &C) const {
 }
 
 void CapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((capability(\"" << getName() << "\")))";
+    OS << " __attribute__((capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::capability(\"" << getName() << "\")]]";
+    OS << " [[clang::capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((shared_capability(\"" << getName() << "\")))";
+    OS << " __attribute__((shared_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::shared_capability(\"" << getName() << "\")]]";
+    OS << " [[clang::shared_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -6019,16 +6717,20 @@ CarriesDependencyAttr *CarriesDependencyAttr::clone(ASTContext &C) const {
 }
 
 void CarriesDependencyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((carries_dependency))";
+    OS << " __attribute__((carries_dependency";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[carries_dependency]]";
+    OS << " [[carries_dependency";
+    OS << "]]";
     break;
   }
 }
@@ -6093,20 +6795,37 @@ CleanupAttr *CleanupAttr::clone(ASTContext &C) const {
 }
 
 void CleanupAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cleanup(" << getFunctionDecl()->getNameInfo().getAsString() << ")))";
+    OS << " __attribute__((cleanup";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFunctionDecl()->getNameInfo().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::cleanup(" << getFunctionDecl()->getNameInfo().getAsString() << ")]]";
+    OS << " [[gnu::cleanup";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFunctionDecl()->getNameInfo().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::cleanup(" << getFunctionDecl()->getNameInfo().getAsString() << ")]]";
+    OS << " [[gnu::cleanup";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFunctionDecl()->getNameInfo().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -6169,12 +6888,15 @@ CmseNSCallAttr *CmseNSCallAttr::clone(ASTContext &C) const {
 }
 
 void CmseNSCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cmse_nonsecure_call))";
+    OS << " __attribute__((cmse_nonsecure_call";
+    OS << "))";
     break;
   }
 }
@@ -6233,12 +6955,15 @@ CmseNSEntryAttr *CmseNSEntryAttr::clone(ASTContext &C) const {
 }
 
 void CmseNSEntryAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cmse_nonsecure_entry))";
+    OS << " __attribute__((cmse_nonsecure_entry";
+    OS << "))";
     break;
   }
 }
@@ -6303,12 +7028,19 @@ CodeSegAttr *CodeSegAttr::clone(ASTContext &C) const {
 }
 
 void CodeSegAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(code_seg(\"" << getName() << "\"))";
+    OS << " __declspec(code_seg";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -6367,20 +7099,25 @@ ColdAttr *ColdAttr::clone(ASTContext &C) const {
 }
 
 void ColdAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((cold))";
+    OS << " __attribute__((cold";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::cold]]";
+    OS << " [[gnu::cold";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::cold]]";
+    OS << " [[gnu::cold";
+    OS << "]]";
     break;
   }
 }
@@ -6443,20 +7180,25 @@ CommonAttr *CommonAttr::clone(ASTContext &C) const {
 }
 
 void CommonAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((common))";
+    OS << " __attribute__((common";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::common]]";
+    OS << " [[gnu::common";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::common]]";
+    OS << " [[gnu::common";
+    OS << "]]";
     break;
   }
 }
@@ -6519,32 +7261,40 @@ ConstAttr *ConstAttr::clone(ASTContext &C) const {
 }
 
 void ConstAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((const))";
+    OS << " __attribute__((const";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::const]]";
+    OS << " [[gnu::const";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::const]]";
+    OS << " [[gnu::const";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((__const))";
+    OS << " __attribute__((__const";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[gnu::__const]]";
+    OS << " [[gnu::__const";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[gnu::__const]]";
+    OS << " [[gnu::__const";
+    OS << "]]";
     break;
   }
 }
@@ -6619,20 +7369,25 @@ ConstInitAttr *ConstInitAttr::clone(ASTContext &C) const {
 }
 
 void ConstInitAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " constinit";
+    OS << "";
     break;
   }
   case 1 : {
-    OS << " __attribute__((require_constant_initialization))";
+    OS << " __attribute__((require_constant_initialization";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[clang::require_constant_initialization]]";
+    OS << " [[clang::require_constant_initialization";
+    OS << "]]";
     break;
   }
 }
@@ -6706,20 +7461,37 @@ ConstructorAttr *ConstructorAttr::clone(ASTContext &C) const {
 }
 
 void ConstructorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((constructor(" << getPriority() << ")))";
+    OS << " __attribute__((constructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::constructor(" << getPriority() << ")]]";
+    OS << " [[gnu::constructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::constructor(" << getPriority() << ")]]";
+    OS << " [[gnu::constructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -6807,16 +7579,28 @@ ConsumableAttr *ConsumableAttr::clone(ASTContext &C) const {
 }
 
 void ConsumableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((consumable(\"" << ConsumableAttr::ConvertConsumedStateToStr(getDefaultState()) << "\")))";
+    OS << " __attribute__((consumable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ConsumableAttr::ConvertConsumedStateToStr(getDefaultState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::consumable(\"" << ConsumableAttr::ConvertConsumedStateToStr(getDefaultState()) << "\")]]";
+    OS << " [[clang::consumable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ConsumableAttr::ConvertConsumedStateToStr(getDefaultState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -6877,16 +7661,20 @@ ConsumableAutoCastAttr *ConsumableAutoCastAttr::clone(ASTContext &C) const {
 }
 
 void ConsumableAutoCastAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((consumable_auto_cast_state))";
+    OS << " __attribute__((consumable_auto_cast_state";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::consumable_auto_cast_state]]";
+    OS << " [[clang::consumable_auto_cast_state";
+    OS << "]]";
     break;
   }
 }
@@ -6947,16 +7735,20 @@ ConsumableSetOnReadAttr *ConsumableSetOnReadAttr::clone(ASTContext &C) const {
 }
 
 void ConsumableSetOnReadAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((consumable_set_state_on_read))";
+    OS << " __attribute__((consumable_set_state_on_read";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::consumable_set_state_on_read]]";
+    OS << " [[clang::consumable_set_state_on_read";
+    OS << "]]";
     break;
   }
 }
@@ -7017,20 +7809,25 @@ ConvergentAttr *ConvergentAttr::clone(ASTContext &C) const {
 }
 
 void ConvergentAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((convergent))";
+    OS << " __attribute__((convergent";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::convergent]]";
+    OS << " [[clang::convergent";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::convergent]]";
+    OS << " [[clang::convergent";
+    OS << "]]";
     break;
   }
 }
@@ -7093,24 +7890,30 @@ DLLExportAttr *DLLExportAttr::clone(ASTContext &C) const {
 }
 
 void DLLExportAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(dllexport)";
+    OS << " __declspec(dllexport";
+    OS << ")";
     break;
   }
   case 1 : {
-    OS << " __attribute__((dllexport))";
+    OS << " __attribute__((dllexport";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[gnu::dllexport]]";
+    OS << " [[gnu::dllexport";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " [[gnu::dllexport]]";
+    OS << " [[gnu::dllexport";
+    OS << "]]";
     break;
   }
 }
@@ -7224,24 +8027,30 @@ DLLImportAttr *DLLImportAttr::clone(ASTContext &C) const {
 }
 
 void DLLImportAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(dllimport)";
+    OS << " __declspec(dllimport";
+    OS << ")";
     break;
   }
   case 1 : {
-    OS << " __attribute__((dllimport))";
+    OS << " __attribute__((dllimport";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[gnu::dllimport]]";
+    OS << " [[gnu::dllimport";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " [[gnu::dllimport]]";
+    OS << " [[gnu::dllimport";
+    OS << "]]";
     break;
   }
 }
@@ -7375,39 +8184,53 @@ DeprecatedAttr *DeprecatedAttr::clone(ASTContext &C) const {
 }
 
 void DeprecatedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((deprecated(\"" << getMessage() << "\"";
+    OS << " __attribute__((deprecated";
+    OS << "(\"" << getMessage() << "\"";
     if (!getReplacement().empty()) OS << ", \"" << getReplacement() << "\"";
-    OS << ")))";
-    break;
-  }
-  case 1 : {
-    OS << " [[gnu::deprecated(\"" << getMessage() << "\"";
-    OS << ")]]";
-    break;
-  }
-  case 2 : {
-    OS << " [[gnu::deprecated(\"" << getMessage() << "\"";
-    OS << ")]]";
-    break;
-  }
-  case 3 : {
-    OS << " __declspec(deprecated(\"" << getMessage() << "\"";
+    OS << ")";
     OS << "))";
     break;
   }
+  case 1 : {
+    OS << " [[gnu::deprecated";
+    OS << "(\"" << getMessage() << "\"";
+    OS << ")";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[gnu::deprecated";
+    OS << "(\"" << getMessage() << "\"";
+    OS << ")";
+    OS << "]]";
+    break;
+  }
+  case 3 : {
+    OS << " __declspec(deprecated";
+    OS << "(\"" << getMessage() << "\"";
+    OS << ")";
+    OS << ")";
+    break;
+  }
   case 4 : {
-    OS << " [[deprecated(\"" << getMessage() << "\"";
-    OS << ")]]";
+    OS << " [[deprecated";
+    OS << "(\"" << getMessage() << "\"";
+    OS << ")";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[deprecated(\"" << getMessage() << "\"";
-    OS << ")]]";
+    OS << " [[deprecated";
+    OS << "(\"" << getMessage() << "\"";
+    OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -7487,20 +8310,37 @@ DestructorAttr *DestructorAttr::clone(ASTContext &C) const {
 }
 
 void DestructorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((destructor(" << getPriority() << ")))";
+    OS << " __attribute__((destructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::destructor(" << getPriority() << ")]]";
+    OS << " [[gnu::destructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::destructor(" << getPriority() << ")]]";
+    OS << " [[gnu::destructor";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -7645,12 +8485,23 @@ DiagnoseIfAttr *DiagnoseIfAttr::clone(ASTContext &C) const {
 }
 
 void DiagnoseIfAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((diagnose_if(" << getCond() << ", \"" << getMessage() << "\", \"" << DiagnoseIfAttr::ConvertDiagnosticTypeToStr(getDiagnosticType()) << "\")))";
+    OS << " __attribute__((diagnose_if";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCond() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << DiagnoseIfAttr::ConvertDiagnosticTypeToStr(getDiagnosticType()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -7709,20 +8560,25 @@ DisableTailCallsAttr *DisableTailCallsAttr::clone(ASTContext &C) const {
 }
 
 void DisableTailCallsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((disable_tail_calls))";
+    OS << " __attribute__((disable_tail_calls";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::disable_tail_calls]]";
+    OS << " [[clang::disable_tail_calls";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::disable_tail_calls]]";
+    OS << " [[clang::disable_tail_calls";
+    OS << "]]";
     break;
   }
 }
@@ -7785,12 +8641,15 @@ EmptyBasesAttr *EmptyBasesAttr::clone(ASTContext &C) const {
 }
 
 void EmptyBasesAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(empty_bases)";
+    OS << " __declspec(empty_bases";
+    OS << ")";
     break;
   }
 }
@@ -7859,12 +8718,21 @@ EnableIfAttr *EnableIfAttr::clone(ASTContext &C) const {
 }
 
 void EnableIfAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((enable_if(" << getCond() << ", \"" << getMessage() << "\")))";
+    OS << " __attribute__((enable_if";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCond() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -7929,20 +8797,37 @@ EnforceTCBAttr *EnforceTCBAttr::clone(ASTContext &C) const {
 }
 
 void EnforceTCBAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((enforce_tcb(\"" << getTCBName() << "\")))";
+    OS << " __attribute__((enforce_tcb";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::enforce_tcb(\"" << getTCBName() << "\")]]";
+    OS << " [[clang::enforce_tcb";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::enforce_tcb(\"" << getTCBName() << "\")]]";
+    OS << " [[clang::enforce_tcb";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -8011,20 +8896,37 @@ EnforceTCBLeafAttr *EnforceTCBLeafAttr::clone(ASTContext &C) const {
 }
 
 void EnforceTCBLeafAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((enforce_tcb_leaf(\"" << getTCBName() << "\")))";
+    OS << " __attribute__((enforce_tcb_leaf";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::enforce_tcb_leaf(\"" << getTCBName() << "\")]]";
+    OS << " [[clang::enforce_tcb_leaf";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::enforce_tcb_leaf(\"" << getTCBName() << "\")]]";
+    OS << " [[clang::enforce_tcb_leaf";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getTCBName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -8110,20 +9012,37 @@ EnumExtensibilityAttr *EnumExtensibilityAttr::clone(ASTContext &C) const {
 }
 
 void EnumExtensibilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((enum_extensibility(\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\")))";
+    OS << " __attribute__((enum_extensibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::enum_extensibility(\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\")]]";
+    OS << " [[clang::enum_extensibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::enum_extensibility(\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\")]]";
+    OS << " [[clang::enum_extensibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << EnumExtensibilityAttr::ConvertKindToStr(getExtensibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -8186,20 +9105,25 @@ ExcludeFromExplicitInstantiationAttr *ExcludeFromExplicitInstantiationAttr::clon
 }
 
 void ExcludeFromExplicitInstantiationAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((exclude_from_explicit_instantiation))";
+    OS << " __attribute__((exclude_from_explicit_instantiation";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::exclude_from_explicit_instantiation]]";
+    OS << " [[clang::exclude_from_explicit_instantiation";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::exclude_from_explicit_instantiation]]";
+    OS << " [[clang::exclude_from_explicit_instantiation";
+    OS << "]]";
     break;
   }
 }
@@ -8280,19 +9204,25 @@ ExclusiveTrylockFunctionAttr *ExclusiveTrylockFunctionAttr::clone(ASTContext &C)
 }
 
 void ExclusiveTrylockFunctionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((exclusive_trylock_function(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((exclusive_trylock_function";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -8376,20 +9306,49 @@ ExternalSourceSymbolAttr *ExternalSourceSymbolAttr::clone(ASTContext &C) const {
 }
 
 void ExternalSourceSymbolAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((external_source_symbol(\"" << getLanguage() << "\", \"" << getDefinedIn() << "\", " << getGeneratedDeclaration() << ")))";
+    OS << " __attribute__((external_source_symbol";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getLanguage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getDefinedIn() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getGeneratedDeclaration() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::external_source_symbol(\"" << getLanguage() << "\", \"" << getDefinedIn() << "\", " << getGeneratedDeclaration() << ")]]";
+    OS << " [[clang::external_source_symbol";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getLanguage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getDefinedIn() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getGeneratedDeclaration() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::external_source_symbol(\"" << getLanguage() << "\", \"" << getDefinedIn() << "\", " << getGeneratedDeclaration() << ")]]";
+    OS << " [[clang::external_source_symbol";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getLanguage() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getDefinedIn() << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getGeneratedDeclaration() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -8452,32 +9411,40 @@ FallThroughAttr *FallThroughAttr::clone(ASTContext &C) const {
 }
 
 void FallThroughAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[fallthrough]]";
+    OS << " [[fallthrough";
+    OS << "]]";
     break;
   }
   case 1 : {
-    OS << " [[fallthrough]]";
+    OS << " [[fallthrough";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::fallthrough]]";
+    OS << " [[clang::fallthrough";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((fallthrough))";
+    OS << " __attribute__((fallthrough";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[gnu::fallthrough]]";
+    OS << " [[gnu::fallthrough";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[gnu::fallthrough]]";
+    OS << " [[gnu::fallthrough";
+    OS << "]]";
     break;
   }
 }
@@ -8546,28 +9513,35 @@ FastCallAttr *FastCallAttr::clone(ASTContext &C) const {
 }
 
 void FastCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((fastcall))";
+    OS << " __attribute__((fastcall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::fastcall]]";
+    OS << " [[gnu::fastcall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::fastcall]]";
+    OS << " [[gnu::fastcall";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __fastcall";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _fastcall";
+    OS << "";
     break;
   }
 }
@@ -8639,16 +9613,20 @@ FinalAttr *FinalAttr::clone(ASTContext &C) const {
 }
 
 void FinalAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " final";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " sealed";
+    OS << "";
     break;
   }
 }
@@ -8709,20 +9687,25 @@ FlagEnumAttr *FlagEnumAttr::clone(ASTContext &C) const {
 }
 
 void FlagEnumAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((flag_enum))";
+    OS << " __attribute__((flag_enum";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::flag_enum]]";
+    OS << " [[clang::flag_enum";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::flag_enum]]";
+    OS << " [[clang::flag_enum";
+    OS << "]]";
     break;
   }
 }
@@ -8785,20 +9768,25 @@ FlattenAttr *FlattenAttr::clone(ASTContext &C) const {
 }
 
 void FlattenAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((flatten))";
+    OS << " __attribute__((flatten";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::flatten]]";
+    OS << " [[gnu::flatten";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::flatten]]";
+    OS << " [[gnu::flatten";
+    OS << "]]";
     break;
   }
 }
@@ -8873,20 +9861,49 @@ FormatAttr *FormatAttr::clone(ASTContext &C) const {
 }
 
 void FormatAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((format(" << (getType() ? getType()->getName() : "") << ", " << getFormatIdx() << ", " << getFirstArg() << ")))";
+    OS << " __attribute__((format";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getType() ? getType()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFirstArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::format(" << (getType() ? getType()->getName() : "") << ", " << getFormatIdx() << ", " << getFirstArg() << ")]]";
+    OS << " [[gnu::format";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getType() ? getType()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFirstArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::format(" << (getType() ? getType()->getName() : "") << ", " << getFormatIdx() << ", " << getFirstArg() << ")]]";
+    OS << " [[gnu::format";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getType() ? getType()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFirstArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -8953,20 +9970,37 @@ FormatArgAttr *FormatArgAttr::clone(ASTContext &C) const {
 }
 
 void FormatArgAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((format_arg(" << getFormatIdx().getSourceIndex() << ")))";
+    OS << " __attribute__((format_arg";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::format_arg(" << getFormatIdx().getSourceIndex() << ")]]";
+    OS << " [[gnu::format_arg";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::format_arg(" << getFormatIdx().getSourceIndex() << ")]]";
+    OS << " [[gnu::format_arg";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getFormatIdx().getSourceIndex() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -9029,20 +10063,25 @@ GNUInlineAttr *GNUInlineAttr::clone(ASTContext &C) const {
 }
 
 void GNUInlineAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((gnu_inline))";
+    OS << " __attribute__((gnu_inline";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::gnu_inline]]";
+    OS << " [[gnu::gnu_inline";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::gnu_inline]]";
+    OS << " [[gnu::gnu_inline";
+    OS << "]]";
     break;
   }
 }
@@ -9109,12 +10148,19 @@ GuardedByAttr *GuardedByAttr::clone(ASTContext &C) const {
 }
 
 void GuardedByAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((guarded_by(" << getArg() << ")))";
+    OS << " __attribute__((guarded_by";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -9173,16 +10219,20 @@ GuardedVarAttr *GuardedVarAttr::clone(ASTContext &C) const {
 }
 
 void GuardedVarAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((guarded_var))";
+    OS << " __attribute__((guarded_var";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::guarded_var]]";
+    OS << " [[clang::guarded_var";
+    OS << "]]";
     break;
   }
 }
@@ -9243,16 +10293,20 @@ HIPManagedAttr *HIPManagedAttr::clone(ASTContext &C) const {
 }
 
 void HIPManagedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((managed))";
+    OS << " __attribute__((managed";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __declspec(__managed__)";
+    OS << " __declspec(__managed__";
+    OS << ")";
     break;
   }
 }
@@ -9313,20 +10367,25 @@ HotAttr *HotAttr::clone(ASTContext &C) const {
 }
 
 void HotAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((hot))";
+    OS << " __attribute__((hot";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::hot]]";
+    OS << " [[gnu::hot";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::hot]]";
+    OS << " [[gnu::hot";
+    OS << "]]";
     break;
   }
 }
@@ -9389,20 +10448,25 @@ IBActionAttr *IBActionAttr::clone(ASTContext &C) const {
 }
 
 void IBActionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ibaction))";
+    OS << " __attribute__((ibaction";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ibaction]]";
+    OS << " [[clang::ibaction";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ibaction]]";
+    OS << " [[clang::ibaction";
+    OS << "]]";
     break;
   }
 }
@@ -9465,20 +10529,25 @@ IBOutletAttr *IBOutletAttr::clone(ASTContext &C) const {
 }
 
 void IBOutletAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((iboutlet))";
+    OS << " __attribute__((iboutlet";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::iboutlet]]";
+    OS << " [[clang::iboutlet";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::iboutlet]]";
+    OS << " [[clang::iboutlet";
+    OS << "]]";
     break;
   }
 }
@@ -9552,61 +10621,48 @@ IBOutletCollectionAttr *IBOutletCollectionAttr::clone(ASTContext &C) const {
 }
 
 void IBOutletCollectionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __attribute__((iboutletcollection";
-    unsigned TrailingOmittedArgs = 0;
     if (!getInterfaceLoc())
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!getInterfaceLoc())) {
-      OS << "" << getInterface().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getInterface().getAsString() << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "))";
     break;
   }
   case 1 : {
     OS << " [[clang::iboutletcollection";
-    unsigned TrailingOmittedArgs = 0;
     if (!getInterfaceLoc())
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!getInterfaceLoc())) {
-      OS << "" << getInterface().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getInterface().getAsString() << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
   case 2 : {
     OS << " [[clang::iboutletcollection";
-    unsigned TrailingOmittedArgs = 0;
     if (!getInterfaceLoc())
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!getInterfaceLoc())) {
-      OS << "" << getInterface().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getInterface().getAsString() << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
@@ -9676,20 +10732,37 @@ IFuncAttr *IFuncAttr::clone(ASTContext &C) const {
 }
 
 void IFuncAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ifunc(\"" << getResolver() << "\")))";
+    OS << " __attribute__((ifunc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getResolver() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::ifunc(\"" << getResolver() << "\")]]";
+    OS << " [[gnu::ifunc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getResolver() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::ifunc(\"" << getResolver() << "\")]]";
+    OS << " [[gnu::ifunc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getResolver() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -9756,16 +10829,28 @@ InitPriorityAttr *InitPriorityAttr::clone(ASTContext &C) const {
 }
 
 void InitPriorityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((init_priority(" << getPriority() << ")))";
+    OS << " __attribute__((init_priority";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::init_priority(" << getPriority() << ")]]";
+    OS << " [[gnu::init_priority";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getPriority() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -9832,6 +10917,8 @@ InitSegAttr *InitSegAttr::clone(ASTContext &C) const {
 }
 
 void InitSegAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
@@ -9897,16 +10984,20 @@ IntelOclBiccAttr *IntelOclBiccAttr::clone(ASTContext &C) const {
 }
 
 void IntelOclBiccAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((intel_ocl_bicc))";
+    OS << " __attribute__((intel_ocl_bicc";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::intel_ocl_bicc]]";
+    OS << " [[clang::intel_ocl_bicc";
+    OS << "]]";
     break;
   }
 }
@@ -9967,20 +11058,25 @@ InternalLinkageAttr *InternalLinkageAttr::clone(ASTContext &C) const {
 }
 
 void InternalLinkageAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((internal_linkage))";
+    OS << " __attribute__((internal_linkage";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::internal_linkage]]";
+    OS << " [[clang::internal_linkage";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::internal_linkage]]";
+    OS << " [[clang::internal_linkage";
+    OS << "]]";
     break;
   }
 }
@@ -10043,20 +11139,25 @@ LTOVisibilityPublicAttr *LTOVisibilityPublicAttr::clone(ASTContext &C) const {
 }
 
 void LTOVisibilityPublicAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((lto_visibility_public))";
+    OS << " __attribute__((lto_visibility_public";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::lto_visibility_public]]";
+    OS << " [[clang::lto_visibility_public";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::lto_visibility_public]]";
+    OS << " [[clang::lto_visibility_public";
+    OS << "]]";
     break;
   }
 }
@@ -10123,12 +11224,19 @@ LayoutVersionAttr *LayoutVersionAttr::clone(ASTContext &C) const {
 }
 
 void LayoutVersionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(layout_version(" << getVersion() << "))";
+    OS << " __declspec(layout_version";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getVersion() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -10187,20 +11295,25 @@ LeafAttr *LeafAttr::clone(ASTContext &C) const {
 }
 
 void LeafAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((leaf))";
+    OS << " __attribute__((leaf";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::leaf]]";
+    OS << " [[gnu::leaf";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::leaf]]";
+    OS << " [[gnu::leaf";
+    OS << "]]";
     break;
   }
 }
@@ -10263,16 +11376,20 @@ LifetimeBoundAttr *LifetimeBoundAttr::clone(ASTContext &C) const {
 }
 
 void LifetimeBoundAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((lifetimebound))";
+    OS << " __attribute__((lifetimebound";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::lifetimebound]]";
+    OS << " [[clang::lifetimebound";
+    OS << "]]";
     break;
   }
 }
@@ -10333,16 +11450,20 @@ LikelyAttr *LikelyAttr::clone(ASTContext &C) const {
 }
 
 void LikelyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[likely]]";
+    OS << " [[likely";
+    OS << "]]";
     break;
   }
   case 1 : {
-    OS << " [[clang::likely]]";
+    OS << " [[clang::likely";
+    OS << "]]";
     break;
   }
 }
@@ -10403,20 +11524,25 @@ LoaderUninitializedAttr *LoaderUninitializedAttr::clone(ASTContext &C) const {
 }
 
 void LoaderUninitializedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((loader_uninitialized))";
+    OS << " __attribute__((loader_uninitialized";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::loader_uninitialized]]";
+    OS << " [[clang::loader_uninitialized";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::loader_uninitialized]]";
+    OS << " [[clang::loader_uninitialized";
+    OS << "]]";
     break;
   }
 }
@@ -10483,12 +11609,19 @@ LockReturnedAttr *LockReturnedAttr::clone(ASTContext &C) const {
 }
 
 void LockReturnedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((lock_returned(" << getArg() << ")))";
+    OS << " __attribute__((lock_returned";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -10559,19 +11692,23 @@ LocksExcludedAttr *LocksExcludedAttr::clone(ASTContext &C) const {
 }
 
 void LocksExcludedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((locks_excluded(";
-  bool isFirst = true;
+    OS << " __attribute__((locks_excluded";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -10718,6 +11855,8 @@ LoopHintAttr *LoopHintAttr::clone(ASTContext &C) const {
 }
 
 void LoopHintAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
@@ -10769,6 +11908,81 @@ const char *LoopHintAttr::getSpelling() const {
 }
 
 
+// M68kInterruptAttr implementation
+
+M68kInterruptAttr *M68kInterruptAttr::CreateImplicit(ASTContext &Ctx, unsigned Number, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) M68kInterruptAttr(Ctx, CommonInfo, Number);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+M68kInterruptAttr *M68kInterruptAttr::Create(ASTContext &Ctx, unsigned Number, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) M68kInterruptAttr(Ctx, CommonInfo, Number);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+M68kInterruptAttr *M68kInterruptAttr::CreateImplicit(ASTContext &Ctx, unsigned Number, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, Number, I);
+}
+
+M68kInterruptAttr *M68kInterruptAttr::Create(ASTContext &Ctx, unsigned Number, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, Number, I);
+}
+
+M68kInterruptAttr::M68kInterruptAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+              , unsigned Number
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::M68kInterrupt, false, false)
+              , number(Number)
+  {
+}
+
+
+
+M68kInterruptAttr *M68kInterruptAttr::clone(ASTContext &C) const {
+  auto *A = new (C) M68kInterruptAttr(C, *this, number);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void M68kInterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumber() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
+    break;
+  }
+}
+}
+
+const char *M68kInterruptAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "interrupt";
+  }
+}
+
+
 // MIGServerRoutineAttr implementation
 
 MIGServerRoutineAttr *MIGServerRoutineAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
@@ -10811,20 +12025,25 @@ MIGServerRoutineAttr *MIGServerRoutineAttr::clone(ASTContext &C) const {
 }
 
 void MIGServerRoutineAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((mig_server_routine))";
+    OS << " __attribute__((mig_server_routine";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::mig_server_routine]]";
+    OS << " [[clang::mig_server_routine";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::mig_server_routine]]";
+    OS << " [[clang::mig_server_routine";
+    OS << "]]";
     break;
   }
 }
@@ -10887,20 +12106,25 @@ MSABIAttr *MSABIAttr::clone(ASTContext &C) const {
 }
 
 void MSABIAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ms_abi))";
+    OS << " __attribute__((ms_abi";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::ms_abi]]";
+    OS << " [[gnu::ms_abi";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::ms_abi]]";
+    OS << " [[gnu::ms_abi";
+    OS << "]]";
     break;
   }
 }
@@ -10963,12 +12187,15 @@ MSAllocatorAttr *MSAllocatorAttr::clone(ASTContext &C) const {
 }
 
 void MSAllocatorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(allocator)";
+    OS << " __declspec(allocator";
+    OS << ")";
     break;
   }
 }
@@ -11068,24 +12295,30 @@ MSInheritanceAttr *MSInheritanceAttr::clone(ASTContext &C) const {
 }
 
 void MSInheritanceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __single_inheritance";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " __multiple_inheritance";
+    OS << "";
     break;
   }
   case 2 : {
     OS << " __virtual_inheritance";
+    OS << "";
     break;
   }
   case 3 : {
     OS << " __unspecified_inheritance";
+    OS << "";
     break;
   }
 }
@@ -11150,12 +12383,15 @@ MSNoVTableAttr *MSNoVTableAttr::clone(ASTContext &C) const {
 }
 
 void MSNoVTableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(novtable)";
+    OS << " __declspec(novtable";
+    OS << ")";
     break;
   }
 }
@@ -11218,20 +12454,37 @@ MSP430InterruptAttr *MSP430InterruptAttr::clone(ASTContext &C) const {
 }
 
 void MSP430InterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt(" << getNumber() << ")))";
+    OS << " __attribute__((interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumber() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt(" << getNumber() << ")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumber() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt(" << getNumber() << ")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNumber() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -11294,20 +12547,25 @@ MSStructAttr *MSStructAttr::clone(ASTContext &C) const {
 }
 
 void MSStructAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ms_struct))";
+    OS << " __attribute__((ms_struct";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::ms_struct]]";
+    OS << " [[gnu::ms_struct";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::ms_struct]]";
+    OS << " [[gnu::ms_struct";
+    OS << "]]";
     break;
   }
 }
@@ -11476,20 +12734,25 @@ MayAliasAttr *MayAliasAttr::clone(ASTContext &C) const {
 }
 
 void MayAliasAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((may_alias))";
+    OS << " __attribute__((may_alias";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::may_alias]]";
+    OS << " [[gnu::may_alias";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::may_alias]]";
+    OS << " [[gnu::may_alias";
+    OS << "]]";
     break;
   }
 }
@@ -11552,20 +12815,25 @@ MicroMipsAttr *MicroMipsAttr::clone(ASTContext &C) const {
 }
 
 void MicroMipsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((micromips))";
+    OS << " __attribute__((micromips";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::micromips]]";
+    OS << " [[gnu::micromips";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::micromips]]";
+    OS << " [[gnu::micromips";
+    OS << "]]";
     break;
   }
 }
@@ -11628,20 +12896,25 @@ MinSizeAttr *MinSizeAttr::clone(ASTContext &C) const {
 }
 
 void MinSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((minsize))";
+    OS << " __attribute__((minsize";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::minsize]]";
+    OS << " [[clang::minsize";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::minsize]]";
+    OS << " [[clang::minsize";
+    OS << "]]";
     break;
   }
 }
@@ -11708,20 +12981,37 @@ MinVectorWidthAttr *MinVectorWidthAttr::clone(ASTContext &C) const {
 }
 
 void MinVectorWidthAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((min_vector_width(" << getVectorWidth() << ")))";
+    OS << " __attribute__((min_vector_width";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getVectorWidth() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::min_vector_width(" << getVectorWidth() << ")]]";
+    OS << " [[clang::min_vector_width";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getVectorWidth() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::min_vector_width(" << getVectorWidth() << ")]]";
+    OS << " [[clang::min_vector_width";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getVectorWidth() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -11784,20 +13074,25 @@ Mips16Attr *Mips16Attr::clone(ASTContext &C) const {
 }
 
 void Mips16Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((mips16))";
+    OS << " __attribute__((mips16";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::mips16]]";
+    OS << " [[gnu::mips16";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::mips16]]";
+    OS << " [[gnu::mips16";
+    OS << "]]";
     break;
   }
 }
@@ -11898,20 +13193,37 @@ MipsInterruptAttr *MipsInterruptAttr::clone(ASTContext &C) const {
 }
 
 void MipsInterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt(\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")))";
+    OS << " __attribute__((interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt(\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt(\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << MipsInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -11983,32 +13295,40 @@ MipsLongCallAttr *MipsLongCallAttr::clone(ASTContext &C) const {
 }
 
 void MipsLongCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((long_call))";
+    OS << " __attribute__((long_call";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::long_call]]";
+    OS << " [[gnu::long_call";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::long_call]]";
+    OS << " [[gnu::long_call";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((far))";
+    OS << " __attribute__((far";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[gnu::far]]";
+    OS << " [[gnu::far";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[gnu::far]]";
+    OS << " [[gnu::far";
+    OS << "]]";
     break;
   }
 }
@@ -12086,32 +13406,40 @@ MipsShortCallAttr *MipsShortCallAttr::clone(ASTContext &C) const {
 }
 
 void MipsShortCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((short_call))";
+    OS << " __attribute__((short_call";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::short_call]]";
+    OS << " [[gnu::short_call";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::short_call]]";
+    OS << " [[gnu::short_call";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((near))";
+    OS << " __attribute__((near";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[gnu::near]]";
+    OS << " [[gnu::near";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[gnu::near]]";
+    OS << " [[gnu::near";
+    OS << "]]";
     break;
   }
 }
@@ -12184,20 +13512,37 @@ ModeAttr *ModeAttr::clone(ASTContext &C) const {
 }
 
 void ModeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((mode(" << (getMode() ? getMode()->getName() : "") << ")))";
+    OS << " __attribute__((mode";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getMode() ? getMode()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::mode(" << (getMode() ? getMode()->getName() : "") << ")]]";
+    OS << " [[gnu::mode";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getMode() ? getMode()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::mode(" << (getMode() ? getMode()->getName() : "") << ")]]";
+    OS << " [[gnu::mode";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getMode() ? getMode()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -12214,6 +13559,87 @@ const char *ModeAttr::getSpelling() const {
     return "mode";
   case 2:
     return "mode";
+  }
+}
+
+
+// MustTailAttr implementation
+
+MustTailAttr *MustTailAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) MustTailAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+MustTailAttr *MustTailAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) MustTailAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+MustTailAttr *MustTailAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+MustTailAttr *MustTailAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+MustTailAttr::MustTailAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : StmtAttr(Ctx, CommonInfo, attr::MustTail, false)
+  {
+}
+
+MustTailAttr *MustTailAttr::clone(ASTContext &C) const {
+  auto *A = new (C) MustTailAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void MustTailAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((musttail";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::musttail";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[clang::musttail";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *MustTailAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "musttail";
+  case 1:
+    return "musttail";
+  case 2:
+    return "musttail";
   }
 }
 
@@ -12260,20 +13686,25 @@ NSConsumedAttr *NSConsumedAttr::clone(ASTContext &C) const {
 }
 
 void NSConsumedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_consumed))";
+    OS << " __attribute__((ns_consumed";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ns_consumed]]";
+    OS << " [[clang::ns_consumed";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ns_consumed]]";
+    OS << " [[clang::ns_consumed";
+    OS << "]]";
     break;
   }
 }
@@ -12336,20 +13767,25 @@ NSConsumesSelfAttr *NSConsumesSelfAttr::clone(ASTContext &C) const {
 }
 
 void NSConsumesSelfAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_consumes_self))";
+    OS << " __attribute__((ns_consumes_self";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ns_consumes_self]]";
+    OS << " [[clang::ns_consumes_self";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ns_consumes_self]]";
+    OS << " [[clang::ns_consumes_self";
+    OS << "]]";
     break;
   }
 }
@@ -12416,12 +13852,19 @@ NSErrorDomainAttr *NSErrorDomainAttr::clone(ASTContext &C) const {
 }
 
 void NSErrorDomainAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_error_domain(" << getErrorDomain()->getName() << ")))";
+    OS << " __attribute__((ns_error_domain";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getErrorDomain()->getName() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -12480,20 +13923,25 @@ NSReturnsAutoreleasedAttr *NSReturnsAutoreleasedAttr::clone(ASTContext &C) const
 }
 
 void NSReturnsAutoreleasedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_returns_autoreleased))";
+    OS << " __attribute__((ns_returns_autoreleased";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ns_returns_autoreleased]]";
+    OS << " [[clang::ns_returns_autoreleased";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ns_returns_autoreleased]]";
+    OS << " [[clang::ns_returns_autoreleased";
+    OS << "]]";
     break;
   }
 }
@@ -12556,20 +14004,25 @@ NSReturnsNotRetainedAttr *NSReturnsNotRetainedAttr::clone(ASTContext &C) const {
 }
 
 void NSReturnsNotRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_returns_not_retained))";
+    OS << " __attribute__((ns_returns_not_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ns_returns_not_retained]]";
+    OS << " [[clang::ns_returns_not_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ns_returns_not_retained]]";
+    OS << " [[clang::ns_returns_not_retained";
+    OS << "]]";
     break;
   }
 }
@@ -12632,20 +14085,25 @@ NSReturnsRetainedAttr *NSReturnsRetainedAttr::clone(ASTContext &C) const {
 }
 
 void NSReturnsRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ns_returns_retained))";
+    OS << " __attribute__((ns_returns_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ns_returns_retained]]";
+    OS << " [[clang::ns_returns_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ns_returns_retained]]";
+    OS << " [[clang::ns_returns_retained";
+    OS << "]]";
     break;
   }
 }
@@ -12708,24 +14166,30 @@ NakedAttr *NakedAttr::clone(ASTContext &C) const {
 }
 
 void NakedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((naked))";
+    OS << " __attribute__((naked";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::naked]]";
+    OS << " [[gnu::naked";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::naked]]";
+    OS << " [[gnu::naked";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(naked)";
+    OS << " __declspec(naked";
+    OS << ")";
     break;
   }
 }
@@ -12790,12 +14254,15 @@ NoAliasAttr *NoAliasAttr::clone(ASTContext &C) const {
 }
 
 void NoAliasAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(noalias)";
+    OS << " __declspec(noalias";
+    OS << ")";
     break;
   }
 }
@@ -12874,41 +14341,49 @@ NoBuiltinAttr *NoBuiltinAttr::clone(ASTContext &C) const {
 }
 
 void NoBuiltinAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_builtin(";
-  bool isFirst = true;
+    OS << " __attribute__((no_builtin";
+    OS << "";
   for (const auto &Val : builtinNames()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_builtin(";
-  bool isFirst = true;
+    OS << " [[clang::no_builtin";
+    OS << "";
   for (const auto &Val : builtinNames()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::no_builtin(";
-  bool isFirst = true;
+    OS << " [[clang::no_builtin";
+    OS << "";
   for (const auto &Val : builtinNames()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -12971,20 +14446,25 @@ NoCommonAttr *NoCommonAttr::clone(ASTContext &C) const {
 }
 
 void NoCommonAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nocommon))";
+    OS << " __attribute__((nocommon";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nocommon]]";
+    OS << " [[gnu::nocommon";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nocommon]]";
+    OS << " [[gnu::nocommon";
+    OS << "]]";
     break;
   }
 }
@@ -13047,20 +14527,25 @@ NoDebugAttr *NoDebugAttr::clone(ASTContext &C) const {
 }
 
 void NoDebugAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nodebug))";
+    OS << " __attribute__((nodebug";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nodebug]]";
+    OS << " [[gnu::nodebug";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nodebug]]";
+    OS << " [[gnu::nodebug";
+    OS << "]]";
     break;
   }
 }
@@ -13123,20 +14608,25 @@ NoDerefAttr *NoDerefAttr::clone(ASTContext &C) const {
 }
 
 void NoDerefAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((noderef))";
+    OS << " __attribute__((noderef";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::noderef]]";
+    OS << " [[clang::noderef";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::noderef]]";
+    OS << " [[clang::noderef";
+    OS << "]]";
     break;
   }
 }
@@ -13199,16 +14689,20 @@ NoDestroyAttr *NoDestroyAttr::clone(ASTContext &C) const {
 }
 
 void NoDestroyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_destroy))";
+    OS << " __attribute__((no_destroy";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_destroy]]";
+    OS << " [[clang::no_destroy";
+    OS << "]]";
     break;
   }
 }
@@ -13269,20 +14763,25 @@ NoDuplicateAttr *NoDuplicateAttr::clone(ASTContext &C) const {
 }
 
 void NoDuplicateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((noduplicate))";
+    OS << " __attribute__((noduplicate";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::noduplicate]]";
+    OS << " [[clang::noduplicate";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::noduplicate]]";
+    OS << " [[clang::noduplicate";
+    OS << "]]";
     break;
   }
 }
@@ -13345,20 +14844,25 @@ NoEscapeAttr *NoEscapeAttr::clone(ASTContext &C) const {
 }
 
 void NoEscapeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((noescape))";
+    OS << " __attribute__((noescape";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::noescape]]";
+    OS << " [[clang::noescape";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::noescape]]";
+    OS << " [[clang::noescape";
+    OS << "]]";
     break;
   }
 }
@@ -13421,24 +14925,30 @@ NoInlineAttr *NoInlineAttr::clone(ASTContext &C) const {
 }
 
 void NoInlineAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((noinline))";
+    OS << " __attribute__((noinline";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::noinline]]";
+    OS << " [[gnu::noinline";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::noinline]]";
+    OS << " [[gnu::noinline";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(noinline)";
+    OS << " __declspec(noinline";
+    OS << ")";
     break;
   }
 }
@@ -13503,20 +15013,25 @@ NoInstrumentFunctionAttr *NoInstrumentFunctionAttr::clone(ASTContext &C) const {
 }
 
 void NoInstrumentFunctionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_instrument_function))";
+    OS << " __attribute__((no_instrument_function";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::no_instrument_function]]";
+    OS << " [[gnu::no_instrument_function";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::no_instrument_function]]";
+    OS << " [[gnu::no_instrument_function";
+    OS << "]]";
     break;
   }
 }
@@ -13579,20 +15094,25 @@ NoMergeAttr *NoMergeAttr::clone(ASTContext &C) const {
 }
 
 void NoMergeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nomerge))";
+    OS << " __attribute__((nomerge";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::nomerge]]";
+    OS << " [[clang::nomerge";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::nomerge]]";
+    OS << " [[clang::nomerge";
+    OS << "]]";
     break;
   }
 }
@@ -13655,20 +15175,25 @@ NoMicroMipsAttr *NoMicroMipsAttr::clone(ASTContext &C) const {
 }
 
 void NoMicroMipsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nomicromips))";
+    OS << " __attribute__((nomicromips";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nomicromips]]";
+    OS << " [[gnu::nomicromips";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nomicromips]]";
+    OS << " [[gnu::nomicromips";
+    OS << "]]";
     break;
   }
 }
@@ -13731,20 +15256,25 @@ NoMips16Attr *NoMips16Attr::clone(ASTContext &C) const {
 }
 
 void NoMips16Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nomips16))";
+    OS << " __attribute__((nomips16";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nomips16]]";
+    OS << " [[gnu::nomips16";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nomips16]]";
+    OS << " [[gnu::nomips16";
+    OS << "]]";
     break;
   }
 }
@@ -13761,6 +15291,87 @@ const char *NoMips16Attr::getSpelling() const {
     return "nomips16";
   case 2:
     return "nomips16";
+  }
+}
+
+
+// NoProfileFunctionAttr implementation
+
+NoProfileFunctionAttr *NoProfileFunctionAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) NoProfileFunctionAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+NoProfileFunctionAttr *NoProfileFunctionAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) NoProfileFunctionAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+NoProfileFunctionAttr *NoProfileFunctionAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+NoProfileFunctionAttr *NoProfileFunctionAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+NoProfileFunctionAttr::NoProfileFunctionAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::NoProfileFunction, false, false)
+  {
+}
+
+NoProfileFunctionAttr *NoProfileFunctionAttr::clone(ASTContext &C) const {
+  auto *A = new (C) NoProfileFunctionAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void NoProfileFunctionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((no_profile_instrument_function";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[gnu::no_profile_instrument_function";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[gnu::no_profile_instrument_function";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *NoProfileFunctionAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "no_profile_instrument_function";
+  case 1:
+    return "no_profile_instrument_function";
+  case 2:
+    return "no_profile_instrument_function";
   }
 }
 
@@ -13807,24 +15418,30 @@ NoReturnAttr *NoReturnAttr::clone(ASTContext &C) const {
 }
 
 void NoReturnAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((noreturn))";
+    OS << " __attribute__((noreturn";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::noreturn]]";
+    OS << " [[gnu::noreturn";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::noreturn]]";
+    OS << " [[gnu::noreturn";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(noreturn)";
+    OS << " __declspec(noreturn";
+    OS << ")";
     break;
   }
 }
@@ -13909,41 +15526,49 @@ NoSanitizeAttr *NoSanitizeAttr::clone(ASTContext &C) const {
 }
 
 void NoSanitizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_sanitize(";
-  bool isFirst = true;
+    OS << " __attribute__((no_sanitize";
+    OS << "";
   for (const auto &Val : sanitizers()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_sanitize(";
-  bool isFirst = true;
+    OS << " [[clang::no_sanitize";
+    OS << "";
   for (const auto &Val : sanitizers()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::no_sanitize(";
-  bool isFirst = true;
+    OS << " [[clang::no_sanitize";
+    OS << "";
   for (const auto &Val : sanitizers()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -14006,20 +15631,25 @@ NoSpeculativeLoadHardeningAttr *NoSpeculativeLoadHardeningAttr::clone(ASTContext
 }
 
 void NoSpeculativeLoadHardeningAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_speculative_load_hardening))";
+    OS << " __attribute__((no_speculative_load_hardening";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_speculative_load_hardening]]";
+    OS << " [[clang::no_speculative_load_hardening";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::no_speculative_load_hardening]]";
+    OS << " [[clang::no_speculative_load_hardening";
+    OS << "]]";
     break;
   }
 }
@@ -14082,20 +15712,25 @@ NoSplitStackAttr *NoSplitStackAttr::clone(ASTContext &C) const {
 }
 
 void NoSplitStackAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_split_stack))";
+    OS << " __attribute__((no_split_stack";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::no_split_stack]]";
+    OS << " [[gnu::no_split_stack";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::no_split_stack]]";
+    OS << " [[gnu::no_split_stack";
+    OS << "]]";
     break;
   }
 }
@@ -14158,20 +15793,25 @@ NoStackProtectorAttr *NoStackProtectorAttr::clone(ASTContext &C) const {
 }
 
 void NoStackProtectorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_stack_protector))";
+    OS << " __attribute__((no_stack_protector";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_stack_protector]]";
+    OS << " [[clang::no_stack_protector";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::no_stack_protector]]";
+    OS << " [[clang::no_stack_protector";
+    OS << "]]";
     break;
   }
 }
@@ -14234,20 +15874,25 @@ NoThreadSafetyAnalysisAttr *NoThreadSafetyAnalysisAttr::clone(ASTContext &C) con
 }
 
 void NoThreadSafetyAnalysisAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((no_thread_safety_analysis))";
+    OS << " __attribute__((no_thread_safety_analysis";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::no_thread_safety_analysis]]";
+    OS << " [[clang::no_thread_safety_analysis";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::no_thread_safety_analysis]]";
+    OS << " [[clang::no_thread_safety_analysis";
+    OS << "]]";
     break;
   }
 }
@@ -14310,24 +15955,30 @@ NoThrowAttr *NoThrowAttr::clone(ASTContext &C) const {
 }
 
 void NoThrowAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nothrow))";
+    OS << " __attribute__((nothrow";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nothrow]]";
+    OS << " [[gnu::nothrow";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nothrow]]";
+    OS << " [[gnu::nothrow";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(nothrow)";
+    OS << " __declspec(nothrow";
+    OS << ")";
     break;
   }
 }
@@ -14392,12 +16043,15 @@ NoUniqueAddressAttr *NoUniqueAddressAttr::clone(ASTContext &C) const {
 }
 
 void NoUniqueAddressAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[no_unique_address]]";
+    OS << " [[no_unique_address";
+    OS << "]]";
     break;
   }
 }
@@ -14468,41 +16122,49 @@ NonNullAttr *NonNullAttr::clone(ASTContext &C) const {
 }
 
 void NonNullAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((nonnull(";
-  bool isFirst = true;
+    OS << " __attribute__((nonnull";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::nonnull(";
-  bool isFirst = true;
+    OS << " [[gnu::nonnull";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::nonnull(";
-  bool isFirst = true;
+    OS << " [[gnu::nonnull";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -14565,20 +16227,25 @@ NotTailCalledAttr *NotTailCalledAttr::clone(ASTContext &C) const {
 }
 
 void NotTailCalledAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((not_tail_called))";
+    OS << " __attribute__((not_tail_called";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::not_tail_called]]";
+    OS << " [[clang::not_tail_called";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::not_tail_called]]";
+    OS << " [[clang::not_tail_called";
+    OS << "]]";
     break;
   }
 }
@@ -14910,6 +16577,8 @@ OMPDeclareSimdDeclAttr *OMPDeclareSimdDeclAttr::clone(ASTContext &C) const {
 }
 
 void OMPDeclareSimdDeclAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
@@ -15027,6 +16696,8 @@ OMPDeclareTargetDeclAttr *OMPDeclareTargetDeclAttr::clone(ASTContext &C) const {
 }
 
 void OMPDeclareTargetDeclAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
@@ -15100,6 +16771,8 @@ OMPDeclareVariantAttr *OMPDeclareVariantAttr::clone(ASTContext &C) const {
 }
 
 void OMPDeclareVariantAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
@@ -15267,20 +16940,25 @@ OSConsumedAttr *OSConsumedAttr::clone(ASTContext &C) const {
 }
 
 void OSConsumedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_consumed))";
+    OS << " __attribute__((os_consumed";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_consumed]]";
+    OS << " [[clang::os_consumed";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_consumed]]";
+    OS << " [[clang::os_consumed";
+    OS << "]]";
     break;
   }
 }
@@ -15343,20 +17021,25 @@ OSConsumesThisAttr *OSConsumesThisAttr::clone(ASTContext &C) const {
 }
 
 void OSConsumesThisAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_consumes_this))";
+    OS << " __attribute__((os_consumes_this";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_consumes_this]]";
+    OS << " [[clang::os_consumes_this";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_consumes_this]]";
+    OS << " [[clang::os_consumes_this";
+    OS << "]]";
     break;
   }
 }
@@ -15419,20 +17102,25 @@ OSReturnsNotRetainedAttr *OSReturnsNotRetainedAttr::clone(ASTContext &C) const {
 }
 
 void OSReturnsNotRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_returns_not_retained))";
+    OS << " __attribute__((os_returns_not_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_returns_not_retained]]";
+    OS << " [[clang::os_returns_not_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_returns_not_retained]]";
+    OS << " [[clang::os_returns_not_retained";
+    OS << "]]";
     break;
   }
 }
@@ -15495,20 +17183,25 @@ OSReturnsRetainedAttr *OSReturnsRetainedAttr::clone(ASTContext &C) const {
 }
 
 void OSReturnsRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_returns_retained))";
+    OS << " __attribute__((os_returns_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_returns_retained]]";
+    OS << " [[clang::os_returns_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_returns_retained]]";
+    OS << " [[clang::os_returns_retained";
+    OS << "]]";
     break;
   }
 }
@@ -15571,20 +17264,25 @@ OSReturnsRetainedOnNonZeroAttr *OSReturnsRetainedOnNonZeroAttr::clone(ASTContext
 }
 
 void OSReturnsRetainedOnNonZeroAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_returns_retained_on_non_zero))";
+    OS << " __attribute__((os_returns_retained_on_non_zero";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_returns_retained_on_non_zero]]";
+    OS << " [[clang::os_returns_retained_on_non_zero";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_returns_retained_on_non_zero]]";
+    OS << " [[clang::os_returns_retained_on_non_zero";
+    OS << "]]";
     break;
   }
 }
@@ -15647,20 +17345,25 @@ OSReturnsRetainedOnZeroAttr *OSReturnsRetainedOnZeroAttr::clone(ASTContext &C) c
 }
 
 void OSReturnsRetainedOnZeroAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((os_returns_retained_on_zero))";
+    OS << " __attribute__((os_returns_retained_on_zero";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::os_returns_retained_on_zero]]";
+    OS << " [[clang::os_returns_retained_on_zero";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::os_returns_retained_on_zero]]";
+    OS << " [[clang::os_returns_retained_on_zero";
+    OS << "]]";
     break;
   }
 }
@@ -15723,20 +17426,25 @@ ObjCBoxableAttr *ObjCBoxableAttr::clone(ASTContext &C) const {
 }
 
 void ObjCBoxableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_boxable))";
+    OS << " __attribute__((objc_boxable";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_boxable]]";
+    OS << " [[clang::objc_boxable";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_boxable]]";
+    OS << " [[clang::objc_boxable";
+    OS << "]]";
     break;
   }
 }
@@ -15803,20 +17511,37 @@ ObjCBridgeAttr *ObjCBridgeAttr::clone(ASTContext &C) const {
 }
 
 void ObjCBridgeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_bridge(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")))";
+    OS << " __attribute__((objc_bridge";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_bridge(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_bridge(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -15883,20 +17608,37 @@ ObjCBridgeMutableAttr *ObjCBridgeMutableAttr::clone(ASTContext &C) const {
 }
 
 void ObjCBridgeMutableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_bridge_mutable(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")))";
+    OS << " __attribute__((objc_bridge_mutable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_bridge_mutable(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge_mutable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_bridge_mutable(" << (getBridgedType() ? getBridgedType()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge_mutable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getBridgedType() ? getBridgedType()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -15971,20 +17713,49 @@ ObjCBridgeRelatedAttr *ObjCBridgeRelatedAttr::clone(ASTContext &C) const {
 }
 
 void ObjCBridgeRelatedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_bridge_related(" << (getRelatedClass() ? getRelatedClass()->getName() : "") << ", " << (getClassMethod() ? getClassMethod()->getName() : "") << ", " << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << ")))";
+    OS << " __attribute__((objc_bridge_related";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getRelatedClass() ? getRelatedClass()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getClassMethod() ? getClassMethod()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_bridge_related(" << (getRelatedClass() ? getRelatedClass()->getName() : "") << ", " << (getClassMethod() ? getClassMethod()->getName() : "") << ", " << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge_related";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getRelatedClass() ? getRelatedClass()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getClassMethod() ? getClassMethod()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_bridge_related(" << (getRelatedClass() ? getRelatedClass()->getName() : "") << ", " << (getClassMethod() ? getClassMethod()->getName() : "") << ", " << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << ")]]";
+    OS << " [[clang::objc_bridge_related";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getRelatedClass() ? getRelatedClass()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getClassMethod() ? getClassMethod()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getInstanceMethod() ? getInstanceMethod()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -16047,20 +17818,25 @@ ObjCClassStubAttr *ObjCClassStubAttr::clone(ASTContext &C) const {
 }
 
 void ObjCClassStubAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_class_stub))";
+    OS << " __attribute__((objc_class_stub";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_class_stub]]";
+    OS << " [[clang::objc_class_stub";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_class_stub]]";
+    OS << " [[clang::objc_class_stub";
+    OS << "]]";
     break;
   }
 }
@@ -16123,20 +17899,25 @@ ObjCDesignatedInitializerAttr *ObjCDesignatedInitializerAttr::clone(ASTContext &
 }
 
 void ObjCDesignatedInitializerAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_designated_initializer))";
+    OS << " __attribute__((objc_designated_initializer";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_designated_initializer]]";
+    OS << " [[clang::objc_designated_initializer";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_designated_initializer]]";
+    OS << " [[clang::objc_designated_initializer";
+    OS << "]]";
     break;
   }
 }
@@ -16199,20 +17980,25 @@ ObjCDirectAttr *ObjCDirectAttr::clone(ASTContext &C) const {
 }
 
 void ObjCDirectAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_direct))";
+    OS << " __attribute__((objc_direct";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_direct]]";
+    OS << " [[clang::objc_direct";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_direct]]";
+    OS << " [[clang::objc_direct";
+    OS << "]]";
     break;
   }
 }
@@ -16275,20 +18061,25 @@ ObjCDirectMembersAttr *ObjCDirectMembersAttr::clone(ASTContext &C) const {
 }
 
 void ObjCDirectMembersAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_direct_members))";
+    OS << " __attribute__((objc_direct_members";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_direct_members]]";
+    OS << " [[clang::objc_direct_members";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_direct_members]]";
+    OS << " [[clang::objc_direct_members";
+    OS << "]]";
     break;
   }
 }
@@ -16351,20 +18142,25 @@ ObjCExceptionAttr *ObjCExceptionAttr::clone(ASTContext &C) const {
 }
 
 void ObjCExceptionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_exception))";
+    OS << " __attribute__((objc_exception";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_exception]]";
+    OS << " [[clang::objc_exception";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_exception]]";
+    OS << " [[clang::objc_exception";
+    OS << "]]";
     break;
   }
 }
@@ -16427,20 +18223,25 @@ ObjCExplicitProtocolImplAttr *ObjCExplicitProtocolImplAttr::clone(ASTContext &C)
 }
 
 void ObjCExplicitProtocolImplAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_protocol_requires_explicit_implementation))";
+    OS << " __attribute__((objc_protocol_requires_explicit_implementation";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_protocol_requires_explicit_implementation]]";
+    OS << " [[clang::objc_protocol_requires_explicit_implementation";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_protocol_requires_explicit_implementation]]";
+    OS << " [[clang::objc_protocol_requires_explicit_implementation";
+    OS << "]]";
     break;
   }
 }
@@ -16503,20 +18304,25 @@ ObjCExternallyRetainedAttr *ObjCExternallyRetainedAttr::clone(ASTContext &C) con
 }
 
 void ObjCExternallyRetainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_externally_retained))";
+    OS << " __attribute__((objc_externally_retained";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_externally_retained]]";
+    OS << " [[clang::objc_externally_retained";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_externally_retained]]";
+    OS << " [[clang::objc_externally_retained";
+    OS << "]]";
     break;
   }
 }
@@ -16583,20 +18389,37 @@ ObjCGCAttr *ObjCGCAttr::clone(ASTContext &C) const {
 }
 
 void ObjCGCAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_gc(" << (getKind() ? getKind()->getName() : "") << ")))";
+    OS << " __attribute__((objc_gc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_gc(" << (getKind() ? getKind()->getName() : "") << ")]]";
+    OS << " [[clang::objc_gc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_gc(" << (getKind() ? getKind()->getName() : "") << ")]]";
+    OS << " [[clang::objc_gc";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -16659,20 +18482,25 @@ ObjCIndependentClassAttr *ObjCIndependentClassAttr::clone(ASTContext &C) const {
 }
 
 void ObjCIndependentClassAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_independent_class))";
+    OS << " __attribute__((objc_independent_class";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_independent_class]]";
+    OS << " [[clang::objc_independent_class";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_independent_class]]";
+    OS << " [[clang::objc_independent_class";
+    OS << "]]";
     break;
   }
 }
@@ -16735,12 +18563,15 @@ ObjCInertUnsafeUnretainedAttr *ObjCInertUnsafeUnretainedAttr::clone(ASTContext &
 }
 
 void ObjCInertUnsafeUnretainedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __unsafe_unretained";
+    OS << "";
     break;
   }
 }
@@ -16799,12 +18630,15 @@ ObjCKindOfAttr *ObjCKindOfAttr::clone(ASTContext &C) const {
 }
 
 void ObjCKindOfAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __kindof";
+    OS << "";
     break;
   }
 }
@@ -16894,20 +18728,37 @@ ObjCMethodFamilyAttr *ObjCMethodFamilyAttr::clone(ASTContext &C) const {
 }
 
 void ObjCMethodFamilyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_method_family(\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\")))";
+    OS << " __attribute__((objc_method_family";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_method_family(\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\")]]";
+    OS << " [[clang::objc_method_family";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_method_family(\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\")]]";
+    OS << " [[clang::objc_method_family";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ObjCMethodFamilyAttr::ConvertFamilyKindToStr(getFamily()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -16970,20 +18821,25 @@ ObjCNSObjectAttr *ObjCNSObjectAttr::clone(ASTContext &C) const {
 }
 
 void ObjCNSObjectAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((NSObject))";
+    OS << " __attribute__((NSObject";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::NSObject]]";
+    OS << " [[clang::NSObject";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::NSObject]]";
+    OS << " [[clang::NSObject";
+    OS << "]]";
     break;
   }
 }
@@ -17046,20 +18902,25 @@ ObjCNonLazyClassAttr *ObjCNonLazyClassAttr::clone(ASTContext &C) const {
 }
 
 void ObjCNonLazyClassAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_nonlazy_class))";
+    OS << " __attribute__((objc_nonlazy_class";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_nonlazy_class]]";
+    OS << " [[clang::objc_nonlazy_class";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_nonlazy_class]]";
+    OS << " [[clang::objc_nonlazy_class";
+    OS << "]]";
     break;
   }
 }
@@ -17122,20 +18983,25 @@ ObjCNonRuntimeProtocolAttr *ObjCNonRuntimeProtocolAttr::clone(ASTContext &C) con
 }
 
 void ObjCNonRuntimeProtocolAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_non_runtime_protocol))";
+    OS << " __attribute__((objc_non_runtime_protocol";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_non_runtime_protocol]]";
+    OS << " [[clang::objc_non_runtime_protocol";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_non_runtime_protocol]]";
+    OS << " [[clang::objc_non_runtime_protocol";
+    OS << "]]";
     break;
   }
 }
@@ -17202,20 +19068,37 @@ ObjCOwnershipAttr *ObjCOwnershipAttr::clone(ASTContext &C) const {
 }
 
 void ObjCOwnershipAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_ownership(" << (getKind() ? getKind()->getName() : "") << ")))";
+    OS << " __attribute__((objc_ownership";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_ownership(" << (getKind() ? getKind()->getName() : "") << ")]]";
+    OS << " [[clang::objc_ownership";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_ownership(" << (getKind() ? getKind()->getName() : "") << ")]]";
+    OS << " [[clang::objc_ownership";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getKind() ? getKind()->getName() : "") << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -17278,20 +19161,25 @@ ObjCPreciseLifetimeAttr *ObjCPreciseLifetimeAttr::clone(ASTContext &C) const {
 }
 
 void ObjCPreciseLifetimeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_precise_lifetime))";
+    OS << " __attribute__((objc_precise_lifetime";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_precise_lifetime]]";
+    OS << " [[clang::objc_precise_lifetime";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_precise_lifetime]]";
+    OS << " [[clang::objc_precise_lifetime";
+    OS << "]]";
     break;
   }
 }
@@ -17354,20 +19242,25 @@ ObjCRequiresPropertyDefsAttr *ObjCRequiresPropertyDefsAttr::clone(ASTContext &C)
 }
 
 void ObjCRequiresPropertyDefsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_requires_property_definitions))";
+    OS << " __attribute__((objc_requires_property_definitions";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_requires_property_definitions]]";
+    OS << " [[clang::objc_requires_property_definitions";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_requires_property_definitions]]";
+    OS << " [[clang::objc_requires_property_definitions";
+    OS << "]]";
     break;
   }
 }
@@ -17430,20 +19323,25 @@ ObjCRequiresSuperAttr *ObjCRequiresSuperAttr::clone(ASTContext &C) const {
 }
 
 void ObjCRequiresSuperAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_requires_super))";
+    OS << " __attribute__((objc_requires_super";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_requires_super]]";
+    OS << " [[clang::objc_requires_super";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_requires_super]]";
+    OS << " [[clang::objc_requires_super";
+    OS << "]]";
     break;
   }
 }
@@ -17506,20 +19404,25 @@ ObjCReturnsInnerPointerAttr *ObjCReturnsInnerPointerAttr::clone(ASTContext &C) c
 }
 
 void ObjCReturnsInnerPointerAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_returns_inner_pointer))";
+    OS << " __attribute__((objc_returns_inner_pointer";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_returns_inner_pointer]]";
+    OS << " [[clang::objc_returns_inner_pointer";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_returns_inner_pointer]]";
+    OS << " [[clang::objc_returns_inner_pointer";
+    OS << "]]";
     break;
   }
 }
@@ -17582,20 +19485,25 @@ ObjCRootClassAttr *ObjCRootClassAttr::clone(ASTContext &C) const {
 }
 
 void ObjCRootClassAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_root_class))";
+    OS << " __attribute__((objc_root_class";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_root_class]]";
+    OS << " [[clang::objc_root_class";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_root_class]]";
+    OS << " [[clang::objc_root_class";
+    OS << "]]";
     break;
   }
 }
@@ -17664,20 +19572,37 @@ ObjCRuntimeNameAttr *ObjCRuntimeNameAttr::clone(ASTContext &C) const {
 }
 
 void ObjCRuntimeNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_runtime_name(\"" << getMetadataName() << "\")))";
+    OS << " __attribute__((objc_runtime_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMetadataName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_runtime_name(\"" << getMetadataName() << "\")]]";
+    OS << " [[clang::objc_runtime_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMetadataName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_runtime_name(\"" << getMetadataName() << "\")]]";
+    OS << " [[clang::objc_runtime_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMetadataName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -17740,20 +19665,25 @@ ObjCRuntimeVisibleAttr *ObjCRuntimeVisibleAttr::clone(ASTContext &C) const {
 }
 
 void ObjCRuntimeVisibleAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_runtime_visible))";
+    OS << " __attribute__((objc_runtime_visible";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_runtime_visible]]";
+    OS << " [[clang::objc_runtime_visible";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_runtime_visible]]";
+    OS << " [[clang::objc_runtime_visible";
+    OS << "]]";
     break;
   }
 }
@@ -17816,20 +19746,25 @@ ObjCSubclassingRestrictedAttr *ObjCSubclassingRestrictedAttr::clone(ASTContext &
 }
 
 void ObjCSubclassingRestrictedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((objc_subclassing_restricted))";
+    OS << " __attribute__((objc_subclassing_restricted";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::objc_subclassing_restricted]]";
+    OS << " [[clang::objc_subclassing_restricted";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::objc_subclassing_restricted]]";
+    OS << " [[clang::objc_subclassing_restricted";
+    OS << "]]";
     break;
   }
 }
@@ -17901,32 +19836,40 @@ OpenCLAccessAttr *OpenCLAccessAttr::clone(ASTContext &C) const {
 }
 
 void OpenCLAccessAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __read_only";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " read_only";
+    OS << "";
     break;
   }
   case 2 : {
     OS << " __write_only";
+    OS << "";
     break;
   }
   case 3 : {
     OS << " write_only";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " __read_write";
+    OS << "";
     break;
   }
   case 5 : {
     OS << " read_write";
+    OS << "";
     break;
   }
 }
@@ -18003,28 +19946,35 @@ OpenCLConstantAddressSpaceAttr *OpenCLConstantAddressSpaceAttr::clone(ASTContext
 }
 
 void OpenCLConstantAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __constant";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " constant";
+    OS << "";
     break;
   }
   case 2 : {
-    OS << " __attribute__((opencl_constant))";
+    OS << " __attribute__((opencl_constant";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::opencl_constant]]";
+    OS << " [[clang::opencl_constant";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[clang::opencl_constant]]";
+    OS << " [[clang::opencl_constant";
+    OS << "]]";
     break;
   }
 }
@@ -18099,28 +20049,35 @@ OpenCLGenericAddressSpaceAttr *OpenCLGenericAddressSpaceAttr::clone(ASTContext &
 }
 
 void OpenCLGenericAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __generic";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " generic";
+    OS << "";
     break;
   }
   case 2 : {
-    OS << " __attribute__((opencl_generic))";
+    OS << " __attribute__((opencl_generic";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::opencl_generic]]";
+    OS << " [[clang::opencl_generic";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[clang::opencl_generic]]";
+    OS << " [[clang::opencl_generic";
+    OS << "]]";
     break;
   }
 }
@@ -18195,28 +20152,35 @@ OpenCLGlobalAddressSpaceAttr *OpenCLGlobalAddressSpaceAttr::clone(ASTContext &C)
 }
 
 void OpenCLGlobalAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __global";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " global";
+    OS << "";
     break;
   }
   case 2 : {
-    OS << " __attribute__((opencl_global))";
+    OS << " __attribute__((opencl_global";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::opencl_global]]";
+    OS << " [[clang::opencl_global";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[clang::opencl_global]]";
+    OS << " [[clang::opencl_global";
+    OS << "]]";
     break;
   }
 }
@@ -18283,20 +20247,25 @@ OpenCLGlobalDeviceAddressSpaceAttr *OpenCLGlobalDeviceAddressSpaceAttr::clone(AS
 }
 
 void OpenCLGlobalDeviceAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((opencl_global_device))";
+    OS << " __attribute__((opencl_global_device";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::opencl_global_device]]";
+    OS << " [[clang::opencl_global_device";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::opencl_global_device]]";
+    OS << " [[clang::opencl_global_device";
+    OS << "]]";
     break;
   }
 }
@@ -18359,20 +20328,25 @@ OpenCLGlobalHostAddressSpaceAttr *OpenCLGlobalHostAddressSpaceAttr::clone(ASTCon
 }
 
 void OpenCLGlobalHostAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((opencl_global_host))";
+    OS << " __attribute__((opencl_global_host";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::opencl_global_host]]";
+    OS << " [[clang::opencl_global_host";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::opencl_global_host]]";
+    OS << " [[clang::opencl_global_host";
+    OS << "]]";
     break;
   }
 }
@@ -18439,12 +20413,19 @@ OpenCLIntelReqdSubGroupSizeAttr *OpenCLIntelReqdSubGroupSizeAttr::clone(ASTConte
 }
 
 void OpenCLIntelReqdSubGroupSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((intel_reqd_sub_group_size(" << getSubGroupSize() << ")))";
+    OS << " __attribute__((intel_reqd_sub_group_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSubGroupSize() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -18503,16 +20484,20 @@ OpenCLKernelAttr *OpenCLKernelAttr::clone(ASTContext &C) const {
 }
 
 void OpenCLKernelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __kernel";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " kernel";
+    OS << "";
     break;
   }
 }
@@ -18581,28 +20566,35 @@ OpenCLLocalAddressSpaceAttr *OpenCLLocalAddressSpaceAttr::clone(ASTContext &C) c
 }
 
 void OpenCLLocalAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __local";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " local";
+    OS << "";
     break;
   }
   case 2 : {
-    OS << " __attribute__((opencl_local))";
+    OS << " __attribute__((opencl_local";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::opencl_local]]";
+    OS << " [[clang::opencl_local";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[clang::opencl_local]]";
+    OS << " [[clang::opencl_local";
+    OS << "]]";
     break;
   }
 }
@@ -18677,28 +20669,35 @@ OpenCLPrivateAddressSpaceAttr *OpenCLPrivateAddressSpaceAttr::clone(ASTContext &
 }
 
 void OpenCLPrivateAddressSpaceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __private";
+    OS << "";
     break;
   }
   case 1 : {
     OS << " private";
+    OS << "";
     break;
   }
   case 2 : {
-    OS << " __attribute__((opencl_private))";
+    OS << " __attribute__((opencl_private";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::opencl_private]]";
+    OS << " [[clang::opencl_private";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[clang::opencl_private]]";
+    OS << " [[clang::opencl_private";
+    OS << "]]";
     break;
   }
 }
@@ -18753,8 +20752,15 @@ OpenCLUnrollHintAttr *OpenCLUnrollHintAttr::Create(ASTContext &Ctx, unsigned Unr
 OpenCLUnrollHintAttr::OpenCLUnrollHintAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
               , unsigned UnrollHint
              )
-  : InheritableAttr(Ctx, CommonInfo, attr::OpenCLUnrollHint, false, false)
+  : StmtAttr(Ctx, CommonInfo, attr::OpenCLUnrollHint, false)
               , unrollHint(UnrollHint)
+  {
+}
+
+OpenCLUnrollHintAttr::OpenCLUnrollHintAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : StmtAttr(Ctx, CommonInfo, attr::OpenCLUnrollHint, false)
+              , unrollHint()
   {
 }
 
@@ -18769,12 +20775,19 @@ OpenCLUnrollHintAttr *OpenCLUnrollHintAttr::clone(ASTContext &C) const {
 }
 
 void OpenCLUnrollHintAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((opencl_unroll_hint(" << getUnrollHint() << ")))";
+    OS << " __attribute__((opencl_unroll_hint";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getUnrollHint() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -18833,20 +20846,25 @@ OptimizeNoneAttr *OptimizeNoneAttr::clone(ASTContext &C) const {
 }
 
 void OptimizeNoneAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((optnone))";
+    OS << " __attribute__((optnone";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::optnone]]";
+    OS << " [[clang::optnone";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::optnone]]";
+    OS << " [[clang::optnone";
+    OS << "]]";
     break;
   }
 }
@@ -18909,20 +20927,25 @@ OverloadableAttr *OverloadableAttr::clone(ASTContext &C) const {
 }
 
 void OverloadableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((overloadable))";
+    OS << " __attribute__((overloadable";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::overloadable]]";
+    OS << " [[clang::overloadable";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::overloadable]]";
+    OS << " [[clang::overloadable";
+    OS << "]]";
     break;
   }
 }
@@ -18985,12 +21008,15 @@ OverrideAttr *OverrideAttr::clone(ASTContext &C) const {
 }
 
 void OverrideAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " override";
+    OS << "";
     break;
   }
 }
@@ -19060,25 +21086,22 @@ OwnerAttr *OwnerAttr::clone(ASTContext &C) const {
 }
 
 void OwnerAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " [[gsl::Owner";
-    unsigned TrailingOmittedArgs = 0;
     if (!getDerefTypeLoc())
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!getDerefTypeLoc())) {
-      OS << "" << getDerefType().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getDerefType().getAsString() << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
@@ -19168,107 +21191,145 @@ OwnershipAttr *OwnershipAttr::clone(ASTContext &C) const {
 }
 
 void OwnershipAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((ownership_holds(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((ownership_holds";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::ownership_holds(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_holds";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::ownership_holds(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_holds";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((ownership_returns(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((ownership_returns";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[clang::ownership_returns(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_returns";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[clang::ownership_returns(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_returns";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 6 : {
-    OS << " __attribute__((ownership_takes(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((ownership_takes";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 7 : {
-    OS << " [[clang::ownership_takes(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_takes";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 8 : {
-    OS << " [[clang::ownership_takes(" << (getModule() ? getModule()->getName() : "") << ", ";
-  bool isFirst = true;
+    OS << " [[clang::ownership_takes";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getModule() ? getModule()->getName() : "") << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val.getSourceIndex();
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -19343,20 +21404,25 @@ PackedAttr *PackedAttr::clone(ASTContext &C) const {
 }
 
 void PackedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((packed))";
+    OS << " __attribute__((packed";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::packed]]";
+    OS << " [[gnu::packed";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::packed]]";
+    OS << " [[gnu::packed";
+    OS << "]]";
     break;
   }
 }
@@ -19444,16 +21510,28 @@ ParamTypestateAttr *ParamTypestateAttr::clone(ASTContext &C) const {
 }
 
 void ParamTypestateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((param_typestate(\"" << ParamTypestateAttr::ConvertConsumedStateToStr(getParamState()) << "\")))";
+    OS << " __attribute__((param_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ParamTypestateAttr::ConvertConsumedStateToStr(getParamState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::param_typestate(\"" << ParamTypestateAttr::ConvertConsumedStateToStr(getParamState()) << "\")]]";
+    OS << " [[clang::param_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ParamTypestateAttr::ConvertConsumedStateToStr(getParamState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -19514,28 +21592,35 @@ PascalAttr *PascalAttr::clone(ASTContext &C) const {
 }
 
 void PascalAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pascal))";
+    OS << " __attribute__((pascal";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::pascal]]";
+    OS << " [[clang::pascal";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::pascal]]";
+    OS << " [[clang::pascal";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __pascal";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _pascal";
+    OS << "";
     break;
   }
 }
@@ -19615,32 +21700,64 @@ PassObjectSizeAttr *PassObjectSizeAttr::clone(ASTContext &C) const {
 }
 
 void PassObjectSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pass_object_size(" << getType() << ")))";
+    OS << " __attribute__((pass_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::pass_object_size(" << getType() << ")]]";
+    OS << " [[clang::pass_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::pass_object_size(" << getType() << ")]]";
+    OS << " [[clang::pass_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((pass_dynamic_object_size(" << getType() << ")))";
+    OS << " __attribute__((pass_dynamic_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[clang::pass_dynamic_object_size(" << getType() << ")]]";
+    OS << " [[clang::pass_dynamic_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[clang::pass_dynamic_object_size(" << getType() << ")]]";
+    OS << " [[clang::pass_dynamic_object_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getType() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -19726,20 +21843,43 @@ PatchableFunctionEntryAttr *PatchableFunctionEntryAttr::clone(ASTContext &C) con
 }
 
 void PatchableFunctionEntryAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((patchable_function_entry(" << getCount() << ", " << getOffset() << ")))";
+    OS << " __attribute__((patchable_function_entry";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCount() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::patchable_function_entry(" << getCount() << ", " << getOffset() << ")]]";
+    OS << " [[gnu::patchable_function_entry";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCount() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::patchable_function_entry(" << getCount() << ", " << getOffset() << ")]]";
+    OS << " [[gnu::patchable_function_entry";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCount() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getOffset() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -19825,20 +21965,37 @@ PcsAttr *PcsAttr::clone(ASTContext &C) const {
 }
 
 void PcsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pcs(\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\")))";
+    OS << " __attribute__((pcs";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::pcs(\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\")]]";
+    OS << " [[gnu::pcs";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::pcs(\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\")]]";
+    OS << " [[gnu::pcs";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << PcsAttr::ConvertPCSTypeToStr(getPCS()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -19912,25 +22069,22 @@ PointerAttr *PointerAttr::clone(ASTContext &C) const {
 }
 
 void PointerAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " [[gsl::Pointer";
-    unsigned TrailingOmittedArgs = 0;
     if (!getDerefTypeLoc())
       ++TrailingOmittedArgs;
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << "(";
-    OS << "";
     if (!(!getDerefTypeLoc())) {
-      OS << "" << getDerefType().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getDerefType().getAsString() << "";
     }
-    OS << "";
-    if (TrailingOmittedArgs < 1)
-       OS << ")";
+    if (!IsFirstArgument)
+      OS << ")";
     OS << "]]";
     break;
   }
@@ -20269,16 +22423,28 @@ PreferredNameAttr *PreferredNameAttr::clone(ASTContext &C) const {
 }
 
 void PreferredNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((preferred_name(" << getTypedefType().getAsString() << ")))";
+    OS << " __attribute__((preferred_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypedefType().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::preferred_name(" << getTypedefType().getAsString() << ")]]";
+    OS << " [[clang::preferred_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypedefType().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -20339,20 +22505,25 @@ PreserveAllAttr *PreserveAllAttr::clone(ASTContext &C) const {
 }
 
 void PreserveAllAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((preserve_all))";
+    OS << " __attribute__((preserve_all";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::preserve_all]]";
+    OS << " [[clang::preserve_all";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::preserve_all]]";
+    OS << " [[clang::preserve_all";
+    OS << "]]";
     break;
   }
 }
@@ -20415,20 +22586,25 @@ PreserveMostAttr *PreserveMostAttr::clone(ASTContext &C) const {
 }
 
 void PreserveMostAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((preserve_most))";
+    OS << " __attribute__((preserve_most";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::preserve_most]]";
+    OS << " [[clang::preserve_most";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::preserve_most]]";
+    OS << " [[clang::preserve_most";
+    OS << "]]";
     break;
   }
 }
@@ -20495,12 +22671,19 @@ PtGuardedByAttr *PtGuardedByAttr::clone(ASTContext &C) const {
 }
 
 void PtGuardedByAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pt_guarded_by(" << getArg() << ")))";
+    OS << " __attribute__((pt_guarded_by";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArg() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -20559,16 +22742,20 @@ PtGuardedVarAttr *PtGuardedVarAttr::clone(ASTContext &C) const {
 }
 
 void PtGuardedVarAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pt_guarded_var))";
+    OS << " __attribute__((pt_guarded_var";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::pt_guarded_var]]";
+    OS << " [[clang::pt_guarded_var";
+    OS << "]]";
     break;
   }
 }
@@ -20629,12 +22816,15 @@ Ptr32Attr *Ptr32Attr::clone(ASTContext &C) const {
 }
 
 void Ptr32Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __ptr32";
+    OS << "";
     break;
   }
 }
@@ -20693,12 +22883,15 @@ Ptr64Attr *Ptr64Attr::clone(ASTContext &C) const {
 }
 
 void Ptr64Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __ptr64";
+    OS << "";
     break;
   }
 }
@@ -20757,20 +22950,25 @@ PureAttr *PureAttr::clone(ASTContext &C) const {
 }
 
 void PureAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((pure))";
+    OS << " __attribute__((pure";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::pure]]";
+    OS << " [[gnu::pure";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::pure]]";
+    OS << " [[gnu::pure";
+    OS << "]]";
     break;
   }
 }
@@ -20865,20 +23063,37 @@ RISCVInterruptAttr *RISCVInterruptAttr::clone(ASTContext &C) const {
 }
 
 void RISCVInterruptAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((interrupt(\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")))";
+    OS << " __attribute__((interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::interrupt(\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::interrupt(\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\")]]";
+    OS << " [[gnu::interrupt";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << RISCVInterruptAttr::ConvertInterruptTypeToStr(getInterrupt()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -20941,24 +23156,30 @@ RegCallAttr *RegCallAttr::clone(ASTContext &C) const {
 }
 
 void RegCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((regcall))";
+    OS << " __attribute__((regcall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::regcall]]";
+    OS << " [[gnu::regcall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::regcall]]";
+    OS << " [[gnu::regcall";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __regcall";
+    OS << "";
     break;
   }
 }
@@ -21023,16 +23244,20 @@ ReinitializesAttr *ReinitializesAttr::clone(ASTContext &C) const {
 }
 
 void ReinitializesAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((reinitializes))";
+    OS << " __attribute__((reinitializes";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::reinitializes]]";
+    OS << " [[clang::reinitializes";
+    OS << "]]";
     break;
   }
 }
@@ -21116,96 +23341,114 @@ ReleaseCapabilityAttr *ReleaseCapabilityAttr::clone(ASTContext &C) const {
 }
 
 void ReleaseCapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((release_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((release_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::release_capability(";
-  bool isFirst = true;
+    OS << " [[clang::release_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((release_shared_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((release_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::release_shared_capability(";
-  bool isFirst = true;
+    OS << " [[clang::release_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " __attribute__((release_generic_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((release_generic_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 5 : {
-    OS << " [[clang::release_generic_capability(";
-  bool isFirst = true;
+    OS << " [[clang::release_generic_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 6 : {
-    OS << " __attribute__((unlock_function(";
-  bool isFirst = true;
+    OS << " __attribute__((unlock_function";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 7 : {
-    OS << " [[clang::unlock_function(";
-  bool isFirst = true;
+    OS << " [[clang::unlock_function";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -21284,20 +23527,37 @@ ReleaseHandleAttr *ReleaseHandleAttr::clone(ASTContext &C) const {
 }
 
 void ReleaseHandleAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((release_handle(\"" << getHandleType() << "\")))";
+    OS << " __attribute__((release_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::release_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::release_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::release_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::release_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -21360,12 +23620,15 @@ RenderScriptKernelAttr *RenderScriptKernelAttr::clone(ASTContext &C) const {
 }
 
 void RenderScriptKernelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((kernel))";
+    OS << " __attribute__((kernel";
+    OS << "))";
     break;
   }
 }
@@ -21436,12 +23699,23 @@ ReqdWorkGroupSizeAttr *ReqdWorkGroupSizeAttr::clone(ASTContext &C) const {
 }
 
 void ReqdWorkGroupSizeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((reqd_work_group_size(" << getXDim() << ", " << getYDim() << ", " << getZDim() << ")))";
+    OS << " __attribute__((reqd_work_group_size";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getXDim() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getYDim() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getZDim() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -21523,96 +23797,114 @@ RequiresCapabilityAttr *RequiresCapabilityAttr::clone(ASTContext &C) const {
 }
 
 void RequiresCapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((requires_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((requires_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::requires_capability(";
-  bool isFirst = true;
+    OS << " [[clang::requires_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((exclusive_locks_required(";
-  bool isFirst = true;
+    OS << " __attribute__((exclusive_locks_required";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::exclusive_locks_required(";
-  bool isFirst = true;
+    OS << " [[clang::exclusive_locks_required";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " __attribute__((requires_shared_capability(";
-  bool isFirst = true;
+    OS << " __attribute__((requires_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 5 : {
-    OS << " [[clang::requires_shared_capability(";
-  bool isFirst = true;
+    OS << " [[clang::requires_shared_capability";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 6 : {
-    OS << " __attribute__((shared_locks_required(";
-  bool isFirst = true;
+    OS << " __attribute__((shared_locks_required";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 7 : {
-    OS << " [[clang::shared_locks_required(";
-  bool isFirst = true;
+    OS << " [[clang::shared_locks_required";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -21692,24 +23984,30 @@ RestrictAttr *RestrictAttr::clone(ASTContext &C) const {
 }
 
 void RestrictAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(restrict)";
+    OS << " __declspec(restrict";
+    OS << ")";
     break;
   }
   case 1 : {
-    OS << " __attribute__((malloc))";
+    OS << " __attribute__((malloc";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[gnu::malloc]]";
+    OS << " [[gnu::malloc";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " [[gnu::malloc]]";
+    OS << " [[gnu::malloc";
+    OS << "]]";
     break;
   }
 }
@@ -21728,6 +24026,87 @@ const char *RestrictAttr::getSpelling() const {
     return "malloc";
   case 3:
     return "malloc";
+  }
+}
+
+
+// RetainAttr implementation
+
+RetainAttr *RetainAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) RetainAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+RetainAttr *RetainAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) RetainAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+RetainAttr *RetainAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+RetainAttr *RetainAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+RetainAttr::RetainAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::Retain, false, false)
+  {
+}
+
+RetainAttr *RetainAttr::clone(ASTContext &C) const {
+  auto *A = new (C) RetainAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void RetainAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((retain";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[gnu::retain";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[gnu::retain";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *RetainAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "retain";
+  case 1:
+    return "retain";
+  case 2:
+    return "retain";
   }
 }
 
@@ -21799,16 +24178,28 @@ ReturnTypestateAttr *ReturnTypestateAttr::clone(ASTContext &C) const {
 }
 
 void ReturnTypestateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((return_typestate(\"" << ReturnTypestateAttr::ConvertConsumedStateToStr(getState()) << "\")))";
+    OS << " __attribute__((return_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ReturnTypestateAttr::ConvertConsumedStateToStr(getState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::return_typestate(\"" << ReturnTypestateAttr::ConvertConsumedStateToStr(getState()) << "\")]]";
+    OS << " [[clang::return_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << ReturnTypestateAttr::ConvertConsumedStateToStr(getState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -21869,20 +24260,25 @@ ReturnsNonNullAttr *ReturnsNonNullAttr::clone(ASTContext &C) const {
 }
 
 void ReturnsNonNullAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((returns_nonnull))";
+    OS << " __attribute__((returns_nonnull";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::returns_nonnull]]";
+    OS << " [[gnu::returns_nonnull";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::returns_nonnull]]";
+    OS << " [[gnu::returns_nonnull";
+    OS << "]]";
     break;
   }
 }
@@ -21945,20 +24341,25 @@ ReturnsTwiceAttr *ReturnsTwiceAttr::clone(ASTContext &C) const {
 }
 
 void ReturnsTwiceAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((returns_twice))";
+    OS << " __attribute__((returns_twice";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::returns_twice]]";
+    OS << " [[gnu::returns_twice";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::returns_twice]]";
+    OS << " [[gnu::returns_twice";
+    OS << "]]";
     break;
   }
 }
@@ -22021,12 +24422,15 @@ SPtrAttr *SPtrAttr::clone(ASTContext &C) const {
 }
 
 void SPtrAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __sptr";
+    OS << "";
     break;
   }
 }
@@ -22085,20 +24489,25 @@ SYCLKernelAttr *SYCLKernelAttr::clone(ASTContext &C) const {
 }
 
 void SYCLKernelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((sycl_kernel))";
+    OS << " __attribute__((sycl_kernel";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::sycl_kernel]]";
+    OS << " [[clang::sycl_kernel";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::sycl_kernel]]";
+    OS << " [[clang::sycl_kernel";
+    OS << "]]";
     break;
   }
 }
@@ -22161,16 +24570,20 @@ ScopedLockableAttr *ScopedLockableAttr::clone(ASTContext &C) const {
 }
 
 void ScopedLockableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((scoped_lockable))";
+    OS << " __attribute__((scoped_lockable";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::scoped_lockable]]";
+    OS << " [[clang::scoped_lockable";
+    OS << "]]";
     break;
   }
 }
@@ -22244,24 +24657,46 @@ SectionAttr *SectionAttr::clone(ASTContext &C) const {
 }
 
 void SectionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((section(\"" << getName() << "\")))";
+    OS << " __attribute__((section";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::section(\"" << getName() << "\")]]";
+    OS << " [[gnu::section";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::section(\"" << getName() << "\")]]";
+    OS << " [[gnu::section";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __declspec(allocate(\"" << getName() << "\"))";
+    OS << " __declspec(allocate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
 }
@@ -22326,24 +24761,30 @@ SelectAnyAttr *SelectAnyAttr::clone(ASTContext &C) const {
 }
 
 void SelectAnyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(selectany)";
+    OS << " __declspec(selectany";
+    OS << ")";
     break;
   }
   case 1 : {
-    OS << " __attribute__((selectany))";
+    OS << " __attribute__((selectany";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[gnu::selectany]]";
+    OS << " [[gnu::selectany";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " [[gnu::selectany]]";
+    OS << " [[gnu::selectany";
+    OS << "]]";
     break;
   }
 }
@@ -22424,20 +24865,43 @@ SentinelAttr *SentinelAttr::clone(ASTContext &C) const {
 }
 
 void SentinelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((sentinel(" << getSentinel() << ", " << getNullPos() << ")))";
+    OS << " __attribute__((sentinel";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSentinel() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNullPos() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::sentinel(" << getSentinel() << ", " << getNullPos() << ")]]";
+    OS << " [[gnu::sentinel";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSentinel() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNullPos() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::sentinel(" << getSentinel() << ", " << getNullPos() << ")]]";
+    OS << " [[gnu::sentinel";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSentinel() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getNullPos() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -22525,16 +24989,28 @@ SetTypestateAttr *SetTypestateAttr::clone(ASTContext &C) const {
 }
 
 void SetTypestateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((set_typestate(\"" << SetTypestateAttr::ConvertConsumedStateToStr(getNewState()) << "\")))";
+    OS << " __attribute__((set_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SetTypestateAttr::ConvertConsumedStateToStr(getNewState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::set_typestate(\"" << SetTypestateAttr::ConvertConsumedStateToStr(getNewState()) << "\")]]";
+    OS << " [[clang::set_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SetTypestateAttr::ConvertConsumedStateToStr(getNewState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -22613,19 +25089,25 @@ SharedTrylockFunctionAttr *SharedTrylockFunctionAttr::clone(ASTContext &C) const
 }
 
 void SharedTrylockFunctionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((shared_trylock_function(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((shared_trylock_function";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -22684,20 +25166,25 @@ SpeculativeLoadHardeningAttr *SpeculativeLoadHardeningAttr::clone(ASTContext &C)
 }
 
 void SpeculativeLoadHardeningAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((speculative_load_hardening))";
+    OS << " __attribute__((speculative_load_hardening";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::speculative_load_hardening]]";
+    OS << " [[clang::speculative_load_hardening";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::speculative_load_hardening]]";
+    OS << " [[clang::speculative_load_hardening";
+    OS << "]]";
     break;
   }
 }
@@ -22714,6 +25201,80 @@ const char *SpeculativeLoadHardeningAttr::getSpelling() const {
     return "speculative_load_hardening";
   case 2:
     return "speculative_load_hardening";
+  }
+}
+
+
+// StandaloneDebugAttr implementation
+
+StandaloneDebugAttr *StandaloneDebugAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) StandaloneDebugAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+StandaloneDebugAttr *StandaloneDebugAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) StandaloneDebugAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+StandaloneDebugAttr *StandaloneDebugAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+StandaloneDebugAttr *StandaloneDebugAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+StandaloneDebugAttr::StandaloneDebugAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::StandaloneDebug, false, false)
+  {
+}
+
+StandaloneDebugAttr *StandaloneDebugAttr::clone(ASTContext &C) const {
+  auto *A = new (C) StandaloneDebugAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void StandaloneDebugAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((standalone_debug";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::standalone_debug";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *StandaloneDebugAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "standalone_debug";
+  case 1:
+    return "standalone_debug";
   }
 }
 
@@ -22760,28 +25321,35 @@ StdCallAttr *StdCallAttr::clone(ASTContext &C) const {
 }
 
 void StdCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((stdcall))";
+    OS << " __attribute__((stdcall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::stdcall]]";
+    OS << " [[gnu::stdcall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::stdcall]]";
+    OS << " [[gnu::stdcall";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __stdcall";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _stdcall";
+    OS << "";
     break;
   }
 }
@@ -22917,19 +25485,23 @@ SuppressAttr *SuppressAttr::clone(ASTContext &C) const {
 }
 
 void SuppressAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[gsl::suppress(";
-  bool isFirst = true;
+    OS << " [[gsl::suppress";
+    OS << "";
   for (const auto &Val : diagnosticIdentifiers()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << "\"" << Val << "\"";
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -23026,53 +25598,55 @@ SwiftAsyncAttr *SwiftAsyncAttr::clone(ASTContext &C) const {
 }
 
 void SwiftAsyncAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __attribute__((swift_async";
-    unsigned TrailingOmittedArgs = 0;
     if (!getCompletionHandlerIndex().isValid())
       ++TrailingOmittedArgs;
-    OS << "(\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
     if (!(!getCompletionHandlerIndex().isValid())) {
-      OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
     }
-    OS << ")))";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
     OS << " [[clang::swift_async";
-    unsigned TrailingOmittedArgs = 0;
     if (!getCompletionHandlerIndex().isValid())
       ++TrailingOmittedArgs;
-    OS << "(\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
     if (!(!getCompletionHandlerIndex().isValid())) {
-      OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
     }
-    OS << ")]]";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
     OS << " [[clang::swift_async";
-    unsigned TrailingOmittedArgs = 0;
     if (!getCompletionHandlerIndex().isValid())
       ++TrailingOmittedArgs;
-    OS << "(\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
-    if (1 < 2 - TrailingOmittedArgs)
-      OS << ", ";
-    OS << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncAttr::ConvertKindToStr(getKind()) << "\"";
     if (!(!getCompletionHandlerIndex().isValid())) {
-      OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getCompletionHandlerIndex().getSourceIndex() << "";
     }
-    OS << ")]]";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -23089,6 +25663,307 @@ const char *SwiftAsyncAttr::getSpelling() const {
     return "swift_async";
   case 2:
     return "swift_async";
+  }
+}
+
+
+// SwiftAsyncCallAttr implementation
+
+SwiftAsyncCallAttr *SwiftAsyncCallAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncCallAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncCallAttr *SwiftAsyncCallAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncCallAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncCallAttr *SwiftAsyncCallAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+SwiftAsyncCallAttr *SwiftAsyncCallAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+SwiftAsyncCallAttr::SwiftAsyncCallAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::SwiftAsyncCall, false, false)
+  {
+}
+
+SwiftAsyncCallAttr *SwiftAsyncCallAttr::clone(ASTContext &C) const {
+  auto *A = new (C) SwiftAsyncCallAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void SwiftAsyncCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((swiftasynccall";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::swiftasynccall";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[clang::swiftasynccall";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *SwiftAsyncCallAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "swiftasynccall";
+  case 1:
+    return "swiftasynccall";
+  case 2:
+    return "swiftasynccall";
+  }
+}
+
+
+// SwiftAsyncContextAttr implementation
+
+SwiftAsyncContextAttr *SwiftAsyncContextAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncContextAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncContextAttr *SwiftAsyncContextAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncContextAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncContextAttr *SwiftAsyncContextAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+SwiftAsyncContextAttr *SwiftAsyncContextAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+SwiftAsyncContextAttr::SwiftAsyncContextAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : ParameterABIAttr(Ctx, CommonInfo, attr::SwiftAsyncContext, false, false)
+  {
+}
+
+SwiftAsyncContextAttr *SwiftAsyncContextAttr::clone(ASTContext &C) const {
+  auto *A = new (C) SwiftAsyncContextAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void SwiftAsyncContextAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((swift_async_context";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::swift_async_context";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[clang::swift_async_context";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *SwiftAsyncContextAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "swift_async_context";
+  case 1:
+    return "swift_async_context";
+  case 2:
+    return "swift_async_context";
+  }
+}
+
+
+// SwiftAsyncErrorAttr implementation
+
+SwiftAsyncErrorAttr *SwiftAsyncErrorAttr::CreateImplicit(ASTContext &Ctx, ConventionKind Convention, unsigned HandlerParamIdx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncErrorAttr(Ctx, CommonInfo, Convention, HandlerParamIdx);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncErrorAttr *SwiftAsyncErrorAttr::Create(ASTContext &Ctx, ConventionKind Convention, unsigned HandlerParamIdx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) SwiftAsyncErrorAttr(Ctx, CommonInfo, Convention, HandlerParamIdx);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+SwiftAsyncErrorAttr *SwiftAsyncErrorAttr::CreateImplicit(ASTContext &Ctx, ConventionKind Convention, unsigned HandlerParamIdx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, Convention, HandlerParamIdx, I);
+}
+
+SwiftAsyncErrorAttr *SwiftAsyncErrorAttr::Create(ASTContext &Ctx, ConventionKind Convention, unsigned HandlerParamIdx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, Convention, HandlerParamIdx, I);
+}
+
+SwiftAsyncErrorAttr::SwiftAsyncErrorAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+              , ConventionKind Convention
+              , unsigned HandlerParamIdx
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::SwiftAsyncError, false, false)
+              , convention(Convention)
+              , handlerParamIdx(HandlerParamIdx)
+  {
+}
+
+SwiftAsyncErrorAttr::SwiftAsyncErrorAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+              , ConventionKind Convention
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::SwiftAsyncError, false, false)
+              , convention(Convention)
+              , handlerParamIdx()
+  {
+}
+
+
+
+bool SwiftAsyncErrorAttr::ConvertStrToConventionKind(StringRef Val, ConventionKind &Out) {
+  Optional<ConventionKind> R = llvm::StringSwitch<Optional<ConventionKind>>(Val)
+    .Case("none", SwiftAsyncErrorAttr::None)
+    .Case("nonnull_error", SwiftAsyncErrorAttr::NonNullError)
+    .Case("zero_argument", SwiftAsyncErrorAttr::ZeroArgument)
+    .Case("nonzero_argument", SwiftAsyncErrorAttr::NonZeroArgument)
+    .Default(Optional<ConventionKind>());
+  if (R) {
+    Out = *R;
+      return true;
+    }
+  return false;
+}
+
+const char *SwiftAsyncErrorAttr::ConvertConventionKindToStr(ConventionKind Val) {
+  switch(Val) {
+  case SwiftAsyncErrorAttr::None: return "none";
+  case SwiftAsyncErrorAttr::NonNullError: return "nonnull_error";
+  case SwiftAsyncErrorAttr::ZeroArgument: return "zero_argument";
+  case SwiftAsyncErrorAttr::NonZeroArgument: return "nonzero_argument";
+  }
+  llvm_unreachable("No enumerator with that value");
+}
+
+
+SwiftAsyncErrorAttr *SwiftAsyncErrorAttr::clone(ASTContext &C) const {
+  auto *A = new (C) SwiftAsyncErrorAttr(C, *this, convention, handlerParamIdx);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void SwiftAsyncErrorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((swift_async_error";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncErrorAttr::ConvertConventionKindToStr(getConvention()) << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getHandlerParamIdx() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::swift_async_error";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncErrorAttr::ConvertConventionKindToStr(getConvention()) << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getHandlerParamIdx() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
+    break;
+  }
+  case 2 : {
+    OS << " [[clang::swift_async_error";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftAsyncErrorAttr::ConvertConventionKindToStr(getConvention()) << "\"";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getHandlerParamIdx() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *SwiftAsyncErrorAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "swift_async_error";
+  case 1:
+    return "swift_async_error";
+  case 2:
+    return "swift_async_error";
   }
 }
 
@@ -23141,12 +26016,19 @@ SwiftAsyncNameAttr *SwiftAsyncNameAttr::clone(ASTContext &C) const {
 }
 
 void SwiftAsyncNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_async_name(\"" << getName() << "\")))";
+    OS << " __attribute__((swift_async_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23211,12 +26093,19 @@ SwiftAttrAttr *SwiftAttrAttr::clone(ASTContext &C) const {
 }
 
 void SwiftAttrAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_attr(\"" << getAttribute() << "\")))";
+    OS << " __attribute__((swift_attr";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAttribute() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23281,12 +26170,19 @@ SwiftBridgeAttr *SwiftBridgeAttr::clone(ASTContext &C) const {
 }
 
 void SwiftBridgeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_bridge(\"" << getSwiftType() << "\")))";
+    OS << " __attribute__((swift_bridge";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getSwiftType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23345,12 +26241,15 @@ SwiftBridgedTypedefAttr *SwiftBridgedTypedefAttr::clone(ASTContext &C) const {
 }
 
 void SwiftBridgedTypedefAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_bridged_typedef))";
+    OS << " __attribute__((swift_bridged_typedef";
+    OS << "))";
     break;
   }
 }
@@ -23409,20 +26308,25 @@ SwiftCallAttr *SwiftCallAttr::clone(ASTContext &C) const {
 }
 
 void SwiftCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swiftcall))";
+    OS << " __attribute__((swiftcall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::swiftcall]]";
+    OS << " [[clang::swiftcall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::swiftcall]]";
+    OS << " [[clang::swiftcall";
+    OS << "]]";
     break;
   }
 }
@@ -23485,20 +26389,25 @@ SwiftContextAttr *SwiftContextAttr::clone(ASTContext &C) const {
 }
 
 void SwiftContextAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_context))";
+    OS << " __attribute__((swift_context";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::swift_context]]";
+    OS << " [[clang::swift_context";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::swift_context]]";
+    OS << " [[clang::swift_context";
+    OS << "]]";
     break;
   }
 }
@@ -23590,12 +26499,19 @@ SwiftErrorAttr *SwiftErrorAttr::clone(ASTContext &C) const {
 }
 
 void SwiftErrorAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_error(\"" << SwiftErrorAttr::ConvertConventionKindToStr(getConvention()) << "\")))";
+    OS << " __attribute__((swift_error";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftErrorAttr::ConvertConventionKindToStr(getConvention()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23654,20 +26570,25 @@ SwiftErrorResultAttr *SwiftErrorResultAttr::clone(ASTContext &C) const {
 }
 
 void SwiftErrorResultAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_error_result))";
+    OS << " __attribute__((swift_error_result";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::swift_error_result]]";
+    OS << " [[clang::swift_error_result";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::swift_error_result]]";
+    OS << " [[clang::swift_error_result";
+    OS << "]]";
     break;
   }
 }
@@ -23730,20 +26651,25 @@ SwiftIndirectResultAttr *SwiftIndirectResultAttr::clone(ASTContext &C) const {
 }
 
 void SwiftIndirectResultAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_indirect_result))";
+    OS << " __attribute__((swift_indirect_result";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::swift_indirect_result]]";
+    OS << " [[clang::swift_indirect_result";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::swift_indirect_result]]";
+    OS << " [[clang::swift_indirect_result";
+    OS << "]]";
     break;
   }
 }
@@ -23812,12 +26738,19 @@ SwiftNameAttr *SwiftNameAttr::clone(ASTContext &C) const {
 }
 
 void SwiftNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_name(\"" << getName() << "\")))";
+    OS << " __attribute__((swift_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23904,16 +26837,28 @@ SwiftNewTypeAttr *SwiftNewTypeAttr::clone(ASTContext &C) const {
 }
 
 void SwiftNewTypeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_newtype(\"" << SwiftNewTypeAttr::ConvertNewtypeKindToStr(getNewtypeKind()) << "\")))";
+    OS << " __attribute__((swift_newtype";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftNewTypeAttr::ConvertNewtypeKindToStr(getNewtypeKind()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " __attribute__((swift_wrapper(\"" << SwiftNewTypeAttr::ConvertNewtypeKindToStr(getNewtypeKind()) << "\")))";
+    OS << " __attribute__((swift_wrapper";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << SwiftNewTypeAttr::ConvertNewtypeKindToStr(getNewtypeKind()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -23974,12 +26919,15 @@ SwiftObjCMembersAttr *SwiftObjCMembersAttr::clone(ASTContext &C) const {
 }
 
 void SwiftObjCMembersAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_objc_members))";
+    OS << " __attribute__((swift_objc_members";
+    OS << "))";
     break;
   }
 }
@@ -24038,12 +26986,15 @@ SwiftPrivateAttr *SwiftPrivateAttr::clone(ASTContext &C) const {
 }
 
 void SwiftPrivateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((swift_private))";
+    OS << " __attribute__((swift_private";
+    OS << "))";
     break;
   }
 }
@@ -24102,20 +27053,25 @@ SysVABIAttr *SysVABIAttr::clone(ASTContext &C) const {
 }
 
 void SysVABIAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((sysv_abi))";
+    OS << " __attribute__((sysv_abi";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::sysv_abi]]";
+    OS << " [[gnu::sysv_abi";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::sysv_abi]]";
+    OS << " [[gnu::sysv_abi";
+    OS << "]]";
     break;
   }
 }
@@ -24184,20 +27140,37 @@ TLSModelAttr *TLSModelAttr::clone(ASTContext &C) const {
 }
 
 void TLSModelAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((tls_model(\"" << getModel() << "\")))";
+    OS << " __attribute__((tls_model";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getModel() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::tls_model(\"" << getModel() << "\")]]";
+    OS << " [[gnu::tls_model";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getModel() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::tls_model(\"" << getModel() << "\")]]";
+    OS << " [[gnu::tls_model";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getModel() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -24266,20 +27239,37 @@ TargetAttr *TargetAttr::clone(ASTContext &C) const {
 }
 
 void TargetAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((target(\"" << getFeaturesStr() << "\")))";
+    OS << " __attribute__((target";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getFeaturesStr() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::target(\"" << getFeaturesStr() << "\")]]";
+    OS << " [[gnu::target";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getFeaturesStr() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::target(\"" << getFeaturesStr() << "\")]]";
+    OS << " [[gnu::target";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getFeaturesStr() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -24365,16 +27355,28 @@ TestTypestateAttr *TestTypestateAttr::clone(ASTContext &C) const {
 }
 
 void TestTypestateAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((test_typestate(\"" << TestTypestateAttr::ConvertConsumedStateToStr(getTestState()) << "\")))";
+    OS << " __attribute__((test_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << TestTypestateAttr::ConvertConsumedStateToStr(getTestState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::test_typestate(\"" << TestTypestateAttr::ConvertConsumedStateToStr(getTestState()) << "\")]]";
+    OS << " [[clang::test_typestate";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << TestTypestateAttr::ConvertConsumedStateToStr(getTestState()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -24435,28 +27437,35 @@ ThisCallAttr *ThisCallAttr::clone(ASTContext &C) const {
 }
 
 void ThisCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((thiscall))";
+    OS << " __attribute__((thiscall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::thiscall]]";
+    OS << " [[gnu::thiscall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::thiscall]]";
+    OS << " [[gnu::thiscall";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __thiscall";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _thiscall";
+    OS << "";
     break;
   }
 }
@@ -24523,12 +27532,15 @@ ThreadAttr *ThreadAttr::clone(ASTContext &C) const {
 }
 
 void ThreadAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(thread)";
+    OS << " __declspec(thread";
+    OS << ")";
     break;
   }
 }
@@ -24587,20 +27599,25 @@ TransparentUnionAttr *TransparentUnionAttr::clone(ASTContext &C) const {
 }
 
 void TransparentUnionAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((transparent_union))";
+    OS << " __attribute__((transparent_union";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::transparent_union]]";
+    OS << " [[gnu::transparent_union";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::transparent_union]]";
+    OS << " [[gnu::transparent_union";
+    OS << "]]";
     break;
   }
 }
@@ -24663,16 +27680,20 @@ TrivialABIAttr *TrivialABIAttr::clone(ASTContext &C) const {
 }
 
 void TrivialABIAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((trivial_abi))";
+    OS << " __attribute__((trivial_abi";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::trivial_abi]]";
+    OS << " [[clang::trivial_abi";
+    OS << "]]";
     break;
   }
 }
@@ -24758,52 +27779,70 @@ TryAcquireCapabilityAttr *TryAcquireCapabilityAttr::clone(ASTContext &C) const {
 }
 
 void TryAcquireCapabilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((try_acquire_capability(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((try_acquire_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::try_acquire_capability(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " [[clang::try_acquire_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " __attribute__((try_acquire_shared_capability(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " __attribute__((try_acquire_shared_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")))";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 3 : {
-    OS << " [[clang::try_acquire_shared_capability(" << getSuccessValue() << ", ";
-  bool isFirst = true;
+    OS << " [[clang::try_acquire_shared_capability";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getSuccessValue() << "";
+    OS << "";
   for (const auto &Val : args()) {
-    if (isFirst) isFirst = false;
-    else OS << ", ";
+    DelimitAttributeArgument(OS, IsFirstArgument);
     OS << Val;
   }
-  OS << ")]]";
+  OS << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -24868,12 +27907,15 @@ TypeNonNullAttr *TypeNonNullAttr::clone(ASTContext &C) const {
 }
 
 void TypeNonNullAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " _Nonnull";
+    OS << "";
     break;
   }
 }
@@ -24932,12 +27974,15 @@ TypeNullUnspecifiedAttr *TypeNullUnspecifiedAttr::clone(ASTContext &C) const {
 }
 
 void TypeNullUnspecifiedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " _Null_unspecified";
+    OS << "";
     break;
   }
 }
@@ -24996,12 +28041,15 @@ TypeNullableAttr *TypeNullableAttr::clone(ASTContext &C) const {
 }
 
 void TypeNullableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " _Nullable";
+    OS << "";
     break;
   }
 }
@@ -25060,12 +28108,15 @@ TypeNullableResultAttr *TypeNullableResultAttr::clone(ASTContext &C) const {
 }
 
 void TypeNullableResultAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " _Nullable_result";
+    OS << "";
     break;
   }
 }
@@ -25140,20 +28191,55 @@ TypeTagForDatatypeAttr *TypeTagForDatatypeAttr::clone(ASTContext &C) const {
 }
 
 void TypeTagForDatatypeAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((type_tag_for_datatype(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getMatchingCType().getAsString() << ", " << getLayoutCompatible() << ", " << getMustBeNull() << ")))";
+    OS << " __attribute__((type_tag_for_datatype";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMatchingCType().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getLayoutCompatible() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMustBeNull() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::type_tag_for_datatype(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getMatchingCType().getAsString() << ", " << getLayoutCompatible() << ", " << getMustBeNull() << ")]]";
+    OS << " [[clang::type_tag_for_datatype";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMatchingCType().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getLayoutCompatible() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMustBeNull() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::type_tag_for_datatype(" << (getArgumentKind() ? getArgumentKind()->getName() : "") << ", " << getMatchingCType().getAsString() << ", " << getLayoutCompatible() << ", " << getMustBeNull() << ")]]";
+    OS << " [[clang::type_tag_for_datatype";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << (getArgumentKind() ? getArgumentKind()->getName() : "") << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMatchingCType().getAsString() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getLayoutCompatible() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getMustBeNull() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -25242,20 +28328,37 @@ TypeVisibilityAttr *TypeVisibilityAttr::clone(ASTContext &C) const {
 }
 
 void TypeVisibilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((type_visibility(\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")))";
+    OS << " __attribute__((type_visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::type_visibility(\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")]]";
+    OS << " [[clang::type_visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::type_visibility(\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")]]";
+    OS << " [[clang::type_visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << TypeVisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -25318,12 +28421,15 @@ UPtrAttr *UPtrAttr::clone(ASTContext &C) const {
 }
 
 void UPtrAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
     OS << " __uptr";
+    OS << "";
     break;
   }
 }
@@ -25436,20 +28542,37 @@ UnavailableAttr *UnavailableAttr::clone(ASTContext &C) const {
 }
 
 void UnavailableAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((unavailable(\"" << getMessage() << "\")))";
+    OS << " __attribute__((unavailable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::unavailable(\"" << getMessage() << "\")]]";
+    OS << " [[clang::unavailable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::unavailable(\"" << getMessage() << "\")]]";
+    OS << " [[clang::unavailable";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -25512,16 +28635,20 @@ UninitializedAttr *UninitializedAttr::clone(ASTContext &C) const {
 }
 
 void UninitializedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((uninitialized))";
+    OS << " __attribute__((uninitialized";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::uninitialized]]";
+    OS << " [[clang::uninitialized";
+    OS << "]]";
     break;
   }
 }
@@ -25582,16 +28709,20 @@ UnlikelyAttr *UnlikelyAttr::clone(ASTContext &C) const {
 }
 
 void UnlikelyAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[unlikely]]";
+    OS << " [[unlikely";
+    OS << "]]";
     break;
   }
   case 1 : {
-    OS << " [[clang::unlikely]]";
+    OS << " [[clang::unlikely";
+    OS << "]]";
     break;
   }
 }
@@ -25660,28 +28791,35 @@ UnusedAttr *UnusedAttr::clone(ASTContext &C) const {
 }
 
 void UnusedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[maybe_unused]]";
+    OS << " [[maybe_unused";
+    OS << "]]";
     break;
   }
   case 1 : {
-    OS << " __attribute__((unused))";
+    OS << " __attribute__((unused";
+    OS << "))";
     break;
   }
   case 2 : {
-    OS << " [[gnu::unused]]";
+    OS << " [[gnu::unused";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " [[gnu::unused]]";
+    OS << " [[gnu::unused";
+    OS << "]]";
     break;
   }
   case 4 : {
-    OS << " [[maybe_unused]]";
+    OS << " [[maybe_unused";
+    OS << "]]";
     break;
   }
 }
@@ -25754,20 +28892,37 @@ UseHandleAttr *UseHandleAttr::clone(ASTContext &C) const {
 }
 
 void UseHandleAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((use_handle(\"" << getHandleType() << "\")))";
+    OS << " __attribute__((use_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::use_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::use_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::use_handle(\"" << getHandleType() << "\")]]";
+    OS << " [[clang::use_handle";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getHandleType() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -25830,20 +28985,25 @@ UsedAttr *UsedAttr::clone(ASTContext &C) const {
 }
 
 void UsedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((used))";
+    OS << " __attribute__((used";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::used]]";
+    OS << " [[gnu::used";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::used]]";
+    OS << " [[gnu::used";
+    OS << "]]";
     break;
   }
 }
@@ -25860,6 +29020,80 @@ const char *UsedAttr::getSpelling() const {
     return "used";
   case 2:
     return "used";
+  }
+}
+
+
+// UsingIfExistsAttr implementation
+
+UsingIfExistsAttr *UsingIfExistsAttr::CreateImplicit(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) UsingIfExistsAttr(Ctx, CommonInfo);
+  A->setImplicit(true);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+UsingIfExistsAttr *UsingIfExistsAttr::Create(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo) {
+  auto *A = new (Ctx) UsingIfExistsAttr(Ctx, CommonInfo);
+  if (!A->isAttributeSpellingListCalculated() && !A->getAttrName())
+    A->setAttributeSpellingListIndex(0);
+  return A;
+}
+
+UsingIfExistsAttr *UsingIfExistsAttr::CreateImplicit(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return CreateImplicit(Ctx, I);
+}
+
+UsingIfExistsAttr *UsingIfExistsAttr::Create(ASTContext &Ctx, SourceRange Range, AttributeCommonInfo::Syntax Syntax) {
+  AttributeCommonInfo I(Range, NoSemaHandlerAttribute, Syntax);
+  return Create(Ctx, I);
+}
+
+UsingIfExistsAttr::UsingIfExistsAttr(ASTContext &Ctx, const AttributeCommonInfo &CommonInfo
+             )
+  : InheritableAttr(Ctx, CommonInfo, attr::UsingIfExists, false, false)
+  {
+}
+
+UsingIfExistsAttr *UsingIfExistsAttr::clone(ASTContext &C) const {
+  auto *A = new (C) UsingIfExistsAttr(C, *this);
+  A->Inherited = Inherited;
+  A->IsPackExpansion = IsPackExpansion;
+  A->setImplicit(Implicit);
+  return A;
+}
+
+void UsingIfExistsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    break;
+  case 0 : {
+    OS << " __attribute__((using_if_exists";
+    OS << "))";
+    break;
+  }
+  case 1 : {
+    OS << " [[clang::using_if_exists";
+    OS << "]]";
+    break;
+  }
+}
+}
+
+const char *UsingIfExistsAttr::getSpelling() const {
+  switch (getAttributeSpellingListIndex()) {
+  default:
+    llvm_unreachable("Unknown attribute spelling!");
+    return "(No spelling)";
+  case 0:
+    return "using_if_exists";
+  case 1:
+    return "using_if_exists";
   }
 }
 
@@ -25952,16 +29186,28 @@ UuidAttr *UuidAttr::clone(ASTContext &C) const {
 }
 
 void UuidAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __declspec(uuid(\"" << getGuid() << "\"))";
+    OS << " __declspec(uuid";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getGuid() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << ")";
     break;
   }
   case 1 : {
-    OS << "[uuid(\"" << getGuid() << "\")]";
+    OS << "[uuid";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getGuid() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]";
     break;
   }
 }
@@ -26022,16 +29268,20 @@ VecReturnAttr *VecReturnAttr::clone(ASTContext &C) const {
 }
 
 void VecReturnAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((vecreturn))";
+    OS << " __attribute__((vecreturn";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::vecreturn]]";
+    OS << " [[clang::vecreturn";
+    OS << "]]";
     break;
   }
 }
@@ -26096,12 +29346,19 @@ VecTypeHintAttr *VecTypeHintAttr::clone(ASTContext &C) const {
 }
 
 void VecTypeHintAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((vec_type_hint(" << getTypeHint().getAsString() << ")))";
+    OS << " __attribute__((vec_type_hint";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getTypeHint().getAsString() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -26160,28 +29417,35 @@ VectorCallAttr *VectorCallAttr::clone(ASTContext &C) const {
 }
 
 void VectorCallAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((vectorcall))";
+    OS << " __attribute__((vectorcall";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::vectorcall]]";
+    OS << " [[clang::vectorcall";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::vectorcall]]";
+    OS << " [[clang::vectorcall";
+    OS << "]]";
     break;
   }
   case 3 : {
     OS << " __vectorcall";
+    OS << "";
     break;
   }
   case 4 : {
     OS << " _vectorcall";
+    OS << "";
     break;
   }
 }
@@ -26274,20 +29538,37 @@ VisibilityAttr *VisibilityAttr::clone(ASTContext &C) const {
 }
 
 void VisibilityAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((visibility(\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")))";
+    OS << " __attribute__((visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::visibility(\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")]]";
+    OS << " [[gnu::visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::visibility(\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\")]]";
+    OS << " [[gnu::visibility";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << VisibilityAttr::ConvertVisibilityTypeToStr(getVisibility()) << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -26350,20 +29631,25 @@ WarnUnusedAttr *WarnUnusedAttr::clone(ASTContext &C) const {
 }
 
 void WarnUnusedAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((warn_unused))";
+    OS << " __attribute__((warn_unused";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::warn_unused]]";
+    OS << " [[gnu::warn_unused";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::warn_unused]]";
+    OS << " [[gnu::warn_unused";
+    OS << "]]";
     break;
   }
 }
@@ -26448,32 +29734,64 @@ WarnUnusedResultAttr *WarnUnusedResultAttr::clone(ASTContext &C) const {
 }
 
 void WarnUnusedResultAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " [[nodiscard(\"" << getMessage() << "\")]]";
+    OS << " [[nodiscard";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 1 : {
-    OS << " [[nodiscard(\"" << getMessage() << "\")]]";
+    OS << " [[nodiscard";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::warn_unused_result(\"" << getMessage() << "\")]]";
+    OS << " [[clang::warn_unused_result";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((warn_unused_result(\"" << getMessage() << "\")))";
+    OS << " __attribute__((warn_unused_result";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[gnu::warn_unused_result(\"" << getMessage() << "\")]]";
+    OS << " [[gnu::warn_unused_result";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[gnu::warn_unused_result(\"" << getMessage() << "\")]]";
+    OS << " [[gnu::warn_unused_result";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getMessage() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -26542,20 +29860,25 @@ WeakAttr *WeakAttr::clone(ASTContext &C) const {
 }
 
 void WeakAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((weak))";
+    OS << " __attribute__((weak";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::weak]]";
+    OS << " [[gnu::weak";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::weak]]";
+    OS << " [[gnu::weak";
+    OS << "]]";
     break;
   }
 }
@@ -26618,20 +29941,25 @@ WeakImportAttr *WeakImportAttr::clone(ASTContext &C) const {
 }
 
 void WeakImportAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((weak_import))";
+    OS << " __attribute__((weak_import";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::weak_import]]";
+    OS << " [[clang::weak_import";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::weak_import]]";
+    OS << " [[clang::weak_import";
+    OS << "]]";
     break;
   }
 }
@@ -26707,20 +30035,37 @@ WeakRefAttr *WeakRefAttr::clone(ASTContext &C) const {
 }
 
 void WeakRefAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((weakref(\"" << getAliasee() << "\")))";
+    OS << " __attribute__((weakref";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::weakref(\"" << getAliasee() << "\")]]";
+    OS << " [[gnu::weakref";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::weakref(\"" << getAliasee() << "\")]]";
+    OS << " [[gnu::weakref";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getAliasee() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -26789,20 +30134,37 @@ WebAssemblyExportNameAttr *WebAssemblyExportNameAttr::clone(ASTContext &C) const
 }
 
 void WebAssemblyExportNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((export_name(\"" << getExportName() << "\")))";
+    OS << " __attribute__((export_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getExportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::export_name(\"" << getExportName() << "\")]]";
+    OS << " [[clang::export_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getExportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::export_name(\"" << getExportName() << "\")]]";
+    OS << " [[clang::export_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getExportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -26871,20 +30233,37 @@ WebAssemblyImportModuleAttr *WebAssemblyImportModuleAttr::clone(ASTContext &C) c
 }
 
 void WebAssemblyImportModuleAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((import_module(\"" << getImportModule() << "\")))";
+    OS << " __attribute__((import_module";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportModule() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::import_module(\"" << getImportModule() << "\")]]";
+    OS << " [[clang::import_module";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportModule() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::import_module(\"" << getImportModule() << "\")]]";
+    OS << " [[clang::import_module";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportModule() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -26953,20 +30332,37 @@ WebAssemblyImportNameAttr *WebAssemblyImportNameAttr::clone(ASTContext &C) const
 }
 
 void WebAssemblyImportNameAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((import_name(\"" << getImportName() << "\")))";
+    OS << " __attribute__((import_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::import_name(\"" << getImportName() << "\")]]";
+    OS << " [[clang::import_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::import_name(\"" << getImportName() << "\")]]";
+    OS << " [[clang::import_name";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "\"" << getImportName() << "\"";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -27041,12 +30437,23 @@ WorkGroupSizeHintAttr *WorkGroupSizeHintAttr::clone(ASTContext &C) const {
 }
 
 void WorkGroupSizeHintAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((work_group_size_hint(" << getXDim() << ", " << getYDim() << ", " << getZDim() << ")))";
+    OS << " __attribute__((work_group_size_hint";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getXDim() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getYDim() << "";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getZDim() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
 }
@@ -27105,20 +30512,25 @@ X86ForceAlignArgPointerAttr *X86ForceAlignArgPointerAttr::clone(ASTContext &C) c
 }
 
 void X86ForceAlignArgPointerAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((force_align_arg_pointer))";
+    OS << " __attribute__((force_align_arg_pointer";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[gnu::force_align_arg_pointer]]";
+    OS << " [[gnu::force_align_arg_pointer";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[gnu::force_align_arg_pointer]]";
+    OS << " [[gnu::force_align_arg_pointer";
+    OS << "]]";
     break;
   }
 }
@@ -27190,32 +30602,40 @@ XRayInstrumentAttr *XRayInstrumentAttr::clone(ASTContext &C) const {
 }
 
 void XRayInstrumentAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((xray_always_instrument))";
+    OS << " __attribute__((xray_always_instrument";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::xray_always_instrument]]";
+    OS << " [[clang::xray_always_instrument";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::xray_always_instrument]]";
+    OS << " [[clang::xray_always_instrument";
+    OS << "]]";
     break;
   }
   case 3 : {
-    OS << " __attribute__((xray_never_instrument))";
+    OS << " __attribute__((xray_never_instrument";
+    OS << "))";
     break;
   }
   case 4 : {
-    OS << " [[clang::xray_never_instrument]]";
+    OS << " [[clang::xray_never_instrument";
+    OS << "]]";
     break;
   }
   case 5 : {
-    OS << " [[clang::xray_never_instrument]]";
+    OS << " [[clang::xray_never_instrument";
+    OS << "]]";
     break;
   }
 }
@@ -27288,20 +30708,37 @@ XRayLogArgsAttr *XRayLogArgsAttr::clone(ASTContext &C) const {
 }
 
 void XRayLogArgsAttr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
+  bool IsFirstArgument = true; (void)IsFirstArgument;
+  unsigned TrailingOmittedArgs = 0; (void)TrailingOmittedArgs;
   switch (getAttributeSpellingListIndex()) {
   default:
     llvm_unreachable("Unknown attribute spelling!");
     break;
   case 0 : {
-    OS << " __attribute__((xray_log_args(" << getArgumentCount() << ")))";
+    OS << " __attribute__((xray_log_args";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentCount() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "))";
     break;
   }
   case 1 : {
-    OS << " [[clang::xray_log_args(" << getArgumentCount() << ")]]";
+    OS << " [[clang::xray_log_args";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentCount() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
   case 2 : {
-    OS << " [[clang::xray_log_args(" << getArgumentCount() << ")]]";
+    OS << " [[clang::xray_log_args";
+    DelimitAttributeArgument(OS, IsFirstArgument);
+    OS << "" << getArgumentCount() << "";
+    if (!IsFirstArgument)
+      OS << ")";
+    OS << "]]";
     break;
   }
 }
@@ -27409,6 +30846,8 @@ const char *Attr::getSpelling() const {
     return cast<BlocksAttr>(this)->getSpelling();
   case attr::Builtin:
     return cast<BuiltinAttr>(this)->getSpelling();
+  case attr::BuiltinAlias:
+    return cast<BuiltinAliasAttr>(this)->getSpelling();
   case attr::C11NoReturn:
     return cast<C11NoReturnAttr>(this)->getSpelling();
   case attr::CDecl:
@@ -27579,6 +31018,8 @@ const char *Attr::getSpelling() const {
     return cast<LocksExcludedAttr>(this)->getSpelling();
   case attr::LoopHint:
     return cast<LoopHintAttr>(this)->getSpelling();
+  case attr::M68kInterrupt:
+    return cast<M68kInterruptAttr>(this)->getSpelling();
   case attr::MIGServerRoutine:
     return cast<MIGServerRoutineAttr>(this)->getSpelling();
   case attr::MSABI:
@@ -27615,6 +31056,8 @@ const char *Attr::getSpelling() const {
     return cast<MipsShortCallAttr>(this)->getSpelling();
   case attr::Mode:
     return cast<ModeAttr>(this)->getSpelling();
+  case attr::MustTail:
+    return cast<MustTailAttr>(this)->getSpelling();
   case attr::NSConsumed:
     return cast<NSConsumedAttr>(this)->getSpelling();
   case attr::NSConsumesSelf:
@@ -27655,6 +31098,8 @@ const char *Attr::getSpelling() const {
     return cast<NoMicroMipsAttr>(this)->getSpelling();
   case attr::NoMips16:
     return cast<NoMips16Attr>(this)->getSpelling();
+  case attr::NoProfileFunction:
+    return cast<NoProfileFunctionAttr>(this)->getSpelling();
   case attr::NoReturn:
     return cast<NoReturnAttr>(this)->getSpelling();
   case attr::NoSanitize:
@@ -27849,6 +31294,8 @@ const char *Attr::getSpelling() const {
     return cast<RequiresCapabilityAttr>(this)->getSpelling();
   case attr::Restrict:
     return cast<RestrictAttr>(this)->getSpelling();
+  case attr::Retain:
+    return cast<RetainAttr>(this)->getSpelling();
   case attr::ReturnTypestate:
     return cast<ReturnTypestateAttr>(this)->getSpelling();
   case attr::ReturnsNonNull:
@@ -27873,6 +31320,8 @@ const char *Attr::getSpelling() const {
     return cast<SharedTrylockFunctionAttr>(this)->getSpelling();
   case attr::SpeculativeLoadHardening:
     return cast<SpeculativeLoadHardeningAttr>(this)->getSpelling();
+  case attr::StandaloneDebug:
+    return cast<StandaloneDebugAttr>(this)->getSpelling();
   case attr::StdCall:
     return cast<StdCallAttr>(this)->getSpelling();
   case attr::StrictFP:
@@ -27881,6 +31330,12 @@ const char *Attr::getSpelling() const {
     return cast<SuppressAttr>(this)->getSpelling();
   case attr::SwiftAsync:
     return cast<SwiftAsyncAttr>(this)->getSpelling();
+  case attr::SwiftAsyncCall:
+    return cast<SwiftAsyncCallAttr>(this)->getSpelling();
+  case attr::SwiftAsyncContext:
+    return cast<SwiftAsyncContextAttr>(this)->getSpelling();
+  case attr::SwiftAsyncError:
+    return cast<SwiftAsyncErrorAttr>(this)->getSpelling();
   case attr::SwiftAsyncName:
     return cast<SwiftAsyncNameAttr>(this)->getSpelling();
   case attr::SwiftAttr:
@@ -27951,6 +31406,8 @@ const char *Attr::getSpelling() const {
     return cast<UseHandleAttr>(this)->getSpelling();
   case attr::Used:
     return cast<UsedAttr>(this)->getSpelling();
+  case attr::UsingIfExists:
+    return cast<UsingIfExistsAttr>(this)->getSpelling();
   case attr::Uuid:
     return cast<UuidAttr>(this)->getSpelling();
   case attr::VecReturn:
@@ -28077,6 +31534,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<BlocksAttr>(this)->clone(C);
   case attr::Builtin:
     return cast<BuiltinAttr>(this)->clone(C);
+  case attr::BuiltinAlias:
+    return cast<BuiltinAliasAttr>(this)->clone(C);
   case attr::C11NoReturn:
     return cast<C11NoReturnAttr>(this)->clone(C);
   case attr::CDecl:
@@ -28247,6 +31706,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<LocksExcludedAttr>(this)->clone(C);
   case attr::LoopHint:
     return cast<LoopHintAttr>(this)->clone(C);
+  case attr::M68kInterrupt:
+    return cast<M68kInterruptAttr>(this)->clone(C);
   case attr::MIGServerRoutine:
     return cast<MIGServerRoutineAttr>(this)->clone(C);
   case attr::MSABI:
@@ -28283,6 +31744,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<MipsShortCallAttr>(this)->clone(C);
   case attr::Mode:
     return cast<ModeAttr>(this)->clone(C);
+  case attr::MustTail:
+    return cast<MustTailAttr>(this)->clone(C);
   case attr::NSConsumed:
     return cast<NSConsumedAttr>(this)->clone(C);
   case attr::NSConsumesSelf:
@@ -28323,6 +31786,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<NoMicroMipsAttr>(this)->clone(C);
   case attr::NoMips16:
     return cast<NoMips16Attr>(this)->clone(C);
+  case attr::NoProfileFunction:
+    return cast<NoProfileFunctionAttr>(this)->clone(C);
   case attr::NoReturn:
     return cast<NoReturnAttr>(this)->clone(C);
   case attr::NoSanitize:
@@ -28517,6 +31982,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<RequiresCapabilityAttr>(this)->clone(C);
   case attr::Restrict:
     return cast<RestrictAttr>(this)->clone(C);
+  case attr::Retain:
+    return cast<RetainAttr>(this)->clone(C);
   case attr::ReturnTypestate:
     return cast<ReturnTypestateAttr>(this)->clone(C);
   case attr::ReturnsNonNull:
@@ -28541,6 +32008,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<SharedTrylockFunctionAttr>(this)->clone(C);
   case attr::SpeculativeLoadHardening:
     return cast<SpeculativeLoadHardeningAttr>(this)->clone(C);
+  case attr::StandaloneDebug:
+    return cast<StandaloneDebugAttr>(this)->clone(C);
   case attr::StdCall:
     return cast<StdCallAttr>(this)->clone(C);
   case attr::StrictFP:
@@ -28549,6 +32018,12 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<SuppressAttr>(this)->clone(C);
   case attr::SwiftAsync:
     return cast<SwiftAsyncAttr>(this)->clone(C);
+  case attr::SwiftAsyncCall:
+    return cast<SwiftAsyncCallAttr>(this)->clone(C);
+  case attr::SwiftAsyncContext:
+    return cast<SwiftAsyncContextAttr>(this)->clone(C);
+  case attr::SwiftAsyncError:
+    return cast<SwiftAsyncErrorAttr>(this)->clone(C);
   case attr::SwiftAsyncName:
     return cast<SwiftAsyncNameAttr>(this)->clone(C);
   case attr::SwiftAttr:
@@ -28619,6 +32094,8 @@ Attr *Attr::clone(ASTContext &C) const {
     return cast<UseHandleAttr>(this)->clone(C);
   case attr::Used:
     return cast<UsedAttr>(this)->clone(C);
+  case attr::UsingIfExists:
+    return cast<UsingIfExistsAttr>(this)->clone(C);
   case attr::Uuid:
     return cast<UuidAttr>(this)->clone(C);
   case attr::VecReturn:
@@ -28745,6 +32222,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<BlocksAttr>(this)->printPretty(OS, Policy);
   case attr::Builtin:
     return cast<BuiltinAttr>(this)->printPretty(OS, Policy);
+  case attr::BuiltinAlias:
+    return cast<BuiltinAliasAttr>(this)->printPretty(OS, Policy);
   case attr::C11NoReturn:
     return cast<C11NoReturnAttr>(this)->printPretty(OS, Policy);
   case attr::CDecl:
@@ -28915,6 +32394,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<LocksExcludedAttr>(this)->printPretty(OS, Policy);
   case attr::LoopHint:
     return cast<LoopHintAttr>(this)->printPretty(OS, Policy);
+  case attr::M68kInterrupt:
+    return cast<M68kInterruptAttr>(this)->printPretty(OS, Policy);
   case attr::MIGServerRoutine:
     return cast<MIGServerRoutineAttr>(this)->printPretty(OS, Policy);
   case attr::MSABI:
@@ -28951,6 +32432,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<MipsShortCallAttr>(this)->printPretty(OS, Policy);
   case attr::Mode:
     return cast<ModeAttr>(this)->printPretty(OS, Policy);
+  case attr::MustTail:
+    return cast<MustTailAttr>(this)->printPretty(OS, Policy);
   case attr::NSConsumed:
     return cast<NSConsumedAttr>(this)->printPretty(OS, Policy);
   case attr::NSConsumesSelf:
@@ -28991,6 +32474,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<NoMicroMipsAttr>(this)->printPretty(OS, Policy);
   case attr::NoMips16:
     return cast<NoMips16Attr>(this)->printPretty(OS, Policy);
+  case attr::NoProfileFunction:
+    return cast<NoProfileFunctionAttr>(this)->printPretty(OS, Policy);
   case attr::NoReturn:
     return cast<NoReturnAttr>(this)->printPretty(OS, Policy);
   case attr::NoSanitize:
@@ -29185,6 +32670,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<RequiresCapabilityAttr>(this)->printPretty(OS, Policy);
   case attr::Restrict:
     return cast<RestrictAttr>(this)->printPretty(OS, Policy);
+  case attr::Retain:
+    return cast<RetainAttr>(this)->printPretty(OS, Policy);
   case attr::ReturnTypestate:
     return cast<ReturnTypestateAttr>(this)->printPretty(OS, Policy);
   case attr::ReturnsNonNull:
@@ -29209,6 +32696,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<SharedTrylockFunctionAttr>(this)->printPretty(OS, Policy);
   case attr::SpeculativeLoadHardening:
     return cast<SpeculativeLoadHardeningAttr>(this)->printPretty(OS, Policy);
+  case attr::StandaloneDebug:
+    return cast<StandaloneDebugAttr>(this)->printPretty(OS, Policy);
   case attr::StdCall:
     return cast<StdCallAttr>(this)->printPretty(OS, Policy);
   case attr::StrictFP:
@@ -29217,6 +32706,12 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<SuppressAttr>(this)->printPretty(OS, Policy);
   case attr::SwiftAsync:
     return cast<SwiftAsyncAttr>(this)->printPretty(OS, Policy);
+  case attr::SwiftAsyncCall:
+    return cast<SwiftAsyncCallAttr>(this)->printPretty(OS, Policy);
+  case attr::SwiftAsyncContext:
+    return cast<SwiftAsyncContextAttr>(this)->printPretty(OS, Policy);
+  case attr::SwiftAsyncError:
+    return cast<SwiftAsyncErrorAttr>(this)->printPretty(OS, Policy);
   case attr::SwiftAsyncName:
     return cast<SwiftAsyncNameAttr>(this)->printPretty(OS, Policy);
   case attr::SwiftAttr:
@@ -29287,6 +32782,8 @@ void Attr::printPretty(raw_ostream &OS, const PrintingPolicy &Policy) const {
     return cast<UseHandleAttr>(this)->printPretty(OS, Policy);
   case attr::Used:
     return cast<UsedAttr>(this)->printPretty(OS, Policy);
+  case attr::UsingIfExists:
+    return cast<UsingIfExistsAttr>(this)->printPretty(OS, Policy);
   case attr::Uuid:
     return cast<UuidAttr>(this)->printPretty(OS, Policy);
   case attr::VecReturn:
