@@ -81,8 +81,6 @@ target_link_libraries(RyReflect PRIVATE LLVMBinaryFormat)
 target_link_libraries(RyReflect PRIVATE LLVMMC)
 target_link_libraries(RyReflect PRIVATE LLVMOption)
 target_link_libraries(RyReflect PRIVATE LLVMSupport)
-#target_link_libraries(RyReflect PRIVATE z)
-#target_link_libraries(RyReflect PRIVATE curses)
 target_link_libraries(RyReflect PRIVATE LLVMDemangle)
 
 target_link_libraries(RyReflect PRIVATE clangHandleCXX)
@@ -97,16 +95,18 @@ target_link_libraries(RyReflect PRIVATE LLVMObject)
 target_link_libraries(RyReflect PRIVATE LLVMMCA)
 target_link_libraries(RyReflect PRIVATE LLVMSparcInfo)
 
-# Linux specific libraries
-if(UNIX AND NOT APPLE)
+# Posix libraries
+if(UNIX)
 	target_link_libraries(RyReflect PRIVATE dl)
 	target_link_libraries(RyReflect PRIVATE util)
+	target_link_libraries(RyReflect PRIVATE pthread)
+	target_link_libraries(RyReflect PRIVATE z)
+	target_link_libraries(RyReflect PRIVATE curses)
 endif()
 
 # GCC specific libraries
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyReflect PRIVATE -lstdc++fs)
-	target_link_libraries(RyReflect PRIVATE -lpthread)
 	target_compile_options(RyReflect PUBLIC -fno-rtti) # Llvm suite is compiled without rtti
 endif()
 

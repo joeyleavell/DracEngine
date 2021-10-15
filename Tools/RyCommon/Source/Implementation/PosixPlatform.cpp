@@ -2,15 +2,16 @@
 
 #if defined(RYBUILD_LINUX) || defined(RYBUILD_OSX)
 
-std::string GetPlatformExecutableExt()
-{
-	return "";
-}
-
+#include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cstdlib>
 #include <string.h>
+
+std::string GetPlatformExecutableExt()
+{
+	return "";
+}
 
 std::string GetModulePath()
 {
