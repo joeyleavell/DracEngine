@@ -45,6 +45,10 @@ crashinfo--*
 *.pro
 *.pri
 *.kdev4
+
+# RyBuild files
+llvm-project/
+cpython/
  
 # Engine files
 /Binary

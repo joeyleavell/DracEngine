@@ -3,9 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <set>
-#include <filesystem>
-
-namespace Filesystem = std::filesystem;
+#include "Common.h"
 
 struct FileLOC
 {

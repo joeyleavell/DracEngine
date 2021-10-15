@@ -6,6 +6,10 @@ set (SOURCES
 
 add_executable(RyLOC ${SOURCES})
 
+# Add RyCommon includes and link with it
+include_directories(Source/Include ../RyCommon/Source/Include)
+target_link_libraries(RyLOC PUBLIC RyCommon)
+
 set_property(TARGET RyCommon PROPERTY CXX_STANDARD 17)
 target_link_libraries(RyLOC PRIVATE -lstdc++fs)
 
