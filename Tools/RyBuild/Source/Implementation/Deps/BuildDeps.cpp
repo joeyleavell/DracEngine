@@ -509,6 +509,7 @@ bool BuildDep(Dependency& Dep, GlobalBuildSettings BuildSettings, std::string Ou
 					{
 						// Make file relative to abs
 						Filesystem::path RelativeToPath = PathRelativeTo(Abs, Filesystem::canonical(SubPath));
+						std::cout << RelativeToPath << std::endl;
 						Filesystem::path InstallLoc = Filesystem::absolute(IncludesInstallLoc / RelativeToPath);
 
 						if (!Filesystem::exists(InstallLoc))

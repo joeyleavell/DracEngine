@@ -17,7 +17,7 @@ OSType GetHostOS()
 	return OSType::WINDOWS;
 #elif defined(RBUILD_HOST_OS_LINUX)
 	return OSType::LINUX;
-#elif defined(RBUILD_HOST_OSX)
+#elif defined(RBUILD_HOST_OS_OSX)
 	return OSType::OSX;
 #endif
 

@@ -81,7 +81,11 @@ Filesystem::path PathRelativeTo_UnRelated(Filesystem::path Base, Filesystem::pat
 		if(!bFoundCommonality)
 		{
 			// Accumulate this part and step up
-			AccumPath = PathMod.filename() / AccumPath;
+			if(AccumPath.empty())
+				AccumPath = PathMod.filename();
+			else
+				AccumPath = PathMod.filename() / AccumPath;
+
 			PathMod = PathMod.parent_path();
 		}
 		

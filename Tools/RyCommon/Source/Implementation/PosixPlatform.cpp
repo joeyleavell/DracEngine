@@ -82,11 +82,11 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 			}
 		}
 
-		std::string SearchDirectories[] = { "/usr/bin", "/bin", "/usr/local/bin" };
+		std::string SearchDirectories[] = { "/opt/homebrew/bin", "/usr/bin", "/bin", "/usr/local/bin" };
 
 		char* Environment[] =
 		{
-			"PATH=/bin:/usr/bin:/usr/local/bin",
+			"PATH=/opt/homebrew/bin:/bin:/usr/bin:/usr/local/bin",
 			0
 		};
 
@@ -125,11 +125,12 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 		// Inside parent proc
 		int ExitStatus;
 
+		waitpid(GccPid, &ExitStatus, 0);
 		// We're in the parent proc, wait on child to finish
-		if (waitpid(GccPid, &ExitStatus, 0) <= 0)
+		//if (Res <= 0)
 		{
-			std::cerr << "Error waiting for child proc: " << std::endl;
-			bSuccess = false;
+	//		std::cerr << "Error waiting for child proc: " << Res << " (exit status=" << ExitStatus << ")" << std::endl;
+	//		bSuccess = false;
 		}
 
 		delete[] CommandLine;
