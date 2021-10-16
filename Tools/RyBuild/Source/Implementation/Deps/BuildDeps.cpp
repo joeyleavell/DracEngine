@@ -4,44 +4,30 @@
 #include <iostream>
 #include <thread>
 
-Platform GetTargetPlatform(Toolset Tools)
+bool IsPlatformExcluded(const Dependency& Dep, const Platform& P)
 {
-	Platform Target;
-#if defined(RYBUILD_Arch_x86_64)
-	Target.Arch = Architecture::x86_64;
-#elif defined(RYBUILD_Arch_x86)
-	Target.Arch = Architecture::x86;
-#elif defined(RYBUILD_Arch_Arm)
-	Target.Arch = Architecture::Arm;
-#endif
-
-#if defined(RYBUILD_WINDOWS)
-	Target.OS = BuildOS::Windows;
-#elif defined(RYBUILD_LINUX)
-	Target.OS = BuildOS::Linux;
-#elif defined(RYBUILD_MAC)
-	//PlatformPath /= "Mac";
-#endif
-
-	Target.Tool = Tools;
-
-	return Target;
-}
-
-bool IsPlatformExcluded(const std::vector<Platform>& Exclusions, const Platform& P)
-{
-	for (const Platform& Exclusion : Exclusions)
+	for (const ArchitectureType& Exclusion : Dep.ExcludedArch)
 	{
-		if (Exclusion.Arch == Architecture::All || Exclusion.Arch == P.Arch)
-		{
-			if (Exclusion.OS == BuildOS::All || Exclusion.OS == P.OS)
-			{
-				if (Exclusion.Tool == Toolset::All || Exclusion.Tool == P.Tool)
-				{
-					return true;
-				}
-			}
-		}
+		if (Exclusion == P.Arch)
+			return true;
+	}
+
+	for (const OSType& Exclusion : Dep.ExcludedOS)
+	{
+		if (Exclusion == P.OS)
+			return true;
+	}
+
+	for (const ToolsetType& Exclusion : Dep.ExcludedToolset)
+	{
+		if (Exclusion == P.Tool)
+			return true;
+	}
+
+	for (const OSToolset& Exclusion : Dep.ExcludedOSToolsets)
+	{
+		if (Exclusion.OS == P.OS && Exclusion.Tool == P.Tool)
+			return true;
 	}
 
 	return false;
@@ -97,67 +83,50 @@ bool GitCloneDep(Dependency& Dep, std::string& RootPath)
 	return true;
 }
 
-Filesystem::path GetPlatformPath(Toolset Tools)
+Filesystem::path GetPlatformPath(ToolsetType Tools)
 {
 	Filesystem::path PlatformPath = "";
 
 	// Detect host platform (cross compiling isn't supported for now)
-#if defined(RYBUILD_Arch_x86_64)
-	PlatformPath /= "x64";
-#elif defined(RYBUILD_Arch_x86)
-	PlatformPath /= "x86";
-#elif defined(RYBUILD_Arch_Arm)
-	PlatformPath /= "Arm";
-#endif
+	ArchitectureType HostArch = GetHostArchitecture();
+	OSType HostOS = GetHostOS();
+	ToolsetType HostToolset = GetHostToolset();
 
-#if defined(RYBUILD_WINDOWS)
-	PlatformPath /= "Windows";
-#elif defined(RYBUILD_LINUX)
-	PlatformPath /= "Linux";
-#elif defined(RYBUILD_MAC)
-	PlatformPath /= "Mac";
-#endif
-
-	if(Tools == Toolset::GCC)
-	{
-#if defined(RYBUILD_WINDOWS)
-		PlatformPath /= "MinGW";
-#elif defined(RYBUILD_LINUX)
-		PlatformPath /= "GCC";
-#endif
-	}
-	else if(Tools == Toolset::MSVC)
-	{
-		PlatformPath /= "MSVC";
-	}
+	PlatformPath /= ArchToString(HostArch);
+	PlatformPath /= OSToString(HostOS);
+	PlatformPath /= ToolsetToString(HostOS, HostToolset);
 
 	return PlatformPath;
 }
 
-bool CMakeGenerate(Dependency& Dep, std::string RootDirectory, Toolset Tools)
+bool CMakeGenerate(GlobalBuildSettings Global, Dependency& Dep, std::string RootDirectory, ToolsetType Tools)
 {
 	std::vector<std::string> CMakeGenerateArgs;
+	OSType HostOS = GetHostOS();
 
 	// Add position independent code flag if on linux since we'll be using these in SOs
-#ifdef RYBUILD_LINUX
-	CMakeGenerateArgs.push_back("-D");
-	CMakeGenerateArgs.push_back("CMAKE_POSITION_INDEPENDENT_CODE=ON");
-#endif
-
-	if(Tools == Toolset::MSVC)
+	if(HostOS == OSType::LINUX)
 	{
-#ifdef RYBUILD_LINUX
-		std::cerr << "MSVC not supported on Linux" << std::endl;
-		return false;
-#endif
+		CMakeGenerateArgs.push_back("-D");
+		CMakeGenerateArgs.push_back("CMAKE_POSITION_INDEPENDENT_CODE=ON");
 	}
-	else if(Tools == Toolset::GCC)
+
+	if(Tools == ToolsetType::MSVC)
 	{
-#if defined(RYBUILD_WINDOWS)
-		CMakeGenerateArgs.push_back("-G");
-		CMakeGenerateArgs.push_back("\"MinGW Makefiles\"");
-		std::cout << "Using MinGW to compile dependencies" << std::endl;
-#endif
+		if(HostOS == OSType::LINUX)
+		{
+			std::cerr << "MSVC not supported on Linux" << std::endl;
+			return false;
+		}
+	}
+	else if(Tools == ToolsetType::GCC)
+	{
+		if(HostOS == OSType::WINDOWS)
+		{
+			CMakeGenerateArgs.push_back("-G");
+			CMakeGenerateArgs.push_back("\"MinGW Makefiles\"");
+			std::cout << "Using MinGW to compile dependencies" << std::endl;
+		}
 	}
 	else
 	{
@@ -187,6 +156,19 @@ bool CMakeGenerate(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 		//CMakeGenerateArgs.push_back();
 		CMakeGenerateArgs.push_back("-D" + CMakeOpt);
 	}
+
+	// Set cmake compilers if available
+	if (!Global.CxxCompiler.empty())
+	{
+		CMakeGenerateArgs.push_back("-DCMAKE_CXX_COMPILER=" + Global.CxxCompiler);
+	}
+	if (!Global.CCompiler.empty())
+	{
+		CMakeGenerateArgs.push_back("-DCMAKE_C_COMPILER=" + Global.CCompiler);
+	}
+
+	for (std::string s : CMakeGenerateArgs)
+		std::cout << s << std::endl;
 		
 	// Run cmake generate
 	if (!ExecProc("cmake", CMakeGenerateArgs))
@@ -198,7 +180,7 @@ bool CMakeGenerate(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 	return true;
 }
 
-bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
+bool CMakeBuild(Dependency& Dep, std::string RootDirectory, ToolsetType Tools)
 {
 	Filesystem::path BuildDir = Filesystem::path(RootDirectory) / "Build" / GetPlatformPath(Tools);
 	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), BuildDir);
@@ -210,7 +192,7 @@ bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 	CMakeBuildArgs.push_back("Release");
 
 	// Add native build arguments
-	if(Tools == Toolset::GCC)
+	if(Tools == ToolsetType::GCC)
 	{
 		CMakeBuildArgs.push_back("--");
 		
@@ -230,7 +212,7 @@ bool CMakeBuild(Dependency& Dep, std::string RootDirectory, Toolset Tools)
 	return true;
 }
 
-bool CMakeInstall(Dependency& Dep, std::string RootDirectory, Toolset Tools)
+bool CMakeInstall(Dependency& Dep, std::string RootDirectory, ToolsetType Tools)
 {
 	Filesystem::path BuildDir = Filesystem::path(RootDirectory) / "Build" / GetPlatformPath(Tools);
 	Filesystem::path RelativeToWD = PathRelativeTo(Filesystem::canonical("."), BuildDir);
@@ -407,9 +389,13 @@ void FindTargetStaticLibs(Dependency& Dep, std::string BuildDirectory, std::vect
 
 bool BuildDep(Dependency& Dep, GlobalBuildSettings BuildSettings, std::string OutputDir, std::string RepoDir)
 {
+	Platform TargetPlat;
+	TargetPlat.Arch = GetHostArchitecture();
+	TargetPlat.OS = GetHostOS();
+	TargetPlat.Tool = BuildSettings.Tools;
+
 	// Don't build if this platform is excluded
-	Platform TargetPlat = GetTargetPlatform(BuildSettings.Tools);
-	if (IsPlatformExcluded(Dep.ExcludedPlatforms, TargetPlat))
+	if (IsPlatformExcluded(Dep, TargetPlat))
 	{
 		// Don't consider this a fail
 		std::cout << "Dependency " << Dep.Name << " will not be built for platform " << GetPlatformPath(BuildSettings.Tools).string() << std::endl;
@@ -427,7 +413,7 @@ bool BuildDep(Dependency& Dep, GlobalBuildSettings BuildSettings, std::string Ou
 	// Cmake generate
 	if(Dep.bRunCMakeBuild && (BuildSettings.bInstallBins || BuildSettings.bInstallLibs))
 	{
-		if (!CMakeGenerate(Dep, RepoDir, BuildSettings.Tools))
+		if (!CMakeGenerate(BuildSettings, Dep, RepoDir, BuildSettings.Tools))
 		{
 			return false;
 		}
@@ -590,7 +576,9 @@ bool BuildDeps(std::vector<Dependency>& Deps, GlobalBuildSettings BuildSettings)
 }
 
 bool BuildDepsCmd(std::vector<std::string>& Args)
-{	
+{
+	OSType HostOS = GetHostOS();
+	
 	// Cut out first arg
 	std::vector<std::string> DepsArgs;
 	for(int Index = 1; Index < Args.size(); Index++)
@@ -615,11 +603,11 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 		if(Parsed == "MSVC")
 		{
-			Settings.Tools = Toolset::MSVC;
+			Settings.Tools = ToolsetType::MSVC;
 		}
 		else if(Parsed == "GCC" || Parsed == "MinGW")
 		{
-			Settings.Tools = Toolset::GCC;
+			Settings.Tools = ToolsetType::GCC;
 		}
 		else
 		{
@@ -629,12 +617,14 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	}
 	else
 	{
-#ifdef RYBUILD_WINDOWS
-		Settings.Tools = Toolset::MSVC;
-#elif defined(RYBUILD_LINUX)
-		Settings.Tools = Toolset::GCC;
-#endif
-
+		if(HostOS == OSType::WINDOWS)
+		{
+			Settings.Tools = ToolsetType::MSVC;
+		}
+		else if(HostOS == OSType::LINUX)
+		{
+			Settings.Tools = ToolsetType::GCC;
+		}
 	}
 
 	if(HasOption(Args, "Repos"))
@@ -670,6 +660,16 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 		{
 			Settings.bInstallLibs = false;
 		}
+	}
+
+	if(HasOption(Args, "CxxCompiler"))
+	{
+		Settings.CxxCompiler = ParseOption(Args, "CxxCompiler");
+	}
+
+	if (HasOption(Args, "CCompiler"))
+	{
+		Settings.CCompiler = ParseOption(Args, "CCompiler");
 	}
 
 	// Future todo: Store these dependencies in a file?
@@ -743,7 +743,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	ShaderConductor.LabelType = GitLabelType::None; // Get the latest of master, doesn't compile otherwise
 	ShaderConductor.GitPath = "https://github.com/microsoft/ShaderConductor.git";
 	ShaderConductor.GitLabel = "v0.2.0"; // Doesn't matter for now
-	ShaderConductor.ExcludedPlatforms.push_back(Platform{ Architecture::All, Toolset::GCC, BuildOS::Windows });
+	ShaderConductor.ExcludedOSToolsets.push_back(OSToolset{ToolsetType::GCC, OSType::WINDOWS });
 
 	Dependency Glm;
 	Glm.Name = "Glm";

@@ -284,7 +284,7 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 		BuildCmd.push_back("/Z7");
 	}
 
-	BuildCmd.push_back("/DRYBUILD_TARGET_" + Settings.TargetOSToString());
+	BuildCmd.push_back("/DRYBUILD_TARGET_" + OSToString(Settings.TargetPlatform.OS));
 	BuildCmd.push_back("/DRYBUILD_CONFIG_" + Settings.ConfigToString());
 	
 	if (Settings.Type == BuildType::STANDALONE)

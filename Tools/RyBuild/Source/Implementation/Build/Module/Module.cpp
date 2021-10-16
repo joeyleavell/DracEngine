@@ -462,9 +462,9 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 
 	if(Settings)
 	{
-		TargetArch = PyUnicode_DecodeFSDefault(Settings->TargetArchToString().c_str());
-		TargetOS = PyUnicode_DecodeFSDefault(Settings->TargetOSToString().c_str());
-		BuildToolset = PyUnicode_DecodeFSDefault(Settings->ToolsetToString().c_str());
+		TargetArch = PyUnicode_DecodeFSDefault(ArchToString(Settings->TargetPlatform.Arch).c_str());
+		TargetOS = PyUnicode_DecodeFSDefault(OSToString(Settings->TargetPlatform.OS).c_str());
+		BuildToolset = PyUnicode_DecodeFSDefault(ToolsetToString(Settings->TargetPlatform.OS, Settings->Toolset).c_str());
 		BuildConfig = PyUnicode_DecodeFSDefault(Settings->ConfigToString().c_str());
 		BuildType = PyUnicode_DecodeFSDefault(Settings->BuildTypeToString().c_str());
 		Distribute = PyBool_FromLong(Settings->bDistribute);

@@ -96,49 +96,6 @@ struct BuildSettings
 		return "None";
 	}
 
-	std::string TargetOSToString() const
-	{
-		switch(TargetPlatform.OS)
-		{
-		case OSType::OSX:
-			return "OSX";
-		case OSType::WINDOWS:
-			return "Windows";
-		case OSType::LINUX:
-			return "Linux";
-		}
-		return "None";
-	}
-
-	std::string TargetArchToString() const
-	{
-		switch (TargetPlatform.Arch)
-		{
-		case ArchitectureType::X64:
-			return "x86_64";
-		case ArchitectureType::X86:
-			return "x86";
-		case ArchitectureType::ARM:
-			return "Arm";
-		}
-		return "None";
-	}
-
-	std::string ToolsetToString() const
-	{
-		switch (Toolset)
-		{
-		case ToolsetType::CLANG:
-			return "Clang";
-		case ToolsetType::GCC:
-			return "GCC";
-		case ToolsetType::MSVC:
-			return "MSVC";
-		}
-		return "None";
-	}
-
-
 	std::string GetTargetPathString() const
 	{
 		Filesystem::path TargetPath = "";

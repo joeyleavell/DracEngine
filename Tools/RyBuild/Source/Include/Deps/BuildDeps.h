@@ -1,6 +1,8 @@
 #pragma once
+
 #include <string>
 #include <vector>
+#include "Common.h"
 
 /**
  * At the moment, only best guess is implemented.
@@ -13,33 +15,17 @@ enum class ArtifactLocatorMethod
 	RelativePath, // Treats the name fields as strict paths to a location/directory
 };
 
-enum class Architecture
+struct OSToolset
 {
-	All,
-	x86_64,
-	x86,
-	Arm
-};
-
-enum class BuildOS
-{
-	All,
-	Windows,
-	Linux
-};
-
-enum class Toolset
-{
-	All,
-	MSVC,
-	GCC
+	ToolsetType Tool;
+	OSType OS;
 };
 
 struct Platform
 {
-	Architecture Arch;
-	Toolset Tool;
-	BuildOS OS;
+	ArchitectureType Arch;
+	ToolsetType Tool;
+	OSType OS;
 };
 
 enum class GitLabelType
@@ -55,11 +41,13 @@ struct GlobalBuildSettings
 	bool bInstallLibs = true;
 	bool bInstallBins = true;
 
-	Toolset Tools;
+	ToolsetType Tools;
 
 	std::string BuildDir;
 	std::string ReposDir;
 
+	std::string CxxCompiler;
+	std::string CCompiler;
 
 };
 
@@ -115,7 +103,10 @@ struct Dependency
 	/**
 	 * Platforms to exclude building this dependency for.
 	 */
-	std::vector<Platform> ExcludedPlatforms;
+	std::vector<OSType> ExcludedOS;
+	std::vector<ArchitectureType> ExcludedArch;
+	std::vector<ToolsetType> ExcludedToolset;
+	std::vector<OSToolset> ExcludedOSToolsets;
 
 	std::vector<std::string> CMakeGenArgs;
 

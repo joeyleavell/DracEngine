@@ -80,7 +80,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 
 	// Define macro for target platform
 	CmdArgs.push_back("-DRYBUILD_CONFIG_" + Settings.ConfigToString());
-	CmdArgs.push_back("-DRYBUILD_TARGET_" + Settings.TargetOSToString());
+	CmdArgs.push_back("-DRYBUILD_TARGET_" + OSToString(Settings.TargetPlatform.OS));
 
 	if (Settings.bDistribute)
 	{
