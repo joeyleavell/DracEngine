@@ -8,6 +8,7 @@
 #include "Core/Delegate.h"
 #include "Core/String.h"
 #include "Core/Memory/Memory.h"
+#include "Core/Reflection.h"
 
 // Reflection defines
 // TODO: make these only defined for reflection generator, even if using clang

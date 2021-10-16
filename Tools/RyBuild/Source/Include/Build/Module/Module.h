@@ -279,15 +279,15 @@ public:
 	{
 		Filesystem::path ThirdPartyBin = GetThirdPartyBinDir();
 
-		if(Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+		if(Settings.TargetPlatform.Arch == ArchitectureType::X64)
 		{
 			ThirdPartyBin /= "x64";
 		}
-		else if(Settings.TargetPlatform.Arch == TargetArchitecture::x86)
+		else if(Settings.TargetPlatform.Arch == ArchitectureType::X86)
 		{
 			ThirdPartyBin /= "x86";
 		}
-		else if(Settings.TargetPlatform.Arch == TargetArchitecture::Arm)
+		else if(Settings.TargetPlatform.Arch == ArchitectureType::ARM)
 		{
 			ThirdPartyBin /= "Arm";
 		}
@@ -296,15 +296,15 @@ public:
 			return;
 		}
 
-		if (Settings.TargetPlatform.OS == TargetOS::Windows)
+		if (Settings.TargetPlatform.OS == OSType::WINDOWS)
 		{
 			ThirdPartyBin /= "Windows";
 		}
-		else if(Settings.TargetPlatform.OS == TargetOS::Mac)
+		else if(Settings.TargetPlatform.OS == OSType::OSX)
 		{
-			ThirdPartyBin /= "Mac";
+			ThirdPartyBin /= "OSX";
 		}
-		else if(Settings.TargetPlatform.OS == TargetOS::Linux)
+		else if(Settings.TargetPlatform.OS == OSType::LINUX)
 		{
 			ThirdPartyBin /= "Linux";
 		}
@@ -313,13 +313,13 @@ public:
 			return;
 		}
 
-		if (Settings.Toolset == BuildToolset::MSVC)
+		if (Settings.Toolset == ToolsetType::MSVC)
 		{
 			ThirdPartyBin /= "MSVC";
 		}
-		else if (Settings.Toolset == BuildToolset::GCC)
+		else if (Settings.Toolset == ToolsetType::GCC)
 		{
-			if(Settings.TargetPlatform.OS == TargetOS::Windows)
+			if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 			{
 				ThirdPartyBin /= "MinGW";
 			}
@@ -328,7 +328,7 @@ public:
 				ThirdPartyBin /= "GCC";
 			}
 		}
-		else if (Settings.Toolset == BuildToolset::CLANG)
+		else if (Settings.Toolset == ToolsetType::CLANG)
 		{
 			ThirdPartyBin /= "Clang";
 		}

@@ -892,11 +892,11 @@ bool AbstractBuildTool::BuildAll(std::vector<std::string>& ModulesFailed)
 	bool bSuccess = true;
 
 	// Determine whether to build standalone or modular
-	if (Settings.Type == BuildType::Standalone)
+	if (Settings.Type == BuildType::STANDALONE)
 	{
 		bSuccess = BuildAllStandalone();
 	}
-	else if (Settings.Type == BuildType::Modular)
+	else if (Settings.Type == BuildType::MODULAR)
 	{
 		bSuccess = BuildAllModular(ModulesFailed);
 	}
@@ -1177,37 +1177,13 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 	AbstractBuildTool* BuildTool = nullptr;
 
 	BuildSettings Settings;
-	Settings.Config = BuildConfiguration::Development;
-	Settings.Type = BuildType::Modular;
+	Settings.Config = BuildConfiguration::DEVELOPMENT;
+	Settings.Type = BuildType::MODULAR;
 
-// Detect host architecture
-#if defined(RYBUILD_Arch_Amd64)
-	Settings.HostPlatform.Arch = TargetArchitecture::x86_64;
-#elif defined(RYBUILD_Arch_x86)
-	Settings.HostPlatform.Arch = TargetArchitecture::x86;
-#elif defined(RYBUILD_Arch_Arm)
-	Settings.HostPlatform.Arch = TargetArchitecture::Arm;
-#elif defined(RYBUILD_Arch_Arm64)
-	Settings.HostPlatform.Arch = TargetArchitecture::Arm64;
-#endif
-
-// Detect host OS
-#if defined(RYBUILD_WINDOWS)
-	Settings.HostPlatform.OS = TargetOS::Windows;
-#elif defined(RYBUILD_LINUX)
-	Settings.HostPlatform.OS = TargetOS::Linux;
-#elif defined(RYBUILD_OSX)
-	Settings.HostPlatform.OS = TargetOS::Mac;	
-#endif
-
-// Detect host toolset
-#if defined(RYBUILD_Toolset_GCC)
-	Settings.Toolset = BuildToolset::GCC;
-#elif defined(RYBUILD_Toolset_MSVC)
-	Settings.Toolset = BuildToolset::MSVC;
-#elif defined(RYBUILD_Toolset_Clang)
-	Settings.Toolset = BuildToolset::Clang;
-#endif
+	// Detect host platform
+	Settings.HostPlatform.OS   = GetHostOS();
+	Settings.HostPlatform.Arch = GetHostArchitecture();
+	Settings.Toolset           = GetHostToolset();
 
 	// Initialize the target platform to the host platform by default
 	Settings.TargetPlatform = Settings.HostPlatform;
@@ -1219,19 +1195,19 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 		if(TargetArch == "x86")
 		{
-			Settings.TargetPlatform.Arch = TargetArchitecture::x86;
+			Settings.TargetPlatform.Arch = ArchitectureType::X86;
 		}
 		else if (TargetArch == "x86_64")
 		{
-			Settings.TargetPlatform.Arch = TargetArchitecture::x86_64;
+			Settings.TargetPlatform.Arch = ArchitectureType::X64;
 		}
 		else if (TargetArch == "Arm")
 		{
-			Settings.TargetPlatform.Arch = TargetArchitecture::Arm;
+			Settings.TargetPlatform.Arch = ArchitectureType::ARM;
 		}
 		else if (TargetArch == "Arm64")
 		{
-			Settings.TargetPlatform.Arch = TargetArchitecture::Arm64;
+			Settings.TargetPlatform.Arch = ArchitectureType::ARM64;
 		}
 		else
 		{
@@ -1248,15 +1224,15 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 		if (TargetOS == "Windows")
 		{
-			Settings.TargetPlatform.OS = TargetOS::Windows;
+			Settings.TargetPlatform.OS = OSType::WINDOWS;
 		}
 		else if (TargetOS == "Linux")
 		{
-			Settings.TargetPlatform.OS = TargetOS::Linux;
+			Settings.TargetPlatform.OS = OSType::LINUX;
 		}
-		else if (TargetOS == "Mac")
+		else if (TargetOS == "OSX")
 		{
-			Settings.TargetPlatform.OS = TargetOS::Mac;
+			Settings.TargetPlatform.OS = OSType::OSX;
 		}
 		else
 		{
@@ -1272,11 +1248,11 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 		if(BuildConfig == "Development")
 		{
-			Settings.Config = BuildConfiguration::Development;
+			Settings.Config = BuildConfiguration::DEVELOPMENT;
 		}
 		else if(BuildConfig == "Shipping")
 		{
-			Settings.Config = BuildConfiguration::Shipping;
+			Settings.Config = BuildConfiguration::SHIPPING;
 		}
 		else
 		{
@@ -1291,11 +1267,11 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 		if (BuildType == "Modular")
 		{
-			Settings.Type = BuildType::Modular;
+			Settings.Type = BuildType::MODULAR;
 		}
 		else if (BuildType == "Standalone")
 		{
-			Settings.Type = BuildType::Standalone;
+			Settings.Type = BuildType::STANDALONE;
 		}
 		else
 		{
@@ -1318,12 +1294,17 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 	// TODO: compile build toolset into a -key=value parameter
 	if (HasOption(Options, "-GCC"))
 	{
-		Settings.Toolset = BuildToolset::GCC;
+		Settings.Toolset = ToolsetType::GCC;
 	}
 
 	if (HasOption(Options, "-MSVC"))
 	{
-		Settings.Toolset = BuildToolset::MSVC;
+		Settings.Toolset = ToolsetType::MSVC;
+	}
+
+	if (HasOption(Options, "-Clang"))
+	{
+		Settings.Toolset = ToolsetType::CLANG;
 	}
 
 	if (HasOption(Options, "-Distribute"))
@@ -1339,13 +1320,13 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 		return false;
 	}
 
-	if(Settings.Toolset == BuildToolset::MSVC)
+	if(Settings.Toolset == ToolsetType::MSVC)
 	{
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 		BuildTool = new MSVCBuildTool(RootDir, Settings);
 #endif
 	}
-	else if(Settings.Toolset == BuildToolset::GCC)
+	else if(Settings.Toolset == ToolsetType::GCC)
 	{
 		BuildTool = new GCCBuildTool(RootDir, Settings);
 	}

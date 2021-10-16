@@ -14,10 +14,7 @@ set (SOURCES
 	Source/Implementation/Generate/Project.cpp
 )
 
-# External includes
-include_directories(Source/Include ../RyCommon/Source/Include)
-
-# Todo: Determine best way to switch architectures, probably using a flag
+############### Platform Libraries ############################
 if(MSVC)
 	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/x64/Windows/MSVC")
 elseif(MinGW)
@@ -27,8 +24,12 @@ elseif(UNIX AND NOT APPLE)
 elseif(APPLE)
 	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/ARM64/OSX/GCC")
 endif()
+###############################################################
 
-# Platform includes
+add_executable(RyBuild ${SOURCES})
+include_directories(Source/Include)
+
+################ Platform Includes ############################
 if(WIN32)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/Windows/Python)
@@ -39,25 +40,36 @@ elseif(APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX/Python)
 endif()
+###############################################################
 
-add_executable(RyBuild ${SOURCES})
-
+################# Target Properties ##########################
 set_target_properties(RyBuild PROPERTIES
             CXX_STANDARD 17
 			CMAKE_CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF)
+##############################################################
 
-# Link with RyCommon
+################# COMMON #####################################
 target_link_libraries(RyBuild PUBLIC RyCommon)
-target_link_libraries(RyBuild PRIVATE python3.11)
+include_directories(../RyCommon/Source/Include)
+##############################################################
 
-# Have to use separate threads library for MinGW builds
+################# Windows PThreads (MinGW) ###################
 if(MinGW)
 	message("${PROJECT_NAME}: mingw ${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator")
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator)
 endif()
+##############################################################
 
-# Operating system specific libraries
+################### LINK PYTHON ###################
+if(UNIX)
+	target_link_libraries(RyBuild PRIVATE python3.11)
+elseif(WIN32)
+	target_link_libraries(RyBuild PRIVATE python311)
+endif()
+###################################################
+
+################### System Libs ###################
 if(MinGW OR WIN32)
 	target_link_libraries(RyBuild PRIVATE rpcrt4)
 elseif(UNIX AND NOT APPLE)
@@ -67,25 +79,22 @@ elseif(UNIX AND NOT APPLE)
 elseif(APPLE)
 	# Apple specific libraries
 endif()
+###################################################
 
-# GCC specific libraries
+################## Compiler Libs ##################
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyBuild PRIVATE -lstdc++fs)
 	target_link_libraries(RyBuild PRIVATE -lpthread)
 endif()
+###################################################
 
 ########################## INSTALL ################################
 install(TARGETS RyBuild DESTINATION .)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/PythonLib)
 
-# TODO: get rid of all DLLs
+# Python on windows is a DLL
 if(MSVC)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python310.dll DESTINATION ${CMAKE_INSTALL_PREFIX})
-elseif(MinGW)
-	# Todo: MinGW dlls
-elseif(UNIX AND NOT APPLE)
-	# Todo: Linux SOs
-elseif(APPLE)
-	# Todo: Apple SOs
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python311.dll DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
+####################################################################

@@ -1,6 +1,6 @@
 #include "Common.h"
 
-#if defined(RYBUILD_LINUX) || defined(RYBUILD_OSX)
+#if defined(RBUILD_HOST_OS_LINUX) || defined(RBUILD_HOST_OS_OSX)
 
 #include <iostream>
 #include <unistd.h>

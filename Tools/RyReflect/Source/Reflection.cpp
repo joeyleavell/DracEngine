@@ -521,9 +521,9 @@ namespace Ry
 		DeclarationMatcher FunctionMatcher
 			= cxxMethodDecl(decl().bind("id"), hasAttr(attr::Annotate), isExpansionInFileMatching(Include));
 
-		//Finder.addMatcher(ClassMatcher, &CodeGenerator);
-		//Finder.addMatcher(PropertyMatcher, &CodeGenerator);
-		//Finder.addMatcher(FunctionMatcher, &CodeGenerator);
+		Finder.addMatcher(ClassMatcher, &CodeGenerator);
+		Finder.addMatcher(PropertyMatcher, &CodeGenerator);
+		Finder.addMatcher(FunctionMatcher, &CodeGenerator);
 
 		std::vector<std::string> Args;
 
@@ -577,7 +577,7 @@ namespace Ry
 
 		llvm::Expected<CommonOptionsParser> Parser = CommonOptionsParser::create(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
 		clang::tooling::ClangTool* Tool = new ClangTool(Parser->getCompilations(), Sources);
-		//Tool.appendArgumentsAdjuster(Parser.getArgumentsAdjuster());
+		Tool->appendArgumentsAdjuster(Parser.get().getArgumentsAdjuster());
 
 		//std::unique_ptr<FrontendActionFactory> Fac2 = newFrontendActionFactory<SyntaxOnlyAction>();
 

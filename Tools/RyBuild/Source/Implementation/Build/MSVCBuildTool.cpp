@@ -1,6 +1,6 @@
 #include "Common.h"
 
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 #include <windows.h>
 #include "Build/MSVCBuildTool.h"
 #include "Build/Module/Module.h"
@@ -251,7 +251,7 @@ AbstractBuildTool(RootDir, Settings)
 
 bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string OutputDirectory, std::string SourceFile, std::string& StdOut, std::string& StdErr)
 {
-	if(Settings.TargetPlatform.Arch != TargetArchitecture::x86_64 && Settings.TargetPlatform.OS != TargetOS::Windows)
+	if(Settings.TargetPlatform.Arch != ArchitectureType::X64 && Settings.TargetPlatform.OS != OSType::WINDOWS)
 	{
 		std::cerr << "Only x86_64 windows targets are supported with the MSVC toolchain" << std::endl;
 		return false;
@@ -279,7 +279,7 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 	BuildCmd.push_back("/MD");
 
 	// Debug information
-	if(Settings.Config == BuildConfiguration::Development)
+	if(Settings.Config == BuildConfiguration::DEVELOPMENT)
 	{
 		BuildCmd.push_back("/Z7");
 	}
@@ -287,7 +287,7 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 	BuildCmd.push_back("/DRYBUILD_TARGET_" + Settings.TargetOSToString());
 	BuildCmd.push_back("/DRYBUILD_CONFIG_" + Settings.ConfigToString());
 	
-	if (Settings.Type == BuildType::Standalone)
+	if (Settings.Type == BuildType::STANDALONE)
 	{
 		BuildCmd.push_back("/DRYBUILD_STANDALONE");
 	}
@@ -399,7 +399,7 @@ bool MSVCBuildTool::LinkModule(Module& TheModule)
 
 	// Create debug information for the code.
 
-	if(Settings.Config == BuildConfiguration::Development)
+	if(Settings.Config == BuildConfiguration::DEVELOPMENT)
 	{
 		BuildCmd.push_back("/DEBUG");
 	}
@@ -538,7 +538,7 @@ bool MSVCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Obje
 	Filesystem::path ArtifactExePath = Filesystem::absolute(Filesystem::path(OutputDirectory) / ArtifactExeName);
 
 	// Create debug information for the code.
-	if(Settings.Config == BuildConfiguration::Development)
+	if(Settings.Config == BuildConfiguration::DEVELOPMENT)
 	{
 		BuildCmd.push_back("/DEBUG");
 	}

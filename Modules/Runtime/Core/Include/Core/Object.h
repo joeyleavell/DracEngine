@@ -51,5 +51,5 @@ namespace Ry
 			return *AsT;
 		}
 	};
-
+	
 }

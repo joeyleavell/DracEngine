@@ -32,3 +32,14 @@ std::string GetRyReflectPath();
 
 
 std::string GetTimestamp(std::string Format);
+
+// Detect host architecture
+#if defined(RBUILD_HOST_ARCH_x86_64)
+Settings.HostPlatform.Arch = TargetArchitecture::x64;
+#elif defined(RBUILD_HOST_ARCH_x86)
+Settings.HostPlatform.Arch = TargetArchitecture::x86;
+#elif defined(RBUILD_HOST_Arch_Arm)
+Settings.HostPlatform.Arch = TargetArchitecture::ARM;
+#elif defined(RBUILD_HOST_Arch_Arm64)
+Settings.HostPlatform.Arch = TargetArchitecture::ARM64;
+#endif

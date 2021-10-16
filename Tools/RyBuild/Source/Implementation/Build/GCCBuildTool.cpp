@@ -13,24 +13,24 @@
 GCCBuildTool::GCCBuildTool(std::string RootDir, BuildSettings Settings) :
 AbstractBuildTool(RootDir, Settings)
 {
-	if(Settings.TargetPlatform.OS == TargetOS::Linux)
+	if(Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		this->ObjectFileExtension = ".o";
 	}
-	else if(Settings.TargetPlatform.OS == TargetOS::Windows)
+	else if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		this->ObjectFileExtension = ".obj";
 	}
 
 	// Determine the program to use based on target/host platforms
 	Program = "g++";
-	if (Settings.HostPlatform.OS == TargetOS::Linux)
+	if (Settings.HostPlatform.OS == OSType::LINUX)
 	{
-		if (Settings.HostPlatform.Arch == TargetArchitecture::x86_64)
+		if (Settings.HostPlatform.Arch == ArchitectureType::X64)
 		{
-			if (Settings.TargetPlatform.OS == TargetOS::Windows)
+			if (Settings.TargetPlatform.OS == OSType::WINDOWS)
 			{
-				if (Settings.TargetPlatform.Arch == TargetArchitecture::x86_64)
+				if (Settings.TargetPlatform.Arch == ArchitectureType::X64)
 				{
 					Program = "x86_64-w64-mingw32-g++";
 				}
@@ -57,7 +57,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 	std::string OutputFileName = Filesystem::path(SourceFile).stem().string() + ObjectFileExtension;
 
 	// On Linux, if we're compiling a shared library, we need to specify position independent code.
-	if(Settings.TargetPlatform.OS == TargetOS::Linux)
+	if(Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		if (!TheModule.IsExecutable(Settings))
 		{
@@ -73,7 +73,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 	// BuildCmd += "/MD ";
 
 	// Debug information (debug builds only?)
-	if(Settings.Config == BuildConfiguration::Development)
+	if(Settings.Config == BuildConfiguration::DEVELOPMENT)
 	{
 		CmdArgs.push_back("-g");
 	}
@@ -87,13 +87,13 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 		CmdArgs.push_back("-DRYBUILD_DISTRIBUTE");
 	}
 
-	if(Settings.Type == BuildType::Standalone)
+	if(Settings.Type == BuildType::STANDALONE)
 	{
 		CmdArgs.push_back("-DRYBUILD_STANDALONE");
 	}
 
 	// Need to specify the windows version on MinGW else we won't have access to certain functions
-	if(Settings.TargetPlatform.OS == TargetOS::Windows)
+	if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		CmdArgs.push_back("-D_WIN32_WINNT=0x0502");
 	}
@@ -219,7 +219,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		Extern.GetPlatformLibs(Settings, ExternPlatformLibs);
 
 		// Also need to check for bins on Linux
-		if(Settings.TargetPlatform.OS == TargetOS::Linux)
+		if(Settings.TargetPlatform.OS == OSType::LINUX)
 		{
 			Extern.GetPlatformBins(Settings, ExternPlatformLibs);
 		}
@@ -254,12 +254,12 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	// 
 	// std::string ArtifactPdbName = ArtifactName + ".pdb";
 
-	if(Settings.TargetPlatform.OS == TargetOS::Windows)
+	if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		ArtifactExecutableName = ArtifactName + ".exe";
 		ArtifactSharedLibName = ArtifactName + ".dll";
 	}
-	else if(Settings.TargetPlatform.OS == TargetOS::Linux)
+	else if(Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		ArtifactExecutableName = ArtifactName + ".out";
 		ArtifactSharedLibName = "lib" + ArtifactName + ".so";
@@ -267,7 +267,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 
 	// Tell GCC to statically link libgcc and libstdc++ if on Windows
 	// This prevents people from needing to download mingw binaries
-	if(Settings.TargetPlatform.OS == TargetOS::Windows)
+	if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		CmdArgs.push_back("-static");
 		CmdArgs.push_back("-static-libstdc++");
@@ -282,7 +282,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	std::string LinkerOptions = "";
 
 	// Tell linker to search in working directory for shared objects (binary folder) if on Linux
-	if(Settings.TargetPlatform.OS == TargetOS::Linux)
+	if(Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		LinkerOptions += "-Wl,-rpath,${ORIGIN}";
 	}
@@ -291,11 +291,11 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	if (!TheModule.IsExecutable(Settings))
 	{
 		// If on windows, we need to give GCC a name for the import library
-		if(Settings.TargetPlatform.OS == TargetOS::Windows)
+		if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 		{
 			LinkerOptions += "-Wl,--out-implib," + ArtifactImpLibPath.string();
 		}
-		else if(Settings.TargetPlatform.OS == TargetOS::Linux)
+		else if(Settings.TargetPlatform.OS == OSType::LINUX)
 		{
 			// Setup the soname
 			LinkerOptions += ",-soname," + ArtifactSharedLibName;
@@ -332,7 +332,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
 
 			// Also need to add binary path for Linux (SOs)
-			if (Settings.TargetPlatform.OS == TargetOS::Linux)
+			if (Settings.TargetPlatform.OS == OSType::LINUX)
 			{
 				CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
 			}
@@ -436,11 +436,11 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 	// 
 	// std::string ArtifactPdbName = ArtifactName + ".pdb";
 
-	if (Settings.TargetPlatform.OS == TargetOS::Windows)
+	if (Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		ArtifactExecutableName = ArtifactName + ".exe";
 	}
-	else if (Settings.TargetPlatform.OS == TargetOS::Linux)
+	else if (Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		ArtifactExecutableName = ArtifactName + ".out";
 	}
@@ -449,7 +449,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 	Filesystem::path ArtifactExePath = Filesystem::canonical(Filesystem::path(OutputDirectory)) / ArtifactExecutableName;
 
 	// Tell GCC to statically link libgcc and libstdc++ if on Windows
-	if (Settings.TargetPlatform.OS == TargetOS::Windows)
+	if (Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		CmdArgs.push_back("-static-libstdc++");
 		CmdArgs.push_back("-static-libgcc");
@@ -458,7 +458,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 	std::string LinkerOptions = "";
 
 	// Tell linker to search in working directory for shared objects (binary folder) if on Linux
-	if (Settings.TargetPlatform.OS == TargetOS::Linux)
+	if (Settings.TargetPlatform.OS == OSType::LINUX)
 	{
 		LinkerOptions += "-Wl,-rpath,${ORIGIN}";
 	}
@@ -490,7 +490,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 				CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
 
 				// Also need to add bins path for SOs on Linux
-				if(Settings.TargetPlatform.OS == TargetOS::Linux)
+				if(Settings.TargetPlatform.OS == OSType::LINUX)
 				{
 					CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
 				}
@@ -541,7 +541,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 			Extern.GetPlatformLibs(Settings, TargetLibs);
 
 			// Also need to check for SOs on Linux
-			if(Settings.TargetPlatform.OS == TargetOS::Linux)
+			if(Settings.TargetPlatform.OS == OSType::LINUX)
 			{
 				Extern.GetPlatformBins(Settings, TargetLibs);
 			}

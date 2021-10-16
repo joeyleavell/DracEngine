@@ -1,6 +1,6 @@
 #include "Common.h"
 
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 #include <windows.h>
 
 std::string GetPlatformExecutableExt()
