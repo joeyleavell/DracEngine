@@ -101,6 +101,10 @@ if(UNIX)
 	target_link_libraries(RyReflect PRIVATE util)
 	target_link_libraries(RyReflect PRIVATE pthread)
 	target_link_libraries(RyReflect PRIVATE z)
+endif()
+
+# Apple libs
+if(APPLE)
 	target_link_libraries(RyReflect PRIVATE curses)
 endif()
 
