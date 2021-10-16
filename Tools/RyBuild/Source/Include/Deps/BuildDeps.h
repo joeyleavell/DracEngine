@@ -81,6 +81,8 @@ struct Dependency
 	 */
 	std::vector<std::string> IncludesDirectories;
 
+	std::vector<std::string> OSXFrameworks;
+
 	/**
 	 * Commands to run prior to building dependency but after cloning.
 	 */
