@@ -110,6 +110,16 @@ bool CMakeGenerate(GlobalBuildSettings Global, Dependency& Dep, std::string Root
 		CMakeGenerateArgs.push_back("-D");
 		CMakeGenerateArgs.push_back("CMAKE_POSITION_INDEPENDENT_CODE=ON");
 	}
+	else if(HostOS == OSType::OSX)
+	{
+		// Add OSX Frameworks
+		std::string CxxFlagsString = "";
+		for(std::string Framework : Dep.OSXFrameworks)
+		{
+			CxxFlagsString += "-framework " + Framework + " ";			
+		}
+		CMakeGenerateArgs.push_back("-DCMAKE_CXX_FLAGS=\"" + CxxFlagsString + "\"");
+	}
 
 	if(Tools == ToolsetType::MSVC)
 	{
@@ -726,6 +736,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	};
 	Glfw.GitPath = "https://github.com/glfw/glfw.git";
 	Glfw.GitLabel = "3.3.3";
+	Glfw.OSXFrameworks = { "OpenGL", "Coco", "IOKit" };
 
 	Dependency Json;
 	Json.Name = "Json";
