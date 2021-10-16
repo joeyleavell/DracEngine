@@ -13,27 +13,6 @@ std::string GetPlatformExecutableExt()
 	return "";
 }
 
-std::string GetModulePath()
-{
-	if (ModulePathCache.empty())
-	{
-		constexpr int BUF_SIZE = 1024;
-		char Buffer[BUF_SIZE];
-
-		memset(Buffer, 0, sizeof(Buffer));
-
-		if (readlink("/proc/self/exe", Buffer, BUF_SIZE - 1) < 0)
-		{
-			// Error
-			std::cerr << "Error getting /proc/self/exe" << std::endl;
-		}
-
-		ModulePathCache = Buffer;
-	}
-
-	return ModulePathCache;
-}
-
 bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize, char* StdOut, int ErrorBuffSize, char* StdErr)
 {
 	constexpr int ProgramBuffSize = 100;

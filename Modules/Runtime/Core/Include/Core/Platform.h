@@ -15,6 +15,8 @@ typedef std::uint32_t uint32;
 typedef std::uint16_t uint16;
 typedef std::uint8_t uint8;
 
+// TODO: CHANGE THIS
+// The engine itself does not need to do host detection - that is the job of the build tool
 /************************************************************************/
 /* Platform implementation                                              */
 /************************************************************************/
@@ -25,13 +27,13 @@ typedef std::uint8_t uint8;
 	#include "Windows/WindowsTypes.h"
 #elif defined(__ANDROID__)
 	#define ANDROID_IMPLEMENTATION
-#elif defined(__linux__)
+#elif defined(__linux__) || defined (__APPLE__)
 	#define LINUX_IMPLEMENTATION
 	#include "Linux/LinuxPlatform.h"
 	#include "Linux/LinuxProcess.h"
 #elif defined(__APPLE__)
 	#define MAX_IMPLEMENTATION
-elif defined(__unix__)
+#elif defined(__unix__)
 	#define UNIX_IMPLEMENTATION
 #endif
 

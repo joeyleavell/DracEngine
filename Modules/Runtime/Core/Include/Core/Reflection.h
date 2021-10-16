@@ -228,7 +228,7 @@ const Ry::DataType* GetType(Ry::ArrayList<T> ArrayList)
 	Result.Size = sizeof(ArrayList);
 	Result.Name = "Ry::ArrayList<" + InnerType.Name + ">";
 	Result.Class = Ry::TypeClass::ArrayList;
-	Result.TemplateType.Add(InnerType);
+	//Result.TemplateType.Add(InnerType);
 
 	return &Result;
 };

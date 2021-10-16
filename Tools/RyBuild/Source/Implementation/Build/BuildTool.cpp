@@ -175,7 +175,9 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				//std::cout << "hp " << HeaderPath << std::endl;
 
 				std::string HeaderStem = HeaderPath.stem().string();
+
 				auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
+
 				auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
 				std::string HeaderName = HeaderStem + ".gen.h";
 				Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
@@ -212,6 +214,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				int StdOutSize = 1024 * 1000;
 				char* StdOutBuffer = new char[StdOutSize];
 				char* StdErrBuffer = new char[StdOutSize];
+
 				bool bResult = ExecProc(RyReflectPath, Args, StdOutSize, StdOutBuffer, StdOutSize, StdErrBuffer);
 				std::string StdOutAsString = StdOutBuffer;
 				std::string StdErrAsString = StdErrBuffer;

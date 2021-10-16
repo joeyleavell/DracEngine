@@ -58,13 +58,13 @@ Filesystem::path PathRelativeTo_UnRelated(Filesystem::path Base, Filesystem::pat
 	int ParentCounter = 0;
 	bool bFoundCommonality = false;
 
-	while(PathMod.has_parent_path() && !bFoundCommonality)
+	while((PathMod.has_parent_path() && PathMod.has_relative_path()) && !bFoundCommonality)
 	{
 		// Step through the B path
 		BaseMod = AbsBase;
 		ParentCounter = 0;
 		
-		while(BaseMod.has_parent_path() && !bFoundCommonality)
+		while((BaseMod.has_parent_path() && BaseMod.has_relative_path()) && !bFoundCommonality)
 		{
 			if (BaseMod == PathMod)
 			{

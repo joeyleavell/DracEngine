@@ -10,7 +10,16 @@ set (SOURCES
 
 include_directories(Source/Include)
 
-add_library(RyCommon STATIC ${SOURCES} "Source/Implementation/Common.cpp" "Source/Include/Platform.h" "Source/Include/PlatformDetection.h" "Source/Implementation/WindowsPlatform.cpp" "Source/Implementation/Platform.cpp" "Source/Implementation/PosixPlatform.cpp" )
+add_library(RyCommon STATIC ${SOURCES} 
+"Source/Implementation/Common.cpp" 
+"Source/Include/Platform.h" 
+"Source/Include/PlatformDetection.h" 
+"Source/Implementation/WindowsPlatform.cpp" 
+"Source/Implementation/Platform.cpp" 
+"Source/Implementation/PosixPlatform.cpp" 
+"Source/Implementation/OSXPlatform.cpp" 
+"Source/Implementation/LinuxPlatform.cpp" 
+)
 
 set_property(TARGET RyCommon PROPERTY CXX_STANDARD 17)
 

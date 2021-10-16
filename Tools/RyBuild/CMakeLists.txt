@@ -91,7 +91,7 @@ endif()
 ########################## INSTALL ################################
 install(TARGETS RyBuild DESTINATION .)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ${CMAKE_INSTALL_PREFIX}/PythonLib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ./PythonLib)
 
 # Python on windows is a DLL
 if(MSVC)
