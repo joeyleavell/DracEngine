@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RyMath.h"
+#include <cmath>
 
 namespace Ry
 {

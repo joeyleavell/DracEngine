@@ -12,6 +12,7 @@
 #include "Event.h"
 #include "Keys.h"
 #include "Timer.h"
+#include <cmath>
 
 namespace Ry
 {

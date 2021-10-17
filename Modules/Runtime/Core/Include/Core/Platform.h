@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mach-o/dyld.h>
 #include <cstdint>
 #include "CoreGen.h"
 

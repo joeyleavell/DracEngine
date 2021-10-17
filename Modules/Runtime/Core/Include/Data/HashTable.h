@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Platform.h"
+#include "Algorithm/Algorithm.h"
 #include "CoreGen.h"
 
 #define TABLE_SIZE 10

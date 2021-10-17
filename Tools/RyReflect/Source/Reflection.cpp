@@ -542,13 +542,32 @@ namespace Ry
 			Args.push_back(IncludePath);
 		}
 
+		Args.push_back("-xc++");
+
+		Args.push_back("-std=c++17");
+		Args.push_back("-stdlib=libc++");
+
+		// TODO: need to do this in a more robust way for OSX
+
+		Args.push_back("-cxx-isystem");
+		Args.push_back("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1");
+
+		Args.push_back("-cxx-isystem");
+		Args.push_back("/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include");
+
+		Args.push_back("-cxx-isystem");
+		Args.push_back("/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers");
+
+		Args.push_back("-cxx-isystem");
+		Args.push_back("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include");
+
+		Args.push_back("-F" + std::string("/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"));
+
 		// Tell clang our module name
 		Args.push_back("-D");
 		Args.push_back("COMPILE_MODULE_" + ModuleNameCaps);
 
-		Args.push_back("-xc++");
-
-		Args.push_back("-std=c++17");
+		std::cout << "hi test" << std::endl;
 
 		//Args.push_back("--help");
 
@@ -572,7 +591,7 @@ namespace Ry
 		std::vector<std::string> Sources = { SourcePath };
 
 		for (std::string Arg : Args)
-		 std::cout << Arg << std::endl;
+			std::cout << Arg << std::endl;
 		std::cout << std::endl;
 
 		llvm::Expected<CommonOptionsParser> Parser = CommonOptionsParser::create(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);

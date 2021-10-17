@@ -112,6 +112,10 @@ struct BuildSettings
 		{
 			TargetPath /= "Arm";
 		}
+		else if (TargetPlatform.Arch == ArchitectureType::ARM64)
+		{
+			TargetPath /= "Arm64";
+		}
 
 		if (TargetPlatform.OS == OSType::WINDOWS)
 		{

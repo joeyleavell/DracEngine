@@ -1,7 +1,7 @@
 # Declare module dependencies
 Modules = ["Core", "Math", "AssetCore", "Rendering", "Profiling"]
 
-Extern = ["Stb", "Fbx"]
+Extern = ["Stb"]
 
 # Declare module type
 Type = "Runtime"

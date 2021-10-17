@@ -1,6 +1,6 @@
+#include "Application.h"
 #include "EntryPoint.h"
 #include "DesktopApplication.h"
-#include "Application.h"
 
 namespace Ry
 {
@@ -13,10 +13,10 @@ namespace Ry
 			{
 				return true;
 			}
-	}
+		}
 
 		return false;
-}
+	}
 
 	Ry::StringView ParseOption(Ry::ArrayList<Ry::String>& Args, Ry::String Option)
 	{

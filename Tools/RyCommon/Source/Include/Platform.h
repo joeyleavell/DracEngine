@@ -58,48 +58,62 @@ ToolsetType GetHostToolset();
 
 inline std::string OSToString(OSType Type)
 {
-	switch (Type)
+	if(Type == OSType::OSX)
 	{
-	case OSType::OSX:
 		return "OSX";
-	case OSType::WINDOWS:
+	} 
+	else if(Type == OSType::WINDOWS)
+	{
 		return "Windows";
-	case OSType::LINUX:
+	} 
+	else if(Type == OSType::LINUX)
+	{
 		return "Linux";
 	}
+
 	return "None";
 }
 
 inline std::string ArchToString(ArchitectureType Type)
 {
-	switch (Type)
+	if(Type == ArchitectureType::X64)
 	{
-	case ArchitectureType::X64:
 		return "x64";
-	case ArchitectureType::X86:
-		return "x86";
-	case ArchitectureType::ARM:
-		return "Arm";
-	case ArchitectureType::ARM64:
-		return "Arm64";
 	}
+	else if(Type == ArchitectureType::X86)
+	{
+		return "x86";
+	}
+	else if(Type == ArchitectureType::ARM)
+	{
+		return "Arm";	
+	}
+	else if(Type == ArchitectureType::ARM64)
+	{
+		return "Arm64";	
+	}
+
 	return "None";
 }
 
 inline std::string ToolsetToString(OSType OS, ToolsetType Type)
 {
-	switch (Type)
+	if(Type == ToolsetType::CLANG)
 	{
-	case ToolsetType::CLANG:
 		return "Clang";
-	case ToolsetType::GCC:
+	}
+	else if(Type == ToolsetType::GCC)
+	{
 		if(OS == OSType::WINDOWS)
 			return "MinGW";
 		else
-			return "GCC";
-	case ToolsetType::MSVC:
-		return "MSVC";
+			return "GCC";		
 	}
+	else if(Type == ToolsetType::MSVC)
+	{
+		return "MSVC";		
+	}
+
 	return "None";
 }
 

@@ -33,13 +33,13 @@ namespace Ry
 
 	// Hash implementation for openly addressed hash containers
 	template <typename K, typename V>
-	uint32 Hash(OAMapContainer<K*, V> Object)
+	EXPORT_ONLY uint32 Hash(OAMapContainer<K*, V> Object)
 	{
 		return Hash<K>(Object.Key);
 	}
 
 	template <typename K, typename V>
-	uint32 Hash(OAMapContainer<K, V> Object)
+	EXPORT_ONLY uint32 Hash(OAMapContainer<K, V> Object)
 	{
 		return Hash<K>(Object.Key);
 	}

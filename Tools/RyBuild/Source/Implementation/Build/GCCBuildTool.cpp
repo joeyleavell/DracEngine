@@ -21,6 +21,11 @@ AbstractBuildTool(RootDir, Settings)
 	{
 		this->ObjectFileExtension = ".obj";
 	}
+	else if(Settings.TargetPlatform.OS == OSType::OSX)
+	{
+		this->ObjectFileExtension = ".o";
+	}
+
 
 	// Determine the program to use based on target/host platforms
 	Program = "g++";
@@ -57,7 +62,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 	std::string OutputFileName = Filesystem::path(SourceFile).stem().string() + ObjectFileExtension;
 
 	// On Linux, if we're compiling a shared library, we need to specify position independent code.
-	if(Settings.TargetPlatform.OS == OSType::LINUX)
+	if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 	{
 		if (!TheModule.IsExecutable(Settings))
 		{
@@ -219,7 +224,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		Extern.GetPlatformLibs(Settings, ExternPlatformLibs);
 
 		// Also need to check for bins on Linux
-		if(Settings.TargetPlatform.OS == OSType::LINUX)
+		if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 		{
 			Extern.GetPlatformBins(Settings, ExternPlatformLibs);
 		}
@@ -264,6 +269,11 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		ArtifactExecutableName = ArtifactName + ".out";
 		ArtifactSharedLibName = "lib" + ArtifactName + ".so";
 	}
+	else if(Settings.TargetPlatform.OS == OSType::OSX)
+	{
+		ArtifactExecutableName = ArtifactName;
+		ArtifactSharedLibName = "lib" + ArtifactName + ".dylib";
+	}
 
 	// Tell GCC to statically link libgcc and libstdc++ if on Windows
 	// This prevents people from needing to download mingw binaries
@@ -300,8 +310,20 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 			// Setup the soname
 			LinkerOptions += ",-soname," + ArtifactSharedLibName;
 		}
-		
-		CmdArgs.push_back("-shared");
+		else if(Settings.TargetPlatform.OS == OSType::OSX)
+		{
+			// Setup the soname
+			LinkerOptions += "-Wl,-install_name," + ArtifactSharedLibName;
+		}
+
+		if(Settings.TargetPlatform.OS == OSType::OSX)
+		{
+			CmdArgs.push_back("-dynamiclib");
+		}
+		else
+		{
+			CmdArgs.push_back("-shared");
+		}
 	}
 
 	if(!LinkerOptions.empty())
@@ -331,10 +353,13 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		{
 			CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
 
-			// Also need to add binary path for Linux (SOs)
-			if (Settings.TargetPlatform.OS == OSType::LINUX)
+			// Also need to add binary path for Linux (SOs) and OSX (dylibs)
+			if (Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 			{
 				CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
+			}
+			else
+			{
 			}
 		}
 		
@@ -393,8 +418,9 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 
 	for(std::string s : CmdArgs)
 	{
-		std::cout << s << std::endl;
+		std::cout << s << " ";
 	}
+	std::cout << std::endl;
 
 	std::cout << "Linking module " << TheModule.Name << std::endl;
 
@@ -444,6 +470,10 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 	{
 		ArtifactExecutableName = ArtifactName + ".out";
 	}
+	else if (Settings.TargetPlatform.OS == OSType::OSX)
+	{
+		ArtifactExecutableName = ArtifactName;
+	}
 
 	// Filesystem::path ArtifactPDBPath = Filesystem::absolute(Filesystem::path(BinaryDir) / ArtifactPdbName);
 	Filesystem::path ArtifactExePath = Filesystem::canonical(Filesystem::path(OutputDirectory)) / ArtifactExecutableName;
@@ -458,7 +488,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 	std::string LinkerOptions = "";
 
 	// Tell linker to search in working directory for shared objects (binary folder) if on Linux
-	if (Settings.TargetPlatform.OS == OSType::LINUX)
+	if (Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 	{
 		LinkerOptions += "-Wl,-rpath,${ORIGIN}";
 	}
@@ -490,7 +520,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 				CmdArgs.push_back("-L" + Extern.GetPlatformLibraryPath(Settings));
 
 				// Also need to add bins path for SOs on Linux
-				if(Settings.TargetPlatform.OS == OSType::LINUX)
+				if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 				{
 					CmdArgs.push_back("-L" + Extern.GetPlatformBinaryPath(Settings));
 				}
@@ -541,7 +571,7 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 			Extern.GetPlatformLibs(Settings, TargetLibs);
 
 			// Also need to check for SOs on Linux
-			if(Settings.TargetPlatform.OS == OSType::LINUX)
+			if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 			{
 				Extern.GetPlatformBins(Settings, TargetLibs);
 			}
@@ -563,11 +593,6 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 			CmdArgs.push_back("-l" + LibStemmed);
 		}
 	}
-
-	// for (std::string s : CmdArgs)
-	// {
-	// 	std::cout << s << std::endl;
-	// }
 
 	for (std::string s : CmdArgs)
 	{

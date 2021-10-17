@@ -5,4 +5,4 @@ Modules = ["Core", "AssetCore"]
 Type = "Runtime"
 
 # Add FMod dependency
-Extern = ["FMod"]
+#Extern = ["FMod"]

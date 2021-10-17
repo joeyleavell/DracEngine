@@ -249,7 +249,7 @@ bool SharedLibTest_Ext(const std::string& Path)
 {
 	Filesystem::path FilePath = Filesystem::path(Path);
 
-	if(FilePath.extension() == ".dll" || FilePath.extension() == ".so")
+	if(FilePath.extension() == ".dll" || FilePath.extension() == ".so" || FilePath.extension() == ".dylib")
 	{
 		return true;
 	}
@@ -713,7 +713,10 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	Box2D.LocatorMethod = ArtifactLocatorMethod::BestGuess;
 	Box2D.IncludesDirectories = { "include" };
 	Box2D.GitPath = "https://github.com/erincatto/box2d.git";
-	Box2D.GitLabel = "v2.4.1";
+	// This tagged version doesn't compile on apple
+	//Box2D.GitLabel = "v2.4.1";
+	Box2D.LabelType = GitLabelType::None; // Get the latest of master, doesn't compile otherwise
+
 
 	Dependency Glew;
 	Glew.Name = "Glew";
@@ -756,6 +759,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	ShaderConductor.GitPath = "https://github.com/microsoft/ShaderConductor.git";
 	ShaderConductor.GitLabel = "v0.2.0"; // Doesn't matter for now
 	ShaderConductor.ExcludedOSToolsets.push_back(OSToolset{ToolsetType::GCC, OSType::WINDOWS });
+	ShaderConductor.CMakeGenArgs = {"Python3_EXECUTABLE=/usr/local/bin/python3"};
 
 	Dependency Glm;
 	Glm.Name = "Glm";
@@ -803,12 +807,18 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	//VulkanLoader.SharedLibNames = { "vulkan" };
 	//VulkanLoader.LibNames = { "vulkan" };
 	//VulkanLoader.LocatorMethod = ArtifactLocatorMethod::NameHint;
-	VulkanLoader.CMakeGenArgs = {
-		"VULKAN_SDK=" + Filesystem::absolute(VulkanHeadersPath).string()
-	};
+	// VulkanLoader.CMakeGenArgs = {
+	// 	"VULKAN_SDK=" + Filesystem::absolute(VulkanHeadersPath).string()
+	// };
 	SpirVReflect.GitPath = "https://github.com/KhronosGroup/SPIRV-Reflect.git";
 	SpirVReflect.LabelType = GitLabelType::None;
-	SpirVReflect.bRunCMakeInstall = true;
+	//SpirVReflect.bRunCMakeInstall = true;
+
+	Dependency RapidXML;
+	RapidXML.Name = "SpirVReflect";
+	RapidXML.GitPath = "https://github.com/KhronosGroup/SPIRV-Reflect.git";
+	RapidXML.LabelType = GitLabelType::None;
+	//SpirVReflect.bRunCMakeInstall = true;
 
 	std::vector<Dependency> TestDeps = { Bullet3, Box2D, Glew, Glfw, Json, ShaderConductor, Glm, VulkanHeaders, VulkanLoader, Stb, SpirVReflect};
 	std::vector<Dependency> Targets;

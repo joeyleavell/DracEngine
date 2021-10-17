@@ -11,7 +11,7 @@ namespace Ry
 	class RENDERASSET_MODULE FbxFactory : public AssetFactory
 	{
 		
-		void LoadAssets(const Ry::AssetRef& Reference, std::vector<Asset*>& AssetDst) override;
+		void LoadAssets(const Ry::AssetRef& Reference, std::vector<Asset*>& AssetDst) override{};
 		
 	};
 

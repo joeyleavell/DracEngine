@@ -88,10 +88,15 @@ if(APPLE)
 	target_link_libraries(RyReflect PRIVATE curses)
 endif()
 
-# GCC specific libraries
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+# Disable RTTI for clang and gcc since llvm is compiled with it disabled
+if ((CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang") OR 
+	(CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR 
+	(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+	target_compile_options(RyReflect PUBLIC -fno-rtti)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyReflect PRIVATE -lstdc++fs)
-	target_compile_options(RyReflect PUBLIC -fno-rtti) # Llvm suite is compiled without rtti
 endif()
 
 install(TARGETS RyReflect DESTINATION .)

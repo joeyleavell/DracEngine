@@ -13,6 +13,16 @@ std::string GetPlatformExecutableExt()
 	return "";
 }
 
+static void
+child_handler(int sig)
+{
+	pid_t pid;
+	int status;
+
+	/* EEEEXTEERMINAAATE! */
+	while((pid = waitpid(-1, &status, WNOHANG)) > 0);
+}
+
 bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int OutputBufferSize, char* StdOut, int ErrorBuffSize, char* StdErr)
 {
 	constexpr int ProgramBuffSize = 100;
@@ -86,7 +96,7 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 
 		char* Environment[] =
 		{
-			"PATH=/opt/homebrew/bin:/bin:/usr/bin:/usr/local/bin",
+			"PATH=/opt/homebrew/bin:/usr/local/bin:/bin:/usr/bin",
 			0
 		};
 
@@ -111,7 +121,29 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 	else
 	{
 
-		// Close write ends of pipes on parent proc
+
+		/* Establish handler. */
+
+		// Inside parent proc
+		int ExitStatus;
+
+		siginfo_t SigInfo;
+		//int Res = waitid(P_PID, GccPid, &SigInfo, WEXITED);
+		while((GccPid = waitpid(GccPid, &ExitStatus, WNOHANG)) > 0);
+
+		// We're in the parent proc, wait on child to finish
+		//if (Res < 0)
+		{
+		// 	std::cerr << "Error waiting for child proc: " << Res << " (exit status=" << ExitStatus << ")" << std::endl;
+		// 	bSuccess = false;
+
+		// 			std::fprintf(stderr , "\n   =>    errno(int) = %d" 
+		// 				"\n   => errno message = %s \n"
+		// 				, errno, strerror(errno));
+		// std::fflush(stderr);
+		}
+
+				// Close write ends of pipes on parent proc
 		if (StdOut)
 		{
 			close(StdOutPipe[1]);
@@ -122,16 +154,6 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 			close(StdErrPipe[1]);
 		}
 
-		// Inside parent proc
-		int ExitStatus;
-
-		waitpid(GccPid, &ExitStatus, 0);
-		// We're in the parent proc, wait on child to finish
-		//if (Res <= 0)
-		{
-	//		std::cerr << "Error waiting for child proc: " << Res << " (exit status=" << ExitStatus << ")" << std::endl;
-	//		bSuccess = false;
-		}
 
 		delete[] CommandLine;
 
@@ -149,10 +171,28 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 			StdErr[StdErrRead] = '\0';
 		}
 
-		if (WEXITSTATUS(ExitStatus) != 0)
+		if(WIFEXITED(ExitStatus))
 		{
-			bSuccess = false;
+			if (WEXITSTATUS(ExitStatus) != 0)
+			{
+				bSuccess = false;
+				std::cout << "Bad exit code" << std::endl;
+			}
 		}
+		else
+		{
+			//bSuccess = false;
+			//std::cout << "Bad exit" << std::endl;
+			if(WIFSIGNALED(ExitStatus))
+			{
+				if(WTERMSIG(ExitStatus) != 1)
+					bSuccess = false;
+			//	std::cout << "signaled by " << WTERMSIG(ExitStatus) << std::endl;
+			//	std::cout << "core dump " << WCOREDUMP(ExitStatus) << std::endl;
+			}
+		}
+
+
 	}
 
 	// Delete allocated command line params
