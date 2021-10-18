@@ -69,6 +69,7 @@ public:
 	std::string RootDir;
 	std::vector<std::string> ModuleDependencies;
 	std::vector<std::string> MacroDefinitions;
+	std::vector<std::string> OSXFrameworks;
 	std::vector<ExternDependency> ExternDependencies;
 
 	std::vector<std::string> PythonIncludes;

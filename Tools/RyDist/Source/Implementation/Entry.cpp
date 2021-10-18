@@ -34,7 +34,7 @@ int main(int ArgC, char** ArgV)
 	// Parse the toolchain
 	if (HasOption(CmdArgs, "-Toolchain"))
 	{
-		std::string Toolchain = ParseOption(CmdArgs, "-Toolchain");
+		std::string Toolchain = ParseUniqueOption(CmdArgs, "-Toolchain");
 
 		BuildArgs.push_back("-" + Toolchain);
 	}
@@ -50,21 +50,21 @@ int main(int ArgC, char** ArgV)
 
 	if (HasOption(CmdArgs, "-TargetOS"))
 	{
-		std::string TargetOS = ParseOption(CmdArgs, "-TargetOS");
+		std::string TargetOS = ParseUniqueOption(CmdArgs, "-TargetOS");
 
 		BuildArgs.push_back("-TargetOS=" + TargetOS);
 	}
 
 	if (HasOption(CmdArgs, "-TargetArch"))
 	{
-		std::string TargetArch = ParseOption(CmdArgs, "-TargetArch");
+		std::string TargetArch = ParseUniqueOption(CmdArgs, "-TargetArch");
 
 		BuildArgs.push_back("-TargetArch=" + TargetArch);
 	}
 
 	if (HasOption(CmdArgs, "-OutputDirectory"))
 	{
-		std::string Output = ParseOption(CmdArgs, "-OutputDirectory");
+		std::string Output = ParseUniqueOption(CmdArgs, "-OutputDirectory");
 
 		BuildArgs.push_back("-OutputDirectory=" + Output);
 		BuildDir = Filesystem::absolute(Output).string();
@@ -81,7 +81,7 @@ int main(int ArgC, char** ArgV)
 
 	if (HasOption(BuildArgs, "-BuildConfig"))
 	{
-		std::string BuildConfig = ParseOption(BuildArgs, "-BuildConfig");
+		std::string BuildConfig = ParseUniqueOption(BuildArgs, "-BuildConfig");
 		BuildArgs.push_back("-BuildConfig=" + BuildConfig);
 	}
 	else

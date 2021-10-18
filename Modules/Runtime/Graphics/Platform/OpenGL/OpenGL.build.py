@@ -6,7 +6,7 @@ Extern = ["Glew", "Glfw"]
 
 Modules = ["Core", "Math", "AssetCore", "Rendering"]
 
-if TargetArch == "x86_64":
+if TargetArch == "x64":
 	if TargetOS == "Windows":
 		if BuildToolset == "MSVC":
 			Libraries = ["user32.lib", "gdi32.lib", "Shell32.lib", "OpenGL32.lib"]

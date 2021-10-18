@@ -6,6 +6,7 @@
 #include "clang/AST/RecursiveASTVisitor.h"
 
 #include "Reflection.h"
+#include "Util/Util.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -500,13 +501,13 @@ namespace Ry
 
 	static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
-	bool GenerateReflectionCode(std::string ModuleNameCaps, 
+	bool GenerateReflectionCode(
 		std::string SourcePath, 
 		std::string Include, 
-		std::vector<std::string> Includes, 
-		std::string& GeneratedSource, 
-		std::string& ErrorMsg,
-		int Thread)
+		std::vector<std::string> Includes,
+		std::vector<std::string> Defines,
+		std::string& GeneratedSource,
+		std::string& ErrorMsg)
 	{
 
 		MatchFinder Finder;
@@ -527,10 +528,10 @@ namespace Ry
 
 		std::vector<std::string> Args;
 
-		//Args.push_back("clang++");
-
+		// Name of our tool
 		Args.push_back("MyTool");
 
+		// Path to compile
 		Args.push_back(SourcePath);
 
 		Args.push_back("--");
@@ -542,44 +543,40 @@ namespace Ry
 			Args.push_back(IncludePath);
 		}
 
+		Args.push_back("-fsyntax-only");
 		Args.push_back("-xc++");
 
+		// Set C++ standard
 		Args.push_back("-std=c++17");
+
+		// C++ standard lib
 		Args.push_back("-stdlib=libc++");
 
 		// TODO: need to do this in a more robust way for OSX
+		std::vector<std::string> SystemLibs = {
+			"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+			"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
+			"/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers",
+			"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include"
+		};
 
-		Args.push_back("-cxx-isystem");
-		Args.push_back("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1");
+		for(std::string SystemLib : SystemLibs)
+		{
+			Args.push_back("-cxx-isystem");
+			Args.push_back(SystemLib);
+		}
 
-		Args.push_back("-cxx-isystem");
-		Args.push_back("/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include");
-
-		Args.push_back("-cxx-isystem");
-		Args.push_back("/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers");
-
-		Args.push_back("-cxx-isystem");
-		Args.push_back("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.0.0/include");
-
+		// Parameter for framework lib
 		Args.push_back("-F" + std::string("/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"));
 
 		// Tell clang our module name
-		Args.push_back("-D");
-		Args.push_back("COMPILE_MODULE_" + ModuleNameCaps);
+		for(std::string Define : Defines)
+		{
+			Args.push_back("-D");
+			Args.push_back(Define);
+		}
 
-		std::cout << "hi test" << std::endl;
-
-		//Args.push_back("--help");
-
-		//Args.push_back("clang++");
-
-		//Args.push_back("clang");
-
-
-		//Args.push_back("-c");
-
-		//Args.push_back("--help");
-		
+		// Make args into char**
 		int ArgC = Args.size();
 		char** ClangOptions = new char* [Args.size()];
 		for(uint32_t Arg = 0; Arg < Args.size(); Arg++)
@@ -590,23 +587,14 @@ namespace Ry
 
 		std::vector<std::string> Sources = { SourcePath };
 
-		for (std::string Arg : Args)
-			std::cout << Arg << std::endl;
-		std::cout << std::endl;
-
 		llvm::Expected<CommonOptionsParser> Parser = CommonOptionsParser::create(ArgC, const_cast<const char**>(ClangOptions), MyToolCategory);
 		clang::tooling::ClangTool* Tool = new ClangTool(Parser->getCompilations(), Sources);
 		Tool->appendArgumentsAdjuster(Parser.get().getArgumentsAdjuster());
 
-		//std::unique_ptr<FrontendActionFactory> Fac2 = newFrontendActionFactory<SyntaxOnlyAction>();
-
 		std::unique_ptr<FrontendActionFactory> Fac = newFrontendActionFactory(&Finder);
 		int Result = Tool->run(Fac.get());
 
-		//int Result = runToolOnCodeWithArgs(Fac->create(), SourcePath, Args);
-
-		//std::unique_ptr<ASTUnit> AST = buildASTFromCodeWithArgs(SourcePath, Args);
-
+		// Free tmp args
 		for (int Arg = 0; Arg < Args.size(); Arg++)
 			delete[] ClangOptions[Arg];
 		delete[] ClangOptions;
@@ -622,22 +610,34 @@ namespace Ry
 			return true;
 	}
 
-	
 }
 
 int main(int ArgC, char** ArgV)
 {
 	int32_t NumIncludes = 0;
-	std::vector<std::string> IncludeDirs;
+	std::vector<std::string> IncludeDirs; // Include dirs
+	std::vector<std::string> PreprocessorDefines; // Preprocessor defines
 	std::string SourcePath;
 	std::string IncludePath;
-	std::string ModuleNameCaps;
-	std::string GenOutPath;
-
+	std::string OutputPath;
 	std::string GeneratedSource;
 	std::string ErrorMsg;
 
-	if (ArgC < 6)
+	// Make a std::vector of args for convenience
+	std::vector<std::string> Args;
+	for (int Arg = 1; Arg < ArgC; Arg++)
+		Args.push_back(ArgV[Arg]);
+
+	for (std::string Arg : Args)
+		std::cout << Arg << std::endl;
+	std::cout << std::endl;
+
+	// Arg spec: ./Tool <SouceFile> <HeaderFile> <OutputFile> [options]
+	// Options:
+	// -Include=... --> specify an include directory
+	// -Define=... --> specify a preprocessor define
+
+	if (ArgC < 4)
 	{
 		std::cout << "Too few arguments" << std::endl;
 		return 1;
@@ -645,20 +645,18 @@ int main(int ArgC, char** ArgV)
 
 	SourcePath = ArgV[1];
 	IncludePath = ArgV[2];
-	ModuleNameCaps = ArgV[3];
-	GenOutPath = ArgV[4];
-	NumIncludes = std::atoi(ArgV[5]);
+	OutputPath= ArgV[3];
 
-	for (int32_t Include = 0; Include < NumIncludes; Include++)
-		IncludeDirs.push_back(ArgV[6 + Include]);
+	ParseMultiOption(IncludeDirs, Args, "Include");
+	ParseMultiOption(PreprocessorDefines, Args, "Define");
 
-	bool bResult = Ry::GenerateReflectionCode(ModuleNameCaps,
+	bool bResult = Ry::GenerateReflectionCode(
 		SourcePath,
 		IncludePath,
 		IncludeDirs,
+		PreprocessorDefines,
 		GeneratedSource,
-		ErrorMsg,
-		0
+		ErrorMsg
 	);
 
 	if (!ErrorMsg.empty())
@@ -667,7 +665,7 @@ int main(int ArgC, char** ArgV)
 	}
 	else if (bResult)
 	{
-		std::ofstream OutFile(GenOutPath);
+		std::ofstream OutFile(OutputPath);
 		{
 			OutFile << GeneratedSource << std::endl;
 		}

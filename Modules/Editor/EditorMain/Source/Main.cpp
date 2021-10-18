@@ -9,17 +9,18 @@
 #include "CommandUtils.h"
 #include "Language/ShaderCompiler.h"
 #include "Editor.h"
+#include "Core/String.h"
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
-#ifdef LINUX_IMPLEMENTATION
+#ifdef RBUILD_TARGET_OS_LINUX
 Ry::Application* LoadApplication(const Ry::String& SOLocation, Ry::RenderingPlatform Platform)
 {
 	return nullptr;
 }
 #endif
 
-#ifdef WINDOWS_IMPLEMENTATION
+#ifdef RBUILD_TARGET_OS_WINDOWS
 #include <windows.h>
 Ry::Application* LoadApplication(const Ry::String& DLLLocation, Ry::RenderingPlatform Platform)
 {

@@ -610,7 +610,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	
 	if(HasOption(DepsArgs, "Toolset"))
 	{
-		std::string Parsed = ParseOption(DepsArgs, "Toolset");
+		std::string Parsed = ParseUniqueOption(DepsArgs, "Toolset");
 
 		if(Parsed == "MSVC")
 		{
@@ -640,12 +640,12 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 	if(HasOption(Args, "Repos"))
 	{
-		Settings.ReposDir = Filesystem::absolute(ParseOption(Args, "Repos")).string();
+		Settings.ReposDir = Filesystem::absolute(ParseUniqueOption(Args, "Repos")).string();
 	}
 
 	if(HasOption(Args, "InstallIncludes"))
 	{
-		std::string Value = ParseOption(Args, "InstallIncludes");
+		std::string Value = ParseUniqueOption(Args, "InstallIncludes");
 
 		if(ToUpper(Value) == "FALSE")
 		{
@@ -655,7 +655,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 	if (HasOption(Args, "InstallBins"))
 	{
-		std::string Value = ParseOption(Args, "InstallBins");
+		std::string Value = ParseUniqueOption(Args, "InstallBins");
 
 		if (ToUpper(Value) == "FALSE")
 		{
@@ -665,7 +665,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 	if (HasOption(Args, "InstallLibs"))
 	{
-		std::string Value = ParseOption(Args, "InstallLibs");
+		std::string Value = ParseUniqueOption(Args, "InstallLibs");
 
 		if (ToUpper(Value) == "FALSE")
 		{
@@ -675,12 +675,12 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 
 	if(HasOption(Args, "CxxCompiler"))
 	{
-		Settings.CxxCompiler = ParseOption(Args, "CxxCompiler");
+		Settings.CxxCompiler = ParseUniqueOption(Args, "CxxCompiler");
 	}
 
 	if (HasOption(Args, "CCompiler"))
 	{
-		Settings.CCompiler = ParseOption(Args, "CCompiler");
+		Settings.CCompiler = ParseUniqueOption(Args, "CCompiler");
 	}
 
 	// Future todo: Store these dependencies in a file?
@@ -826,7 +826,7 @@ bool BuildDepsCmd(std::vector<std::string>& Args)
 	// Optionally select the target
 	if (HasOption(Args, "Target"))
 	{
-		std::string Target = ParseOption(Args, "Target");
+		std::string Target = ParseUniqueOption(Args, "Target");
 
 		for(Dependency& Dep : TestDeps)
 		{

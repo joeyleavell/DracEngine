@@ -1,6 +1,6 @@
 #include "Common.h"
 
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 
 #include "Generate/Windows/WindowsProjectSolution.h"
 #include "Generate/Windows/WindowsProject.h"

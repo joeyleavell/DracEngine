@@ -85,7 +85,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 
 	// Define macro for target platform
 	CmdArgs.push_back("-DRYBUILD_CONFIG_" + Settings.ConfigToString());
-	CmdArgs.push_back("-DRYBUILD_TARGET_" + OSToString(Settings.TargetPlatform.OS));
+	CmdArgs.push_back("-DRBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));
 
 	if (Settings.bDistribute)
 	{
@@ -414,6 +414,16 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		}
 		
 		CmdArgs.push_back("-l" + LibStemmed);
+	}
+
+	// Add OSX frameworks
+	if(Settings.TargetPlatform.OS == OSType::OSX)
+	{
+		for (const std::string& Framework : TheModule.OSXFrameworks)
+		{
+			CmdArgs.push_back("-framework");
+			CmdArgs.push_back(Framework);
+		}
 	}
 
 	for(std::string s : CmdArgs)

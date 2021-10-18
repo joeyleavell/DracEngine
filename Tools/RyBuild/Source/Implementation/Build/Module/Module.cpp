@@ -451,6 +451,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	PyObject* DefIncludes = PyList_New(0);
 	PyObject* DefLibraryPaths = PyList_New(0);
 	PyObject* DefLibraries = PyList_New(0);
+	PyObject* DefOSXFrameworks = PyList_New(0);
 
 	// Variables that are read by the script
 	PyObject* TargetArch = nullptr;
@@ -489,6 +490,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	PyDict_SetItemString(Locals, "Includes", DefIncludes);
 	PyDict_SetItemString(Locals, "LibraryPaths", DefLibraryPaths);
 	PyDict_SetItemString(Locals, "Libraries", DefLibraries);
+	PyDict_SetItemString(Locals, "OSXFrameworks", DefOSXFrameworks);
 
 	// Set global constants
 	PyDict_SetItemString(Locals, "TargetArch", TargetArch);
@@ -519,6 +521,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	PyObject* Includes = PyDict_GetItemString(Locals, "Includes");
 	PyObject* LibraryPaths = PyDict_GetItemString(Locals, "LibraryPaths");
 	PyObject* Libraries = PyDict_GetItemString(Locals, "Libraries");
+	PyObject* OSXFrameworks = PyDict_GetItemString(Locals, "OSXFrameworks");
 
 	std::vector<std::string> ExternDeps;
 
@@ -529,6 +532,7 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 	LoadPythonStringList(NewModule->PythonIncludes, Includes, "", "Include directories must be a list", "All include directories must be strings");
 	LoadPythonStringList(NewModule->PythonLibraryPaths, LibraryPaths, "", "Library paths must be a list", "All library paths must be strings");
 	LoadPythonStringList(NewModule->PythonLibraries, Libraries, "", "Libraries must be a list", "All libraries must be strings");
+	LoadPythonStringList(NewModule->OSXFrameworks, OSXFrameworks, "", "OSXFrameworks must be a list", "Each OSX framework must be strings");
 
 	// Create external dependencies
 	for(const std::string& ExternDep : ExternDeps)
@@ -537,13 +541,6 @@ Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
 		NewDep.Name = ExternDep;
 		NewModule->ExternDependencies.push_back(NewDep);
 	}
-
-	// int Size = PyDict_Size(Locals);
-	// PyObject* Rep = PyObject_Repr(Locals);
-	// PyObject* Utf8 = PyUnicode_AsEncodedString(Rep, "utf-8", "~E~");
-	// std::string ModType = PyBytes_AsString(Utf8);
-	// std::cout << ModType << std::endl;
-	// std::cout << Size << std::endl;
 
 	// Load module type
 	if(Type)

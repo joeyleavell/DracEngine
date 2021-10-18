@@ -204,12 +204,15 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				std::vector<std::string> Args;
 				Args.push_back(SourceLoc.string());
 				Args.push_back(HeaderPath.stem().string() + ".h"); // todo: change to just .filename?
-				Args.push_back(ModuleNameCaps);
 				Args.push_back(GenPathTmp.string());
-				Args.push_back(std::to_string(ModuleIncludes.size()));
+
+				// Add include paths
 				for (const std::string& ModInc : ModuleIncludes)
-					Args.push_back(ModInc);
-				
+					Args.push_back("-Include=" + ModInc);
+
+				// Add defines
+				Args.push_back("-Define=COMPILE_MODULE_" + ModuleNameCaps);
+				Args.push_back("-Define=RBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));
 
 				int StdOutSize = 1024 * 1000;
 				char* StdOutBuffer = new char[StdOutSize];
@@ -1194,7 +1197,7 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 	// Check for target architecture changes
 	if(HasOption(Options, "-TargetArch"))
 	{
-		std::string TargetArch = ParseOption(Options, "-TargetArch");
+		std::string TargetArch = ParseUniqueOption(Options, "-TargetArch");
 
 		if(TargetArch == "x86")
 		{
@@ -1223,7 +1226,7 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 	// Check for target OS changes
 	if (HasOption(Options, "-TargetOS"))
 	{
-		std::string TargetOS = ParseOption(Options, "-TargetOS");
+		std::string TargetOS = ParseUniqueOption(Options, "-TargetOS");
 
 		if (TargetOS == "Windows")
 		{
@@ -1247,7 +1250,7 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 	if(HasOption(Options, "-BuildConfig"))
 	{
-		std::string BuildConfig = ParseOption(Options, "-BuildConfig");
+		std::string BuildConfig = ParseUniqueOption(Options, "-BuildConfig");
 
 		if(BuildConfig == "Development")
 		{
@@ -1266,7 +1269,7 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 	if (HasOption(Options, "-BuildType"))
 	{
-		std::string BuildType = ParseOption(Options, "-BuildType");
+		std::string BuildType = ParseUniqueOption(Options, "-BuildType");
 
 		if (BuildType == "Modular")
 		{
@@ -1285,7 +1288,7 @@ bool RunBuild(std::string RootDir, std::vector<std::string>& Options)
 
 	if (HasOption(Options, "-OutputDirectory"))
 	{
-		Settings.OutputDirectory = ParseOption(Options, "-OutputDirectory");
+		Settings.OutputDirectory = ParseUniqueOption(Options, "-OutputDirectory");
 	}
 	else
 	{

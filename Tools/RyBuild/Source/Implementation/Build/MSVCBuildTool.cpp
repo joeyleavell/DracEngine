@@ -284,7 +284,7 @@ bool MSVCBuildTool::BuildSingleSource(const Module& TheModule, std::string Outpu
 		BuildCmd.push_back("/Z7");
 	}
 
-	BuildCmd.push_back("/DRYBUILD_TARGET_" + OSToString(Settings.TargetPlatform.OS));
+	BuildCmd.push_back("/DRBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));	
 	BuildCmd.push_back("/DRYBUILD_CONFIG_" + Settings.ConfigToString());
 	
 	if (Settings.Type == BuildType::STANDALONE)
@@ -498,6 +498,11 @@ bool MSVCBuildTool::LinkModule(Module& TheModule)
 	for (std::string ObjFile : FoundObjFiles)
 	{
 		BuildCmd.push_back(Filesystem::path(ObjFile).filename().string());
+	}
+
+	for(std::string S : BuildCmd)
+	{
+		std::cout << S << std::endl;
 	}
 
 	std::cout << "Linking module " << TheModule.Name << std::endl;

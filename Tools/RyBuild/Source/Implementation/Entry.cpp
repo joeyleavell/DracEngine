@@ -7,7 +7,7 @@
 #include "Build/BuildTool.h"
 #include "Deps/BuildDeps.h"
 
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 	#include "Generate/Windows/WindowsProject.h"
 	#include "Generate/Windows/WindowsProjectBase.h"
 	#include "Generate/Windows/WindowsProjectSolution.h"
@@ -20,7 +20,7 @@ enum OutputType
 
 bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler)
 {
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 
 	std::string ProjectFilesDir = "Intermediate/ProjectFiles/";
 	std::string EngineProjectName = "AryzeEngine";
@@ -28,8 +28,8 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 	std::string EngineBinary = (Filesystem::canonical(EngineRootPath) / "Binary" / "RyRuntime-EditorMain.exe").string();
 
 	BuildSettings Settings;
-	Settings.Toolset = BuildToolset::MSVC;
-	Settings.TargetPlatform.OS = TargetOS::Windows;
+	Settings.Toolset = ToolsetType::MSVC;
+	Settings.TargetPlatform.OS = OSType::WINDOWS;
 
 	std::string EngineModulesDir = GetEngineModulesDir();
 	
@@ -69,15 +69,15 @@ bool GenerateEngineProjectFiles(std::string EngineRootPath, std::string Compiler
 
 bool GenerateGameProjectFiles(std::string GameName, std::string GameRootPath, std::string EngineRootPath, std::string Compiler)
 {
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 
 	std::string GameModulesDir = "$(SolutionDir)Modules";
 	std::string EngineModulesDir = (Filesystem::canonical(Filesystem::path(EngineRootPath) / "Modules")).string();
 	std::string WorkingDirectory = "$(SolutionDir)Binary";
 
 	BuildSettings Settings;
-	Settings.Toolset = BuildToolset::MSVC;
-	Settings.TargetPlatform.OS = TargetOS::Windows;
+	Settings.Toolset = ToolsetType::MSVC;
+	Settings.TargetPlatform.OS = OSType::WINDOWS;
 
 	// Need to discover modules for project generation
 	std::vector<Module*> EngineModules;

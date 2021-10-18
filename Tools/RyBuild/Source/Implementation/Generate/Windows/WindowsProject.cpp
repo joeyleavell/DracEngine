@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "Util/Util.h"
 
-#ifdef RYBUILD_WINDOWS
+#ifdef RBUILD_HOST_OS_WINDOWS
 #include "Generate/Windows/WindowsProject.h"
 
 namespace RyBuild

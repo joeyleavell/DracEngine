@@ -126,7 +126,21 @@ bool HasOption(std::vector<std::string>& Args, std::string Option)
 	return false;
 }
 
-std::string ParseOption(std::vector<std::string>& Args, std::string Option)
+void ParseMultiOption(std::vector<std::string>& OutValues, std::vector<std::string>& Args, std::string Option)
+{
+	for (std::string& Opt : Args)
+	{
+		if (Opt.find(Option) != std::string::npos)
+		{
+			int SepIndex = Opt.find("=");
+
+			std::string Res = Opt.substr(SepIndex + 1);
+			OutValues.push_back(Res);
+		}
+	}
+}
+
+std::string ParseUniqueOption(std::vector<std::string>& Args, std::string Option)
 {
 	for (std::string& Opt : Args)
 	{

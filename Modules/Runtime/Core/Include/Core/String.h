@@ -1,9 +1,10 @@
 #pragma once
 
 #include <iostream>
-#include "Core/Platform.h"
 #include <cstring>
 #include <cstdarg>
+#include "Core/PlatformImplementation.h"
+#include "CoreGen.h"
 
 #define PRINTF_BUFFER_SIZE (5*1024)
 
