@@ -292,9 +292,8 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	std::string LinkerOptions = "";
 
 	// Tell linker to search in working directory for shared objects (binary folder) if on Linux
-	if(Settings.TargetPlatform.OS == OSType::LINUX)
+	if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
 	{
-		LinkerOptions += "-Wl,-rpath,${ORIGIN}";
 	}
 
 	// See if we need to build a DLL
@@ -307,13 +306,13 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		}
 		else if(Settings.TargetPlatform.OS == OSType::LINUX)
 		{
-			// Setup the soname
-			LinkerOptions += ",-soname," + ArtifactSharedLibName;
+			// Setup the rpath and soname
+			LinkerOptions += "-Wl,-rpath,${ORIGIN},-soname," + ArtifactSharedLibName;
 		}
 		else if(Settings.TargetPlatform.OS == OSType::OSX)
 		{
 			// Setup the soname
-			LinkerOptions += "-Wl,-install_name," + ArtifactSharedLibName;
+			LinkerOptions += "-Wl,-install_name,@rpath/" + ArtifactSharedLibName;
 		}
 
 		if(Settings.TargetPlatform.OS == OSType::OSX)
@@ -323,6 +322,13 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		else
 		{
 			CmdArgs.push_back("-shared");
+		}
+	}
+	else
+	{
+		if(Settings.TargetPlatform.OS == OSType::OSX)
+		{
+			LinkerOptions += "-Wl,-rpath,@executable_path";
 		}
 	}
 

@@ -145,7 +145,7 @@ namespace Ry
 
 		ShaderConductor::Compiler::TargetDesc TargetDsc;
 		TargetDsc.language = ShaderConductor::ShadingLanguage::Glsl;
-		TargetDsc.version = "460";
+		TargetDsc.version = "330";
 		TargetDsc.asModule = false;
 
 		ShaderConductor::Compiler Comp;

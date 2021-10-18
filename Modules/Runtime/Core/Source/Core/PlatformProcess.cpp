@@ -1,4 +1,5 @@
 #include "Core/PlatformProcess.h"
+#include "Core/String.h"
 #include "glfw3.h"
 
 namespace Ry

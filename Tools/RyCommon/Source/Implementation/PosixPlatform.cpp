@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <cstdlib>
 #include <string.h>
+#include <signal.h>
 
 std::string GetPlatformExecutableExt()
 {
@@ -127,23 +128,6 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 		// Inside parent proc
 		int ExitStatus;
 
-		siginfo_t SigInfo;
-		//int Res = waitid(P_PID, GccPid, &SigInfo, WEXITED);
-		while((GccPid = waitpid(GccPid, &ExitStatus, WNOHANG)) > 0);
-
-		// We're in the parent proc, wait on child to finish
-		//if (Res < 0)
-		{
-		// 	std::cerr << "Error waiting for child proc: " << Res << " (exit status=" << ExitStatus << ")" << std::endl;
-		// 	bSuccess = false;
-
-		// 			std::fprintf(stderr , "\n   =>    errno(int) = %d" 
-		// 				"\n   => errno message = %s \n"
-		// 				, errno, strerror(errno));
-		// std::fflush(stderr);
-		}
-
-				// Close write ends of pipes on parent proc
 		if (StdOut)
 		{
 			close(StdOutPipe[1]);
@@ -154,6 +138,46 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 			close(StdErrPipe[1]);
 		}
 
+		// struct sigaction sa;
+		// sa.sa_handler = SIG_IGN; //handle signal by ignoring
+		// sigemptyset(&sa.sa_mask);
+		// sa.sa_flags = 0;
+		// if (sigaction(SIGCHLD, &sa, 0) == -1) 
+		// {
+		// 	perror(0);
+		// 	exit(1);
+		// }
+
+
+		// std::fprintf(stderr, "\n   =>    errno(int) = %d\n", errno);
+
+		while(waitpid(GccPid, &ExitStatus, WNOHANG) == 0)
+		{
+		};
+//		while((GccPid = waitpid(GccPid, &ExitStatus, WNOHANG)) > 0);
+//		if(Res <= 0)
+		{
+			//std::cout << "errno " << errno << std::endl;
+			// if(errno != EINTR)
+			// {
+			// 	bSuccess = false;
+			// }
+			//std::cerr << "Error waiting for child proc: " << Res << " (exit status=" << ExitStatus << ")" << std::endl;
+		// 	 					std::fprintf(stderr , "\n   =>    errno(int) = %d" 
+		// 				"\n   => errno message = %s \n"
+		// 				, errno, strerror(errno));
+		// std::fflush(stderr);
+
+		}
+
+		// We're in the parent proc, wait on child to finish
+		//if (Res < 0)
+		{
+
+
+		}
+
+				// Close write ends of pipes on parent proc
 
 		delete[] CommandLine;
 
@@ -176,7 +200,6 @@ bool ExecProc(std::string Program, std::vector<std::string>& CommandLineVec, int
 			if (WEXITSTATUS(ExitStatus) != 0)
 			{
 				bSuccess = false;
-				std::cout << "Bad exit code" << std::endl;
 			}
 		}
 		else

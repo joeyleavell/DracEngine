@@ -21,6 +21,13 @@ namespace Ry
 
 			int32 offset = 0;
 
+			// calc stride
+			int32 Stride = 0;
+			for (int attrib_index = 0; attrib_index < Format.NumAttributes(); attrib_index++)
+			{
+				Stride += Format.GetAttrib(attrib_index).Size * sizeof(float);
+			}
+
 			for (int attrib_index = 0; attrib_index < Format.NumAttributes(); attrib_index++)
 			{
 				const VertexAttrib& attribute = Format.GetAttrib(attrib_index);
@@ -32,7 +39,8 @@ namespace Ry
 				Attributes[attrib_index] = attribute_ptr;
 
 				// Setup the format of this attribute.
-				glVertexAttribFormat(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, offset);
+				//glVertexAttribFormat(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, offset);
+				glVertexAttribPointer(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, Stride, reinterpret_cast<void*>(offset));
 
 				// Enable this attribute.
 				glEnableVertexAttribArray(attrib_index);
@@ -42,10 +50,10 @@ namespace Ry
 			}
 
 			// Set the stride for all vertex attributes.
-			for (int32 i = 0; i <= Format.NumAttributes(); i++)
-			{
-				glBindVertexBuffer(i, vbo, 0, offset);
-			}
+			// for (int32 i = 0; i <= Format.NumAttributes(); i++)
+			// {
+			// 	glBindVertexBuffer(i, vbo, 0, offset);
+			// }
 
 
 // 			for (int32 i = 0; i < format.attribute_count; i++)

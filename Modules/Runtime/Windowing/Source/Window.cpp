@@ -847,8 +847,13 @@ namespace Ry
 			glfwWindowHint(GLFW_DEPTH_BITS, 32);
 			glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
 
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef RBUILD_TARGET_OS_OSX
+		   	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 		}
 		else if (Platform == RenderingPlatform::Vulkan)
 		{

@@ -50,11 +50,11 @@ namespace Ry
 		}
 
 		// Validate and check the status.
-		glValidateProgram(ProgramHandle);
-		if(!ProgramStatusCheck(GL_VALIDATE_STATUS, "validate"))
-		{
-			return;
-		}
+		//glValidateProgram(ProgramHandle);
+		//if(!ProgramStatusCheck(GL_VALIDATE_STATUS, "validate"))
+		//{
+		//	return;
+		//}
 
 		// Detach and delete unneeded resource.
 		glDetachShader(ProgramHandle, VertShaderHandle);

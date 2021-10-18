@@ -13,6 +13,13 @@
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
 
+#ifdef RBUILD_TARGET_OS_OSX
+Ry::Application* LoadApplication(const Ry::String& SOLocation, Ry::RenderingPlatform Platform)
+{
+	return nullptr;
+}
+#endif
+
 #ifdef RBUILD_TARGET_OS_LINUX
 Ry::Application* LoadApplication(const Ry::String& SOLocation, Ry::RenderingPlatform Platform)
 {

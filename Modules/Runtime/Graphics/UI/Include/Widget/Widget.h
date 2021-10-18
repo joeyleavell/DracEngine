@@ -449,7 +449,7 @@ namespace Ry
 		Ry::String StyleName;
 
 		SizeType CachedSize;
-		Widget* Parent;
+		Widget* Parent{};
 		SizeType MaxSize;
 
 		int32 WidgetLayer;

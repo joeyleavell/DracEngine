@@ -15,3 +15,6 @@ if TargetArch == "x64":
 	elif TargetOS == "Linux":
 		if BuildToolset == "GCC":
 			Libraries = ["GL", "pthread", "dl"]
+
+if TargetOS == "OSX":
+	OSXFrameworks = ["OpenGL"]
