@@ -23,7 +23,10 @@ namespace Ry
 
 	// Generic hash impl, must be implemented
 	template <typename T>
-	uint32 HashImpl(HashTypeTag <T>, const T& Object){};
+	uint32 HashImpl(HashTypeTag <T>, const T& Object)
+	{
+		return 0;
+	};
 
 	template <typename T>
 	EXPORT_ONLY uint32 Hash(SharedPtr<T> Object)

@@ -202,6 +202,7 @@ bool GenerateProjectFilesCmd(std::vector<std::string>& Args)
 
 	}
 
+	return false;
 }
 
 void GenerateModuleCmd(std::vector<std::string>& Args)

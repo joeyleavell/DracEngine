@@ -255,10 +255,6 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 	std::string ArtifactImpLibName = ArtifactName + ".lib"; // This value is only used on windows targets
 	std::string ArtifactExecutableName = "";
 
-	// TODO: How to generate debug info with gcc?
-	// 
-	// std::string ArtifactPdbName = ArtifactName + ".pdb";
-
 	if(Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
 		ArtifactExecutableName = ArtifactName + ".exe";
@@ -291,11 +287,6 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 
 	std::string LinkerOptions = "";
 
-	// Tell linker to search in working directory for shared objects (binary folder) if on Linux
-	if(Settings.TargetPlatform.OS == OSType::LINUX || Settings.TargetPlatform.OS == OSType::OSX)
-	{
-	}
-
 	// See if we need to build a DLL
 	if (!TheModule.IsExecutable(Settings))
 	{
@@ -311,7 +302,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		}
 		else if(Settings.TargetPlatform.OS == OSType::OSX)
 		{
-			// Setup the soname
+			// Setup the install name and rpath
 			LinkerOptions += "-Wl,-install_name,@rpath/" + ArtifactSharedLibName;
 		}
 
@@ -432,17 +423,7 @@ bool GCCBuildTool::LinkModule(Module& TheModule)
 		}
 	}
 
-	for(std::string s : CmdArgs)
-	{
-		std::cout << s << " ";
-	}
-	std::cout << std::endl;
-
 	std::cout << "Linking module " << TheModule.Name << std::endl;
-
-	// if (bIsVerbose)
-	// {
-	// }
 
 	// Invoke the compiler to link the module.
 	constexpr int BufferSize = 1024 * 100;
@@ -473,10 +454,6 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 
 	std::string ArtifactName = StandaloneName;
 	std::string ArtifactExecutableName = "";
-
-	// TODO: How to generate debug info with gcc?
-	// 
-	// std::string ArtifactPdbName = ArtifactName + ".pdb";
 
 	if (Settings.TargetPlatform.OS == OSType::WINDOWS)
 	{
@@ -608,11 +585,6 @@ bool GCCBuildTool::LinkStandalone(std::string OutputDirectory, std::string Objec
 
 			CmdArgs.push_back("-l" + LibStemmed);
 		}
-	}
-
-	for (std::string s : CmdArgs)
-	{
-		std::cout << s << std::endl;
 	}
 	
 	std::cout << "Linking standalone " << StandaloneName << std::endl; 

@@ -451,7 +451,7 @@ namespace Ry
 			
 		}
 
-		void onEndOfTranslationUnit()
+		void onEndOfTranslationUnit() override
 		{
 			// Generate reflection source
 			GeneratedSource << "#include \"Core/Reflection.h\"" << std::endl;

@@ -14,7 +14,7 @@ namespace Ry
 
 		void FaceDirection(Ry::Vector2 Direction)
 		{
-			Ry::Vector2 Norm = normalized(Direction);
+			normalize(Direction);
 			Rotation = std::atan2(Direction.y, Direction.x);
 		}
 
