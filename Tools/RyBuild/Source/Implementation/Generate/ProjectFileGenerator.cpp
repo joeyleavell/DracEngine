@@ -2,10 +2,10 @@
 #include "Common.h"
 #include <string>
 #include <iostream>
-#include "Build/BuildSettings.h"
 #include "Build/Module/Module.h"
 #include "Util/Util.h"
 #include "Generate/Windows/VisualStudioProjectFileGenerator.h"
+#include "Generate/Xcode/XCodeProjectFileGenerator.h"
 
 std::string GetDefaultPlatformCompiler()
 {
@@ -60,6 +60,8 @@ bool CallGeneratorImplementation_Engine(std::string Generator, std::string Engin
 {
 	if (Generator == "VisualStudio2019")
 		return GenerateEngineProjectFiles_VisualStudio(EnginePath, Compiler);
+	if (Generator == "Xcode")
+		return GenerateEngineProjectFiles_XCode(EnginePath, Compiler);
 
 	// Should never get here, assume generator was already checked
 	return false;
@@ -69,6 +71,8 @@ bool CallGeneratorImplementation_Game(std::string Generator, std::string GameNam
 {
 	if (Generator == "VisualStudio2019")
 		return GenerateGameProjectFiles_VisualStudio(GameName, Path, EngineRootPath, Compiler);
+	if (Generator == "Xcode")
+		return GenerateGameProjectFiles_XCode(GameName, Path, EngineRootPath, Compiler);
 
 	// Should never get here, assume generator was already checked
 	return false;
@@ -97,6 +101,11 @@ bool GenerateProjectFilesCmd(std::vector<std::string>& Args)
 	if (HasOption(Args, "Compiler"))
 	{
 		Compiler = ParseUniqueOption(Args, "Compiler");
+	}
+
+	if (HasOption(Args, "Generator"))
+	{
+		Generator = ParseUniqueOption(Args, "Generator");
 	}
 
 	// Check if the specified compiler was supported

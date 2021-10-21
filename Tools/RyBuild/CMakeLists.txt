@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.8)
 
+option(INSTALL_PYTHON_LIB "Whether or not to install the python library" ON)
+
 set (SOURCES
 	Source/Implementation/Entry.cpp
 	Source/Implementation/Build/Module/Module.cpp
@@ -26,7 +28,7 @@ elseif(APPLE)
 endif()
 ###############################################################
 
-add_executable(RyBuild ${SOURCES} "Source/Implementation/Generate/ProjectFileGenerator.cpp" "Source/Implementation/Generate/GenerateModule.cpp" "Source/Include/Generate/GenerateGame.h" "Source/Implementation/Generate/GenerateGame.cpp" "Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp")
+add_executable(RyBuild ${SOURCES} "Source/Implementation/Generate/ProjectFileGenerator.cpp" "Source/Implementation/Generate/GenerateModule.cpp" "Source/Include/Generate/GenerateGame.h" "Source/Implementation/Generate/GenerateGame.cpp" "Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp" "Source/Include/Generate/Xcode/XCodeProjectFileGenerator.h" "Source/Implementation/Generate/Xcode/XCodeProjectFileGenerator.cpp")
 include_directories(Source/Include)
 
 ################ Platform Includes ############################
@@ -91,7 +93,9 @@ endif()
 ########################## INSTALL ################################
 install(TARGETS RyBuild DESTINATION .)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ./PythonLib)
+if(INSTALL_PYTHON_LIB)
+	install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Python/Lib/ DESTINATION ./PythonLib)
+endif()
 
 # Python on windows is a DLL
 if(MSVC)
