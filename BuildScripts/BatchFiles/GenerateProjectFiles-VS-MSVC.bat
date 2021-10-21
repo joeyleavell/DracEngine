@@ -13,6 +13,6 @@ pushd %~dp0
 	cd %BINARYDIR%
 	
 	rem Invoke build tool on the root module path with the found cl.exe
-	call RyBuild.exe generate ProjectFiles -Engine -MSVC "%SOLUTIONROOT%"
+	call RyBuild.exe generate ProjectFiles -Engine -Compiler=MSVC "%SOLUTIONROOT%"
 
 popd

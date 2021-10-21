@@ -316,6 +316,7 @@ namespace RyBuild
 
 	bool WindowsProject::GenerateMainProject()
 	{
+		Filesystem::create_directories(GetArtifactDirectory());
 		std::string ProjectFilePathAbs = (Filesystem::canonical(GetArtifactDirectory()) / (GetPhysicalName() + ".vcxproj")).string();
 		std::string ProjectFileParentPath = Filesystem::path(ProjectFilePathAbs).parent_path().string();
 		

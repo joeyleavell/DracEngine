@@ -105,19 +105,22 @@ public:
 	
 	void DiscoverHeaders(std::vector<std::string>& OutHeaders, bool bThirdParty = false) const
 	{
-		Filesystem::recursive_directory_iterator DirectoryItr(GetIncludeDir());
-
-		for (Filesystem::path File : DirectoryItr)
+		if(Filesystem::exists(GetIncludeDir()))
 		{
-			// Detect if this file is a source file
-			if (File.extension() == ".h")
+			Filesystem::recursive_directory_iterator DirectoryItr(GetIncludeDir());
+
+			for (Filesystem::path File : DirectoryItr)
 			{
-				OutHeaders.push_back(Filesystem::absolute(File).string());
+				// Detect if this file is a source file
+				if (File.extension() == ".h")
+				{
+					OutHeaders.push_back(Filesystem::absolute(File).string());
+				}
 			}
 		}
 
 		// Optionally scan through third party directory for source
-		if (bThirdParty)
+		if (bThirdParty && Filesystem::exists(GetThirdPartyDir()))
 		{
 			Filesystem::recursive_directory_iterator DirectoryItrThirdParty(GetThirdPartyDir());
 
@@ -150,19 +153,22 @@ public:
 	
 	void DiscoverSource(std::vector<std::string>& OutSource, bool bThirdParty = false) const
 	{
-		Filesystem::recursive_directory_iterator DirectoryItr(GetCppDir());
-
-		for (Filesystem::path File : DirectoryItr)
+		if(Filesystem::exists(GetCppDir()))
 		{
-			// Detect if this file is a source file
-			if (File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c")
+			Filesystem::recursive_directory_iterator DirectoryItr(GetCppDir());
+
+			for (Filesystem::path File : DirectoryItr)
 			{
-				OutSource.push_back(Filesystem::absolute(File).string());
+				// Detect if this file is a source file
+				if (File.extension() == ".cpp" || File.extension() == ".hpp" || File.extension() == ".c")
+				{
+					OutSource.push_back(Filesystem::absolute(File).string());
+				}
 			}
 		}
 
 		// Optionally scan through third party directory for source
-		if(bThirdParty)
+		if(bThirdParty && Filesystem::exists(GetThirdPartyDir()))
 		{
 			Filesystem::recursive_directory_iterator DirectoryItrThirdParty (GetThirdPartyDir());
 

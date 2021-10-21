@@ -26,7 +26,7 @@ elseif(APPLE)
 endif()
 ###############################################################
 
-add_executable(RyBuild ${SOURCES})
+add_executable(RyBuild ${SOURCES} "Source/Implementation/Generate/ProjectFileGenerator.cpp" "Source/Implementation/Generate/GenerateModule.cpp" "Source/Include/Generate/GenerateGame.h" "Source/Implementation/Generate/GenerateGame.cpp" "Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp")
 include_directories(Source/Include)
 
 ################ Platform Includes ############################

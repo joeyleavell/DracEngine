@@ -101,12 +101,12 @@ std::string VsWhereQuery(std::string Query)
 std::string VsWhereCached(std::string Query, std::string CacheFile)
 {
 	// Check if the location is cached in working directory
-	std::string CLCachePath = std::experimental::filesystem::absolute(CacheFile).string();
+	std::string CLCachePath = std::filesystem::absolute(CacheFile).string();
 
 	std::string Path;
 	bool bNeedsCache = false;
 
-	if (std::experimental::filesystem::exists(CLCachePath))
+	if (std::filesystem::exists(CLCachePath))
 	{
 		std::ifstream CacheIn(CLCachePath);
 		std::string NextLine;

@@ -200,7 +200,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 					std::string RyReflectPath = GetRyReflectPath();
 					std::vector<std::string> Args;
 					Args.push_back(SourceLoc.string());
-					Args.push_back(HeaderPath.filename());
+					Args.push_back(HeaderPath.filename().string());
 					Args.push_back(GenPathTmp.string());
 
 					// Add include paths
