@@ -239,6 +239,11 @@ public:
 		return Filesystem::absolute(RootDir).string() + (char) Filesystem::path::preferred_separator;
 	}
 
+	std::string GetPythonBuildScriptPath() const
+	{
+		return (Filesystem::path(RootDir) / (Name + std::string(".build.py"))).string();
+	}
+
 	std::string GetCppDir() const
 	{
 		return (Filesystem::path(RootDir) / (std::string("Source") + (char)Filesystem::path::preferred_separator)).string();
@@ -358,8 +363,7 @@ public:
 	
 };
 
-Module* LoadModule(Filesystem::path Path);
-Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings);
+Module* LoadModule(Filesystem::path Path, const BuildSettings* Settings);
 
 void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules);
 void LoadModules(Filesystem::path RootDir, std::vector<Module*>& OutModules, const BuildSettings* Settings = nullptr);

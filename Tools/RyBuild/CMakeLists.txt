@@ -26,8 +26,8 @@ elseif(UNIX AND NOT APPLE)
 elseif(APPLE)
 	link_directories("${CMAKE_CURRENT_SOURCE_DIR}/Platform/Libraries/ARM64/OSX/GCC")
 endif()
-###############################################################
 
+# ---------- Executable
 add_executable(RyBuild ${SOURCES} "Source/Implementation/Generate/ProjectFileGenerator.cpp" "Source/Implementation/Generate/GenerateModule.cpp" "Source/Include/Generate/GenerateGame.h" "Source/Implementation/Generate/GenerateGame.cpp" "Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp" "Source/Include/Generate/Xcode/XCodeProjectFileGenerator.h" "Source/Implementation/Generate/Xcode/XCodeProjectFileGenerator.cpp")
 include_directories(Source/Include)
 
@@ -42,26 +42,22 @@ elseif(APPLE)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Platform/Include/OSX/Python)
 endif()
-###############################################################
 
 ################# Target Properties ##########################
 set_target_properties(RyBuild PROPERTIES
             CXX_STANDARD 17
 			CMAKE_CXX_STANDARD_REQUIRED ON
             CXX_EXTENSIONS OFF)
-##############################################################
 
 ################# COMMON #####################################
 target_link_libraries(RyBuild PUBLIC RyCommon)
 include_directories(../RyCommon/Source/Include)
-##############################################################
 
 ################# Windows PThreads (MinGW) ###################
 if(MinGW)
 	message("${PROJECT_NAME}: mingw ${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator")
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mingw-std-threads/cmake_stdheaders_generator/cmake_stdheaders_generator)
 endif()
-##############################################################
 
 ################### LINK PYTHON ###################
 if(UNIX)
@@ -69,7 +65,6 @@ if(UNIX)
 elseif(WIN32)
 	target_link_libraries(RyBuild PRIVATE python311)
 endif()
-###################################################
 
 ################### System Libs ###################
 if(MinGW OR WIN32)
@@ -81,14 +76,12 @@ elseif(UNIX AND NOT APPLE)
 elseif(APPLE)
 	# Apple specific libraries
 endif()
-###################################################
 
 ################## Compiler Libs ##################
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	target_link_libraries(RyBuild PRIVATE -lstdc++fs)
 	target_link_libraries(RyBuild PRIVATE -lpthread)
 endif()
-###################################################
 
 ########################## INSTALL ################################
 install(TARGETS RyBuild DESTINATION .)
@@ -101,4 +94,3 @@ endif()
 if(MSVC)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python311.dll DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()
-####################################################################

@@ -103,221 +103,6 @@ void ExternDependency::GetPlatformBinPaths(const BuildSettings& Settings, std::v
 	}
 }
 
-Module* LoadModule(Filesystem::path Path)
-{
-	if(!Filesystem::exists(Path))
-	{
-		std::cerr << "No module file at " << Path.string() << std::endl;
-		return nullptr;
-	}
-	
-	Module* NewModule = new Module;
-	NewModule->RootDir = Filesystem::absolute(Path.parent_path()).string();
-	NewModule->ModuleFilePath = Filesystem::canonical(Path).string();
-
-	std::ifstream ModuleInFile(Path.string());
-
-	// Check if this module is an engine module.
-	// Differentiating engine modules from other modules is useful for splitting up binaries, intermediates, etc
-	std::string EngineModulePath = GetEngineModulesDir();
-	if(Filesystem::exists(EngineModulePath) && Filesystem::canonical(Path).string().find(Filesystem::canonical(EngineModulePath).string()) == 0)
-	{
-		NewModule->bEngineModule = true;
-	}
-	
-	try
-	{
-		Json ModuleJson = Json::parse(ModuleInFile);
-
-		std::string NameField = "Name",
-		TypeField = "Type",
-		ModulesField = "Modules",
-		MacrosField = "Macros",
-
-		ThirdPartyField = "ThirdParty",
-		ThirdPartyIncludeField = "Include",
-		ThirdPartyLibrariesField = "LibraryPaths",
-
-		// Libraries
-		LibrariesField = "Libraries",
-		StaticLibrariesField = "Static",
-		DynamicLibrariesField = "Dynamic",
-		Win64Field = "Win64",
-		LinuxField = "Linux";
-		
-
-		if (ModuleJson.contains(NameField) && ModuleJson[NameField].is_string())
-		{
-			ModuleJson[NameField].get_to(NewModule->Name);
-		}
-
-		if (ModuleJson.contains(TypeField) && ModuleJson[TypeField].is_string())
-		{
-			std::string ModuleType;
-			ModuleJson[TypeField].get_to(ModuleType);
-
-			if (ModuleType == "Executable")
-			{
-				NewModule->Type = ModuleType::EXECUTABLE;
-			}
-			else if (ModuleType == "Runtime")
-			{
-				NewModule->Type = ModuleType::LIBRARY;
-			}
-		}
-
-		if (ModuleJson.contains(ModulesField) && ModuleJson[ModulesField].is_array())
-		{
-			int Count = ModuleJson[ModulesField].size();
-
-			for (int Index = 0; Index < Count; Index++)
-			{
-				if (ModuleJson[ModulesField][Index].is_string())
-				{
-					NewModule->ModuleDependencies.push_back(ModuleJson[ModulesField][Index].get<std::string>());
-				}
-			}
-		}
-
-		// Load macro definitions if any
-		if (ModuleJson.contains(MacrosField) && ModuleJson[MacrosField].is_array())
-		{
-			int Count = ModuleJson[MacrosField].size();
-
-			for (int Index = 0; Index < Count; Index++)
-			{
-				if (ModuleJson[MacrosField][Index].is_string())
-				{
-					NewModule->MacroDefinitions.push_back(ModuleJson[MacrosField][Index].get<std::string>());
-				}
-			}
-		}
-
-		// Load system libs if any
-		if (ModuleJson.contains(LibrariesField))
-		{
-			Json LibrariesJson = ModuleJson[LibrariesField];
-
-			if(LibrariesJson.contains("x64"))
-			{
-				Json x64Json = LibrariesJson["x64"];
-
-				if(x64Json.contains("Windows"))
-				{
-					Json WindowsJson = x64Json["Windows"];
-
-
-					// if(WindowsJson.contains("MSVC"))
-					// {
-					// 	LoadPlatformStringArray(NewModule->Libs.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
-					// }
-					//
-					// if (WindowsJson.contains("MinGW"))
-					// {
-					// 	LoadPlatformStringArray(NewModule->Libs.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
-					// }
-
-				}
-
-				// if (x64Json.contains("Linux"))
-				// {
-				// 	Json LinuxJson = x64Json["Linux"];
-				//
-				// 	if (LinuxJson.contains("GCC"))
-				// 	{
-				// 		LoadPlatformStringArray(NewModule->Libs.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
-				// 	}
-				// }
-
-			}
-			
-		}
-
-		if(ModuleJson.contains("Extern"))
-		{
-			Json ExternJson = ModuleJson["Extern"];
-
-			// Add engine third party libraries here
-			if(ExternJson.is_array())
-			{
-				for(int Extern = 0; Extern < ExternJson.size(); Extern++)
-				{
-					ExternDependency NewDep;
-					NewDep.Name = ExternJson.at(Extern).get<std::string>();
-					NewModule->ExternDependencies.push_back(NewDep);
-				}
-			}
-		}
-
-		// if (ModuleJson.contains(ThirdPartyField) && ModuleJson[ThirdPartyField].is_object())
-		// {
-		// 	Json ThirdPartyJson = ModuleJson[ThirdPartyField];
-		// 	
-		// 	if (ThirdPartyJson.contains(ThirdPartyIncludeField) && ThirdPartyJson[ThirdPartyIncludeField].is_array())
-		// 	{
-		// 		Json IncludeJson = ThirdPartyJson[ThirdPartyIncludeField];
-		// 		
-		// 		int IncludePathCount = IncludeJson.size();
-		//
-		// 		for (int PathIndex = 0; PathIndex < IncludePathCount; PathIndex++)
-		// 		{
-		// 			if (IncludeJson[PathIndex].is_string())
-		// 			{
-		// 				NewModule->ModuleThirdParty.Includes.push_back(IncludeJson[PathIndex].get<std::string>());
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	if (ThirdPartyJson.contains(ThirdPartyLibrariesField))
-		// 	{
-		// 		Json LibrariesJson = ThirdPartyJson[ThirdPartyLibrariesField];
-		//
-		// 		if (LibrariesJson.contains("x64"))
-		// 		{
-		// 			Json x64Json = LibrariesJson["x64"];
-		//
-		// 			if (x64Json.contains("Windows"))
-		// 			{
-		// 				Json WindowsJson = x64Json["Windows"];
-		//
-		//
-		// 				if (WindowsJson.contains("MSVC"))
-		// 				{
-		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MSVCLibs, WindowsJson["MSVC"]);
-		// 				}
-		//
-		// 				if (WindowsJson.contains("MinGW"))
-		// 				{
-		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Win64Libs.MinGWLibs, WindowsJson["MinGW"]);
-		// 				}
-		//
-		// 			}
-		//
-		// 			if (x64Json.contains("Linux"))
-		// 			{
-		// 				Json LinuxJson = x64Json["Linux"];
-		//
-		// 				if (LinuxJson.contains("GCC"))
-		// 				{
-		// 					LoadPlatformStringArray(NewModule->ModuleThirdParty.Linux64Libs.GCCLibs, LinuxJson["GCC"]);
-		// 				}
-		// 			}
-		//
-		// 		}
-		// 	}
-		// }
-
-
-	}
-	catch (Json::parse_error& Error)
-	{
-		std::cerr << "Erroring parsing module file " << Path << std::endl;
-		return nullptr;
-	}
-
-	return NewModule;
-}
-
 bool LoadPythonStringList(std::vector<std::string>& Out, PyObject* List, std::string NullErr, std::string NotStringListErr, std::string ElementNotStringErr)
 {
 	if(!List)
@@ -403,7 +188,7 @@ Module* DiscoverModule(Filesystem::path Path)
 	return NewModule;
 }
 
-Module* LoadModulePython(Filesystem::path Path, const BuildSettings* Settings)
+Module* LoadModule(Filesystem::path Path, const BuildSettings* Settings)
 {
 	if (!Filesystem::exists(Path))
 	{
@@ -586,6 +371,7 @@ void DiscoverModules(Filesystem::path RootDir, std::vector<Module*>& OutModules)
 	Filesystem::path FoundModuleFile;
 	Filesystem::directory_iterator NewDirectoryItr(RootDir);
 
+	// Expect python build file to always have the same name as its parent folder
 	for (Filesystem::path File : NewDirectoryItr)
 	{
 		if (File.extension() == ".py" && File.stem().string().find(".build") != std::string::npos)
@@ -631,23 +417,13 @@ void LoadModules_Helper(Filesystem::path RootDir, std::vector<Module*>& OutModul
 {
 	Filesystem::path FoundModuleFile;
 	Filesystem::directory_iterator NewDirectoryItr(RootDir);
-
-	bool bPythonModule = false;
 	
 	for (Filesystem::path File : NewDirectoryItr)
 	{
-		if (File.extension() == ".module")
-		{
-			// Do not recurse any further 
-			FoundModuleFile = File;
-			break;
-		}
-
 		if (File.extension() == ".py")
 		{
 			// Do not recurse any further 
 			FoundModuleFile = File;
-			bPythonModule = true;
 			break;
 		}
 
@@ -655,16 +431,7 @@ void LoadModules_Helper(Filesystem::path RootDir, std::vector<Module*>& OutModul
 
 	if (!FoundModuleFile.empty())
 	{
-		Module* NewModule = nullptr;
-
-		if(bPythonModule)
-		{
-			NewModule = LoadModulePython(FoundModuleFile, Settings);
-		}
-		else
-		{
-			NewModule = LoadModule(FoundModuleFile);
-		}
+		Module* NewModule = LoadModule(FoundModuleFile, Settings);
 
 		if (NewModule)
 		{
