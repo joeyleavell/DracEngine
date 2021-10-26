@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef RBUILD_HOST_OS_WINDOWS
+
 #include <string>
 #include <fstream>
 #include "WindowsProjectBase.h"
@@ -91,3 +93,5 @@ namespace RyBuild
 
 	};
 }
+
+#endif

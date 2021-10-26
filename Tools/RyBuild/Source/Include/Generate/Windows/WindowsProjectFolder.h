@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef RBUILD_HOST_OS_WINDOWS
+
 #include "Generate/Windows/WindowsProjectBase.h"
 
 namespace RyBuild
@@ -28,3 +30,5 @@ namespace RyBuild
 	};
 	
 }
+
+#endif
