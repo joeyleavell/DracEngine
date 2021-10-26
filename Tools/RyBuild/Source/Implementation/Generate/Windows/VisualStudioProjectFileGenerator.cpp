@@ -6,6 +6,7 @@
 #include "Build/Module/Module.h"
 #include "Generate/Windows/WindowsProjectSolution.h"
 #include "Generate/Windows/WindowsProject.h"
+#include <iostream>
 
 bool GenerateEngineProjectFiles_VisualStudio(std::string EngineRootPath, std::string Compiler)
 {
