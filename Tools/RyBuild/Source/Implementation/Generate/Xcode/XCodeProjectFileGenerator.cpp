@@ -275,6 +275,8 @@ public:
 				// Write out configuration list
 
 				// Write out root object (project)
+				PbxGroup Group = GroupsByPath.at(Filesystem::canonical(GetEngineModulesDir()).string());
+				WriteLine("rootObject = " + Group.Uuid.ToString() + "; ");
 			}
 			WriteLineRemoveIndent("};");
 
