@@ -97,7 +97,7 @@ public:
 			NewFile.Path = Filename;
 			NewFile.LastFileType = LastKnownFileType;
 			NewFile.ExplicitFileType = ExplicitFileType;
-			NewFile.SourceTree = "<group>";
+			NewFile.SourceTree = "\"<group>\"";
 
 			FileReferencesByUuid.insert(std::make_pair(NewFile.Uuid.ToString(), NewFile));
 			FileReferencesByPath.insert(std::make_pair(Filesystem::canonical(Path).string(), NewFile));
@@ -131,8 +131,8 @@ public:
 			if (!FileRef.second.ExplicitFileType.empty())
 				Line += "explicitFileType = " + FileRef.second.ExplicitFileType + "; ";
 
-			Line += " path = " + FileRef.second.Path + "; ";
-			Line += " sourceTree = " + FileRef.second.SourceTree + "; ";
+			Line += "path = " + FileRef.second.Path + "; ";
+			Line += "sourceTree = " + FileRef.second.SourceTree + "; ";
 
 			Line += "};";
 
@@ -205,20 +205,28 @@ public:
 				PbxGroupStartLine += " /* " + GetFilenameFromUuid(PbxGroup.first) + " */ ";
 			}
 
-			WriteLineAddIndent(PbxGroupStartLine + " = {");
+			WriteLineAddIndent(PbxGroupStartLine + "= {");
 			{
-				WriteLineAddIndent("children = {");
+				WriteLine("isa = PBXGroup;");
+
+				WriteLineAddIndent("children = (");
 				{
-					for (auto& PbxChild : PbxGroup.second.Children)
+					for(int Child = 0; Child < PbxGroup.second.Children.size(); Child++)
 					{
-						WriteLine(PbxChild + " /* " + GetFilenameFromUuid(PbxChild) + " */ ");
+						std::string ChildUuid = PbxGroup.second.Children.at(Child);
+						std::string Line = ChildUuid + " /* " + GetFilenameFromUuid(ChildUuid) + " */";
+						if(Child < PbxGroup.second.Children.size() - 1)
+						{
+							Line += ",";
+						}
+						WriteLine(Line);
 					}
 				}
-				WriteLineRemoveIndent("};");
+				WriteLineRemoveIndent(");");
 
 				if (!PbxGroup.second.bIsRoot)
 				{
-					WriteLine("name = " + PbxGroup.second.Foldername + ";");
+					WriteLine("path = " + PbxGroup.second.Foldername + ";");
 				}
 
 				WriteLine("sourceTree = \"" + PbxGroup.second.SourceTree + "\";");
@@ -240,7 +248,7 @@ public:
 			WriteLine("archiveVersion = 1;");
 
 			WriteLine("classes = {");
-			WriteLine("}");
+			WriteLine("};");
 
 			WriteLine("objectVersion = 55;");
 
