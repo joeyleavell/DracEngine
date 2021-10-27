@@ -28,6 +28,8 @@ class XCodeUUID
 
 public:
 
+	XCodeUUID() : Upper32(0), Lower64(0) {};
+
 	static XCodeUUID Create()
 	{
 		auto Generate = []()
@@ -63,8 +65,6 @@ public:
 
 private:
 
-	XCodeUUID() {};
-
 	uint32_t Upper32;
 	uint64_t Lower64;
 };
@@ -74,7 +74,7 @@ class PbxWriter
 
 public:
 
-	PbxWriter(): Indentation(0) {};
+	PbxWriter(): Indentation(0), ProjectGuid(XCodeUUID::Create()), EngineExeReference(XCodeUUID::Create()) {};
 
 	void SetEngineModules(const std::vector<Module*>& Mods)
 	{
@@ -89,7 +89,7 @@ public:
 
 	void WriteFileReferences()
 	{
-		static auto AddFileReference = [this](Filesystem::path Path, std::string LastKnownFileType = "", std::string ExplicitFileType = "")
+		static auto AddFileReference = [this](Filesystem::path Path, std::string LastKnownFileType = "", std::string ExplicitFileType = "", std::string SourceTree = "", int IncludeInIndex = -1)
 		{
 			std::string Filename = Path.filename().string();
 
@@ -97,10 +97,13 @@ public:
 			NewFile.Path = Filename;
 			NewFile.LastFileType = LastKnownFileType;
 			NewFile.ExplicitFileType = ExplicitFileType;
-			NewFile.SourceTree = "\"<group>\"";
+			NewFile.SourceTree = SourceTree;
+			NewFile.IncludeInIndex = IncludeInIndex;
 
 			FileReferencesByUuid.insert(std::make_pair(NewFile.Uuid.ToString(), NewFile));
 			FileReferencesByPath.insert(std::make_pair(Filesystem::canonical(Path).string(), NewFile));
+
+			return NewFile.Uuid;
 		};
 
 		for(auto& Module : Modules)
@@ -111,16 +114,20 @@ public:
 			Module.second.Mod->DiscoverSource(Module.second.Sources);
 
 			for(std::string HeaderFile : Module.second.Headers)
-				AddFileReference(Filesystem::path (HeaderFile), "sourcecode.cpp.h");
+				AddFileReference(Filesystem::path (HeaderFile), "sourcecode.cpp.h", "", "\"<group>\"");
 
 			for (std::string SourceFile : Module.second.Sources)
-				AddFileReference(Filesystem::path(SourceFile), "sourcecode.cpp.cpp");
+				AddFileReference(Filesystem::path(SourceFile), "sourcecode.cpp.cpp", "", "\"<group>\"");
 
-			AddFileReference(Filesystem::path(Module.second.PythonBuildScriptPath), "text.script.python");
+			AddFileReference(Filesystem::path(Module.second.PythonBuildScriptPath), "text.script.python", "", "\"<group>\"");
 		}
+
+		// Add AryzeEngine product file reference
+		//EngineExeReference = AddFileReference("AryzeEngine", "", "compiled.mach-o.executable", "BUILT_PRODUCTS_DIR", 0);
 
 		// Generate file references
 		WriteLineIgnoreIndents("/* Begin PBXFileReferences section */");
+
 		for(auto& FileRef : FileReferencesByUuid)
 		{
 			std::string Line = FileRef.first + " /* " + FileRef.second.Path + " */ ";
@@ -130,6 +137,8 @@ public:
 				Line += "lastKnownFileType = " + FileRef.second.LastFileType + "; ";
 			if (!FileRef.second.ExplicitFileType.empty())
 				Line += "explicitFileType = " + FileRef.second.ExplicitFileType + "; ";
+			if(FileRef.second.IncludeInIndex >= 0)
+				Line += "includeInIndex = " + std::to_string(FileRef.second.IncludeInIndex) + "; ";
 
 			Line += "path = " + FileRef.second.Path + "; ";
 			Line += "sourceTree = " + FileRef.second.SourceTree + "; ";
@@ -141,11 +150,11 @@ public:
 		WriteLineIgnoreIndents("/* End PBXFileReferences section */");
 	}
 
-	void AddPbxGroupUnique(Filesystem::path Path, bool bIsRoot = false)
+	bool AddPbxGroupUnique(Filesystem::path Path, XCodeUUID& OutUuid, bool bIsRoot = false)
 	{
 		// Only look at directories
 		if (!Filesystem::is_directory(Path))
-			return;
+			return false;
 		
 		std::string Canon = Filesystem::canonical(Path).string();
 		if (GroupsByUuid.find(Canon) == GroupsByUuid.end())
@@ -164,7 +173,10 @@ public:
 				{
 					// If child doesn't exist, recursively create it
 					if (GroupsByPath.find(ChildCanon) == GroupsByPath.end())
-						AddPbxGroupUnique(ChildCanon);
+					{
+						XCodeUUID Res;
+						AddPbxGroupUnique(ChildCanon, Res);
+					}
 
 					// Insert child
 					PbxGroup Child = GroupsByPath.at(ChildCanon);
@@ -179,7 +191,11 @@ public:
 
 			GroupsByUuid.insert(std::make_pair(NewGroup.Uuid.ToString(), NewGroup));
 			GroupsByPath.insert(std::make_pair(Canon, NewGroup));
+
+			OutUuid = NewGroup.Uuid;
+			return true;
 		}
+		return false;
 	}
 
 	std::string GetFilenameFromUuid(std::string Uuid)
@@ -193,7 +209,11 @@ public:
 	void WriteGroups()
 	{
 		// Add engine modules group
-		AddPbxGroupUnique(GetEngineModulesDir());
+		if(!AddPbxGroupUnique(GetEngineModulesDir(), ModulesRootPbxGroup))
+		{
+			std::cerr << "Failed to add PbxGroup for engine modules directory" << std::endl;
+			return;
+		}
 
 		// Write out PBX groups
 		WriteLineIgnoreIndents("/* Begin PBXGroup section */");
@@ -236,6 +256,22 @@ public:
 		WriteLineIgnoreIndents("/* End PBXGroup section */");
 	}
 
+	void WriteProject()
+	{
+		WriteLineAddIndent(ProjectGuid.ToString() + " /* Project Object */ = {");
+		{
+			WriteLine("isa = PBXProject;");
+			WriteLine("developmentRegion = en;");
+			WriteLine("hasScannedForEncodings = 0;");
+			WriteLine("projectRoot = \"\";"); // Always same directory
+			WriteLine("projectDirPath = \"\";"); // Always same directory
+			WriteLine("mainGroup = \"\";"); // Main files root
+
+		}
+		WriteLineRemoveIndent("};");
+		
+	}
+
 	void Write(std::string Output)
 	{
 		OutPbx.open(Output);
@@ -267,6 +303,9 @@ public:
 				// Write out native targets
 
 				// Write out project
+				WriteLineIgnoreIndents("");
+				WriteProject();
+				WriteLineIgnoreIndents("");
 
 				// Write out build phase
 
@@ -296,6 +335,7 @@ private:
 		std::string ExplicitFileType;
 		std::string Path; // This is really just the name
 		std::string SourceTree;
+		int IncludeInIndex;
 
 		PbxFileReference():
 		Uuid(XCodeUUID::Create())
@@ -343,6 +383,10 @@ private:
 		std::vector<std::string> Sources;
 		std::string PythonBuildScriptPath;
 	};
+
+	XCodeUUID ProjectGuid;
+	XCodeUUID EngineExeReference;
+	XCodeUUID ModulesRootPbxGroup;
 
 	std::unordered_map<std::string, PbxGroup> GroupsByPath;
 	std::unordered_map<std::string, PbxGroup> GroupsByUuid;
