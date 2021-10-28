@@ -258,23 +258,148 @@ public:
 
 	void WriteProject()
 	{
+		XCodeUUID DebugTargetUuid = XCodeUUID::Create();
+		XCodeUUID DebugProjectUuid = XCodeUUID::Create();
+
 		WriteLineAddIndent(ProjectGuid.ToString() + " /* Project Object */ = {");
 		{
 			WriteLine("isa = PBXProject;");
 			WriteLine("developmentRegion = en;");
 			WriteLine("hasScannedForEncodings = 0;");
+			WriteLine("buildConfigurationList = " + ProjectConfigListUuid.ToString() + ";");
 			WriteLine("projectRoot = \"\";"); // Always same directory
 			WriteLine("projectDirPath = \"\";"); // Always same directory
-			WriteLine("mainGroup = \"\";"); // Main files root
-
+			WriteLine("mainGroup = " + ModulesRootPbxGroup.ToString() + ";"); // Main files root
+			WriteLineAddIndent("targets = (");
+			{
+				WriteLine(NativeTargetUuid.ToString());
+			}
+			WriteLineRemoveIndent(");");
 		}
 		WriteLineRemoveIndent("};");
-		
+
+		//USER_HEADER_SEARCH_PATHS = test2;
+
+		// Generate include paths
+		std::string IncludePaths;
+		for(auto& Mod : Modules)
+		{
+			IncludePaths += Mod.second.Mod->GetIncludeDir() + " ";
+			IncludePaths += Mod.second.Mod->GetGeneratedDir() + " ";
+		}
+
+		// Create build configurations
+		WriteLineAddIndent(DebugTargetUuid.ToString() + " = {");
+		{
+			WriteLine("isa = XCBuildConfiguration;");
+			WriteLineAddIndent("buildSettings = {");
+			{
+				WriteLine("PRODUCT_NAME = \"$(TARGET_NAME)\";");
+				WriteLine("HEADER_SEARCH_PATHS = \"" + IncludePaths + "\";");
+			}
+			WriteLineRemoveIndent("};");
+			WriteLine("name = Debug;");
+		}
+		WriteLineRemoveIndent("};");
+
+		WriteLineAddIndent(TargetConfigListUuid.ToString() + " = {");
+		{
+			WriteLine("isa = XCConfigurationList;");
+			WriteLineAddIndent("buildConfigurations = (");
+			{
+				WriteLine(DebugTargetUuid.ToString());
+			}
+			WriteLineRemoveIndent(");");
+			WriteLine("defaultConfigurationIsVisible = 0;");
+			WriteLine("defaultConfigurationName = Debug;");
+		}
+		WriteLineRemoveIndent("};");
+
+		// Create build configurations
+		WriteLineAddIndent(DebugProjectUuid.ToString() + " = {");
+		{
+			WriteLine("isa = XCBuildConfiguration;");
+			WriteLineAddIndent("buildSettings = {");
+			{
+				WriteLine("PRODUCT_NAME = \"$(TARGET_NAME)\";");
+			}
+			WriteLineRemoveIndent("};");
+			WriteLine("name = Debug;");
+		}
+		WriteLineRemoveIndent("};");
+
+		WriteLineAddIndent(ProjectConfigListUuid.ToString() + " = {");
+		{
+			WriteLine("isa = XCConfigurationList;");
+			WriteLineAddIndent("buildConfigurations = (");
+			{
+				WriteLine(DebugProjectUuid.ToString());
+			}
+			WriteLineRemoveIndent(");");
+			WriteLine("defaultConfigurationIsVisible = 0;");
+			WriteLine("defaultConfigurationName = Debug;");
+		}
+		WriteLineRemoveIndent("};");
+
+	}
+
+	void WriteTargets()
+	{
+		NativeTargetUuid = XCodeUUID::Create();
+
+		// Get path to build tool
+		std::string BuildToolPath = GetRyBuildPath();
+		std::string RyBuildArgs = "build ./Modules";
+		std::string Script = BuildToolPath + " " + RyBuildArgs;
+
+		XCodeUUID ScriptBuildPhase = XCodeUUID::Create();
+		WriteLineAddIndent(ScriptBuildPhase.ToString() + " = {");
+		{
+			WriteLine("isa = PBXShellScriptBuildPhase;");
+			WriteLine("buildActionMask = " + std::to_string(INT32_MAX) + ";");
+			WriteLine("files = (");
+			WriteLine(");");
+			WriteLine("inputPaths = (");
+			WriteLine(");");
+			WriteLine("outputPaths = (");
+			WriteLine(");");
+			WriteLine("runOnlyForDeploymentPostprocessing = 0;");
+			WriteLine("shellPath = /bin/sh;");
+			WriteLine("shellScript = \"" + Script + "\";");
+		}
+		WriteLineRemoveIndent("};");
+
+		// Write script build phase
+
+		WriteLineAddIndent(NativeTargetUuid.ToString() + " = {");
+		{
+			WriteLine("isa = PBXNativeTarget;");
+			WriteLine("buildConfigurationList = " + TargetConfigListUuid.ToString() + ";");
+			WriteLine("buildRules = (");
+			WriteLine(");");
+			WriteLine("dependencies = (");
+			WriteLine(");");
+			WriteLineAddIndent("buildPhases = (");
+			{
+				WriteLine(ScriptBuildPhase.ToString());
+			}
+			WriteLineRemoveIndent(");");
+			WriteLine("name = AryzeEngine;");
+			WriteLine("productInstallPath = \"" + GetEngineBinaryDir() + "\";");
+			WriteLine("productName = RyRuntime-EditorMain;");
+			WriteLine("productReference = " + EngineExeReference.ToString() + ";");
+			WriteLine("productType = \"com.apple.product-type.application\";"); // Executable, static lib, dynamic lib, etc.
+		}
+		WriteLineRemoveIndent("};");
+
 	}
 
 	void Write(std::string Output)
 	{
 		OutPbx.open(Output);
+
+		TargetConfigListUuid = XCodeUUID::Create();
+		ProjectConfigListUuid = XCodeUUID::Create();
 		
 		// UTF header
 		WriteLine("// !$*UTF8*$!");
@@ -301,9 +426,9 @@ public:
 				WriteLineIgnoreIndents("");
 
 				// Write out native targets
+				WriteTargets();
 
 				// Write out project
-				WriteLineIgnoreIndents("");
 				WriteProject();
 				WriteLineIgnoreIndents("");
 
@@ -315,10 +440,10 @@ public:
 
 				// Write out root object (project)
 				PbxGroup Group = GroupsByPath.at(Filesystem::canonical(GetEngineModulesDir()).string());
-				WriteLine("rootObject = " + Group.Uuid.ToString() + "; ");
 			}
 			WriteLineRemoveIndent("};");
 
+			WriteLine("rootObject = " + ProjectGuid.ToString() + "; ");
 		}				
 		// Write out root object
 		WriteLineRemoveIndent("}");
@@ -384,9 +509,12 @@ private:
 		std::string PythonBuildScriptPath;
 	};
 
-	XCodeUUID ProjectGuid;
-	XCodeUUID EngineExeReference;
-	XCodeUUID ModulesRootPbxGroup;
+	XCodeUUID TargetConfigListUuid; // Target level configuration list object
+	XCodeUUID ProjectConfigListUuid; // Project level configuration list object
+	XCodeUUID NativeTargetUuid; // Pbx Native target for engine
+	XCodeUUID ProjectGuid; // Pbx project reference
+	XCodeUUID EngineExeReference; // Product file reference
+	XCodeUUID ModulesRootPbxGroup; // Root for project files
 
 	std::unordered_map<std::string, PbxGroup> GroupsByPath;
 	std::unordered_map<std::string, PbxGroup> GroupsByUuid;
