@@ -14,6 +14,12 @@ set (SOURCES
 	Source/Implementation/Generate/Windows/WindowsProjectFolder.cpp
 	Source/Implementation/Generate/Windows/WindowsProjectSolution.cpp
 	Source/Implementation/Generate/Project.cpp
+	Source/Implementation/Generate/ProjectFileGenerator.cpp 
+	Source/Implementation/Generate/GenerateModule.cpp
+	Source/Implementation/Generate/GenerateGame.cpp 
+	Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp
+	Source/Implementation/Generate/Xcode/XCodeProjectFileGenerator.cpp
+	Source/Implementation/Generate/VSCode/VSCodeProjectFileGenerator.cpp
 )
 
 ############### Platform Libraries ############################
@@ -28,7 +34,7 @@ elseif(APPLE)
 endif()
 
 # ---------- Executable
-add_executable(RyBuild ${SOURCES} "Source/Implementation/Generate/ProjectFileGenerator.cpp" "Source/Implementation/Generate/GenerateModule.cpp" "Source/Include/Generate/GenerateGame.h" "Source/Implementation/Generate/GenerateGame.cpp" "Source/Implementation/Generate/Windows/VisualStudioProjectFileGenerator.cpp" "Source/Include/Generate/Xcode/XCodeProjectFileGenerator.h" "Source/Implementation/Generate/Xcode/XCodeProjectFileGenerator.cpp")
+add_executable(RyBuild ${SOURCES})
 include_directories(Source/Include)
 
 ################ Platform Includes ############################

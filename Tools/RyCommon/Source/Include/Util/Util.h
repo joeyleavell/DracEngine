@@ -26,7 +26,9 @@ std::string GetEngineModulesDir();
 std::string GetEngineRuntimeModulesDir();
 std::string GetEngineEditorModulesDir();
 std::string GetEngineExternPath(std::string ExternName);
+std::string GetEngineExternRoot();
 std::string GetEngineBinaryDir();
+std::string GetEditorExecutable();
 std::string GetEngineExecutable();
 std::string GetEngineIntermediateDir();
 std::string GetEngineObjectDir();
@@ -36,5 +38,6 @@ std::string GetEngineResourcesDir();
 // Executable tools paths
 std::string GetRyBuildPath();
 std::string GetRyReflectPath();
+std::string GetToolsBinariesRoot();
 
 std::string GetTimestamp(std::string Format);

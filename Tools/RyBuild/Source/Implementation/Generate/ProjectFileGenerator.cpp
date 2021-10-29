@@ -6,6 +6,7 @@
 #include "Util/Util.h"
 #include "Generate/Windows/VisualStudioProjectFileGenerator.h"
 #include "Generate/Xcode/XCodeProjectFileGenerator.h"
+#include "Generate/VSCode/VSCodeProjectFileGenerator.h"
 
 std::string GetDefaultPlatformCompiler()
 {
@@ -23,7 +24,7 @@ std::string GetDefaultPlatformCompiler()
 
 bool CheckGeneratorSupported(std::string Generator)
 {
-	static std::set<std::string> Generators = {"VisualStudio2019", "Xcode"};
+	static std::set<std::string> Generators = {"VisualStudio2019", "Xcode", "VSCode"};
 
 	return Generators.find(Generator) != Generators.end();
 }
@@ -60,8 +61,10 @@ bool CallGeneratorImplementation_Engine(std::string Generator, std::string Engin
 {
 	if (Generator == "VisualStudio2019")
 		return GenerateEngineProjectFiles_VisualStudio(EnginePath, Compiler);
-	if (Generator == "Xcode")
+	else if (Generator == "Xcode")
 		return GenerateEngineProjectFiles_XCode(EnginePath, Compiler);
+	else if(Generator == "VSCode")
+		return GenerateEngineProjectFiles_VSCode(EnginePath, Compiler);
 
 	// Should never get here, assume generator was already checked
 	return false;
@@ -71,8 +74,10 @@ bool CallGeneratorImplementation_Game(std::string Generator, std::string GameNam
 {
 	if (Generator == "VisualStudio2019")
 		return GenerateGameProjectFiles_VisualStudio(GameName, Path, EngineRootPath, Compiler);
-	if (Generator == "Xcode")
+	else if (Generator == "Xcode")
 		return GenerateGameProjectFiles_XCode(GameName, Path, EngineRootPath, Compiler);
+	else if(Generator == "VSCode")
+		return GenerateGameProjectFiles_VSCode(GameName, Path, EngineRootPath, Compiler);
 
 	// Should never get here, assume generator was already checked
 	return false;

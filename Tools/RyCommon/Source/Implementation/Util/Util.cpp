@@ -230,9 +230,19 @@ std::string GetEngineEditorModulesDir()
 	return ModEdPathCache;
 }
 
+std::string GetEngineExternRoot()
+{
+	return (Filesystem::path(GetEngineRootDir()) / "External").string();
+}
+
 std::string GetEngineExternPath(std::string ExternName)
 {
 	return (Filesystem::path(GetEngineRootDir()) / "External" / ExternName).string();
+}
+
+std::string GetEditorExecutable()
+{
+	return (Filesystem::path(GetEngineRootDir()) / "Binary" / "RyRuntime-EditorMain").string();
 }
 
 std::string GetEngineBinaryDir()
@@ -290,6 +300,11 @@ std::string GetEngineResourcesDir()
 	}
 
 	return EngineResPathCache;
+}
+
+std::string GetToolsBinariesRoot()
+{
+	return Filesystem::path(GetModulePath()).parent_path().string();
 }
 
 std::string GetRyBuildPath()
