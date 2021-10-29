@@ -13,6 +13,8 @@ void ParseMultiOption(std::vector<std::string>& OutValues, std::vector<std::stri
 
 std::string FindNonOption(std::vector<std::string>& Options);
 
+std::string ReadFileAsString(std::string Path);
+
 // File paths utils
 std::string FullPath(std::string Path);
 std::string ToUpper(std::string Word);

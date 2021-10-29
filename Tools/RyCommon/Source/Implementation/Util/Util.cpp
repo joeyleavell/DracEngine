@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cstdarg>
 #include <string>
+#include <fstream>
+#include <sstream>
 
 void IncorrectUsage(std::string Usage)
 {
@@ -166,6 +168,19 @@ std::string FindNonOption(std::vector<std::string>& Options)
 	}
 
 	return "";
+}
+
+std::string ReadFileAsString(std::string Path)
+{
+	std::ifstream FileIn (Path);
+	std::ostringstream Out;
+	char Buffer[1024];
+	while(FileIn.getline(Buffer, 1024))
+	{
+		Out << Buffer;
+	}
+
+	return Out.str();
 }
 
 std::string FullPath(std::string Path)

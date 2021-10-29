@@ -128,7 +128,7 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
       RootTasksJson["tasks"] = json::array({BuildTaskJson, RebuildTaskJson, CleanTaskJson});
 
       std::ofstream Out(TasksJsonPath);
-      Out << RootTasksJson.dump(1); // Pretty indentations
+      Out << RootTasksJson.dump(4); // Pretty indentations
       Out.close(); 
     }
 
@@ -155,29 +155,20 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
       };
 
       std::ofstream Out(CppPropertiesPath);
-      Out << RootPropsJson.dump(1); // Pretty indentations
+      Out << RootPropsJson.dump(4); // Pretty indentations
       Out.close(); 
     }
 
     // Generate launch.json
     {
+      json RootLaunchJson;
+      json ConfigsJson;
       Filesystem::path LaunchPath  = VsCodePath / "launch.json";
 
-      /*
-
-        "version": "0.2.0",
-        "configurations": [
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug",
-            "program": "${workspaceFolder}/Binary/RyRuntime-EditorMain",
-            "args": [
-                "-OpenGL"
-            ],
-            "cwd": "${workspaceFolder}/Binary"
-        },
-*/
+      if(Filesystem::exists(LaunchPath))
+      {
+        RootLaunchJson = json::parse(ReadFileAsString(LaunchPath));
+      }
 
       std::vector<std::string> LaunchArgs;
 
@@ -194,22 +185,46 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
       for(auto& Arg : LaunchArgs)
         ArgsJson.push_back(Arg);
 
+      int MatchingConfig = -1;
+      int CurConfig = 0;
+      if(RootLaunchJson.contains("configurations"))
+      {
+        ConfigsJson = RootLaunchJson["configurations"];
+        for(auto& Config : ConfigsJson)
+        {
+          if(Config.contains("name") && Config["name"] == "Launch Editor")
+          {
+            MatchingConfig = CurConfig;
+            break;
+          }
+          CurConfig++;   
+        }
+
+      }
+
       json LaunchJson = {
         {"type", "lldb"},
         {"request", "launch"},
-        {"name", "Run"},
+        {"name", "Launch Editor"},
         {"program", EditorRelative},
         {"args", ArgsJson},
         {"cwd", WorkingDir}
       };
 
-      json RootLaunchJson = {
-        {"configurations", json::array({LaunchJson})},
+      if(MatchingConfig >= 0)
+        ConfigsJson[MatchingConfig] = LaunchJson;      
+      else if(ConfigsJson.size() <= 0)
+        ConfigsJson = json::array({LaunchJson});
+      else
+        ConfigsJson.push_back(LaunchJson);
+
+      RootLaunchJson = {
+        {"configurations", ConfigsJson},
         {"version", "0.2.0"}
       };
 
       std::ofstream Out(LaunchPath);
-      Out << RootLaunchJson.dump(1); // Pretty indentations
+      Out << RootLaunchJson.dump(4); // Pretty indentations
       Out.close(); 
     }
 
