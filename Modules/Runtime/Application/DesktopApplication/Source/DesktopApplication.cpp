@@ -186,12 +186,12 @@ namespace Ry
 
 	int32 DesktopApp::GetViewportWidth() const
 	{
-		return GameWindow->GetWindowWidth();
+		return GameWindow->GetFramebufferWidth();
 	}
 
 	int32 DesktopApp::GetViewportHeight() const
 	{
-		return GameWindow->GetWindowHeight();
+		return GameWindow->GetFramebufferHeight();
 	}
 
 	Ry::SwapChain* DesktopApp::GetSwapChain() const

@@ -35,4 +35,7 @@ typedef std::uint8_t uint8;
 	// TODO: Android
 #elif defined(__unix__)
 	// TODO: Other unicies
+#else
+	#define EXPORT_ONLY
+	#define IMPORT_ONLY
 #endif

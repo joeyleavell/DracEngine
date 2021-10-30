@@ -106,7 +106,7 @@ namespace Ry
 			bool bIsUnderVirtual = false;
 
 			AbsPath = AbsPathOriginal;
-			while (AbsPath.has_parent_path())
+			while (AbsPath.has_parent_path() && AbsPath.has_relative_path())
 			{
 				// Check if paths equal
 
@@ -189,7 +189,7 @@ namespace Ry
 				bool bIsUnderVirtual = false;
 
 				AbsPath = AbsPathOriginal;
-				while(AbsPath.has_parent_path())
+				while(AbsPath.has_parent_path() && AbsPath.has_relative_path())
 				{
 					// Check if paths equal
 

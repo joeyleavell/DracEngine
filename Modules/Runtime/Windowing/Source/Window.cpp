@@ -448,7 +448,7 @@ namespace Ry
 
 
 		// Adjust mouse Y to be relative to bottom left
-		MouseY = GetWindowHeight() - MouseY - 1;
+		MouseY = FindWindowHeight() - MouseY - 1;
 
 
 		// Send mouse pos event
@@ -615,7 +615,7 @@ namespace Ry
 
 			double CurX, CurY;
 			AssociatedWindow->GetCursorPos(CurX, CurY);
-			CurY = AssociatedWindow->GetWindowHeight() - CurY - 1;
+			CurY = AssociatedWindow->FindWindowHeight() - CurY - 1;
 
 			// TODO: Fire raw mouse pressed/released event
 			AssociatedWindow->FireButtonEvent(Button, CurX, CurY, EventInfo.bIsPressed);
@@ -782,7 +782,23 @@ namespace Ry
 		return SwapChain;
 	}
 
-	int32 Window::GetWindowWidth() const
+	int32 Window::FindWindowWidth() const
+	{
+		int32 Width, Height;
+		glfwGetWindowSize(WindowResource, &Width, &Height);
+
+		return Width;
+	}
+
+	int32 Window::FindWindowHeight() const
+	{
+		int32 Width, Height;
+		glfwGetWindowSize(WindowResource, &Width, &Height);
+
+		return Height;
+	}
+
+	int32 Window::GetFramebufferWidth() const
 	{
 		if (IsFullscreen())
 		{
@@ -797,7 +813,7 @@ namespace Ry
 		}
 	}
 
-	int32 Window::GetWindowHeight() const
+	int32 Window::GetFramebufferHeight() const
 	{
 		if (IsFullscreen())
 		{
@@ -812,7 +828,7 @@ namespace Ry
 		}
 	}
 
-	void Window::GetWindowSize(int32& Width, int32& Height)
+	void Window::GetFramebufferSize(int32& Width, int32& Height)
 	{
 		glfwGetFramebufferSize(WindowResource, &Width, &Height);
 	}

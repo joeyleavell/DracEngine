@@ -978,7 +978,17 @@ namespace Ry
 					RectScissor Scissor = Group->State.Scissor;
 					if(Scissor.IsEnabled())
 					{
-						AtLayer->CommandBuffer->SetScissorSize(Scissor.X, Scissor.Y, Scissor.Width, Scissor.Height);
+						float Px = Scissor.X / ((float) Ry::GetViewportWidth());
+						float Py = Scissor.Y / ((float) Ry::GetViewportHeight());
+						float Pw = Scissor.Width / ((float) Ry::GetViewportWidth());
+						float Ph = Scissor.Height / ((float) Ry::GetViewportHeight());
+
+						AtLayer->CommandBuffer->SetScissorSize(
+							Px * Swap->GetSwapChainWidth(), 
+							Py * Swap->GetSwapChainHeight(), 
+							Pw * Swap->GetSwapChainWidth(), 
+							Ph * Swap->GetSwapChainHeight()
+						);
 					}
 					else
 					{

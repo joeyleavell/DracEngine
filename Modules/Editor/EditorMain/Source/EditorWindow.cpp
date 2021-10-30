@@ -22,12 +22,12 @@ namespace Ry
 
 	int32 EditorWindow::GetViewportWidth()
 	{
-		return EdWindow->GetWindowWidth();
+		return EdWindow->FindWindowWidth();
 	}
 
 	int32 EditorWindow::GetViewportHeight()
 	{
-		return EdWindow->GetWindowHeight();
+		return EdWindow->FindWindowHeight();
 	}
 
 	void EditorWindow::InitWindow()

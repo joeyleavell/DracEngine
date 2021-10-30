@@ -107,9 +107,12 @@ namespace Ry
 
 		Ry::SwapChain* GetSwapChain();
 
-		int32 GetWindowWidth() const;
-		int32 GetWindowHeight() const;
-		void GetWindowSize(int32& Width, int32& Height);
+		int32 FindWindowWidth() const;
+		int32 FindWindowHeight() const;
+
+		int32 GetFramebufferWidth() const;
+		int32 GetFramebufferHeight() const;
+		void GetFramebufferSize(int32& Width, int32& Height);
 
 		/* TODO: this will need extra considerations with Vulkan */
 		bool IsFullscreen() const;

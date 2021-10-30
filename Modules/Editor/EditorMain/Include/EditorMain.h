@@ -66,12 +66,12 @@ namespace Ry
 
 		int32 GetViewportWidth()
 		{
-			return EditorMainWindow->GetWindowWidth();
+			return EditorMainWindow->GetFramebufferWidth();
 		}
 
 		int32 GetViewportHeight()
 		{
-			return EditorMainWindow->GetWindowHeight();
+			return EditorMainWindow->GetFramebufferHeight();
 		}
 
 		void InitWindow()
@@ -172,7 +172,7 @@ namespace Ry
 			DefaultDiffuse = Ry::RendAPI->CreateTexture(TextureFiltering::Nearest);
 			DefaultDiffuse->Data(&DefaultDiffuseBmp);
 
-			Proj = Ry::perspective4(EditorMainWindow->GetWindowWidth() / (float)EditorMainWindow->GetWindowHeight(), 70.0f, 0.01f, 2500.0f);
+			Proj = Ry::perspective4(EditorMainWindow->GetFramebufferWidth() / (float)EditorMainWindow->GetFramebufferHeight(), 70.0f, 0.01f, 2500.0f);
 			// Load mesh
 			Ry::MeshAsset* Asset = Ry::AssetMan->LoadAsset<MeshAsset>("/Engine/Mesh/Rbarn15.obj", "mesh/obj");
 			NewMesh = Asset->CreateRuntimeMesh();
@@ -307,8 +307,8 @@ namespace Ry
 			{
 				CommandBuffer->BeginRenderPass(true);
 				{
-					CommandBuffer->SetViewportSize(0, 0, EditorMainWindow->GetWindowWidth(), EditorMainWindow->GetWindowHeight());
-					CommandBuffer->SetScissorSize(0, 0, EditorMainWindow->GetWindowWidth(), EditorMainWindow->GetWindowHeight());
+					CommandBuffer->SetViewportSize(0, 0, EditorMainWindow->GetFramebufferWidth(), EditorMainWindow->GetFramebufferHeight());
+					CommandBuffer->SetScissorSize(0, 0, EditorMainWindow->GetFramebufferWidth(), EditorMainWindow->GetFramebufferHeight());
 					CommandBuffer->BindPipeline(Pipeline);
 
 					//CommandBuffer->BindResources(&ResSet, 1);
