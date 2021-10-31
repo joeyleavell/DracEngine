@@ -64,7 +64,6 @@ namespace Ry
 		virtual void Arrange() override
 		{
 			// Default margin: 5px
-			int32 CurrentX = static_cast<int32>(0);
 			int32 CurrentY = static_cast<int32>(0);
 
 			for(int32 VBoxIndex = 0; VBoxIndex < ChildrenSlots.GetSize(); VBoxIndex++)

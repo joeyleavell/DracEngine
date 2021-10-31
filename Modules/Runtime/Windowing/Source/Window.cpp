@@ -95,7 +95,7 @@ namespace Ry
 
 			if (Monitor)
 			{
-				const GLFWvidmode* Mode = glfwGetVideoMode(Monitor);
+			//	const GLFWvidmode* Mode = glfwGetVideoMode(Monitor);
 				WindowResource = glfwCreateWindow(Width, Height, *Title, Monitor, nullptr);
 
 				
@@ -764,7 +764,6 @@ namespace Ry
 		// Get the correct monitor
 		int count;
 		GLFWmonitor** monitors = glfwGetMonitors(&count);
-		GLFWmonitor* monitor = nullptr;
 
 		if (index >= count)
 		{

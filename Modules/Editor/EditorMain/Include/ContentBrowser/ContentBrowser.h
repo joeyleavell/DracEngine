@@ -33,9 +33,6 @@ namespace Ry
 
 		Ry::String CurrentDirectory;
 
-		GridLayout* Directory;
-
-
 		Ry::Map<ContentBrowserItem*, BrowserNode> Nodes;
 	};
 

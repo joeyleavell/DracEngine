@@ -5,15 +5,17 @@ namespace Ry
 {
 	
 	Timer::Timer():
+		started(false),
 		delay(0.0),
-		started(false)
+		start(0.0)
 	{
 		start = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1e9;
 	}
 
 	Timer::Timer(double delay):
+		started(false),
 		delay(delay),
-		started(false)
+		start(0.0)
 	{
 		start = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1e9;
 	}

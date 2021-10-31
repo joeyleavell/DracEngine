@@ -310,8 +310,6 @@ namespace Ry
 	Node TileLayerPhysicsComponent::FindNextNode(Node A, Node B, Edge** InOutEdge)
 	{
 		// go through neighboring edges
-		Node EndNode;
-
 		Edge* ResultEdge = nullptr;
 
 		// Check all edges

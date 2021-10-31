@@ -192,18 +192,18 @@ namespace Ry
 		KeyIterator(const KeyIterator&& Other) noexcept:
 		HashTable(Other.HashTable),
 		TableIndex(Other.TableIndex),
+		NextIndex(Other.NextIndex),
 		CurrentEntry(Other.CurrentEntry),
-		NextEntry(Other.NextEntry),
-		NextIndex(Other.NextIndex)
+		NextEntry(Other.NextEntry)
 		{
 		}
 
 		KeyIterator(MapChain<K, V>** HashTable):
 		HashTable(HashTable),
 		TableIndex(-1),
+		NextIndex(-1),
 		CurrentEntry(nullptr),
-		NextEntry(nullptr),
-		NextIndex(-1)
+		NextEntry(nullptr)
 		{
 			CurrentEntry = FindNext(TableIndex, -1);
 

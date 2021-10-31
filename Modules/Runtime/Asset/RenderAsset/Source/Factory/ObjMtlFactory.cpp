@@ -49,7 +49,6 @@ namespace Ry
 		Ry::String MatLibContents = Ry::File::LoadFileAsString2(Reference.GetAbsolute());
 		int32 MatLibLineCount = MatLibContents.split("\n", &MatLibLines);
 
-		int32 MaterialIndex = 0;
 		Material* CurrentMaterial = nullptr;
 
 		// Load the OBJ materials

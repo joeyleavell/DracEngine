@@ -175,7 +175,6 @@ namespace Ry
 			return MeasuredWidth.Get(String);
 		
 		const int32 TAB_SPACES = 4;
-		const int32 SPACE_ADVANCE = GetGlyph(' ')->AdvanceWidth;
 
 		Ry::StringView* Lines = nullptr;
 

@@ -113,7 +113,6 @@ namespace Ry
 		Profiler LoadString;
 
 		float TotalSplit = 0.0f;
-		float TotalDelete = 0.0f;
 
 		Ry::MeshData* MeshData = new Ry::MeshData;
 		MeshData->SetVertFormat(Ry::VF_P_UV_N_T_Bi);
@@ -141,8 +140,6 @@ namespace Ry
 		int32 LineCount = OBJFile.split("\n", &OBJLines);
 		SplitProf.end();
 		TotalSplit += SplitProf.get_duration_ms();
-
-		Ry::Material* CurrentMaterial = nullptr;
 
 		for(uint32 Line = 0; Line < (uint32) LineCount; Line++)
 		{
@@ -381,7 +378,6 @@ namespace Ry
 		GenerateProf.end();
 
 		Prof.end();
-		float LoadTime = Prof.get_duration_ms();
 
 		//std::cout << "Total=" << LoadTime << " split%=" << (TotalSplit / LoadTime) << std::endl;
 		//std::cout << "generate%=" << (GenerateProf.get_duration_ms() / LoadTime) << " loadstring%=" << (LoadString.get_duration_ms() / LoadTime) << std::endl;

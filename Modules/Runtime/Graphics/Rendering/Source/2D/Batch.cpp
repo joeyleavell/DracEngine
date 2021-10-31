@@ -652,7 +652,7 @@ namespace Ry
 
 	void Batch::Update()
 	{
-		auto AddItem = [this](Ry::SharedPtr<BatchItem> Item, Mesh* BatchMesh)
+		auto AddItem = [](Ry::SharedPtr<BatchItem> Item, Mesh* BatchMesh)
 		{
 			uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
 

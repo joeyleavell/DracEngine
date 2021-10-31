@@ -255,8 +255,9 @@ namespace Ry
 	// Inverse functions
 	Matrix<2, 2> inverse(const Matrix<2, 2>& mat)
 	{
+		//todo: implement
 		Matrix<2, 2> result;
-		float d = deter(mat);
+		//float d = deter(mat);
 
 		return result;
 	}

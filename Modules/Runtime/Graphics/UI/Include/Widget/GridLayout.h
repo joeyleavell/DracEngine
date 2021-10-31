@@ -176,7 +176,6 @@ namespace Ry
 						if(FoundSlot)
 						{
 							SharedPtr<Ry::Widget> Widget = FoundSlot->GetWidget();
-							SizeType ContentSize = Widget->ComputeSize();
 
 							// Add padding now
 							//CurrentX += FoundSlot->GetPadding().Left;

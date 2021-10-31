@@ -46,7 +46,7 @@ namespace Ry
 		{
 			Component::Update(Delta);
 
-			Transform WorldTransform = GetWorldTransform();
+			//Transform WorldTransform = GetWorldTransform();
 			//Camera->transform.position = WorldTransform.position;
 			//Camera->transform.rotation = WorldTransform.rotation;
 			//Camera->transform.scale = WorldTransform.scale;

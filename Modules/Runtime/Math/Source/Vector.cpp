@@ -510,7 +510,7 @@ namespace Ry
 	Vector3 MakeRotation(const Vector3& Forward)
 	{
 		float pitch = 0.0f;
-		float roll = 0.0f;
+		//float roll = 0.0f;
 		float yaw = 0.0f;
 
 		yaw = angle(Vector3(Forward.x, 0.0f, Forward.z), Vector3(0.0f, 0.0f, 1.0f));

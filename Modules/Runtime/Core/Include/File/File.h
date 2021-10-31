@@ -4,23 +4,9 @@
 #include "Core/String.h"
 #include "Data/Map.h"
 #include <chrono>
-
-#if __GNUC__ >= 8
-
 #include <filesystem>
 
-	namespace Filesystem = std::filesystem;
-
-#else
-
-	#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-	#include <experimental/filesystem>
-	#undef _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-
-	namespace Filesystem = std::experimental::filesystem;
-
-#endif
-
+namespace Filesystem = std::filesystem;
 
 namespace Ry
 {

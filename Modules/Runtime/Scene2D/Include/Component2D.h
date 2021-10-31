@@ -96,6 +96,7 @@ namespace Ry
 	public:
 
 		Component2D(Entity2D* Owner);
+		virtual ~Component2D(){};
 
 		void FireUpdate(float Delta);
 		virtual void Update(float Delta) {};
@@ -121,6 +122,7 @@ namespace Ry
 	public:
 
 		Transform2DComponent(Entity2D* Owner);
+		virtual ~Transform2DComponent(){};
 
 		void SetRelativeTransform(const Transform2D& Transform);
 
@@ -148,6 +150,7 @@ namespace Ry
 		MulticastDelegate<> OnRenderStateDirty;
 
 		Primitive2DComponent(Entity2D* Owner, Ry::PrimitiveMobility Mobility, const Vector2& Size = {0.0f, 0.0f}, const Vector2& Origin = { 0.0f, 0.0f });
+		virtual ~Primitive2DComponent(){};
 
 		void DrawPrimitive();
 
@@ -181,8 +184,6 @@ namespace Ry
 		void Update(float Delta) override;
 
 	private:
-
-		int32 Count{};
 
 		Ry::ArrayList<Ry::SharedPtr<Particle>> Particles;
 
@@ -260,7 +261,6 @@ namespace Ry
 	private:
 
 		Ry::String CurrentAnim;
-		bool bPaused;
 		Ry::OAHashMap<Ry::String, SharedPtr<Ry::Animation>> Anims;
 		SharedPtr<Animation2DComponent> AnimComp;
 

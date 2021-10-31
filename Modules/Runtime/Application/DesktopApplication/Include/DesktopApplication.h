@@ -87,7 +87,6 @@ namespace Ry
 
 		int FrameCounter;
 		int AverageFPS;
-		bool Initialized;
 
 		AbstractGame* Game;
 

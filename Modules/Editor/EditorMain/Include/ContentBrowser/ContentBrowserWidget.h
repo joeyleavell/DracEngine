@@ -23,7 +23,6 @@ namespace Ry
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
 
 	private:
-		int32 kills = 0;
 
 		Ry::SharedPtr<BorderWidget> Icon;
 		Ry::SharedPtr<Label> Lab;

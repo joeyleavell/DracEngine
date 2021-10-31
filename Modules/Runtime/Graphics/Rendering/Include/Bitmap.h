@@ -25,7 +25,7 @@ namespace Ry
 	class PixelBuffer
 	{
 	public:
-		PixelBuffer(int32 Width, int32 Height, PixelFormat Format, PixelStorage Storage): Width(Width),Height(Height), Data(nullptr), Format(Format), Storage(Storage) {};
+		PixelBuffer(int32 InWidth, int32 InHeight, PixelFormat InFormat, PixelStorage Storage): Format(InFormat), Storage(Storage), Width(InWidth), Height(InHeight), Data(nullptr) {};
 		virtual ~PixelBuffer() {};
 
 		int32 GetWidth() const { return Width; }

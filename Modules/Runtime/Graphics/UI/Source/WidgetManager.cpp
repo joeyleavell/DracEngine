@@ -40,7 +40,6 @@ namespace Ry
 			NewCache->XmlContents = Ry::File::LoadFileAsString2(Path.GetAbsolute());
 
 			xml_document<> AltDoc;
-			bool bParseError = false;
 
 			try
 			{

@@ -21,7 +21,7 @@ namespace Ry
 		{
 			const Ry::ReflectedClass* Cl = Itr.GetValue();
 			std::cout << *Itr.GetKey() << std::endl;
-			for (const Ry::Field Field : Cl->Fields)
+			for (const Ry::Field& Field : Cl->Fields)
 			{
 				std::cout << "\t" << *Field.Name << " " << *Field.Type->Name << std::endl;
 			}
@@ -46,8 +46,7 @@ namespace Ry
 		// Create UI
 		UI = new UserInterface(Bat);
 
-		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		BitmapFont* TextFont = Font->GenerateBitmapFont(40);
+		//VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
 
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;

@@ -167,9 +167,6 @@ namespace Ry
 		{
 			RenderingPass::BeginPass();
 
-			int32 ViewportWidth = Ry::GetViewportWidth();
-			int32 ViewportHeight = Ry::GetViewportHeight();
-
 			// todo: uniforms aren't set using the shader anymore
 			//ImposeShader->uniform_float("ScreenWidth", (float) ViewportWidth);
 			//ImposeShader->uniform_float("ScreenHeight", (float) ViewportHeight);
@@ -309,19 +306,19 @@ namespace Ry
 
 			int32 TextureUnit = 0;
 
-			for(const ColorSource& ColorSource : ColorSources)
+			//for(const ColorSource& ColorSource : ColorSources)
 			{
 				// ColorSource.Buffer->GetColorAttachment(ColorSource.ColorAttachment)->Bind(TextureUnit);
 				TextureUnit++;
 			}
 
-			for (const DepthSource& DepthSource : DepthSources)
+			//for (const DepthSource& DepthSource : DepthSources)
 			{
 				// DepthSource.Buffer->GetDepthAttachment()->Bind(TextureUnit);
 				TextureUnit++;
 			}
 
-			for (const StencilSource& StencilSource : StencilSources)
+			//for (const StencilSource& StencilSource : StencilSources)
 			{
 				// StencilSource.Buffer->GetStencilAttachment()->Bind(TextureUnit);
 				TextureUnit++;

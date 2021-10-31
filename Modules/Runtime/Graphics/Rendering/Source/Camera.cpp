@@ -22,7 +22,7 @@ namespace Ry
 
 	Camera2D::Camera2D(float Left, float Right, float Bottom, float Top)
 	{
-		float aspect = Ry::GetViewportWidth() / (float)Ry::GetViewportHeight();
+	//	float aspect = Ry::GetViewportWidth() / (float)Ry::GetViewportHeight();
 
 		// TODO: needs to account for aspect ratio!!!!
 		Projection = ortho4(Left, Right, Bottom, Top, -1.0f, 1.0f);
@@ -64,7 +64,7 @@ namespace Ry
 	
 	OrthoCamera::OrthoCamera(float left, float right, float bottom, float top)
 	{
-		float aspect = Ry::GetViewportWidth() / (float) Ry::GetViewportHeight();
+		//float aspect = Ry::GetViewportWidth() / (float) Ry::GetViewportHeight();
 	
 		// TODO: needs to account for aspect ratio!!!!
 		Projection = ortho4(left, right, bottom, top, 1.0f, -1.0f);

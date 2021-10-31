@@ -138,16 +138,12 @@ namespace Ry
 
 	private:
 
-		GLFWcursor* CurCursor{};
-
 		double WindowPosX{};
 		double WindowPosY{};
 
 		WindowManipData ManipData;
 		MouseEventInfo* ButtonsInfo;
 
-		float HigherOrderClickInterval = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press, etc.)
-		float SingleClickInterval = 0.5f; // Amount of time allowed between clicks in higher-order click events (double press, triple press)
 		float ClickDistThreshold = 10.0f; // Pixel deviation allowed before drag event is triggered
 
 		void FireScrollEvent(float ScrollX, float ScrollY);

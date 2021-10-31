@@ -1,8 +1,8 @@
+#ifdef RBUILD_TARGET_OS_WINDOWS
+
 #include "Core/Windows/WindowsPlatform.h"
 #include "Core/PlatformProcess.h"
 #include "File/File.h"
-
-#ifdef RBUILD_TARGET_OS_WINDOWS
 
 // Windows include
 #include "windows.h"

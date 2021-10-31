@@ -135,7 +135,6 @@ namespace Ry
 
 			std::chrono::high_resolution_clock::time_point last_frame = std::chrono::high_resolution_clock::now();
 			std::chrono::high_resolution_clock::time_point last_second = last_frame;
-			uint64 frame_period = (uint64)std::floor(1e9 / Conf.fps_lock);
 
 			while (Running)
 			{

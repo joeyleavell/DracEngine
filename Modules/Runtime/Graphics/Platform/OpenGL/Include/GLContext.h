@@ -15,7 +15,7 @@ namespace Ry
 
 		virtual bool PreWindowCreation(::GLFWwindow* Window);
 
-		virtual bool InitContext(::GLFWwindow* Window, SwapChain* SwapChains);
+		virtual bool InitContextGL(::GLFWwindow* Window, SwapChain* SwapChains);
 
 		virtual void CleanupContext();
 	};

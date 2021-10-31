@@ -16,7 +16,7 @@ namespace Ry
 		return true;
 	}
 
-	bool GLContext::InitContext(::GLFWwindow* Window, SwapChain* SwapChains)
+	bool GLContext::InitContextGL(::GLFWwindow* Window, SwapChain* SwapChains)
 	{
 		glfwMakeContextCurrent(Window);
 

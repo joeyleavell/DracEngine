@@ -233,7 +233,7 @@ namespace Ry
 		void SetClass(const Ry::String& Class);
 		void SetStyleName(const Ry::String& StyleName);
 		const Ry::String& GetId() const;
-		const Ry::String& GetClass() const;
+		const Ry::String& GetClassName() const;
 		const Ry::String& GetStyleName() const;
 
 		bool IsHovered()
@@ -288,9 +288,7 @@ namespace Ry
 		{
 			this->Parent = Parent;
 
-			// Calculate widget layer for new parent
-			int32 PreviousDepth = WidgetLayer;
-			
+			// Calculate widget layer for new parent			
 			WidgetLayer = 0;
 			Widget* Temp = Parent;
 			while(Temp)

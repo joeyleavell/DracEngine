@@ -6,13 +6,13 @@ namespace Ry
 	static uint32 IDCounter;
 
 	Widget::Widget() :
-		RelativePosition{ 0, 0 },
-		MaxSize{ -1, -1 },
 		Parent(nullptr),
-		bPressed(false),
+		MaxSize{ -1, -1 },
+		WidgetLayer(0),
+		RelativePosition{ 0, 0 },
 		bHovered(false),
-		bVisible(true),
-		WidgetLayer(0)
+		bPressed(false),
+		bVisible(true)
 	{
 		this->WidgetID = IDCounter++;
 	}
@@ -37,7 +37,7 @@ namespace Ry
 		return Id;
 	}
 
-	const Ry::String& Widget::GetClass() const
+	const Ry::String& Widget::GetClassName() const
 	{
 		return Class;
 	}

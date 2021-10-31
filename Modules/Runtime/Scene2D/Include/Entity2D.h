@@ -16,7 +16,7 @@ namespace Ry
 		MulticastDelegate<Entity2D*> OnPhysicsStateDirty;
 
 		Entity2D(World2D* World);
-		~Entity2D();
+		virtual ~Entity2D();
 		
 		virtual void Update(float Delta);
 

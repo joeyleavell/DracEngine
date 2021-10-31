@@ -88,9 +88,9 @@ namespace Ry
 			// Check if there is a mesh component
 			if (Ent->CanRender())
 			{
-				Ry::ArrayList<MeshComponent*>& MeshComponents = Ent->GetMeshComponents();
+				//Ry::ArrayList<MeshComponent*>& MeshComponents = Ent->GetMeshComponents();
 
-				for (MeshComponent* MeshComp : MeshComponents)
+				//for (MeshComponent* MeshComp : MeshComponents)
 				{
 					// Render mesh with model matrix and camera matrix
 //					ObjectPipeline->RenderMesh(MeshComp->GetRuntimeMesh(), MeshComp->GetWorldTransform().get_transform(), GlobalCamera->get_view_proj(), Lighting);

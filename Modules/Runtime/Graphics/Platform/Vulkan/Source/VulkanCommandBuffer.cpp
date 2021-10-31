@@ -108,7 +108,10 @@ namespace Ry
 		RenderPassInfo.renderArea.offset = { 0, 0 };
 		RenderPassInfo.renderArea.extent = Target->GetFrameBufferExtent();
 	
-		VkClearValue ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		VkClearValue ClearColor;
+		ClearColor.color = VkClearColorValue {{0.0f, 0.0f, 0.0f, 1.0f}};
+		ClearColor.depthStencil = VkClearDepthStencilValue{};
+
 		RenderPassInfo.clearValueCount = 1;
 		RenderPassInfo.pClearValues = &ClearColor;
 	
@@ -256,7 +259,7 @@ namespace Ry
 		RenderPassInfo.renderArea.extent = Target->GetFrameBufferExtent();
 
 		Ry::ArrayList<VkClearValue> ClearValues(2);
-		ClearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		ClearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f }};
 		ClearValues[1].depthStencil = { 1.0f, 0};
 
 		RenderPassInfo.clearValueCount = 2;

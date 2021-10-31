@@ -533,7 +533,6 @@ namespace Ry
 	private:
 
 		bool bDragging = false;
-		bool bShowCursor;
 		int32 CursorPos;
 		int32 SelectionPos;
 
