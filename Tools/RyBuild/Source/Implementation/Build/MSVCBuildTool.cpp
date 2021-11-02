@@ -500,11 +500,6 @@ bool MSVCBuildTool::LinkModule(Module& TheModule)
 		BuildCmd.push_back(Filesystem::path(ObjFile).filename().string());
 	}
 
-	for(std::string S : BuildCmd)
-	{
-		std::cout << S << std::endl;
-	}
-
 	std::cout << "Linking module " << TheModule.Name << std::endl;
 
 	// Invoke the compiler to link the module.

@@ -1,5 +1,4 @@
-#include "Core/PlatformProcess.h"
-#include "Core/String.h"
+#include "Core/Platform.h"
 #include "glfw3.h"
 
 namespace Ry
@@ -15,5 +14,4 @@ namespace Ry
 		return glfwGetClipboardString(nullptr);
 	}
 
-	
 }

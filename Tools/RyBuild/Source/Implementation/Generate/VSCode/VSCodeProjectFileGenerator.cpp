@@ -167,7 +167,7 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
 
       if(Filesystem::exists(LaunchPath))
       {
-        RootLaunchJson = json::parse(ReadFileAsString(LaunchPath));
+        RootLaunchJson = json::parse(ReadFileAsString(LaunchPath.string()));
       }
 
       std::vector<std::string> LaunchArgs;
@@ -202,8 +202,18 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
 
       }
 
+      std::string LaunchType;
+		if(Compiler == "MSVC")
+		{
+            LaunchType = "cppvsdbg";
+		}
+        else
+        {
+            LaunchType = "lldb";
+        }
+
       json LaunchJson = {
-        {"type", "lldb"},
+        {"type", LaunchType},
         {"request", "launch"},
         {"name", "Launch Editor"},
         {"program", EditorRelative},
@@ -233,5 +243,5 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
 
 bool GenerateGameProjectFiles_VSCode(std::string GameName, std::string GameRootPath, std::string EngineRootPath, std::string Compiler)
 {
-
+    return false;
 }
