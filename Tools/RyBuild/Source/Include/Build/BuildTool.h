@@ -16,7 +16,7 @@ public:
 	AbstractBuildTool(std::string RootPath, BuildSettings Settings)
 	{
 		this->RootPath = RootPath;
-		this->CompileThreadCount = std::thread::hardware_concurrency();
+		this->CompileThreadCount = static_cast<int32_t>(std::thread::hardware_concurrency() * 1.5);
 		 // this->CompileThreadCount = 1;
 
 		this->Settings = Settings;
@@ -36,7 +36,7 @@ public:
 		
 	}
 
-	virtual bool CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory);
+	virtual bool CreateGeneratedModuleSource();
 	
 	/**
 	 * Instructs the build tool to compile a single source file.

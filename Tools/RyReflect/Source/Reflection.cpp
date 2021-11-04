@@ -292,11 +292,11 @@ namespace Ry
 
 					GeneratedSource << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";\\" << std::endl;
 					GeneratedSource << "\t" << FieldsVar << ".Offset = offsetof(" << QualifiedName << ", " << Decl->getNameAsString() << ");\\" << std::endl;
-					
+
 					if(Decl->getType()->isIntegerType() 
-						|| Decl->getType()->isFloatingType() 
-						|| IsArrayList(Decl->getType()) 
-						|| IsRyString(Decl->getType()))
+						|| Decl->getType()->isFloatingType()
+						|| IsRyString(Decl->getType())
+						|| IsArrayList(Decl->getType()))
 					{
 						GeneratedSource << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();\\" << std::endl;
 						GeneratedSource << "\t" << FieldsVar << ".ObjectClass = nullptr;\\" << std::endl;

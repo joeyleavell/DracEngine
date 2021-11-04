@@ -7,6 +7,7 @@
 #include "TextureAsset.h"
 #include "Widget/VerticalPanel.h"
 #include "Widget/Label.h"
+#include "Widget/Splitter.h"
 #include "Interface/RenderCommand.h"
 #include "ContentBrowser/ContentBrowserWidget.h"
 #include "WidgetManager.h"
@@ -16,6 +17,7 @@ namespace Ry
 	EditorUI::EditorUI(SwapChain* Parent):
 	Layer(Parent)
 	{
+		std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
 		while (Itr)
 		{
@@ -70,14 +72,29 @@ namespace Ry
 		.FillX(1.0f)
 		.FillY(1.0f)
 		[
-			NewWidget(Ry::BorderWidget)
-			.DefaultBox(Default)
-			.HoveredBox(Hovered)
-			.Padding(10.0f)
-			.FillX(1.0f)
+			NewWidget(Ry::Splitter)
+			.BarThickness(5.0f)
+			.Type(SplitterType::HORIZONTAL)
+
+			+ Ry::Splitter::MakeSlot()
 			[
-				NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
+				NewWidget(BorderWidget)
+				.DefaultBox(Default)
+				.Padding(75.0f)
 			]
+	
+			+ Ry::Splitter::MakeSlot()
+			[
+				NewWidget(Ry::BorderWidget)
+				.DefaultBox(Default)
+				.HoveredBox(Hovered)
+				.Padding(10.0f)
+				.FillX(1.0f)
+				[
+					NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
+				]
+			]
+
 		];
 		
 		// Create the content browser utility

@@ -104,7 +104,7 @@ namespace Ry
 		const Ry::ReflectedClass* ObjectClass; // If this type is an object, this value represents the class of he object
 
 		// Only applicable for ArrayLists at the moment
-		Ry::ArrayList<DataType> TemplateType;
+		Ry::ArrayList<DataType> TemplateTypes;
 
 		template<typename T, typename Object>
 		T* GetPtrToField(Object* Obj) const
@@ -210,27 +210,28 @@ template<typename T>
 const Ry::DataType* GetTypeImpl(Ry::TypeTag<T>)
 {
 	static Ry::DataType Default{};
+	Default.Name = "<default type>";
 	return &Default;
 }
+
+template<typename T>
+const Ry::DataType* GetTypeImpl(Ry::TypeTag<Ry::ArrayList<T>> ArrayListTag)
+{
+	static Ry::DataType Result;
+
+	const Ry::DataType* InnerType = GetType<T>();
+	Result.Size = sizeof(Ry::ArrayList<T>);
+	Result.Name = "Ry::ArrayList<" + InnerType->Name + ">";
+	Result.Class = Ry::TypeClass::ArrayList;
+	//Result.TemplateTypes.Add(InnerType);
+
+	return &Result;
+};
 
 template<typename T>
 const Ry::DataType* GetType()
 {
 	return GetTypeImpl(Ry::TypeTag<T>{});
-};
-
-template<typename T>
-const Ry::DataType* GetType(Ry::ArrayList<T> ArrayList)
-{
-	static Ry::DataType InnerType = GetType<T>();
-	static Ry::DataType Result;
-
-	Result.Size = sizeof(ArrayList);
-	Result.Name = "Ry::ArrayList<" + InnerType.Name + ">";
-	Result.Class = Ry::TypeClass::ArrayList;
-	//Result.TemplateType.Add(InnerType);
-
-	return &Result;
 };
 
 

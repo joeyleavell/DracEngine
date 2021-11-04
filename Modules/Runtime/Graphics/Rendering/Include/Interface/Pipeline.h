@@ -78,6 +78,11 @@ namespace Ry
 			return X == Other.X && Y == Other.Y && Width == Other.Width && Height == Other.Height;
 		}
 
+		bool TestAgainst(float OtherX, float OtherY)
+		{
+			return (OtherX >= X && OtherX < X + Width) && (OtherY >= Y && OtherY < Y + Height);
+		}
+
 		bool TestAgainst(const RectScissor& Other)
 		{
 			bool bVisX = Other.X >= X && Other.X < X + Width;

@@ -68,48 +68,75 @@ void AbstractBuildTool::CreateBaseModuleSource(const Module& TheModule)
 	ModuleSourceOut.close();
 }
 
-bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::string ObjectDirectory)
+bool AbstractBuildTool::CreateGeneratedModuleSource()
 {
-	std::string ModuleNameCaps = ToUpper(TheModule.Name);
-	CreateBaseModuleSource(TheModule);
 
-	std::vector<std::string> ModuleIncludes;
-	TheModule.GatherIncludes(Modules, ModuleIncludes);
-
-	std::string GeneratedDirectory = TheModule.GetGeneratedDir();
-
-	std::vector<std::string>* HeadersNeedingGeneration = new std::vector<std::string>;
-	FindOutOfDateHeaders(TheModule, GeneratedDirectory, *HeadersNeedingGeneration);
-	std::unordered_map<int32_t, bool>* GenerationResult = new std::unordered_map<int32_t, bool>;
-	std::vector<std::string>  GenPathsNew;
-	std::vector<std::string>  GenPathsTmp;
-	std::vector<std::string>  GenPathsOld;
-
-	if(!HeadersNeedingGeneration->empty())
+	struct ModuleData
 	{
-		std::cout << "Generating source for module " << TheModule.Name << std::endl;
+		std::string ModuleNameCaps;
+		std::string GeneratedDirectory;
+		std::string GeneratedSourceDirectory;
+		std::string IncludeDir;
+		std::string SourceDir;
+		
+		std::vector<std::string> ModuleIncludes;
+
+	};
+
+	std::vector<std::string>* AllHeaders = new std::vector<std::string>;
+	std::unordered_map<std::string, ModuleData*>* HeadersToMod = new std::unordered_map<std::string, ModuleData*>;
+	std::vector<std::string>* GenPathsNew = new std::vector<std::string>;
+	std::vector<std::string>* GenPathsTmp = new std::vector<std::string>;
+	std::vector<std::string>* GenPathsOld = new std::vector<std::string>;
+
+	for(auto& TheModule : Modules)
+	{
+		Module* Mod = TheModule.second;
+		ModuleData* Data = new ModuleData;
+		
+		Data->ModuleNameCaps = ToUpper(TheModule.first);
+		
+		CreateBaseModuleSource(*TheModule.second);
+
+		Mod->GatherIncludes(Modules, Data->ModuleIncludes);
+
+		Data->GeneratedDirectory = Mod->GetGeneratedDir();
+		Data->GeneratedSourceDirectory = Mod->GetGeneratedSourcePath();
+
+		Data->IncludeDir = Mod->GetIncludeDir();
+		Data->SourceDir = Mod->GetCppDir();
+
+		std::vector<std::string> Headers;
+		FindOutOfDateHeaders(*Mod, Data->GeneratedDirectory, Headers);
+
+		for(auto& Header : Headers)
+		{
+			AllHeaders->push_back(Header);
+			HeadersToMod->insert(std::make_pair(Header, Data));
+		}
+		
 	}
 
 	// Pre-create all .gen.h files for headers that need to be re-created
-	for (int32_t HeaderIndex = 0; HeaderIndex < HeadersNeedingGeneration->size(); HeaderIndex++)
+	for (auto& Header : *AllHeaders)
 	{
-		std::string Path = (*HeadersNeedingGeneration)[HeaderIndex];
+		ModuleData* Data = HeadersToMod->at(Header);
 		
-		Filesystem::path HeaderPath = Path;
+		Filesystem::path HeaderPath = Header;
 		std::string HeaderStem = HeaderPath.stem().string();
 
 		std::string GenPathNew = HeaderStem + ".gen.h";
-		Filesystem::path FullGenPathNew = Filesystem::path(GeneratedDirectory) / GenPathNew;
+		Filesystem::path FullGenPathNew = Filesystem::path(Data->GeneratedDirectory) / GenPathNew;
 
 		std::string GenPathTmp = HeaderStem + ".gen.tmp.h";
-		Filesystem::path FullGenPathTmp = Filesystem::path(GeneratedDirectory) / GenPathTmp;
+		Filesystem::path FullGenPathTmp = Filesystem::path(Data->GeneratedDirectory) / GenPathTmp;
 
 		std::string GenPathOld = HeaderStem + ".gen.old.h";
-		Filesystem::path FullGenPathOld = Filesystem::path(GeneratedDirectory) / GenPathOld;
+		Filesystem::path FullGenPathOld = Filesystem::path(Data->GeneratedDirectory) / GenPathOld;
 
-		GenPathsNew.push_back(FullGenPathNew.string());
-		GenPathsTmp.push_back(FullGenPathTmp.string());
-		GenPathsOld.push_back(FullGenPathOld.string());
+		GenPathsNew->push_back(FullGenPathNew.string());
+		GenPathsTmp->push_back(FullGenPathTmp.string());
+		GenPathsOld->push_back(FullGenPathOld.string());
 
 		// Rename current file to prevent changing the file last modified time, need this file in case the code generation fails
 		if(Filesystem::exists(FullGenPathNew))
@@ -121,45 +148,47 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 		std::ofstream Tap;
 		Tap.open(FullGenPathNew.string());
 		Tap << "#include \"Core/Reflection.h\"" << std::endl;
-		Tap << "#include \"" + Filesystem::path(TheModule.GetGeneratedSourcePath()).filename().string() + "\"\n";
+		Tap << "#include \"" + Filesystem::path(Data->GeneratedSourceDirectory).filename().string() + "\"\n";
 		Tap.close();
 	}
 
 	std::mutex HeaderAcquisitionLock;
 	std::mutex OutWriteLock;
+	std::vector<std::thread*> ThreadPool;
 	unsigned int* CurrentHeaderIndex = new unsigned int(0);
 	unsigned int* CompletionIndex = new unsigned int(0);
-	std::vector<std::thread*> ThreadPool;
 	bool bGenerationSuccess = true;
-	for (unsigned int ThreadSpawn = 0; ThreadSpawn < CompileThreadCount && ThreadSpawn < HeadersNeedingGeneration->size(); ThreadSpawn++)
+	std::unordered_map<int32_t, bool>* GenerationResult = new std::unordered_map<int32_t, bool>;
+
+	for (unsigned int ThreadSpawn = 0; ThreadSpawn < CompileThreadCount && ThreadSpawn < HeadersToMod->size(); ThreadSpawn++)
 	{
 		std::thread* NewThread = new std::thread([this, 
-			&TheModule,
+			HeadersToMod,
+			AllHeaders,
+			GenerationResult,
 			&OutWriteLock,
 			&bGenerationSuccess,
 			&HeaderAcquisitionLock,
-			GeneratedDirectory,
-			HeadersNeedingGeneration,
 			CompletionIndex, 
-			CurrentHeaderIndex,
-			ModuleNameCaps,
-			ModuleIncludes,
-			GenerationResult
+			CurrentHeaderIndex
 		]()
 		{
 			int32_t RetrievedIndex = 0;
 			while (RetrievedIndex >= 0)
 			{
 				std::string HeaderNeedingGeneration;
+				ModuleData* Data;
 
 				// Try to get the next available header
 				HeaderAcquisitionLock.lock();
 				{
-					if (*CurrentHeaderIndex < HeadersNeedingGeneration->size())
+					if (*CurrentHeaderIndex < AllHeaders->size())
 					{
 						RetrievedIndex = *CurrentHeaderIndex;
-						HeaderNeedingGeneration = (*HeadersNeedingGeneration)[*CurrentHeaderIndex];
+						HeaderNeedingGeneration = (*AllHeaders)[*CurrentHeaderIndex];
 						(*CurrentHeaderIndex)++;
+
+						Data = HeadersToMod->at(HeaderNeedingGeneration);
 					}
 					else
 					{
@@ -172,12 +201,13 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				{
 					Filesystem::path HeaderPath = HeaderNeedingGeneration;
 					std::string HeaderStem = HeaderPath.stem().string();
-					auto RelativeToInclude = PathRelativeTo(TheModule.GetIncludeDir(), HeaderPath);
-					auto SourceLoc = TheModule.GetCppDir() / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
+					auto RelativeToInclude = PathRelativeTo(Data->IncludeDir, HeaderPath);
+					auto SourceLoc = Data->SourceDir / RelativeToInclude.parent_path() / (HeaderStem + ".cpp");
+
 					std::string HeaderName = HeaderStem + ".gen.h";
-					Filesystem::path GenPath = Filesystem::path(GeneratedDirectory) / HeaderName;
+					Filesystem::path GenPath = Filesystem::path(Data->GeneratedDirectory) / HeaderName;
 					std::string GenHeaderNameTmp = HeaderStem + ".gen.tmp.h";
-					Filesystem::path GenPathTmp = Filesystem::path(GeneratedDirectory) / GenHeaderNameTmp;
+					Filesystem::path GenPathTmp = Filesystem::path(Data->GeneratedDirectory) / GenHeaderNameTmp;
 
 					if (!Filesystem::exists(SourceLoc)) // If source doesn't exist, assume header only file
 					{
@@ -189,7 +219,9 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 						{
 							// TODO: create a stub .cpp file so we can still generate source for this header
 							OutWriteLock.lock();
-							GenerationResult->insert(std::make_pair(RetrievedIndex, true));
+							{
+								GenerationResult->insert(std::make_pair(RetrievedIndex, true));
+							}
 							OutWriteLock.unlock();
 
 							continue;
@@ -204,11 +236,11 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 					Args.push_back(GenPathTmp.string());
 
 					// Add include paths
-					for (const std::string& ModInc : ModuleIncludes)
+					for (const std::string& ModInc : Data->ModuleIncludes)
 						Args.push_back("-Include=" + ModInc);
 
 					// Add defines
-					Args.push_back("-Define=COMPILE_MODULE_" + ModuleNameCaps);
+					Args.push_back("-Define=COMPILE_MODULE_" + Data->ModuleNameCaps);
 					Args.push_back("-Define=RBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));
 
 					int StdOutSize = 1024 * 1000;
@@ -226,7 +258,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 						GenerationResult->insert(std::make_pair(RetrievedIndex, bResult));
 
 						// Print out header that source was just generated for
-						std::cout << "\t[" << (*CompletionIndex + 1) << " of " << HeadersNeedingGeneration->size() << "] " << HeaderPath.filename().string();
+						std::cout << "\t[" << (*CompletionIndex + 1) << " of " << AllHeaders->size() << "] " << HeaderPath.filename().string();
 						(*CompletionIndex)++;
 						if (!bResult && !StdOutAsString.empty())
 							std::cout << " [fail]: " << StdOutBuffer;
@@ -257,11 +289,14 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	}
 
 	// Final output to file
-	for (int32_t GenIndex = 0; GenIndex < HeadersNeedingGeneration->size(); GenIndex++)
+	for (int32_t GenIndex = 0; GenIndex < AllHeaders->size(); GenIndex++)
 	{
-		std::string GenPathNew = GenPathsNew.at(GenIndex);
-		std::string GenPathTmp = GenPathsTmp.at(GenIndex);
-		std::string GenPathOld = GenPathsOld.at(GenIndex);
+		std::string Header = AllHeaders->at(GenIndex);
+		ModuleData* Dat = HeadersToMod->at(Header);
+
+		std::string GenPathNew = GenPathsNew->at(GenIndex);
+		std::string GenPathTmp = GenPathsTmp->at(GenIndex);
+		std::string GenPathOld = GenPathsOld->at(GenIndex);
 
 		bool bSuccess = GenerationResult->at(GenIndex);
 
@@ -281,7 +316,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 				}
 				FileIn.close();
 
-				std::string SourcePrefix = "#include \"" + Filesystem::path(TheModule.GetGeneratedSourcePath()).filename().string() + "\"\n";
+				std::string SourcePrefix = "#include \"" + Filesystem::path(Dat->GeneratedSourceDirectory).filename().string() + "\"\n";
 				std::string FinalSource = SourcePrefix + OutString.str();
 
 				Filesystem::remove(GenPathTmp);
@@ -310,7 +345,8 @@ bool AbstractBuildTool::CreateGeneratedModuleSource(Module& TheModule, std::stri
 	// Cleanup multi-threading variables
 	delete CurrentHeaderIndex;
 	delete CompletionIndex;
-	delete HeadersNeedingGeneration;
+	delete AllHeaders;
+	delete HeadersToMod;
 	delete GenerationResult;
 
 	return bGenerationSuccess;
@@ -1029,14 +1065,11 @@ bool AbstractBuildTool::BuildAllStandalone()
 
 	bool bBuiltSuccessfully = true;
 
-	for (auto& Mod : Modules)
+	// Create generated source for all modules
+	if(!CreateGeneratedModuleSource())
 	{
-		// Create generated source for each module
-		if(!CreateGeneratedModuleSource(*Mod.second, StandaloneObjectDir))
-		{
-			std::cerr << "Failed to generate source for module " << Mod.first << std::endl;
-			return false;
-		}
+		std::cerr << "Failed to generate source" << std::endl;
+		return false;
 	}
 
 	// Compile all modules. Order doesn't matter here since they're all being linked together inevitably.
@@ -1095,19 +1128,10 @@ bool AbstractBuildTool::BuildAllModular(std::vector<std::string>& ModulesFailed)
 
 		TopSort(AllModules, Modules, ModulesTopSorted);
 
-		
-		// Generate module source
-		for(int ModIndex = ModulesTopSorted.size() - 1; ModIndex >= 0; ModIndex--)
+		if (!CreateGeneratedModuleSource())
 		{
-			std::string& ModuleName = ModulesTopSorted[ModIndex];
-			Module* Mod = Modules[ModuleName];
-			
-			if (!CreateGeneratedModuleSource(*Mod, GetModuleObjectDir(*Mod)))
-			{
-				std::cerr << "Failed to generate source for module " << ModuleName << std::endl;
-				return false;
-			}
-
+			std::cerr << "Failed to generate source" << std::endl;
+			return false;
 		}
 		
 		for (auto& Mod : Modules)

@@ -5,6 +5,7 @@
 #include "Event.h"
 #include "Interface/Pipeline.h"
 #include "2D/Batch/Batch.h"
+#include "Core/Object.h"
 #include "Widget.gen.h"
 
 #define WidgetBeginArgsSlot(ClassName) \
