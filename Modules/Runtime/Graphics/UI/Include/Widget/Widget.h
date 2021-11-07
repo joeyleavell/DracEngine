@@ -285,6 +285,11 @@ namespace Ry
 			return *this;
 		}
 
+		virtual void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
+		{
+			
+		}
+
 		virtual void SetParent(Widget* Parent)
 		{
 			this->Parent = Parent;
@@ -301,35 +306,35 @@ namespace Ry
 			MarkDirty(this);
 		}
 
-		virtual PipelineState GetPipelineState() const
+		virtual PipelineState GetPipelineState(Widget* ForWidget) const
 		{
 			if (Parent)
 			{
 				// Return clip space of parent
-				return Parent->GetPipelineState();
+				return Parent->GetPipelineState(ForWidget);
 			}
 			else
 			{
 				// By default widgets never clip
 				PipelineState State;
-				State.Scissor = GetClipSpace();
-				State.StateID = WidgetID;
+				State.Scissor = GetClipSpace(ForWidget);
+				State.StateID = Ry::to_string(WidgetID);
 
 				return State;
 			}
 		}
 
-		virtual RectScissor GetClipSpace() const
+		virtual RectScissor GetClipSpace(const Widget* ForWidget) const
 		{
 			if(Parent)
 			{
 				// Return clip space of parent
-				return Parent->GetClipSpace();
+				return Parent->GetClipSpace(ForWidget);
 			}
 			else
 			{
 				// By default widgets never clip
-				static RectScissor Clip;
+				RectScissor Clip{0, 0, Ry::GetViewportWidth(), Ry::GetViewportHeight()};
 				return Clip;
 			}
 		}
@@ -438,6 +443,15 @@ namespace Ry
 			{
 				RenderStateDirty.Broadcast(Self, bFullRefresh);
 			}
+		}
+
+		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+		{
+			// By default, add the pipeline state associated with the entire widget.
+			// Children widgets can have their own dynamic pipeline states, but most widgets don't implement this.
+			// One widget that does implement this is the splitter widget.
+			
+			OutStates.Add(GetPipelineState(nullptr));
 		}
 
 	protected:

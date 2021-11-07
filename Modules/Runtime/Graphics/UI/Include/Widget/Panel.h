@@ -167,9 +167,23 @@ namespace Ry
 			}
 		}
 
+		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override
+		{
+			for (SharedPtr<Widget> Child : Children)
+			{
+				if (Child.IsValid())
+				{
+					OutChildren.Add(Child.Get());
+					Child->GetAllChildren(OutChildren);
+				}
+			}
+
+		}
+
 		virtual void Draw(StyleSet* Style) override
 		{
-			RectScissor ClipSpace = GetClipSpace();
+			// Get clip space for entire widget
+			RectScissor ClipSpace = GetClipSpace(nullptr);
 
 			bool bUpdateBatch = false;
 

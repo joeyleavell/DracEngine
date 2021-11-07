@@ -93,11 +93,11 @@ namespace Ry
 
 		void OnShow(Ry::Batch* Batch) override
 		{
-			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
-			Batch->AddItem(CursorItem, "Shape", GetPipelineState(), nullptr, WidgetLayer + 1);
+			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
+			Batch->AddItem(CursorItem, "Shape", GetPipelineState(this), nullptr, WidgetLayer + 1);
 
 			if (CursorPos != SelectionPos && SelectionPos >= 0)
-				Batch->AddItem(SelectionItem, "Shape", GetPipelineState(), nullptr, WidgetLayer);
+				Batch->AddItem(SelectionItem, "Shape", GetPipelineState(this), nullptr, WidgetLayer);
 			
 		}
 

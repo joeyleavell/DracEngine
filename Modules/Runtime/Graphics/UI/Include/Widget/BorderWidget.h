@@ -133,26 +133,26 @@ namespace Ry
 				{
 					if(Style.Pressed)
 					{
-						Style.Pressed->Show(Batch, WidgetLayer, GetPipelineState());
+						Style.Pressed->Show(Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if(Style.Hovered)
 					{
-						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState());
+						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
+						Style.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
 					}
 				}
 				else
 				{
 					if(Style.Hovered)
 					{
-						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState());
+						Style.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if(Style.Default)
 					{
-						Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
+						Style.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
 					}
 				}
 			}
@@ -160,7 +160,7 @@ namespace Ry
 			{
 				if(Style.Default)
 				{
-					Style.Default->Show(Batch, WidgetLayer, GetPipelineState());
+					Style.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
 				}
 			}
 		}

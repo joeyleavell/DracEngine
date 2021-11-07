@@ -170,13 +170,19 @@ namespace Ry
 		 */
 		virtual void Arrange() override
 		{
-			RectScissor Clip = GetClipSpace();
-
-			// Check if clip space has changed
-			if(!(Clip == LastClip))
+			// Check if any widget's clip space has changed
+			for(SharedPtr<Slot> Child : ChildrenSlots)
 			{
-				LastClip = Clip;
-				MarkDirty(this);
+				RectScissor Clip = GetClipSpace(Child->GetWidget().Get());
+
+				if (!(Clip == LastClip))
+				{
+					LastClip = Clip;
+					MarkDirty(this);
+
+					// Already re-rendered everything, don't need to repeat
+					break;
+				}
 			}
 			
 			// Calculate scroll amount
@@ -212,16 +218,16 @@ namespace Ry
 
 		}
 
-		PipelineState GetPipelineState() const override
+		PipelineState GetPipelineState(Widget* ForWidget) const override
 		{
 			PipelineState State;
-			State.Scissor = GetClipSpace();
-			State.StateID = GetWidgetID();
+			State.Scissor = GetClipSpace(ForWidget); // Scroll pane doesn't 
+			State.StateID = Ry::to_string(GetWidgetID());
 
 			return State;
 		}
 
-		virtual RectScissor GetClipSpace() const override
+		virtual RectScissor GetClipSpace(const Widget* ForWidget) const override
 		{
 			Point Position = GetAbsolutePosition();
 
@@ -255,13 +261,13 @@ namespace Ry
 		{
 			Widget::OnShow(Batch);
 
-			Batch->AddItem(DebugRect, "Shape", GetPipelineState());
+			Batch->AddItem(DebugRect, "Shape", GetPipelineState(this));
 
 			// Push scroll bar to last layer
 			// todo: come up with better way than this
 			RectScissor Scissor;
-			HorizontalScrollBar->Show(Batch, -1, GetPipelineState());
-			VerticalScrollBar->Show(Batch, -1, GetPipelineState());
+			HorizontalScrollBar->Show(Batch, -1, GetPipelineState(this));
+			VerticalScrollBar->Show(Batch, -1, GetPipelineState(this));
 		}
 
 		virtual void OnHide(Ry::Batch* Batch) override

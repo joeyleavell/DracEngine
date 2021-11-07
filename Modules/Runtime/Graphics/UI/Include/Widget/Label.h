@@ -83,7 +83,7 @@ namespace Ry
 
 		void OnShow(Ry::Batch* Batch) override
 		{
-			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(), Style.Font->GetAtlasTexture(), WidgetLayer);
+			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), Style.Font->GetAtlasTexture(), WidgetLayer);
 		}
 
 		void OnHide(Ry::Batch* Batch) override

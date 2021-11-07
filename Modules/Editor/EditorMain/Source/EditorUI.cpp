@@ -59,6 +59,18 @@ namespace Ry
 		Default.SetBorderRadius(10);
 		Default.SetBorderSize(0);
 
+		BoxDrawable Default2;
+		Default2.SetBackgroundColor(GREEN);
+		Default2.SetBorderColor(GREEN);
+		Default2.SetBorderRadius(10);
+		Default2.SetBorderSize(0);
+
+		BoxDrawable Default3;
+		Default3.SetBackgroundColor(BLUE);
+		Default3.SetBorderColor(BLUE);
+		Default3.SetBorderRadius(10);
+		Default3.SetBorderSize(0);
+
 		BoxDrawable Hovered;
 		Hovered.SetBackgroundColor(WHITE.ScaleRGB(0.05f));
 		Hovered.SetBorderColor(GREEN);
@@ -78,16 +90,30 @@ namespace Ry
 
 			+ Ry::Splitter::MakeSlot()
 			[
-				NewWidget(BorderWidget)
-				.DefaultBox(Default)
-				.Padding(75.0f)
+				NewWidget(Ry::Splitter)
+				.BarThickness(5.0f)
+				.Type(SplitterType::VERTICAL)
+				
+				+ Ry::Splitter::MakeSlot()
+				[
+					NewWidget(BorderWidget)
+					.DefaultBox(Default2)
+					.Padding(75.0f)
+				]
+				+ Ry::Splitter::MakeSlot()
+				[
+					NewWidget(BorderWidget)
+					.DefaultBox(Default3)
+					.Padding(75.0f)
+				]
+
 			]
 	
 			+ Ry::Splitter::MakeSlot()
 			[
 				NewWidget(Ry::BorderWidget)
-				.DefaultBox(Default)
-				.HoveredBox(Hovered)
+				//.DefaultBox(Default)
+				//.HoveredBox(Hovered)
 				.Padding(10.0f)
 				.FillX(1.0f)
 				[

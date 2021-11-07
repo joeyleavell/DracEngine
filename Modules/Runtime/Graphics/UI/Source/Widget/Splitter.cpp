@@ -31,16 +31,21 @@ namespace Ry
 
 		SharedPtr<Widget> WidgetA = Children[0];
 		SharedPtr<Widget> WidgetB = Children[1];
+		RectScissor OurSize = Widget::GetClipSpace(this);
+
+		// Vertical or horizontal, widget A's position is always the same
+		WidgetA->SetRelativePosition(0, 0);
 
 		// Arrange left to right
 		if(Type == SplitterType::HORIZONTAL)
 		{
-			SizeType OurSize = ComputeSize();
-
 			float LeftWidth = OurSize.Width * BarPosition;
-
-			WidgetA->SetRelativePosition(0, 0);
 			WidgetB->SetRelativePosition(LeftWidth + BarThickness / 2.0f, 0.0f);
+		}
+		else // Vertical
+		{
+			float BottomHeight = OurSize.Height * BarPosition;
+			WidgetB->SetRelativePosition(0.0f, BottomHeight + BarThickness / 2.0f);
 		}
 
 		WidgetA->Arrange();
@@ -51,16 +56,25 @@ namespace Ry
 	{
 		if(bDragging)
 		{
-			SizeType OurSize = ComputeSize();
+			RectScissor OurSize = Widget::GetClipSpace(this);
 			Point OurPos = GetAbsolutePosition();
-			float DeltaX = MouseEv.MouseX - OurPos.X;
 
 			// Calculate new bar position
-			BarPosition = DeltaX / OurSize.Width;
+			if(Type == SplitterType::HORIZONTAL)
+			{
+				float DeltaX = MouseEv.MouseX - OurPos.X;
+				BarPosition = DeltaX / OurSize.Width;
+			}
+			else // Vertical
+			{
+				float DeltaY = MouseEv.MouseY - OurPos.Y;
+				BarPosition = DeltaY / OurSize.Height;
+			}
+
 			BarPosition = std::max(0.0f, BarPosition);
 			BarPosition = std::min(1.0f, BarPosition);
 
-			MarkDirty(this);
+			MarkDirty(this, true);
 			
 			return true;
 		}
@@ -72,12 +86,22 @@ namespace Ry
 
 	bool Splitter::OnMouseButtonEvent(const MouseButtonEvent& MouseEv)
 	{
-		SizeType OurSize = ComputeSize();
+		RectScissor OurSize = Widget::GetClipSpace(this);
 		Point OurPos = GetAbsolutePosition();
-		float PosX = OurPos.X + OurSize.Width * BarPosition - BarThickness / 2.0f;
+
+		RectScissor SplitterBarBounds;
+		if(Type ==SplitterType::HORIZONTAL)
+		{
+			float PosX = OurPos.X + OurSize.Width * BarPosition - BarThickness / 2.0f;
+			SplitterBarBounds = RectScissor{ (int32)PosX, OurPos.Y, (int32)BarThickness, OurSize.Height };
+		}
+		else // Vertical
+		{
+			float PosY = OurPos.Y + OurSize.Height * BarPosition - BarThickness / 2.0f;
+			SplitterBarBounds = RectScissor{ (int32)OurPos.Y, (int32)PosY, OurSize.Width, (int32) BarThickness};
+		}
 
 		//Ry::BatchRectangle(SplitterItem, WHITE, PosX, OurPos.Y, BarThickness, OurSize.Height, 1.0f);
-		RectScissor SplitterBarBounds{ (int32) PosX, OurPos.Y, (int32) BarThickness, OurSize.Height };
 
 		bool bHandledHere = false;
 		if(MouseEv.ButtonID == MOUSE_BUTTON_LEFT)
@@ -121,7 +145,7 @@ namespace Ry
 	{
 		PanelWidget::OnShow(Batch);
 
-		Batch->AddItem(SplitterItem, "Shape", GetPipelineState(), nullptr, WidgetLayer + 1);
+		Batch->AddItem(SplitterItem, "Shape", GetPipelineState(nullptr), nullptr, WidgetLayer + 1);
 	}
 
 	void Splitter::OnHide(Ry::Batch* Batch)
@@ -133,15 +157,19 @@ namespace Ry
 
 	void Splitter::Draw(StyleSet* Style)
 	{
-
+		RectScissor OurSize = Widget::GetClipSpace(this);
+		Point OurPos = GetAbsolutePosition();
+		
 		// Draw splitter bar
 		if(Type == SplitterType::HORIZONTAL)
 		{
-			SizeType OurSize = ComputeSize();
-			Point OurPos = GetAbsolutePosition();
 			float PosX = OurPos.X + OurSize.Width * BarPosition - BarThickness / 2.0f;
-
 			Ry::BatchRectangle(SplitterItem, WHITE, PosX, OurPos.Y, BarThickness, OurSize.Height, 1.0f);
+		}
+		else // Vertical
+		{
+			float PosY = OurPos.Y + OurSize.Height * BarPosition - BarThickness / 2.0f;
+			Ry::BatchRectangle(SplitterItem, WHITE, OurPos.X, PosY, OurSize.Width, BarThickness, 1.0f);
 		}
 
 		PanelWidget::Draw(Style);

@@ -75,11 +75,33 @@ namespace Ry
 				RootWidget->SetVisible(true, true);
 			}
 
+			// Update the dynamic pipeline states of all children
+			static Ry::ArrayList<Widget*> AllChildren;
+			static Ry::ArrayList<PipelineState> PipelineStates;
+
+			PipelineStates.SoftClear();
+			AllChildren.SoftClear();
+			
+			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
+			{
+				RootWidget->GetAllChildren(AllChildren);
+			}
+			for (Widget* Child : AllChildren)
+			{
+				Child->GetPipelineStates(PipelineStates);
+			}
+
+			for (const PipelineState& State : PipelineStates)
+			{
+				Bat->UpdatePipelineState(State);
+			}
+
+
 			Bat->Update();
 		}
 
 		void Draw()
-		{
+		{			
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
 				// Arrange the root widget so it is correctly placed
@@ -94,8 +116,12 @@ namespace Ry
 
 	private:
 
+
 		void RenderStateDirty(Widget* Wid, bool bFullRefresh)
 		{
+			static Ry::ArrayList<PipelineState> PipelineStates;
+			static Ry::ArrayList<Widget*> AllChildren;
+
 			// Takes care of widget visibility changes and widget swapping elements
 			Wid->OnHide(Bat);
 			if (Wid->IsVisible())
@@ -107,8 +133,30 @@ namespace Ry
 			// Takes care of position changes, element changes, etc.
 			Wid->Draw(nullptr);
 
+			PipelineStates.SoftClear();
+			AllChildren.SoftClear();
+
 			// Takes care of scissor changes
-			Bat->UpdatePipelineState(Wid->GetPipelineState());
+			if(bFullRefresh)
+			{
+				for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
+				{
+					RootWidget->GetAllChildren(AllChildren);
+				}
+			}
+			else
+			{
+				AllChildren.Add(Wid);
+			}
+
+			for(Widget* Child : AllChildren)
+			{
+				Child->GetPipelineStates(PipelineStates);
+				for (const PipelineState& State : PipelineStates)
+				{
+					Bat->UpdatePipelineState(State);
+				}
+			}
 
 			if(bFullRefresh)
 				Draw(); // Re-arrange everything, will also update batch

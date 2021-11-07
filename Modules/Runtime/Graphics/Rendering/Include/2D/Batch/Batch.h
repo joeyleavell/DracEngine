@@ -216,7 +216,7 @@ namespace Ry
 	struct RENDERING_MODULE PipelineState
 	{
 		// Used for referencing this specific state ID in the future.
-		int32 StateID = 0;
+		Ry::String StateID;
 		RectScissor Scissor;
 
 		bool operator==(const PipelineState& Other) const

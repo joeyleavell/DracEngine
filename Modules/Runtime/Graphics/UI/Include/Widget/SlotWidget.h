@@ -148,6 +148,15 @@ namespace Ry
 			return *this;
 		}
 
+		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override
+		{
+			if(Child.IsValid())
+			{
+				OutChildren.Add(Child.Get());
+				Child->GetAllChildren(OutChildren);
+			}
+		}
+
 		SizeType ComputeSize() const override
 		{
 			SizeType ParentSize;
