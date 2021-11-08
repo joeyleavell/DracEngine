@@ -229,8 +229,15 @@ namespace Ry
 						} while (MountPoint != AbsPath);
 					}
 
-					// Finally, append the mount point
-					return *MountItr.Key() + "/" + VirtualPath;
+					// Finally, append the mount point if not empty
+					if(VirtualPath.IsEmpty())
+					{
+						return *MountItr.Key();
+					}
+					else
+					{
+						return *MountItr.Key() + "/" + VirtualPath;
+					}
 				}
 				
 				++MountItr;

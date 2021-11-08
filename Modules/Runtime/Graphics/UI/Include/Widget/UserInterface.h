@@ -152,10 +152,11 @@ namespace Ry
 			for(Widget* Child : AllChildren)
 			{
 				Child->GetPipelineStates(PipelineStates);
-				for (const PipelineState& State : PipelineStates)
-				{
-					Bat->UpdatePipelineState(State);
-				}
+			}
+
+			for (const PipelineState& State : PipelineStates)
+			{
+				Bat->UpdatePipelineState(State);
 			}
 
 			if(bFullRefresh)

@@ -18,6 +18,8 @@ namespace Ry
 
         SplitterType Type;
 		float BarThickness;
+		float MinBarPosition;
+		float MaxBarPosition;
 
     	/*
     	 * Determines what percentage the bar is along at. In the range [0, 1].
@@ -57,6 +59,8 @@ namespace Ry
 			this->Type = In.mType;
 			this->BarThickness = In.mBarThickness;
 			this->BarPosition = 0.5f;
+			this->MinBarPosition = 0.2;
+			this->MaxBarPosition = 0.8;
 
 			for (PanelWidget::Slot& Child : In.Slots)
 			{

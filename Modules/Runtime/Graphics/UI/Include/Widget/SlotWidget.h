@@ -170,15 +170,17 @@ namespace Ry
 			}
 
 			// Compute parent size only if we need to
-			if (Parent && (WidthMode == SizeMode::PERCENTAGE || HeightMode == SizeMode::PERCENTAGE))
-			{
-				ParentSize = Parent->ComputeSize();
-			}
-			else
-			{
-				ParentSize.Width = Ry::GetViewportWidth();
-				ParentSize.Height = Ry::GetViewportHeight();
-			}
+			RectScissor ClipSpace = Widget::GetClipSpace(this);
+			ParentSize.Width = ClipSpace.Width;
+			ParentSize.Height = ClipSpace.Height;
+
+			// if (Parent && (WidthMode == SizeMode::PERCENTAGE || HeightMode == SizeMode::PERCENTAGE))
+			// {
+			// 	ParentSize = Parent->ComputeSize();
+			// }
+			// else
+			// {
+			// }
 
 			if (WidthMode == SizeMode::PERCENTAGE)
 			{
@@ -230,7 +232,7 @@ namespace Ry
 
 				if (WidthMode == SizeMode::PERCENTAGE)
 				{
-					SizeType ThisSize = ComputeSize();
+					RectScissor ThisSize = Widget::GetClipSpace(this);
 					switch ((uint32)HorizontalAlign)
 					{
 					case (uint32)HAlign::CENTER:
@@ -247,7 +249,7 @@ namespace Ry
 
 				if (HeightMode == SizeMode::PERCENTAGE)
 				{
-					SizeType ThisSize = ComputeSize();
+					RectScissor ThisSize = Widget::GetClipSpace(this);
 					switch ((uint32)VerticalAlign)
 					{
 					case (uint32)VAlign::CENTER:

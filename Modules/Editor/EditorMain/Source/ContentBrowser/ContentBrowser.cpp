@@ -84,7 +84,7 @@ namespace Ry
 			if(Node.bDirectory)
 			{
 				// Concat paths, Go into directory
-				Ry::String NewVirtual = CurrentDirectory + "/" + Node.Name + "/";
+				Ry::String NewVirtual = CurrentDirectory + "/" + Node.Name;
 				SetDirectory(NewVirtual);
 			}
 			else

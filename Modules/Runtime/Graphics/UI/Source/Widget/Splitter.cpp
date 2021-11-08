@@ -71,8 +71,8 @@ namespace Ry
 				BarPosition = DeltaY / OurSize.Height;
 			}
 
-			BarPosition = std::max(0.0f, BarPosition);
-			BarPosition = std::min(1.0f, BarPosition);
+			BarPosition = std::max(MinBarPosition, BarPosition);
+			BarPosition = std::min(MaxBarPosition, BarPosition);
 
 			MarkDirty(this, true);
 			
