@@ -254,7 +254,7 @@ namespace Ry
 			if (Res.Height < 0)
 				Res.Height = 0;
 
-			return Res;
+			return Res.Combine(Widget::GetClipSpace(this));
 		}
 
 		virtual void OnShow(Ry::Batch* Batch) override
@@ -300,7 +300,7 @@ namespace Ry
 			{
 				float ScrollY = MouseEv.ScrollY;
 
-				VerticalScroll(-ScrollY * 30.0f);
+				VerticalScroll(ScrollY * 30.0f);
 
 				return true;
 			}

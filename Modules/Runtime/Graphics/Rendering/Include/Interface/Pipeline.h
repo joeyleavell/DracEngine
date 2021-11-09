@@ -95,6 +95,27 @@ namespace Ry
 
 			return bVisX && bVisY;
 		}
+
+		RectScissor Combine(const RectScissor& Other)
+		{
+
+			// Check if the two don't intersect
+			if ((X >= Other.X + Other.Width) || (Y >= Other.Y + Other.Height) || (Other.X >= X + Width) || (Other.Y >= Y + Height))
+				return *this;
+
+			/* bottom left point of the overlapping area. */
+			int BottomLeftX = std::max(X, Other.X);
+			int BottomLeftY = std::max(Y, Other.Y);
+
+			/* top right point of the overlapping area. */
+			int TopRightX = std::min(X + Width, Other.X + Other.Width);
+			int TopRightY = std::min(Y + Height, Other.Y + Other.Height);
+
+			int32 Width = TopRightX - BottomLeftX;
+			int32 Height = TopRightY - BottomLeftY;
+
+			return RectScissor{ BottomLeftX, BottomLeftY, Width, Height };
+		}
 	};
 
 	struct PipelineCreateInfo
