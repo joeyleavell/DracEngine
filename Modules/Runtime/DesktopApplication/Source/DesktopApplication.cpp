@@ -29,7 +29,6 @@
 #include "nlohmann/json.hpp"
 #include "Core/PlatformProcess.h"
 #include "Factory/FbxFactory.h"
-typedef nlohmann::json Json;
 
 namespace Ry
 {
@@ -426,7 +425,7 @@ namespace Ry
 		if (Ry::File::DoesFileExist(FileName))
 		{
 			Ry::String FileContents = Ry::File::LoadFileAsString2(FileName);
-			Json ProjectJson = Json::parse(*FileContents);
+			nlohmann::json ProjectJson = nlohmann::json::parse(*FileContents);
 
 			ProjectJson["FrameLock"].get_to(Conf.fps_lock);
 			ProjectJson["Window"]["Width"].get_to(Conf.window.width);
@@ -437,7 +436,7 @@ namespace Ry
 		else
 		{
 			// Generate and save new application launch settings
-			Json ProjectJson;
+			nlohmann::json ProjectJson;
 			
 			ProjectJson["FrameLock"] = Conf.fps_lock;
 			ProjectJson["Window"]["Width"] = Conf.window.width;

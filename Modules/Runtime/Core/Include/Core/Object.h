@@ -2,6 +2,7 @@
 
 #include "Core/Core.h"
 #include "Object.gen.h"
+#include "Json/Json.h"
 
 #ifndef GeneratedBody
 	#define GeneratedBody()\
@@ -51,5 +52,7 @@ namespace Ry
 			return *AsT;
 		}
 	};
+
+	CORE_MODULE Json Jsonify(Ry::Object& Object);
 	
 }
