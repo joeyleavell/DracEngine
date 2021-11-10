@@ -161,7 +161,7 @@ namespace Ry
 		
 	};
 	
-	struct UI_MODULE SizeType
+	struct USERINTERFACE_MODULE SizeType
 	{
 		int32 Width;
 		int32 Height;
@@ -179,7 +179,7 @@ namespace Ry
 		}
 	};
 
-	struct UI_MODULE Point
+	struct USERINTERFACE_MODULE Point
 	{
 		int32 X;
 		int32 Y;
@@ -213,7 +213,7 @@ namespace Ry
 		LEFT, CENTER, RIGHT
 	};
 
-	class UI_MODULE Widget : public Ry::Object
+	class USERINTERFACE_MODULE Widget : public Ry::Object
 	{
 	public:
 

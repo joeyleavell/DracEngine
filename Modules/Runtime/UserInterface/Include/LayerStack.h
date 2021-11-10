@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
@@ -9,7 +9,7 @@ namespace Ry
 	class Layer;
 	struct Event;
 
-	class UI_MODULE LayerStack
+	class USERINTERFACE_MODULE LayerStack
 	{
 	public:
 

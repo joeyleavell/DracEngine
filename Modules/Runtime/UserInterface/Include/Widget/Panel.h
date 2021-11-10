@@ -2,14 +2,14 @@
 
 #include "Widget/Widget.h"
 #include <vector>
-#include "UIGen.h"
 #include "Data/ArrayList.h"
 #include "2D/Batch/Batch.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE PanelWidget : public Widget
+	class USERINTERFACE_MODULE PanelWidget : public Widget
 	{
 	public:
 

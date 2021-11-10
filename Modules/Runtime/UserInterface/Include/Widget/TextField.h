@@ -11,7 +11,7 @@
 namespace Ry
 {
 
-	class UI_MODULE TextField : public Widget
+	class USERINTERFACE_MODULE TextField : public Widget
 	{
 	public:
 

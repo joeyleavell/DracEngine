@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Widget/Panel.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE VerticalLayout : public PanelWidget
+	class USERINTERFACE_MODULE VerticalLayout : public PanelWidget
 	{		
 	public:
 

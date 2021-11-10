@@ -2,12 +2,12 @@
 
 #include "Widget/Panel.h"
 #include "Core/Core.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE HorizontalLayout : public PanelWidget
+	class USERINTERFACE_MODULE HorizontalLayout : public PanelWidget
 	{
 	public:
 

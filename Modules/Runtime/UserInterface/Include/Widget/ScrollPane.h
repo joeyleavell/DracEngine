@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Widget/Panel.h"
-#include "UIGen.h"
 #include "2D/Batch/Batch.h"
 #include "Drawable.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE ScrollPane : public PanelWidget
+	class USERINTERFACE_MODULE ScrollPane : public PanelWidget
 	{
 	public:
 

@@ -15,7 +15,7 @@ namespace Ry
 {
 	class AssetRef;
 
-	class UI_MODULE WidgetManager
+	class USERINTERFACE_MODULE WidgetManager
 	{
 	public:
 		WidgetManager();
@@ -49,7 +49,7 @@ namespace Ry
 
 	extern WidgetManager Manager;
 
-	UI_MODULE SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path);
-	UI_MODULE SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path);
+	USERINTERFACE_MODULE SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path);
+	USERINTERFACE_MODULE SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path);
 
 }

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Event.h"
-#include "UIGen.h"
 #include "SwapChain.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE Layer
+	class USERINTERFACE_MODULE Layer
 	{
 	public:
 

@@ -6,11 +6,11 @@
 #include "Font.h"
 #include "Color.h"
 #include "Style.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
-	class UI_MODULE Label : public Widget
+	class USERINTERFACE_MODULE Label : public Widget
 	{
 	public:
 

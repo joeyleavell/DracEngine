@@ -2,7 +2,7 @@ Type = "Runtime"
 
 Extern = ["Glfw", "VulkanLoader", "VulkanHeaders"]
 
-Modules = ["Core", "Input", "Rendering", "AssetCore", "Math", "OpenGL", "Vulkan", "Utility", "UI"]
+Modules = ["Core", "Input", "Rendering", "AssetCore", "Math", "OpenGL", "Vulkan", "Utility", "UserInterface"]
 
 if TargetArch == "x86_64":
 	if TargetOS == "Windows":

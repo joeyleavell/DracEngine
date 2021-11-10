@@ -8,7 +8,7 @@
 namespace Ry
 {
 
-	class UI_MODULE TextStyle
+	class USERINTERFACE_MODULE TextStyle
 	{
 	public:
 		
@@ -37,7 +37,7 @@ namespace Ry
 
 	};
 
-	class UI_MODULE BoxStyle
+	class USERINTERFACE_MODULE BoxStyle
 	{
 	public:
 		Ry::SharedPtr<Drawable> Default;
@@ -117,7 +117,7 @@ namespace Ry
 		}
 	};
 
-	class UI_MODULE StyleSet
+	class USERINTERFACE_MODULE StyleSet
 	{
 	public:
 
@@ -140,7 +140,7 @@ namespace Ry
 
 	};
 
-	extern UI_MODULE Map<Ry::String, StyleSet*> RegisteredStyles;
+	extern USERINTERFACE_MODULE Map<Ry::String, StyleSet*> RegisteredStyles;
 
 	void RegisterStyle(Ry::String Name, StyleSet* Set);
 	void UnregisterStyle(Ry::String Name);

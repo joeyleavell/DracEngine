@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Widget/Panel.h"
-#include "UIGen.h"
 #include <chrono>
 #include "Data/Set.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
@@ -19,7 +19,7 @@ namespace Ry
 		}
 	};
 
-	class UI_MODULE GridLayout : public PanelWidget
+	class USERINTERFACE_MODULE GridLayout : public PanelWidget
 	{
 	public:
 		

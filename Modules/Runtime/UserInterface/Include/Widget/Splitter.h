@@ -12,7 +12,7 @@ namespace Ry
 		HORIZONTAL
 	};
 
-    class UI_MODULE Splitter : public Ry::PanelWidget
+    class USERINTERFACE_MODULE Splitter : public Ry::PanelWidget
     {
     public:
 
@@ -59,8 +59,8 @@ namespace Ry
 			this->Type = In.mType;
 			this->BarThickness = In.mBarThickness;
 			this->BarPosition = 0.5f;
-			this->MinBarPosition = 0.2;
-			this->MaxBarPosition = 0.8;
+			this->MinBarPosition = 0.1;
+			this->MaxBarPosition = 0.9;
 
 			for (PanelWidget::Slot& Child : In.Slots)
 			{

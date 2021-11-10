@@ -4,11 +4,11 @@
 #include "Color.h"
 #include "Drawable.h"
 #include "Style.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
-	class UI_MODULE SlotWidget : public Widget
+	class USERINTERFACE_MODULE SlotWidget : public Widget
 	{
 	public:
 

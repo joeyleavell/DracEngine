@@ -1,12 +1,12 @@
 #pragma once
 
 #include "SlotWidget.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE Button : public SlotWidget
+	class USERINTERFACE_MODULE Button : public SlotWidget
 	{
 	public:
 

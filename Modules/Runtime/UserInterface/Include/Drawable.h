@@ -3,12 +3,12 @@
 #include "Core/Core.h"
 #include "RenderingEngine.h"
 #include "2D/Batch/Batch.h"
-#include "UIGen.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE Drawable
+	class USERINTERFACE_MODULE Drawable
 	{
 	public:
 
@@ -20,7 +20,7 @@ namespace Ry
 		virtual void Draw(float X, float Y, float Width, float Height) = 0;
 	};
 
-	class UI_MODULE ImageDrawable : public Drawable
+	class USERINTERFACE_MODULE ImageDrawable : public Drawable
 	{
 	public:
 		ImageDrawable()
@@ -76,7 +76,7 @@ namespace Ry
 
 	};
 
-	class UI_MODULE BoxDrawable : public Drawable
+	class USERINTERFACE_MODULE BoxDrawable : public Drawable
 	{
 	public:
 		BoxDrawable()

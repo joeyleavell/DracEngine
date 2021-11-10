@@ -5,13 +5,13 @@
 #include "RenderingPass.h"
 #include "2D/Batch/Batch.h"
 #include <vector>
-#include "UIGen.h"
 #include "Event.h"
+#include "UserInterfaceGen.h"
 
 namespace Ry
 {
 
-	class UI_MODULE UserInterface
+	class USERINTERFACE_MODULE UserInterface
 	{
 	public:
 
