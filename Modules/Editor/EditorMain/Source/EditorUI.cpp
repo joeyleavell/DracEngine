@@ -90,13 +90,25 @@ namespace Ry
 		[
 			NewWidget(Ry::Splitter)
 			.BarThickness(5.0f)
-			.Type(SplitterType::HORIZONTAL)
+			.Type(SplitterType::VERTICAL)
+
+			+ Ry::Splitter::MakeSlot()
+			[
+				NewWidget(Ry::BorderWidget)
+				//.DefaultBox(Default)
+				//.HoveredBox(Hovered)
+				.Padding(10.0f)
+				.FillX(1.0f)
+				[
+					NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
+				]
+			]
 
 			+ Ry::Splitter::MakeSlot()
 			[
 				NewWidget(Ry::Splitter)
-				.BarThickness(5.0f)
-				.Type(SplitterType::VERTICAL)
+				.BarThickness(4.0f)
+				.Type(SplitterType::HORIZONTAL)
 				
 				+ Ry::Splitter::MakeSlot()
 				[
@@ -111,18 +123,6 @@ namespace Ry
 					.Padding(75.0f)
 				]
 
-			]
-	
-			+ Ry::Splitter::MakeSlot()
-			[
-				NewWidget(Ry::BorderWidget)
-				//.DefaultBox(Default)
-				//.HoveredBox(Hovered)
-				.Padding(10.0f)
-				.FillX(1.0f)
-				[
-					NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
-				]
 			]
 
 		];

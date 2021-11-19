@@ -17,6 +17,9 @@ namespace Ry
 		{
 		public:
 
+			SizeMode Mode;
+			SizeType Size;
+
 			Slot()
 			{
 			}
@@ -55,7 +58,7 @@ namespace Ry
 
 				return *this;
 			}
-
+			
 			Slot& SetBottomPadding(float Padding)
 			{
 				this->SlotPadding.Bottom = Padding;

@@ -218,7 +218,7 @@ namespace Ry
 
 		}
 
-		PipelineState GetPipelineState(Widget* ForWidget) const override
+		PipelineState GetPipelineState(const Widget* ForWidget) const override
 		{
 			PipelineState State;
 			State.Scissor = GetClipSpace(ForWidget); // Scroll pane doesn't 
@@ -283,6 +283,14 @@ namespace Ry
 		SizeType ComputeSize() const override
 		{
 			return Size;
+	/*		if(Parent)
+			{
+				return Parent->ComputeSize();
+			}
+			else
+			{
+				return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+			}*/
 		}
 
 		void ClearChildren() override

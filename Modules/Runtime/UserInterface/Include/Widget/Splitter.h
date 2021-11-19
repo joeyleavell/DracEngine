@@ -78,21 +78,21 @@ namespace Ry
 				return Widget::GetClipSpace(ForWidget);
 
 			RectScissor OurSize = Widget::GetClipSpace(this);
-			Point OurPos = GetAbsolutePosition();
+			//Point OurPos = GetAbsolutePosition();
 
 			if(Type == SplitterType::HORIZONTAL)
 			{
-				float SplitterWidth = OurSize.Width * BarPosition;
+				int32 SplitterWidth = std::floor(OurSize.Width * BarPosition);
 
 				if (ForWidget == Children[0].Get())
 				{
 					// Clip space for left widget
-					return RectScissor{ OurPos.X, OurPos.Y, (int32) SplitterWidth - (int32)(BarThickness / 2.0f + 1.0f), OurSize.Height };
+					return RectScissor{ OurSize.X, OurSize.Y, SplitterWidth, OurSize.Height };
 				}
 				else
 				{
 					// Clip space for right widget
-					return RectScissor{ OurPos.X + (int32) SplitterWidth + (int32)(BarThickness / 2.0f), OurPos.Y, OurSize.Width - (int32)SplitterWidth - (int32)(BarThickness / 2.0f), OurSize.Height };
+					return RectScissor{ OurSize.X + (int32) SplitterWidth + (int32)(BarThickness), OurSize.Y, OurSize.Width - (int32)SplitterWidth - (int32) BarPosition, OurSize.Height };
 				}
 			}
 			else // Vertical
@@ -102,12 +102,12 @@ namespace Ry
 				if (ForWidget == Children[0].Get())
 				{
 					// Clip space for bottom widget
-					return RectScissor{ OurPos.X, OurPos.Y, OurSize.Width, (int32) SplitterHeight - (int32) (BarThickness / 2.0f + 1.0f)};
+					return RectScissor{ OurSize.X, OurSize.Y, OurSize.Width, (int32) std::round(SplitterHeight)};
 				}
 				else
 				{
 					// Clip space for top widget
-					return RectScissor{ OurPos.X, OurPos.Y + (int32)SplitterHeight + (int32)(BarThickness / 2.0f), OurSize.Width, OurSize.Height - (int32)SplitterHeight - (int32)(BarThickness / 2.0f) };
+					return RectScissor{ OurSize.X, (int32) std::ceil(OurSize.Y + SplitterHeight + BarThickness), OurSize.Width, (int32)std::ceil(OurSize.Height - SplitterHeight - BarThickness)};
 				}
 
 			}
@@ -121,7 +121,7 @@ namespace Ry
 			OutStates.Add(GetPipelineState(nullptr));
 		}
 
-		PipelineState GetPipelineState(Widget* ForWidget) const override
+		PipelineState GetPipelineState(const Widget* ForWidget) const override
 		{
 			// Default pipeline state
 			if (!ForWidget)

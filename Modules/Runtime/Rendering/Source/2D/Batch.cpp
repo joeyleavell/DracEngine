@@ -530,7 +530,7 @@ namespace Ry
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
 	{
 		if (Layer < 0)
-			Layer = Layers.GetSize() - 1;
+			Layer = std::max(Layers.GetSize() - 1, 0);
 
 		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Text, Layer);
 

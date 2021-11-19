@@ -306,12 +306,12 @@ namespace Ry
 			MarkDirty(this);
 		}
 
-		virtual PipelineState GetPipelineState(Widget* ForWidget) const
+		virtual PipelineState GetPipelineState(const Widget* ForWidget) const
 		{
 			if (Parent)
 			{
 				// Return clip space of parent
-				return Parent->GetPipelineState(ForWidget);
+				return Parent->GetPipelineState(this);
 			}
 			else
 			{
@@ -329,7 +329,7 @@ namespace Ry
 			if(Parent)
 			{
 				// Return clip space of parent
-				return Parent->GetClipSpace(ForWidget);
+				return Parent->GetClipSpace(this);
 			}
 			else
 			{
