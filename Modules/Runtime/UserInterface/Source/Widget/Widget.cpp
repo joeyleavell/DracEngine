@@ -131,4 +131,214 @@ namespace Ry
 	{
 		return false;
 	}
+
+	bool Widget::IsHovered()
+	{
+		return bHovered;
+	}
+
+	bool Widget::IsPressed()
+	{
+		return bPressed;
+	}
+
+	bool Widget::IsVisible()
+	{
+		return bVisible;
+	}
+
+	Point Widget::GetRelativePosition() const
+	{
+		return RelativePosition;
+	}
+
+	Point Widget::GetAbsolutePosition() const
+	{
+		Point AbsolutePosition = GetRelativePosition();
+		if (Parent)
+		{
+			Point ParentPos = Parent->GetAbsolutePosition();
+			AbsolutePosition.X += ParentPos.X;
+			AbsolutePosition.Y += ParentPos.Y;
+		}
+
+		return AbsolutePosition;
+	}
+
+	Widget& Widget::SetRelativePosition(float X, float Y)
+	{
+		RelativePosition.X = (int32)X;
+		RelativePosition.Y = (int32)Y;
+
+		return *this;
+	}
+
+	Widget& Widget::SetMaxSize(int32 MaxWidth, int32 MaxHeight)
+	{
+		this->MaxSize = SizeType{ MaxWidth, MaxHeight };
+
+		return *this;
+	}
+
+	void Widget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
+	{
+
+	}
+
+	void Widget::SetParent(Widget* Parent)
+	{
+		this->Parent = Parent;
+
+		// Calculate widget layer for new parent			
+		WidgetLayer = 0;
+		Widget* Temp = Parent;
+		while (Temp)
+		{
+			WidgetLayer++;
+			Temp = Temp->Parent;
+		}
+
+		MarkDirty(this);
+	}
+
+	PipelineState Widget::GetPipelineState(const Widget* ForWidget) const
+	{
+		if (Parent)
+		{
+			// Return clip space of parent
+			return Parent->GetPipelineState(this);
+		}
+		else
+		{
+			// By default widgets never clip
+			PipelineState State;
+			State.Scissor = GetClipSpace(ForWidget);
+			State.StateID = Ry::to_string(WidgetID);
+
+			return State;
+		}
+	}
+
+	RectScissor Widget::GetClipSpace(const Widget* ForWidget) const
+	{
+		if (Parent)
+		{
+			// Return clip space of parent
+			return Parent->GetClipSpace(this);
+		}
+		else
+		{
+			// By default widgets never clip
+			RectScissor Clip{ 0, 0, Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+			return Clip;
+		}
+	}
+
+	Widget& Widget::operator[](SharedPtr<Ry::Widget> Child)
+	{
+		return *this;
+	}
+
+	void Widget::Arrange()
+	{
+
+	}
+
+	void Widget::OnHovered(const MouseEvent& MouseEv)
+	{
+
+	}
+
+	void Widget::OnUnhovered(const MouseEvent& MouseEv)
+	{
+
+	}
+
+	bool Widget::OnPressed(const MouseButtonEvent& MouseEv)
+	{
+		return false;
+	}
+
+	bool Widget::OnReleased(const MouseButtonEvent& MouseEv)
+	{
+		return false;
+	}
+
+	bool Widget::OnEvent(const Event& Ev)
+	{
+		if (Ev.Type == EVENT_MOUSE)
+		{
+			const MouseEvent& Mouse = static_cast<const MouseEvent&>(Ev);
+
+			return OnMouseEvent(Mouse);
+		}
+		else if (Ev.Type == EVENT_MOUSE_BUTTON)
+		{
+			const MouseButtonEvent& MouseButton = static_cast<const MouseButtonEvent&>(Ev);
+
+			return OnMouseButtonEvent(MouseButton);
+		}
+		else if (Ev.Type == EVENT_MOUSE_CLICK)
+		{
+			const MouseClickEvent& MouseClick = static_cast<const MouseClickEvent&>(Ev);
+			return OnMouseClicked(MouseClick);
+		}
+		else if (Ev.Type == EVENT_MOUSE_DRAG)
+		{
+			const MouseDragEvent& MouseDrag = static_cast<const MouseDragEvent&>(Ev);
+			return OnMouseDragged(MouseDrag);
+		}
+		else if (Ev.Type == EVENT_MOUSE_SCROLL)
+		{
+			const MouseScrollEvent& MouseScroll = static_cast<const MouseScrollEvent&>(Ev);
+			return OnMouseScroll(MouseScroll);
+		}
+		else if (Ev.Type == EVENT_KEY)
+		{
+			const KeyEvent& Key = static_cast<const KeyEvent&>(Ev);
+			return OnKey(Key);
+		}
+		else if (Ev.Type == EVENT_CHAR)
+		{
+			const CharEvent& Char = static_cast<const CharEvent&>(Ev);
+			return OnChar(Char);
+		}
+
+		return false;
+	}
+
+	void Widget::SetVisible(bool bVisibility, bool bPropagate)
+	{
+		this->bVisible = bVisibility;
+
+		MarkDirty(this);
+	}
+
+	void Widget::MarkDirty(Widget* Self, bool bFullRefresh)
+	{
+		if (Parent)
+		{
+			Parent->MarkDirty(Self, bFullRefresh);
+		}
+		else
+		{
+			RenderStateDirty.Broadcast(Self, bFullRefresh);
+		}
+	}
+
+	void Widget::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	{
+		// By default, add the pipeline state associated with the entire widget.
+		// Children widgets can have their own dynamic pipeline states, but most widgets don't implement this.
+		// One widget that does implement this is the splitter widget.
+
+		OutStates.Add(GetPipelineState(nullptr));
+	}
+
+	int32 Widget::GetWidgetID() const
+	{
+		return WidgetID;
+	}
+
+
 }

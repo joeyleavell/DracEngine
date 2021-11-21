@@ -1,8 +1,107 @@
-#include "Widget/Splitter.h"
+#include "Widget/Layout/Splitter.h"
 #include "Buttons.h"
 
 namespace Ry
 {
+
+	Splitter::Splitter() {};
+
+	Splitter::Slot Splitter::MakeSlot()
+	{
+		Splitter::Slot NewSlot;
+		return NewSlot;
+	}
+
+	void Splitter::Construct(Splitter::Args& In)
+	{
+		CORE_ASSERT(In.Slots.GetSize() <= 2);
+
+		this->Type = In.mType;
+		this->BarThickness = In.mBarThickness;
+		this->BarPosition = 0.5f;
+		this->MinBarPosition = 0.1;
+		this->MaxBarPosition = 0.9;
+
+		for (PanelWidget::Slot& Child : In.Slots)
+		{
+			SharedPtr<Slot> Result = CastShared<Slot>(AppendSlot(Child.GetWidget()));
+			Result->SetPadding(Child.GetPadding());
+		}
+
+		SplitterItem = MakeItem();
+	}
+
+	RectScissor Splitter::GetClipSpace(const Widget* ForWidget) const
+	{
+		// Default nullptr (entire widget) clip space
+		if (!ForWidget)
+			return Widget::GetClipSpace(ForWidget);
+
+		RectScissor OurSize = Widget::GetClipSpace(this);
+		//Point OurPos = GetAbsolutePosition();
+
+		if (Type == SplitterType::HORIZONTAL)
+		{
+			int32 SplitterWidth = std::round(OurSize.Width * BarPosition);
+
+			if (ForWidget == Children[0].Get())
+			{
+				// Clip space for left widget
+				return RectScissor{ OurSize.X, OurSize.Y, SplitterWidth, OurSize.Height };
+			}
+			else
+			{
+				// Clip space for right widget
+				return RectScissor{ (int32)std::round(OurSize.X + SplitterWidth + BarThickness), OurSize.Y, (int32)std::round(OurSize.Width - SplitterWidth - BarPosition), OurSize.Height };
+			}
+		}
+		else // Vertical
+		{
+			float SplitterHeight = OurSize.Height * BarPosition;
+
+			if (ForWidget == Children[0].Get())
+			{
+				// Clip space for bottom widget
+				return RectScissor{ OurSize.X, OurSize.Y, OurSize.Width, (int32)std::round(SplitterHeight) };
+			}
+			else
+			{
+				// Clip space for top widget
+				return RectScissor{ OurSize.X, (int32)std::round(OurSize.Y + SplitterHeight + BarThickness), OurSize.Width, (int32)std::round(OurSize.Height - SplitterHeight - BarThickness) };
+			}
+
+		}
+
+	}
+
+	void Splitter::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	{
+		OutStates.Add(GetPipelineState(Children[0].Get()));
+		OutStates.Add(GetPipelineState(Children[1].Get()));
+		OutStates.Add(GetPipelineState(nullptr));
+	}
+
+	PipelineState Splitter::GetPipelineState(const Widget* ForWidget) const
+	{
+		// Default pipeline state
+		if (!ForWidget)
+			return Widget::GetPipelineState(ForWidget);
+
+		PipelineState State;
+		State.Scissor = GetClipSpace(ForWidget);
+
+		// Must have two children
+		if (ForWidget == Children[0].Get())
+		{
+			State.StateID = Ry::to_string(GetWidgetID()) + "_A";
+		}
+		else
+		{
+			State.StateID = Ry::to_string(GetWidgetID()) + "_B";
+		}
+
+		return State;
+	}
 
 	SizeType Splitter::ComputeSize() const
 	{

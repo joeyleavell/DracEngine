@@ -1,13 +1,13 @@
 #include "ContentBrowser/ContentBrowserWidget.h"
-#include "Widget/VerticalPanel.h"
+#include "Widget/Layout/VerticalPanel.h"
 #include "Widget/BorderWidget.h"
 #include "Widget/Label.h"
 #include "TextureAsset.h"
 #include "Manager/AssetManager.h"
 #include "VectorFontAsset.h"
-#include "Widget/HorizontalPanel.h"
-#include "Widget/ScrollPane.h"
-#include "Widget/Button.h"
+#include "Widget/Layout/HorizontalPanel.h"
+#include "Widget/Layout/ScrollPane.h"
+#include "Widget/Input/Button.h"
 
 namespace Ry
 {
@@ -15,9 +15,9 @@ namespace Ry
 	{
 		
 		SetChild(
-			NewWidget(Ry::VerticalLayout)
+			NewWidget(Ry::VerticalPanel)
 			+
-			VerticalLayout::MakeSlot()
+			VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Icon, Ry::BorderWidget)
 				.DefaultImage(Texture)
@@ -27,7 +27,7 @@ namespace Ry
 			]
 
 			+
-			VerticalLayout::MakeSlot()
+				VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Lab, Ry::Label)
 				.Text(Name)
@@ -64,15 +64,15 @@ namespace Ry
 
 		// Create directory grid
 		SetChild(
-			NewWidget(VerticalLayout)
+			NewWidget(VerticalPanel)
 			+ 
-			VerticalLayout::MakeSlot()
+			VerticalPanel::MakeSlot()
 			[
 				NewWidget(BorderWidget)
 				[
-					NewWidget(HorizontalLayout)
+					NewWidget(HorizontalPanel)
 					+
-					HorizontalLayout::MakeSlot()
+					HorizontalPanel::MakeSlot()
 					.SetBottomPadding(10.0f)
 					[
 						// Up directory
@@ -92,7 +92,7 @@ namespace Ry
 
 					// Current Directory
 					+
-					HorizontalLayout::MakeSlot()
+					HorizontalPanel::MakeSlot()
 					.SetBottomPadding(10.0f)
 					[
 						NewWidgetAssign(CurDirLabel, TextField)
@@ -104,7 +104,7 @@ namespace Ry
 
 			]
 
-			+ VerticalLayout::MakeSlot()
+			+ VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Pane, ScrollPane)
 				.Width(600)
@@ -112,7 +112,7 @@ namespace Ry
 				
 				+ ScrollPane::MakeSlot()
 				[
-					NewWidgetAssign(Grid, GridLayout)
+					NewWidgetAssign(Grid, GridPanel)
 					.CellWidth(200.0f)
 					.CellHeight(100.0f)
 				]

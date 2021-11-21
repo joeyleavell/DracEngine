@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Core.h"
 #include "RenderingEngine.h"
 #include "2D/Batch/Batch.h"
 #include "UserInterfaceGen.h"

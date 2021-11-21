@@ -3,7 +3,7 @@
 #include "Layer.h"
 #include "2D/Batch/Batch.h"
 #include "Widget/UserInterface.h"
-#include "Widget/GridLayout.h"
+#include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
 #include "EditorUI.gen.h"
 

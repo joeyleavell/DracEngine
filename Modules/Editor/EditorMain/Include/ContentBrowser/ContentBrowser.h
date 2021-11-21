@@ -1,6 +1,6 @@
 #pragma once
 #pragma once
-#include "Widget/GridLayout.h"
+#include "Widget/Layout/GridPanel.h"
 #include "Data/Map.h"
 
 namespace Ry

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Widget/SlotWidget.h"
-#include "Widget/GridLayout.h"
+#include "Widget/Layout/SlotWidget.h"
+#include "Widget/Layout/GridPanel.h"
 #include "Widget/Label.h"
 #include "Widget/BorderWidget.h"
-#include "Widget/Button.h"
-#include "Widget/ScrollPane.h"
-#include "Widget/TextField.h"
+#include "Widget/Input/Button.h"
+#include "Widget/Layout/ScrollPane.h"
+#include "Widget/Input/TextField.h"
 
 namespace Ry
 {
@@ -55,7 +55,7 @@ namespace Ry
 		Texture* FileTexture;
 		Texture* UpArrowTexture;
 
-		Ry::SharedPtr<GridLayout> Grid;
+		Ry::SharedPtr<GridPanel> Grid;
 
 	};
 

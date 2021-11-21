@@ -236,139 +236,25 @@ namespace Ry
 		const Ry::String& GetId() const;
 		const Ry::String& GetClassName() const;
 		const Ry::String& GetStyleName() const;
+		bool IsHovered();
+		bool IsPressed();
+		bool IsVisible();
 
-		bool IsHovered()
-		{
-			return bHovered;
-		}
+		Point GetRelativePosition() const;
+		Point GetAbsolutePosition() const;
+		Widget& SetRelativePosition(float X, float Y);
+		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight);
 
-		bool IsPressed()
-		{
-			return bPressed;
-		}
-
-		bool IsVisible()
-		{
-			return bVisible;
-		}
-
-		Point GetRelativePosition() const
-		{
-			return RelativePosition;
-		}
-
-		Point GetAbsolutePosition() const
-		{
-			Point AbsolutePosition = GetRelativePosition();
-			if(Parent)
-			{
-				Point ParentPos = Parent->GetAbsolutePosition();
-				AbsolutePosition.X += ParentPos.X;
-				AbsolutePosition.Y += ParentPos.Y;
-			}
-
-			return AbsolutePosition;
-		}
-
-		Widget& SetRelativePosition(float X, float Y)
-		{
-			RelativePosition.X = (int32)X;
-			RelativePosition.Y = (int32)Y;
-
-			return *this;
-		}
-
-		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight)
-		{
-			this->MaxSize = SizeType{MaxWidth, MaxHeight};
-
-			return *this;
-		}
-
-		virtual void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
-		{
-			
-		}
-
-		virtual void SetParent(Widget* Parent)
-		{
-			this->Parent = Parent;
-
-			// Calculate widget layer for new parent			
-			WidgetLayer = 0;
-			Widget* Temp = Parent;
-			while(Temp)
-			{
-				WidgetLayer++;
-				Temp = Temp->Parent;
-			}
-
-			MarkDirty(this);
-		}
-
-		virtual PipelineState GetPipelineState(const Widget* ForWidget) const
-		{
-			if (Parent)
-			{
-				// Return clip space of parent
-				return Parent->GetPipelineState(this);
-			}
-			else
-			{
-				// By default widgets never clip
-				PipelineState State;
-				State.Scissor = GetClipSpace(ForWidget);
-				State.StateID = Ry::to_string(WidgetID);
-
-				return State;
-			}
-		}
-
-		virtual RectScissor GetClipSpace(const Widget* ForWidget) const
-		{
-			if(Parent)
-			{
-				// Return clip space of parent
-				return Parent->GetClipSpace(this);
-			}
-			else
-			{
-				// By default widgets never clip
-				RectScissor Clip{0, 0, Ry::GetViewportWidth(), Ry::GetViewportHeight()};
-				return Clip;
-			}
-		}
-
-		virtual Widget& operator[](SharedPtr<Ry::Widget> Child)
-		{
-			return *this;
-		}
-
-		virtual void Arrange()
-		{
-
-		}
-
-		virtual void OnHovered(const MouseEvent& MouseEv)
-		{
-
-		}
-
-		virtual void OnUnhovered(const MouseEvent& MouseEv)
-		{
-
-		}
-
-		virtual bool OnPressed(const MouseButtonEvent& MouseEv)
-		{
-			return false;
-		}
-
-		virtual bool OnReleased(const MouseButtonEvent& MouseEv)
-		{
-			return false;
-		}
-
+		virtual void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren);
+		virtual void SetParent(Widget* Parent);
+		virtual PipelineState GetPipelineState(const Widget* ForWidget) const;
+		virtual RectScissor GetClipSpace(const Widget* ForWidget) const;
+		virtual Widget& operator[](SharedPtr<Ry::Widget> Child);
+		virtual void Arrange();
+		virtual void OnHovered(const MouseEvent& MouseEv);
+		virtual void OnUnhovered(const MouseEvent& MouseEv);
+		virtual bool OnPressed(const MouseButtonEvent& MouseEv);
+		virtual bool OnReleased(const MouseButtonEvent& MouseEv);
 		virtual bool OnMouseEvent(const MouseEvent& MouseEv);
 		virtual bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv);
 		virtual bool OnMouseClicked(const MouseClickEvent& MouseEv);
@@ -376,85 +262,18 @@ namespace Ry
 		virtual bool OnMouseScroll(const MouseScrollEvent& MouseEv);
 		virtual bool OnKey(const KeyEvent& KeyEv);
 		virtual bool OnChar(const CharEvent& CharEv);
-
-		virtual bool OnEvent(const Event& Ev)
-		{
-			if (Ev.Type == EVENT_MOUSE)
-			{
-				const MouseEvent& Mouse = static_cast<const MouseEvent&>(Ev);
-
-				return OnMouseEvent(Mouse);
-			}
-			else if (Ev.Type == EVENT_MOUSE_BUTTON)
-			{
-				const MouseButtonEvent& MouseButton = static_cast<const MouseButtonEvent&>(Ev);
-
-				return OnMouseButtonEvent(MouseButton);
-			}
-			else if(Ev.Type == EVENT_MOUSE_CLICK)
-			{
-				const MouseClickEvent& MouseClick = static_cast<const MouseClickEvent&>(Ev);
-				return OnMouseClicked(MouseClick);
-			}
-			else if(Ev.Type == EVENT_MOUSE_DRAG)
-			{
-				const MouseDragEvent& MouseDrag = static_cast<const MouseDragEvent&>(Ev);
-				return OnMouseDragged(MouseDrag);
-			}
-			else if (Ev.Type == EVENT_MOUSE_SCROLL)
-			{
-				const MouseScrollEvent& MouseScroll = static_cast<const MouseScrollEvent&>(Ev);
-				return OnMouseScroll(MouseScroll);
-			}
-			else if (Ev.Type == EVENT_KEY)
-			{
-				const KeyEvent& Key = static_cast<const KeyEvent&>(Ev);
-				return OnKey(Key);
-			}
-			else if (Ev.Type == EVENT_CHAR)
-			{
-				const CharEvent& Char = static_cast<const CharEvent&>(Ev);
-				return OnChar(Char);
-			}
-
-			return false;
-		}
-
-		virtual void SetVisible(bool bVisibility, bool bPropagate)
-		{
-			this->bVisible = bVisibility;
-
-			MarkDirty(this);
-		}
-		
+		virtual bool OnEvent(const Event& Ev);
+		virtual void SetVisible(bool bVisibility, bool bPropagate);
+		void MarkDirty(Widget* Self, bool bFullRefresh = false);
+		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates);
 		virtual void Draw(StyleSet* Style) {};
 		virtual SizeType ComputeSize() const { return SizeType{}; };
-
 		virtual void OnShow(Ry::Batch* Batch) {}
 		virtual void OnHide(Ry::Batch* Batch) {};
 
-		void MarkDirty(Widget* Self, bool bFullRefresh = false)
-		{
-			if (Parent)
-			{
-				Parent->MarkDirty(Self, bFullRefresh);
-			}
-			else
-			{
-				RenderStateDirty.Broadcast(Self, bFullRefresh);
-			}
-		}
-
-		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
-		{
-			// By default, add the pipeline state associated with the entire widget.
-			// Children widgets can have their own dynamic pipeline states, but most widgets don't implement this.
-			// One widget that does implement this is the splitter widget.
-			
-			OutStates.Add(GetPipelineState(nullptr));
-		}
-
 	protected:
+
+		int32 GetWidgetID() const;
 
 		// Attributes used for identifying widgets from a parent
 		Ry::String Id;
@@ -466,35 +285,12 @@ namespace Ry
 		SizeType MaxSize;
 
 		int32 WidgetLayer;
-
-	protected:
-
-
-		/*bool IsParentHidden()
-		{
-			Widget* CurParent = Parent;
-			bool bHidden = false;
-			while(CurParent && !bHidden)
-			{
-				if(!CurParent->IsVisible())
-				{
-					bHidden = true;
-				}
-				CurParent = CurParent->Parent;
-			}
-			return bHidden;			
-		}*/
 		
 		Point RelativePosition;
 
 		bool bHovered;
 		bool bPressed;
 		bool bVisible;
-
-		int32 GetWidgetID() const
-		{
-			return WidgetID;
-		}
 
 	private:
 

@@ -13,7 +13,7 @@
 #include "Widget/UserInterface.h"
 #include "Widget/BorderWidget.h"
 #include "VulkanRenderAPI.h"
-#include "Widget/VerticalPanel.h"
+#include "Widget/Layout/VerticalPanel.h"
 #include "Language/ShaderCompiler.h"
 #include "Interface/RenderCommand.h"
 #include "Interface/VertexArray.h"

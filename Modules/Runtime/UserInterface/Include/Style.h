@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Core/Core.h"
 #include "Color.h"
 #include "Font.h"
 #include "Drawable.h"

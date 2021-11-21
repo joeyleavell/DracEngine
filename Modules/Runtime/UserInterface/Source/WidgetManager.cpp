@@ -1,15 +1,8 @@
 #include "WidgetManager.h"
 #include "rapidxml.hpp"
 #include "File/File.h"
-#include "Widget/VerticalPanel.h"
-#include "Widget/HorizontalPanel.h"
-#include "Widget/ScrollPane.h"
-#include "Widget/GridLayout.h"
-#include "Widget/SlotWidget.h"
 #include "Widget/BorderWidget.h"
-#include "Widget/Button.h"
 #include "Widget/Label.h"
-#include "Widget/TextField.h"
 
 using namespace rapidxml;
 
@@ -32,7 +25,7 @@ namespace Ry
 		Ry::String AsVirtual = Path.GetVirtual();
 		if (CachedWidgets.Contains(AsVirtual))
 		{
-			return LoadWidget_Internal(CachedWidgets.Get(AsVirtual)->Root);
+			return LoadWidgetSingle(CachedWidgets.Get(AsVirtual)->Root);
 		}
 		else
 		{
@@ -64,14 +57,8 @@ namespace Ry
 
 			CachedWidgets.Insert(AsVirtual, NewCache);
 
-			return LoadWidget_Internal(NewCache->Root);
+			return LoadWidgetSingle(NewCache->Root);
 		}
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidget_Internal(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Widget> Result = LoadWidgetSingle(Node);
-		return Result;
 	}
 
 	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetSingle(rapidxml::xml_node<>* Node)
@@ -86,6 +73,7 @@ namespace Ry
 
 			if(Result.IsValid())
 			{
+				// Set the attributes of the newly created widget
 				xml_attribute<>* Attrib = Node->first_attribute();
 				while (Attrib)
 				{
@@ -104,6 +92,31 @@ namespace Ry
 
 					Attrib = Attrib->next_attribute();
 				}
+
+				// Load all children of this widget
+				Ry::ArrayList<Ry::SharedPtr<Widget>> ChildrenWidgets;
+				xml_node<>* ChildNode = Node->first_node();
+				while(ChildNode)
+				{
+					Ry::SharedPtr<Widget> Result = LoadWidgetSingle(ChildNode);
+					ChildrenWidgets.Add(Result);
+					ChildNode = ChildNode->next_sibling();
+				}
+
+				if(Ry::SlotWidget* AsSlot = dynamic_cast<Ry::SlotWidget*>(Result.Get()))
+				{
+					// Assert that there is only 1 child widget
+					CORE_ASSERTF(ChildrenWidgets.GetSize() == 1, "There must only be 1 child of a slot widget");
+
+					AsSlot->SetChild(ChildrenWidgets[0]);
+				}
+
+				// if (Ry::PanelWidget* AsPanel = dynamic_cast<Ry::PanelWidget*>(Result.Get()))
+				// {
+				// 	AsPanel->
+				// }
+
+				
 			}
 			else
 			{
@@ -112,69 +125,6 @@ namespace Ry
 		}
 
 		return Result;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetVerticalBox(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::VerticalLayout> Res = NewWidget(Ry::VerticalLayout);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetHorizontalBox(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::HorizontalLayout> Res = NewWidget(Ry::HorizontalLayout);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetScrollBox(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::ScrollPane> Res = NewWidget(Ry::ScrollPane);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetGridBox(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::GridLayout> Res = NewWidget(Ry::GridLayout);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetSlot(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::SlotWidget> Res = NewWidget(Ry::SlotWidget);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetBorder(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::BorderWidget> Res = NewWidget(Ry::BorderWidget);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetButton(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::Button> Res = NewWidget(Ry::Button);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetLabel(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::Label> Res = NewWidget(Ry::Label);
-
-		return Res;
-	}
-
-	SharedPtr<Ry::Widget> WidgetManager::LoadWidgetTextField(rapidxml::xml_node<>* Node)
-	{
-		Ry::SharedPtr<Ry::TextField> Res = NewWidget(Ry::TextField);
-
-		return Res;
 	}
 
 	SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path)

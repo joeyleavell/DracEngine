@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Widget/Widget.h"
-#include "RenderingEngine.h"
 #include "RenderingPass.h"
 #include "Font.h"
 #include "Color.h"
@@ -20,115 +19,20 @@ namespace Ry
 			WidgetProp(Ry::Color, Color)
 		WidgetEndArgs()
 
-		void Construct(Args& In)
-		{
-			this->SetText(In.mText);
-			this->SetStyle(In.mFont, In.mColor);
-
-			this->bTextSizeDirty = true;
-		}
-
-		Label():
-		Widget()
-		{
-			ItemSet = MakeItemSet();
-		}
-
-		SizeType ComputeSize() const override
-		{
-			if(bTextSizeDirty)
-			{
-				CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
-				CachedSize.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
-				bTextSizeDirty = false;
-			}
-
-			return CachedSize;
-		}
-
-		Label& SetText(const Ry::String& Text)
-		{
-			this->Text = Text;
-			bTextSizeDirty = true;
-
-			// Pre compute text data
-			ComputeTextData();
-
-			MarkDirty(this);
-			
-			return *this;
-		}
-
-		Label& SetStyle(BitmapFont* Font, const Color& Color)
-		{
-			Style.SetFont(Font).SetColor(Color);
-			bTextSizeDirty = true;
-
-			return *this;
-		}
-
-		Label& SetFont(BitmapFont* Font)
-		{
-			Style.SetFont(Font);
-			bTextSizeDirty = true;
-
-			MarkDirty(this);
-			return *this;
-		}
-
-		const Ry::String& GetText() const
-		{
-			return Text;
-		}
-
-		void OnShow(Ry::Batch* Batch) override
-		{
-			Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), Style.Font->GetAtlasTexture(), WidgetLayer);
-		}
-
-		void OnHide(Ry::Batch* Batch) override
-		{
-			Batch->RemoveItemSet(ItemSet);
-		}
-
-		void Draw(StyleSet* TheStyle) override
-		{
-			if(IsVisible())
-			{
-				Point Abs = GetAbsolutePosition();
-				SizeType TextSize = ComputeSize();
-				Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + TextSize.Height), static_cast<float>(ComputeSize().Width));
-			}
-
-			//TextBatch->SetTexture(Style.Font->GetAtlasTexture());
-		}
+		Label();
+		void Construct(Args& In);
+		SizeType ComputeSize() const override;
+		Label& SetText(const Ry::String& Text);
+		Label& SetStyle(BitmapFont* Font, const Color& Color);
+		Label& SetFont(BitmapFont* Font);
+		const Ry::String& GetText() const;
+		void OnShow(Ry::Batch* Batch) override;
+		void OnHide(Ry::Batch* Batch) override;
+		void Draw(StyleSet* TheStyle) override;
 
 	private:
 
-		void ComputeTextData()
-		{
-			ComputedTextData.Lines.Clear();
-			
-			Ry::StringView* Lines = nullptr;
-			int32 LineCount = Text.split("\n", &Lines);
-			for (int32 Line = 0; Line < LineCount; Line++)
-			{
-				TextLine NewLine;
-
-				Ry::StringView* Words = nullptr;
-				int32 WordCount = Lines[Line].split(" ", &Words);
-				for (int32 Word = 0; Word < WordCount; Word++)
-				{
-					NewLine.Words.Add(Words[Word]);
-				}
-
-				// Add the cached line
-				ComputedTextData.Lines.Add(NewLine);
-
-				delete[] Words;
-			}
-			delete[] Lines;
-		}
+		void ComputeTextData();
 
 		mutable SizeType CachedSize;
 		mutable bool bTextSizeDirty;

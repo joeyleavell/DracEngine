@@ -31,18 +31,7 @@ namespace Ry
 			rapidxml::xml_node<char>* Root;
 		};
 
-		SharedPtr<Ry::Widget> LoadWidget_Internal(rapidxml::xml_node<char>* Node);
-
 		SharedPtr<Ry::Widget> LoadWidgetSingle(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetVerticalBox(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetHorizontalBox(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetScrollBox(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetGridBox(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetSlot(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetBorder(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetButton(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetLabel(rapidxml::xml_node<char>* Node);
-		SharedPtr<Ry::Widget> LoadWidgetTextField(rapidxml::xml_node<char>* Node);
 
 		Ry::OAHashMap<Ry::String, SharedPtr<CachedWidget>> CachedWidgets;
 	};
