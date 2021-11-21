@@ -66,6 +66,8 @@ namespace Ry
 		Ry::String Name = Node->name();
 
 		Ry::SharedPtr<Widget> Result;
+
+		
 		if(const Ry::ReflectedClass* WidgetClass = GetReflectedClass(Name))
 		{
 			// Create new widget
@@ -115,13 +117,15 @@ namespace Ry
 				// {
 				// 	AsPanel->
 				// }
-
-				
 			}
 			else
 			{
 				Ry::Log->LogErrorf("Failed to create widget of class %s", *Name);
 			}
+		}
+		else
+		{
+			Ry::Log->LogErrorf("Failed to get widget class %s", *Name);
 		}
 
 		return Result;

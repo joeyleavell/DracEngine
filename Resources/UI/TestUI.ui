@@ -1,2 +1,2 @@
-<Ry::TestRefl TestString="hi">
-</Ry::TestRefl>
+<Ry::Label Text="hi">
+</Ry::Label>

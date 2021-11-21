@@ -25,12 +25,26 @@ namespace Ry
 
 	const Ry::ReflectedClass* ReflectionDatabase::GetReflectedClass(const Ry::String& Name)
 	{
-		return ReflectedClasses.Get(Name);
+		if(ReflectedClasses.Contains(Name))
+		{
+			return ReflectedClasses.Get(Name);
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	const Ry::ReflectedClass* ReflectionDatabase::GetReflectedClass(Ry::String&& Name)
 	{
-		return ReflectedClasses.Get(Name);
+		if(ReflectedClasses.Contains(Name))
+		{
+			return ReflectedClasses.Get(Name);
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
 	Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> ReflectionDatabase::GetClassIterator()

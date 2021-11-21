@@ -15,7 +15,7 @@ namespace Ry
 		GeneratedBody()
 
 		RefField()
-			Ry::String TestString{ "test_string" };
+		Ry::String TestString{ "test_string" };
 		
 		RefField()
 		Ry::ArrayList<int32> TestField{};

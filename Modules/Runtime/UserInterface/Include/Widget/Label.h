@@ -5,13 +5,20 @@
 #include "Font.h"
 #include "Color.h"
 #include "Style.h"
-#include "UserInterfaceGen.h"
+#include "Label.gen.h"
 
 namespace Ry
 {
 	class USERINTERFACE_MODULE Label : public Widget
 	{
 	public:
+
+		GeneratedBody()
+
+		RefField()
+		String Text;
+
+		TextStyle Style;
 
 		WidgetBeginArgs(Label)
 			WidgetProp(Ry::String, Text)
@@ -36,11 +43,7 @@ namespace Ry
 
 		mutable SizeType CachedSize;
 		mutable bool bTextSizeDirty;
-		PrecomputedTextData ComputedTextData;
-		
-		String Text;
-		
-		TextStyle Style;
+		PrecomputedTextData ComputedTextData;				
 		Ry::SharedPtr<BatchItemSet> ItemSet;
-	};
+	} RefClass();
 }

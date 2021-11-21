@@ -32,6 +32,8 @@ namespace Ry
 		const CXXRecordDecl* Decl;
 		RecordType Type;
 		std::string Name;
+
+		ASTContext* Context;
 		
 		std::vector<const FieldDecl*> Fields;
 		std::vector<const FunctionDecl*> Functions;
@@ -238,18 +240,20 @@ namespace Ry
 		{
 			std::string QualifiedName = Record.Decl->getQualifiedNameAsString();
 
+			PrintingPolicy PPolicy(Record.Context->getLangOpts());
+
 			// Assume NumBases == 1
 			bool bHasParent = Record.Decl->getNumBases() == 1;
 			std::string ParentType;
 			if(bHasParent)
-				ParentType = Record.Decl->bases_begin()->getType().getAsString();
+				ParentType = Record.Decl->bases_begin()->getType().getAsString(PPolicy);
 
 			// Create generated body that should be manually placed inside of the reflected class
 			GeneratedSource << "#undef GeneratedBody" << std::endl; // Undefined it here in case it was already defined
 			GeneratedSource << "#define GeneratedBody() \\" << std::endl;
 
 			GeneratedSource << "static void* \\" << std::endl;
-			GeneratedSource << "CreateInstance() \\" << std::endl; // Todo: create version with 
+			GeneratedSource << "CreateInstance() \\" << std::endl; // Todo: create versions that take parameters
 			GeneratedSource << "{ \\" << std::endl;
 			{
 				GeneratedSource << "\treturn new " << QualifiedName << "; \\" << std::endl; // Instantiate
@@ -393,6 +397,7 @@ namespace Ry
 				ReflectedRecord NewRecord;
 				NewRecord.Name = AsRecord->getNameAsString();
 				NewRecord.Decl = AsRecord;
+				NewRecord.Context = Result.Context;
 
 				ReflectedRecords.push_back(NewRecord);
 				RecordDecls.insert(AsRecord);

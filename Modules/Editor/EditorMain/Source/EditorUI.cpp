@@ -30,11 +30,12 @@ namespace Ry
 			++Itr;
 		}
 
-		TestRefl Object;
-		Json AsJson = Ry::Jsonify(Object);
-		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
+		TestRefl Object; 
 
-		//SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget("/Engine/UI/TestUI.ui");
+		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget("/Engine/UI/TestUI.ui");
+		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
+
+		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
 		
 		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
 //		std::cout << "Value " << NewRefl->Other << std::endl;

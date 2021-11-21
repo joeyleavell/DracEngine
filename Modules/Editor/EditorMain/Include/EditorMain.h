@@ -44,6 +44,7 @@ namespace Ry
 			Ry::String EngineRoot = Ry::File::GetParentPath(Ry::File::GetParentPath(GetPlatformModulePath()));
 			Ry::String ResourcesRoot = Ry::File::Join(EngineRoot, "Resources");
 			Ry::String ShadersRoot = Ry::File::Join(EngineRoot, "Shaders");
+			Ry::String UIRoot = Ry::File::Join(EngineRoot, "UI");
 
 			Ry::File::MountDirectory(ResourcesRoot, "Engine");
 

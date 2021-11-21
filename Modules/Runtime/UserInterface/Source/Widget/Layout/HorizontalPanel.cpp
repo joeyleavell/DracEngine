@@ -14,7 +14,7 @@ namespace Ry
 
 	HorizontalPanel::Slot HorizontalPanel::MakeSlot()
 	{
-		Slot NewSlot;
+		HorizontalPanel::Slot NewSlot;
 
 		return NewSlot;
 	}
