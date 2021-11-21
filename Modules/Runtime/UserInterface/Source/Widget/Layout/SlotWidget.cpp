@@ -25,6 +25,16 @@ namespace Ry
 		}
 	}
 
+	void SlotWidget::SetStyle(const Ry::StyleSet* Style)
+	{
+		Widget::SetStyle(Style);
+
+		if(Child.IsValid())
+		{
+			Child->SetStyle(Style);
+		}
+	}
+
 	SlotWidget::SlotWidget() :
 		Widget()
 	{
@@ -196,12 +206,12 @@ namespace Ry
 		}
 	}
 
-	void SlotWidget::Draw(StyleSet* Style)
+	void SlotWidget::Draw()
 	{
 		// Render child
 		if (Child && Child->IsVisible())
 		{
-			Child->Draw(Style);
+			Child->Draw();
 		}
 	}
 
@@ -264,6 +274,7 @@ namespace Ry
 
 		// Setup the parent/child relationship
 		this->Child = Child;
+		Child->SetStyle(Style);
 		Child->SetParent(this);
 		Child->SetVisible(IsVisible(), true); // Child matches our visibility
 

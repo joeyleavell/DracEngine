@@ -3,9 +3,10 @@
 namespace Ry
 {
 
-	UserInterface::UserInterface(Batch* Bat)
+	UserInterface::UserInterface(Batch* Bat, const StyleSet* Style)
 	{
 		this->KeyboardFocus = nullptr;
+		this->Style = Style;
 		SetBatch(Bat);
 	}
 
@@ -34,6 +35,15 @@ namespace Ry
 		this->Bat = Bat;
 	}
 
+	void UserInterface::SetStyle(const StyleSet* Style)
+	{
+		this->Style = Style;
+		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
+		{
+			RootWidget->SetStyle(Style);
+		}
+	}
+
 	/**
 	 * Adds a widget to the root-level of this user interface.
 	 */
@@ -44,6 +54,7 @@ namespace Ry
 		Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 
 		Widget->SetVisible(true, true);
+		Widget->SetStyle(Style);
 
 		Draw();
 	}
@@ -55,7 +66,7 @@ namespace Ry
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 		{
 			RootWidget->Arrange();
-			RootWidget->Draw(nullptr);
+			RootWidget->Draw();
 
 			RootWidget->SetVisible(false, true);
 			RootWidget->SetVisible(true, true);
@@ -94,7 +105,7 @@ namespace Ry
 			RootWidget->Arrange();
 
 			// Create the geometry for the elements
-			RootWidget->Draw(nullptr);
+			RootWidget->Draw();
 		}
 
 		Bat->Update();
@@ -114,7 +125,7 @@ namespace Ry
 		Wid->Arrange();
 
 		// Takes care of position changes, element changes, etc.
-		Wid->Draw(nullptr);
+		Wid->Draw();
 
 		PipelineStates.SoftClear();
 		AllChildren.SoftClear();

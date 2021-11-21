@@ -34,6 +34,8 @@ namespace Ry
 
 		EditorUI(SwapChain* Parent);
 
+		void InitializeEditorStyle();
+
 		void Update(float Delta) override;
 		void Render() override;
 		bool OnEvent(const Event& Ev) override;

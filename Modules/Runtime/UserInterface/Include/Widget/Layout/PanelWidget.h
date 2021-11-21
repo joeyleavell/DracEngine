@@ -134,12 +134,13 @@ namespace Ry
 		PanelWidget();
 
 		void Construct(Args& In);
+		void SetStyle(const Ry::StyleSet* Style) override;
 		virtual SharedPtr<Slot> AppendSlot(SharedPtr<Widget> Widget);
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
 		void SetParent(Widget* Parent) override;
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
-		void Draw(StyleSet* Style) override;
+		void Draw() override;
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget);
 		void SetVisible(bool bVisibility, bool bPropagate) override;
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;

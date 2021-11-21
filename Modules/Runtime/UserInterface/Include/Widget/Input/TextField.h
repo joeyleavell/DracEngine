@@ -34,7 +34,7 @@ namespace Ry
 		bool OnChar(const CharEvent& CharEv) override;
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
-		void Draw(StyleSet* TheStyle) override;
+		void Draw() override;
 
 		TextField& SetText(const Ry::String& Text);
 		TextField& SetStyle(BitmapFont* Font, const Color& Color);

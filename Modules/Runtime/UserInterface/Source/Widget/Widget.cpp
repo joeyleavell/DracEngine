@@ -15,6 +15,7 @@ namespace Ry
 		bVisible(true)
 	{
 		this->WidgetID = IDCounter++;
+		this->Style = nullptr;
 	}
 
 	void Widget::SetId(const Ry::String& Id)
@@ -27,9 +28,14 @@ namespace Ry
 		this->Class = Class;
 	}
 
-	void Widget::SetStyleName(const Ry::String& StyleName)
+	void Widget::SetStyle(const Ry::StyleSet* Style)
 	{
-		this->StyleName = StyleName;
+		this->Style = Style;
+	}
+
+	const Ry::StyleSet* Widget::GetStyle() const
+	{
+		return Style;
 	}
 
 	const Ry::String& Widget::GetId() const
@@ -40,11 +46,6 @@ namespace Ry
 	const Ry::String& Widget::GetClassName() const
 	{
 		return Class;
-	}
-
-	const Ry::String& Widget::GetStyleName() const
-	{
-		return StyleName;
 	}
 
 	bool Widget::OnMouseEvent(const MouseEvent& MouseEv)

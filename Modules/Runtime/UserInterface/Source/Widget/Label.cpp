@@ -12,18 +12,19 @@ namespace Ry
 	void Label::Construct(Args& In)
 	{
 		this->SetText(In.mText);
-		this->SetStyle(In.mFont, In.mColor);
+		this->SetTextStyle(In.mTextStyleName);
 
 		this->bTextSizeDirty = true;
 	}
-
 
 	SizeType Label::ComputeSize() const
 	{
 		if (bTextSizeDirty)
 		{
-			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
-			CachedSize.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
+			const TextStyle& ResolvedTextStyle = Style->GetTextStyle(TextStyleName);
+
+			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : ResolvedTextStyle.Font->MeasureWidth(Text));
+			CachedSize.Height = static_cast<int32>(ResolvedTextStyle.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
 			bTextSizeDirty = false;
 		}
 
@@ -43,22 +44,26 @@ namespace Ry
 		return *this;
 	}
 
-	Label& Label::SetStyle(BitmapFont* Font, const Color& Color)
+	Label& Label::SetTextStyle(const Ry::String& StyleName)
 	{
-		Style.SetFont(Font).SetColor(Color);
+		this->TextStyleName = StyleName;
+	//	Style.SetFont(Font).SetColor(Color);
+		
 		bTextSizeDirty = true;
+
+		MarkDirty(this, true);
 
 		return *this;
 	}
 
-	Label& Label::SetFont(BitmapFont* Font)
+	/*Label& Label::SetFont(BitmapFont* Font)
 	{
 		Style.SetFont(Font);
 		bTextSizeDirty = true;
 
 		MarkDirty(this);
 		return *this;
-	}
+	}*/
 
 	const Ry::String& Label::GetText() const
 	{
@@ -67,7 +72,9 @@ namespace Ry
 
 	void Label::OnShow(Ry::Batch* Batch)
 	{
-		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), Style.Font->GetAtlasTexture(), WidgetLayer);
+		const TextStyle& TextStyle = Style->GetTextStyle(TextStyleName);
+
+		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), TextStyle.Font->GetAtlasTexture(), WidgetLayer);
 	}
 
 	void Label::OnHide(Ry::Batch* Batch)
@@ -75,14 +82,21 @@ namespace Ry
 		Batch->RemoveItemSet(ItemSet);
 	}
 
-	void Label::Draw(StyleSet* TheStyle)
+	void Label::Draw()
 	{
 		if (IsVisible())
 		{
+			const TextStyle& TextStyle = Style->GetTextStyle(TextStyleName);
+
 			Point Abs = GetAbsolutePosition();
 			SizeType TextSize = ComputeSize();
-			Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + TextSize.Height), static_cast<float>(ComputeSize().Width));
+			Ry::BatchText(ItemSet, TextStyle.TextColor, TextStyle.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + TextSize.Height), static_cast<float>(ComputeSize().Width));
 		}
+	}
+
+	void Label::SetStyle(const Ry::StyleSet* Style)
+	{
+		Widget::SetStyle(Style);
 	}
 
 	void Label::ComputeTextData()

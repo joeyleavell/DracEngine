@@ -22,6 +22,7 @@ namespace Ry
 		SlotWidget();
 		void Construct(Args& In);
 
+		void SetStyle(const Ry::StyleSet* Style) override;
 		void SetParent(Widget* Parent) override;
 		SlotWidget& Padding(float Pad);
 		SlotWidget& Padding(float Vertical, float Horizontal);
@@ -38,7 +39,7 @@ namespace Ry
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		SizeType ComputeSize() const override;
 		void SetVisible(bool bVisibility, bool bPropagate) override;
-		void Draw(StyleSet* Style) override;
+		void Draw() override;
 		void Arrange() override;
 		void SetChild(Ry::SharedPtr<Ry::Widget> Child);
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;

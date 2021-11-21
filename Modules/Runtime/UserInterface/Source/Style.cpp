@@ -2,8 +2,9 @@
 
 namespace Ry
 {
-	Map<Ry::String, StyleSet*> RegisteredStyles;
-	
+	Map<Ry::String, const StyleSet*> RegisteredStyles;
+	StyleSet EditorStyle;
+
 	StyleSet::StyleSet()
 	{
 		
@@ -34,17 +35,17 @@ namespace Ry
 		BoxStyles.remove(Name);
 	}
 
-	TextStyle& StyleSet::GetTextStyle(Ry::String Name)
+	const TextStyle& StyleSet::GetTextStyle(Ry::String Name) const
 	{
 		return *TextStyles.get(Name);
 	}
 
-	BoxStyle& StyleSet::GetBoxStyle(Ry::String Name)
+	const BoxStyle& StyleSet::GetBoxStyle(Ry::String Name) const
 	{
 		return *BoxStyles.get(Name);
 	}
 
-	void RegisterStyle(Ry::String Name, StyleSet* Set)
+	void RegisterStyle(Ry::String Name, const StyleSet* Set)
 	{
 		RegisteredStyles.insert(Name, Set);
 	}
@@ -54,7 +55,7 @@ namespace Ry
 		RegisteredStyles.remove(Name);
 	}
 
-	StyleSet* GetStyle(Ry::String Name)
+	const StyleSet* GetStyle(Ry::String Name)
 	{
 		return *RegisteredStyles.get(Name);
 	}

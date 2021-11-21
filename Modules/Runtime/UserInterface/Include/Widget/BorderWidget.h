@@ -42,7 +42,7 @@ namespace Ry
 		BorderWidget& PressedBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize);
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
-		void Draw(StyleSet* TheStyle) override;
+		void Draw() override;
 		bool HasVisual();
 		void OnHovered(const MouseEvent& MouseEv) override;
 		void OnUnhovered(const MouseEvent& MouseEv) override;
@@ -54,7 +54,7 @@ namespace Ry
 		/**
 		 * The styling for various states of this box element.
 		 */
-		BoxStyle Style;
+		BoxStyle BStyle;
 		
 	};
 }

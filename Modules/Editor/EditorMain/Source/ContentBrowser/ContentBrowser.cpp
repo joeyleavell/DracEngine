@@ -14,7 +14,6 @@ namespace Ry
 
 		// Initialize content browser to a directory (virtual)
 		// The virtual path will be translated to an absolute path for crawling
-		SetDirectory("/Engine");
 	}
 
 	void ContentBrowser::UpDirectory()

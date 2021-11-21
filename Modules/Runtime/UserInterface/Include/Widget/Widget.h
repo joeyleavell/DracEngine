@@ -230,12 +230,9 @@ namespace Ry
 		
 		virtual ~Widget() = default;
 
-		void SetId(const Ry::String& Id);
-		void SetClass(const Ry::String& Class);
-		void SetStyleName(const Ry::String& StyleName);
 		const Ry::String& GetId() const;
 		const Ry::String& GetClassName() const;
-		const Ry::String& GetStyleName() const;
+		const Ry::StyleSet* GetStyle() const;
 		bool IsHovered();
 		bool IsPressed();
 		bool IsVisible();
@@ -244,7 +241,11 @@ namespace Ry
 		Point GetAbsolutePosition() const;
 		Widget& SetRelativePosition(float X, float Y);
 		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight);
+		void MarkDirty(Widget* Self, bool bFullRefresh = false);
 
+		virtual void SetId(const Ry::String& Id);
+		virtual void SetClass(const Ry::String& Class);
+		virtual void SetStyle(const Ry::StyleSet* Style);
 		virtual void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren);
 		virtual void SetParent(Widget* Parent);
 		virtual PipelineState GetPipelineState(const Widget* ForWidget) const;
@@ -264,21 +265,21 @@ namespace Ry
 		virtual bool OnChar(const CharEvent& CharEv);
 		virtual bool OnEvent(const Event& Ev);
 		virtual void SetVisible(bool bVisibility, bool bPropagate);
-		void MarkDirty(Widget* Self, bool bFullRefresh = false);
 		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates);
-		virtual void Draw(StyleSet* Style) {};
+		virtual void Draw() {};
 		virtual SizeType ComputeSize() const { return SizeType{}; };
 		virtual void OnShow(Ry::Batch* Batch) {}
 		virtual void OnHide(Ry::Batch* Batch) {};
 
 	protected:
 
+		const StyleSet* Style;
+
 		int32 GetWidgetID() const;
 
 		// Attributes used for identifying widgets from a parent
 		Ry::String Id;
 		Ry::String Class;
-		Ry::String StyleName;
 
 		SizeType CachedSize;
 		Widget* Parent{};

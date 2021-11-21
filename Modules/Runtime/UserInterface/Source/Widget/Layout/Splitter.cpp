@@ -254,7 +254,7 @@ namespace Ry
 		Batch->RemoveItem(SplitterItem);
 	}
 
-	void Splitter::Draw(StyleSet* Style)
+	void Splitter::Draw()
 	{
 		RectScissor OurSize = Widget::GetClipSpace(this);
 		Point OurPos = GetAbsolutePosition();
@@ -271,7 +271,7 @@ namespace Ry
 			Ry::BatchRectangle(SplitterItem, WHITE, OurPos.X, PosY, OurSize.Width, BarThickness, 1.0f);
 		}
 
-		PanelWidget::Draw(Style);
+		PanelWidget::Draw();
 	}
 	
 }

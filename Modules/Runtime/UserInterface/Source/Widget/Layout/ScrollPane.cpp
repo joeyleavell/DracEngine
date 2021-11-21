@@ -112,7 +112,7 @@ namespace Ry
 		return ScrollSlot;
 	}
 
-	void ScrollPane::Draw(StyleSet* Style)
+	void ScrollPane::Draw()
 	{
 		Point Abs = GetAbsolutePosition();
 		Ry::BatchHollowRectangle(DebugRect, WHITE, Abs.X + 2.0f, Abs.Y + 2.0f, Size.Width - 4.0f, Size.Height - 4.0f, 2.0f, 0.0f);
@@ -128,7 +128,7 @@ namespace Ry
 		VerticalScrollBar->Draw((float)VertLoc.X, (float)VertLoc.Y, (float)VertSize.Width, (float)VertSize.Height);
 		HorizontalScrollBar->Draw((float)HorLoc.X, (float)HorLoc.Y, (float)HorSize.Width, (float)HorSize.Height);
 
-		Ry::PanelWidget::Draw(Style);
+		Ry::PanelWidget::Draw();
 	}
 
 	/**

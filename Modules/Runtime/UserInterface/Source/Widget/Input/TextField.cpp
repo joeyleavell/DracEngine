@@ -90,7 +90,7 @@ namespace Ry
 		Batch->RemoveItem(SelectionItem);
 	}
 
-	void TextField::Draw(StyleSet* TheStyle)
+	void TextField::Draw()
 	{
 		if (IsVisible())
 		{

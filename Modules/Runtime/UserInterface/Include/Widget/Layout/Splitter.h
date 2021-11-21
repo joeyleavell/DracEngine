@@ -59,7 +59,7 @@ namespace Ry
 
     	SizeType ComputeSize() const override;
         void Arrange() override;
-		void Draw(StyleSet* Style) override;
+		void Draw() override;
 
     	bool OnMouseEvent(const MouseEvent& MouseEv) override;
     	bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override;

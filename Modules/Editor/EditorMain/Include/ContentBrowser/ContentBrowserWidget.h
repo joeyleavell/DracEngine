@@ -20,12 +20,18 @@ namespace Ry
 		ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name);
 		virtual ~ContentBrowserItem();
 
+		void Construct();
+
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
 
 	private:
 
 		Ry::SharedPtr<BorderWidget> Icon;
 		Ry::SharedPtr<Label> Lab;
+
+		Texture* Tex;
+		BitmapFont* Font;
+		Ry::String Name;
 
 	};
 

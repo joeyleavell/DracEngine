@@ -12,14 +12,25 @@ namespace Ry
 	{
 	}
 
+	void PanelWidget::SetStyle(const Ry::StyleSet* Style)
+	{
+		Widget::SetStyle(Style);
+
+		for(SharedPtr<Widget> Child : Children)
+		{
+			Child->SetStyle(Style);
+		}
+	}
+
 	SharedPtr<PanelWidget::Slot> PanelWidget::AppendSlot(SharedPtr<Widget> Widget)
 	{
 		Children.Add(Widget);
 
 		// Set the widget's parent
+		Widget->SetStyle(Style);
 		Widget->SetParent(this);
 		Widget->SetVisible(IsVisible(), true); // Child matches our visibility
-
+		
 		return SharedPtr<Slot>();
 	}
 
@@ -55,7 +66,7 @@ namespace Ry
 
 	}
 
-	void PanelWidget::Draw(StyleSet* Style)
+	void PanelWidget::Draw()
 	{
 		// Get clip space for entire widget
 		RectScissor ClipSpace = GetClipSpace(nullptr);
@@ -78,7 +89,7 @@ namespace Ry
 					bUpdateBatch = true;
 				}
 
-				Child->Draw(Style);
+				Child->Draw();
 			}
 			else
 			{

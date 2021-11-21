@@ -16,26 +16,26 @@ namespace Ry
 		GeneratedBody()
 
 		RefField()
-		String Text;
+		Ry::String Text;
 
-		TextStyle Style;
+		RefField()
+		Ry::String TextStyleName;
 
 		WidgetBeginArgs(Label)
 			WidgetProp(Ry::String, Text)
-			WidgetProp(BitmapFont*, Font)
-			WidgetProp(Ry::Color, Color)
+			WidgetProp(Ry::String, TextStyleName)
 		WidgetEndArgs()
 
 		Label();
 		void Construct(Args& In);
 		SizeType ComputeSize() const override;
 		Label& SetText(const Ry::String& Text);
-		Label& SetStyle(BitmapFont* Font, const Color& Color);
-		Label& SetFont(BitmapFont* Font);
+		Label& SetTextStyle(const Ry::String& StyleName);
 		const Ry::String& GetText() const;
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
-		void Draw(StyleSet* TheStyle) override;
+		void Draw() override;
+		void SetStyle(const Ry::StyleSet* Style) override;
 
 	private:
 

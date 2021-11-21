@@ -46,7 +46,7 @@ namespace Ry
 		void SetVerticalScrollAmount(float Scroll);
 		static ScrollPane::Slot MakeSlot();
 		SharedPtr<PanelWidget::Slot> AppendSlot(SharedPtr<Widget> Widget) override;
-		void Draw(StyleSet* Style) override;
+		void Draw() override;
 		/**
 		 * Arrange widgets vertically.
 		 */

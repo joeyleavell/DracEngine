@@ -129,8 +129,8 @@ namespace Ry
 		void RemoveTextStyle(Ry::String Name);
 		void RemoveBoxStyle(Ry::String Name);
 
-		TextStyle& GetTextStyle(Ry::String Name);
-		BoxStyle& GetBoxStyle(Ry::String Name);
+		const TextStyle& GetTextStyle(Ry::String Name) const;
+		const BoxStyle& GetBoxStyle(Ry::String Name) const;
 
 	private:
 
@@ -139,11 +139,13 @@ namespace Ry
 
 	};
 
-	extern USERINTERFACE_MODULE Map<Ry::String, StyleSet*> RegisteredStyles;
+	extern USERINTERFACE_MODULE Map<Ry::String, const StyleSet*> RegisteredStyles;
 
-	void RegisterStyle(Ry::String Name, StyleSet* Set);
-	void UnregisterStyle(Ry::String Name);
+	USERINTERFACE_MODULE void RegisterStyle(Ry::String Name, const StyleSet* Set);
+	USERINTERFACE_MODULE void UnregisterStyle(Ry::String Name);
 
-	StyleSet* GetStyle(Ry::String Name);
+	USERINTERFACE_MODULE const StyleSet* GetStyle(Ry::String Name);
+
+	extern USERINTERFACE_MODULE StyleSet EditorStyle;
 	
 }

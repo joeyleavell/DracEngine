@@ -13,33 +13,38 @@ namespace Ry
 {
 	ContentBrowserItem::ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name)
 	{
-		
+		this->Tex = Texture;
+		this->Font = Font;
+		this->Name = Name;
+	}
+
+	ContentBrowserItem::~ContentBrowserItem()
+	{
+		//std::cout << "killing " << *Lab->GetText() << std::endl;
+	}
+
+	void ContentBrowserItem::Construct()
+	{
 		SetChild(
 			NewWidget(Ry::VerticalPanel)
 			+
 			VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Icon, Ry::BorderWidget)
-				.DefaultImage(Texture)
-				.HoveredImage(Texture)
+				.DefaultImage(Tex)
+				.HoveredImage(Tex)
 				.HoveredImageTint(WHITE.ScaleRGB(0.5f))
 				.Padding(30.0f)
 			]
 
 			+
-				VerticalPanel::MakeSlot()
+			VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Lab, Ry::Label)
 				.Text(Name)
-				.Font(Font)
-				.Color(WHITE)
+				.TextStyleName("Normal")
 			]
 		);
-	}
-
-	ContentBrowserItem::~ContentBrowserItem()
-	{
-		//std::cout << "killing " << *Lab->GetText() << std::endl;
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -144,6 +149,8 @@ namespace Ry
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 		Grid->AppendSlot(AsWidget);
 
+		NewItem->Construct();
+
 		return NewItem;
 	}
 
@@ -153,6 +160,8 @@ namespace Ry
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 
 		Grid->AppendSlot(AsWidget);
+
+		NewItem->Construct();
 
 		return NewItem;
 	}

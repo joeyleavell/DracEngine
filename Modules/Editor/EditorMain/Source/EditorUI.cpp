@@ -17,6 +17,8 @@ namespace Ry
 	EditorUI::EditorUI(SwapChain* Parent):
 	Layer(Parent)
 	{
+		InitializeEditorStyle();
+		
 		std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
 		while (Itr)
@@ -51,7 +53,7 @@ namespace Ry
 		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 
 		// Create UI
-		UI = new UserInterface(Bat);
+		UI = new UserInterface(Bat, GetStyle("Editor"));
 
 		//VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
 
@@ -132,6 +134,25 @@ namespace Ry
 		ContentBrowse = new ContentBrowser(BrowserWidget);
 
 		UI->AddRoot(Root);
+
+		// Initialize the directory now that the content browser is added to the root
+		ContentBrowse->SetDirectory("/Engine");
+	}
+
+	void EditorUI::InitializeEditorStyle()
+	{
+		// Load editor font
+		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
+		BitmapFont* NormalTextFont = Font->GenerateBitmapFont(20);
+
+		TextStyle NormalText;
+		NormalText.SetColor(WHITE);
+		NormalText.SetFont(NormalTextFont);
+
+		EditorStyle.AddTextStyle("Normal", NormalText);
+
+		// Register the style globally
+		RegisterStyle("Editor", &EditorStyle);
 	}
 
 	void EditorUI::Update(float Delta)
