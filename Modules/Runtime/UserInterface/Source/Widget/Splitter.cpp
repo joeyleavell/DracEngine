@@ -40,12 +40,12 @@ namespace Ry
 		if(Type == SplitterType::HORIZONTAL)
 		{
 			float LeftWidth = OurSize.Width * BarPosition;
-			WidgetB->SetRelativePosition(std::ceil(LeftWidth + BarThickness), 0.0f);
+			WidgetB->SetRelativePosition(std::round(LeftWidth + BarThickness), 0.0f);
 		}
 		else // Vertical
 		{
 			float BottomHeight = OurSize.Height * BarPosition;
-			WidgetB->SetRelativePosition(0.0f, std::ceil(BottomHeight + BarThickness));
+			WidgetB->SetRelativePosition(0.0f, std::round(BottomHeight + BarThickness));
 		}
 
 		WidgetA->Arrange();
@@ -163,7 +163,7 @@ namespace Ry
 		// Draw splitter bar
 		if(Type == SplitterType::HORIZONTAL)
 		{
-			float PosX = std::floor(OurPos.X + OurSize.Width * BarPosition);
+			float PosX = OurPos.X + std::round(  OurSize.Width * BarPosition);
 			Ry::BatchRectangle(SplitterItem, WHITE, PosX, OurPos.Y, BarThickness, OurSize.Height, 1.0f);
 		}
 		else // Vertical

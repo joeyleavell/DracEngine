@@ -82,7 +82,7 @@ namespace Ry
 
 			if(Type == SplitterType::HORIZONTAL)
 			{
-				int32 SplitterWidth = std::floor(OurSize.Width * BarPosition);
+				int32 SplitterWidth = std::round(OurSize.Width * BarPosition);
 
 				if (ForWidget == Children[0].Get())
 				{
@@ -92,7 +92,7 @@ namespace Ry
 				else
 				{
 					// Clip space for right widget
-					return RectScissor{ OurSize.X + (int32) SplitterWidth + (int32)(BarThickness), OurSize.Y, OurSize.Width - (int32)SplitterWidth - (int32) BarPosition, OurSize.Height };
+					return RectScissor{(int32) std::round(OurSize.X + SplitterWidth + BarThickness), OurSize.Y, (int32) std::round(OurSize.Width - SplitterWidth - BarPosition), OurSize.Height};
 				}
 			}
 			else // Vertical
@@ -107,7 +107,7 @@ namespace Ry
 				else
 				{
 					// Clip space for top widget
-					return RectScissor{ OurSize.X, (int32) std::ceil(OurSize.Y + SplitterHeight + BarThickness), OurSize.Width, (int32)std::ceil(OurSize.Height - SplitterHeight - BarThickness)};
+					return RectScissor{ OurSize.X, (int32) std::round(OurSize.Y + SplitterHeight + BarThickness), OurSize.Width, (int32)std::round(OurSize.Height - SplitterHeight - BarThickness)};
 				}
 
 			}
