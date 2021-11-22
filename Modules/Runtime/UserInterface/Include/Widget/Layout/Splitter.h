@@ -26,20 +26,20 @@ namespace Ry
     	 */
 		float BarPosition;
 
-		WidgetBeginArgsSlot(Splitter)
+		WidgetBeginArgsSlot(Splitter, PanelWidgetSlot)
 			WidgetProp(SplitterType, Type)
 			WidgetProp(float, BarThickness)
 		WidgetEndArgs()
 
-		struct Slot : public PanelWidget::Slot
+		struct Slot : public PanelWidgetSlot
 		{
 			Slot() :
-				PanelWidget::Slot()
+				PanelWidgetSlot()
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid) :
-				PanelWidget::Slot(Wid)
+				PanelWidgetSlot(Wid)
 			{
 			}
 		};
@@ -52,7 +52,7 @@ namespace Ry
     	RectScissor GetClipSpace(const Widget* ForWidget) const override;
 		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates) override;
 		PipelineState GetPipelineState(const Widget* ForWidget) const override;
-    	SharedPtr<PanelWidget::Slot> AppendSlot(SharedPtr<Widget> Widget) override;
+    	SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget) override;
 
     	void OnShow(Ry::Batch* Batch) override;
     	void OnHide(Ry::Batch* Batch) override;

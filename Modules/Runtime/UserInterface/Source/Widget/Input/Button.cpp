@@ -41,5 +41,5 @@ namespace Ry
 
 		return true;
 	}
-	
+
 }

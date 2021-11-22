@@ -5,6 +5,7 @@
 #include "Data/ArrayList.h"
 #include "2D/Batch/Batch.h"
 #include "UserInterfaceGen.h"
+#include "Slot/PanelWidgetSlot.h"
 
 namespace Ry
 {
@@ -13,129 +14,15 @@ namespace Ry
 	{
 	public:
 
-		class Slot
-		{
-		public:
-
-			SizeMode Mode;
-			SizeType Size;
-
-			Slot()
-			{
-			}
-
-			virtual ~Slot()
-			{
-				
-			}
-
-			Slot(SharedPtr<Ry::Widget> Wid)
-			{
-				this->Widget = Wid;
-			}
-
-			Slot& operator[](SharedPtr<Ry::Widget> Child)
-			{
-				this->Widget = Child;
-				return *this;
-			}
-
-			SharedPtr<Ry::Widget> GetWidget()
-			{
-				return Widget;
-			}
-
-			Margin GetPadding()
-			{
-				return SlotPadding;
-			}
-
-			Slot& SetPadding(float Padding)
-			{
-				this->SlotPadding = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-			
-			Slot& SetBottomPadding(float Padding)
-			{
-				this->SlotPadding.Bottom = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-			Slot& SetTopPadding(float Padding)
-			{
-				this->SlotPadding.Top = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-			Slot& SetLeftPadding(float Padding)
-			{
-				this->SlotPadding.Left = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-			Slot& SetRightPadding(float Padding)
-			{
-				this->SlotPadding.Right = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-			Slot& SetPadding(float Horizontal, float Vertical)
-			{
-				this->SlotPadding.Set(Horizontal, Vertical);
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-			Slot& SetPadding(Margin Padding)
-			{
-				this->SlotPadding = Padding;
-
-				MarkWidgetDirty();
-
-				return *this;
-			}
-
-		protected:
-			
-			SharedPtr<Ry::Widget> Widget;
-			Margin SlotPadding;
-
-			void MarkWidgetDirty()
-			{
-				if(Widget.IsValid())
-				{
-					Widget->MarkDirty(Widget.Get());
-				}
-			}
-
-		};
-
-		WidgetBeginArgsSlot(PanelWidget)
+		WidgetBeginArgsSlot(PanelWidget, Ry::PanelWidgetSlot)
 		WidgetEndArgs()
 
 		PanelWidget();
 
 		void Construct(Args& In);
+		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
-		virtual SharedPtr<Slot> AppendSlot(SharedPtr<Widget> Widget);
+		virtual SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget);
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
 		void SetParent(Widget* Parent) override;
@@ -155,6 +42,6 @@ namespace Ry
 	protected:
 
 		Ry::ArrayList<SharedPtr<Widget>> Children;
-	};
+	} RefClass();
 
 }

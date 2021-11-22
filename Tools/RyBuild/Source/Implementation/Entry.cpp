@@ -87,7 +87,8 @@ int main(int ArgCount, char** ArgValues)
 	}
 	else if (SubprogramCmd == "rebuild")
 	{
-		if(!RebuildCmd(Args))
+		bool bResult = RebuildCmd(Args);
+		if(!bResult)
 		{
 			return 1;
 		}

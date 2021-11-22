@@ -5,13 +5,18 @@
 #include "Drawable.h"
 #include "Style.h"
 #include "Widget/Layout/SlotWidget.h"
-#include "UserInterfaceGen.h"
+#include "BorderWidget.gen.h"
 
 namespace Ry
 {
 	class USERINTERFACE_MODULE BorderWidget : public SlotWidget
 	{
 	public:
+
+		GeneratedBody()
+
+		RefField()
+		Ry::String BoxStyleName;
 
 		WidgetBeginArgs(BorderWidget)
 			WidgetProp(float, FillX)
@@ -33,6 +38,7 @@ namespace Ry
 		WidgetEndArgs()
 
 		void Construct(Args& In);
+		
 		BorderWidget();
 		BorderWidget& Box(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize);
 		BorderWidget& DefaultImage(Texture* Image, Color ImageTint = WHITE);
@@ -52,12 +58,12 @@ namespace Ry
 
 	private:
 
-		Ry::String BoxStyleName;
+		Ry::SharedPtr<BatchItemSet> ItemSet;
 
 		/**
 		 * The styling for various states of this box element.
 		 */
 		//BoxStyle BStyle;
 		
-	};
+	} RefClass();
 }

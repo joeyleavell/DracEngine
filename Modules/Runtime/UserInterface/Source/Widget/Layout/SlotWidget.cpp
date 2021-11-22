@@ -25,6 +25,19 @@ namespace Ry
 		}
 	}
 
+	SharedPtr<Widget> SlotWidget::FindChildWidgetById(const Ry::String& Id) const
+	{
+		if(Child)
+		{
+			if (Id == Child->GetId())
+				return Child;
+			else
+				return Child->FindChildWidgetById(Id);
+		}
+
+		return SharedPtr<Ry::Widget>();
+	}
+
 	void SlotWidget::SetStyle(const Ry::StyleSet* Style)
 	{
 		Widget::SetStyle(Style);

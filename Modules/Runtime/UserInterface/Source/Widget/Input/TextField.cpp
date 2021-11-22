@@ -6,7 +6,7 @@ namespace Ry
 	void TextField::Construct(Args& In)
 	{
 		this->SetText(In.mText);
-		this->SetStyle(In.mFont, In.mColor);
+		//this->SetStyle(In.mFont, In.mColor);
 
 		this->bTextSizeDirty = true;
 	}
@@ -26,8 +26,10 @@ namespace Ry
 	{
 		if (bTextSizeDirty)
 		{
-			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : Style.Font->MeasureWidth(Text));
-			CachedSize.Height = static_cast<int32>(Style.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
+			const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
+			
+			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : ResolvedStyle.Font->MeasureWidth(Text));
+			CachedSize.Height = static_cast<int32>(ResolvedStyle.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
 			bTextSizeDirty = false;
 		}
 
@@ -51,20 +53,13 @@ namespace Ry
 		return *this;
 	}
 
-	TextField& TextField::SetStyle(BitmapFont* Font, const Color& Color)
+	TextField& TextField::SetStyle(const Ry::String& TextStyleName)
 	{
-		Style.SetFont(Font).SetColor(Color);
-		bTextSizeDirty = true;
-
-		return *this;
-	}
-
-	TextField& TextField::SetFont(BitmapFont* Font)
-	{
-		Style.SetFont(Font);
+		this->TextStyleName = TextStyleName;
 		bTextSizeDirty = true;
 
 		MarkDirty(this);
+
 		return *this;
 	}
 
@@ -75,7 +70,9 @@ namespace Ry
 
 	void TextField::OnShow(Ry::Batch* Batch)
 	{
-		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), Style.Font->GetAtlasTexture(), WidgetLayer + 1);
+		const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
+
+		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), ResolvedStyle.Font->GetAtlasTexture(), WidgetLayer + 1);
 		Batch->AddItem(CursorItem, "Shape", GetPipelineState(this), nullptr, WidgetLayer + 1);
 
 		if (CursorPos != SelectionPos && SelectionPos >= 0)
@@ -92,19 +89,21 @@ namespace Ry
 
 	void TextField::Draw()
 	{
+		const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
+
 		if (IsVisible())
 		{
 			Point Abs = GetAbsolutePosition();
 			SizeType Size = ComputeSize();
-			Ry::BatchText(ItemSet, Style.TextColor, Style.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + Size.Height), static_cast<float>(ComputeSize().Width));
+			Ry::BatchText(ItemSet, ResolvedStyle.TextColor, ResolvedStyle.Font, ComputedTextData, static_cast<float>(Abs.X), static_cast<float>(Abs.Y + Size.Height), static_cast<float>(ComputeSize().Width));
 
 			Ry::ArrayList<float> XOffsets;
-			Style.Font->MeasureXOffsets(XOffsets, Text);
+			ResolvedStyle.Font->MeasureXOffsets(XOffsets, Text);
 
 			// Draw cursor
 			float CursorX = XOffsets[CursorPos] + Abs.X;
-			float Height = (float)(Style.Font->GetAscent() - Style.Font->GetDescent());
-			Ry::BatchRectangle(CursorItem, WHITE, CursorX, (float)(Abs.Y + Style.Font->GetDescent()), 1.0f, Height, 0.0f);
+			float Height = (float)(ResolvedStyle.Font->GetAscent() - ResolvedStyle.Font->GetDescent());
+			Ry::BatchRectangle(CursorItem, WHITE, CursorX, (float)(Abs.Y + ResolvedStyle.Font->GetDescent()), 1.0f, Height, 0.0f);
 
 			// Draw selection if applicable
 			if (SelectionPos >= 0)
@@ -114,7 +113,7 @@ namespace Ry
 				float Width = std::abs(SelectionX - CursorX);
 				float X = Abs.X + (CursorX < SelectionX ? CursorX : SelectionX);
 
-				Ry::BatchRectangle(SelectionItem, WHITE.ScaleRGB(0.1f), X, (float)(Abs.Y + Style.Font->GetDescent()), Width, Height, 0.0f);
+				Ry::BatchRectangle(SelectionItem, WHITE.ScaleRGB(0.1f), X, (float)(Abs.Y + ResolvedStyle.Font->GetDescent()), Width, Height, 0.0f);
 			}
 
 		}
@@ -122,11 +121,13 @@ namespace Ry
 
 	int32 TextField::FindClosestCursorIndex(int32 Offset)
 	{
+		const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
+
 		int32 RetCursorPos = -1;
 
 		// Calc offsets
 		Ry::ArrayList<float> XOffsets;
-		Style.Font->MeasureXOffsets(XOffsets, Text);
+		ResolvedStyle.Font->MeasureXOffsets(XOffsets, Text);
 
 		// Find closest offset
 		int32 SmallestDiff = INT32_MAX;
@@ -157,7 +158,7 @@ namespace Ry
 			CursorPos = CursorAdvanceRight(Initial);
 			SelectionPos = CursorAdvanceLeft(Initial);
 
-			MarkDirty(this);
+			MarkDirty(this, true);
 
 			return true;
 		}
@@ -447,7 +448,7 @@ namespace Ry
 
 		CursorPos += Insert.getSize();
 		SelectionPos = -1; // Selection immediately goes away on type
-		MarkDirty(this);
+		MarkDirty(this, true);
 	}
 
 	bool TextField::OnKey(const KeyEvent& KeyEv)
@@ -471,7 +472,7 @@ namespace Ry
 					SelectionPos = 0;
 					CursorPos = Text.getSize();
 
-					MarkDirty(this);
+					MarkDirty(this, true);
 				}
 
 				// Pasting text
@@ -496,7 +497,7 @@ namespace Ry
 				HandleRightArrow(KeyEv);
 			}
 
-			MarkDirty(this);
+			MarkDirty(this, true);
 		}
 
 		return true;

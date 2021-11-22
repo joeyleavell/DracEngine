@@ -238,7 +238,7 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
       Out.close(); 
     }
 
-
+    return true;
 }
 
 bool GenerateGameProjectFiles_VSCode(std::string GameName, std::string GameRootPath, std::string EngineRootPath, std::string Compiler)

@@ -21,7 +21,7 @@ namespace Ry
 		// Create the editor style
 		InitializeEditorStyle();
 		
-		std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
+		/*std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
 		while (Itr)
 		{
@@ -32,9 +32,9 @@ namespace Ry
 				std::cout << "\t" << *Field.Name << " " << *Field.Type->Name << std::endl;
 			}
 			++Itr;
-		}
+		}*/
 
-		TestRefl Object; 
+		//TestRefl Object; 
 
 		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget("/Engine/UI/TestUI.ui");
 		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
@@ -56,8 +56,6 @@ namespace Ry
 
 		// Create UI
 		UI = new UserInterface(Bat, GetStyle("Editor"));
-
-		//VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
 
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;

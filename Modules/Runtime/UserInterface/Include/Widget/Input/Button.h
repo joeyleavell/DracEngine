@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Widget/Layout/SlotWidget.h"
-#include "UserInterfaceGen.h"
+#include "Button.gen.h"
 
 namespace Ry
 {
@@ -9,6 +9,8 @@ namespace Ry
 	class USERINTERFACE_MODULE Button : public SlotWidget
 	{
 	public:
+
+		GeneratedBody()
 
 		MulticastDelegate<> OnButtonPressed;
 		MulticastDelegate<> OnButtonReleased;
@@ -31,6 +33,6 @@ namespace Ry
 
 		bool bButtonPressed = false;
 		
-	};
+	} RefClass();
 	
 }

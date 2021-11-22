@@ -2,7 +2,7 @@
 
 #include "Widget/Layout/PanelWidget.h"
 #include "Data/Set.h"
-#include "UserInterfaceGen.h"
+#include "GridPanel.gen.h"
 
 namespace Ry
 {
@@ -21,22 +21,30 @@ namespace Ry
 	class USERINTERFACE_MODULE GridPanel : public PanelWidget
 	{
 	public:
-		
-		class Slot : public PanelWidget::Slot
+
+		GeneratedBody()
+
+		RefField()
+		float CellWidth = 50.0f;
+
+		RefField()
+		float CellHeight = 50.0f;
+
+		class Slot : public PanelWidgetSlot
 		{
 		public:
 			int32 Row;
 			int32 Column;
 
 			Slot() :
-			PanelWidget::Slot(),
+			PanelWidgetSlot(),
 			Row(0),
 			Column(0)
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid) :
-			PanelWidget::Slot(Wid),
+			PanelWidgetSlot(Wid),
 			Row(0),
 			Column(0)
 			{
@@ -44,14 +52,14 @@ namespace Ry
 			
 		};
 		
-		WidgetBeginArgsSlot(GridPanel)
+		WidgetBeginArgsSlot(GridPanel, GridPanel::Slot)
 			WidgetProp(float, CellWidth)
 			WidgetProp(float, CellHeight)
 		WidgetEndArgs()
 
 		void Construct(Args& In);
 
-		Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Widget> Widget) override;
+		Ry::SharedPtr<PanelWidgetSlot> AppendSlot(Ry::SharedPtr<Widget> Widget) override;
 
 		/**
 		 * Arrange widgets vertically.
@@ -73,13 +81,10 @@ namespace Ry
 
 		int32 MaxCols = 5;
 
-		float CellWidth  = 50.0f;
-		float CellHeight = 50.0f;
-
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
 		Ry::Set<SlotPosition> Occupied;
-	};
+	} RefClass();
 
 	template <>
 	inline uint32 HashImpl<Ry::SlotPosition>(HashTypeTag<Ry::SlotPosition>, const Ry::SlotPosition& Object)

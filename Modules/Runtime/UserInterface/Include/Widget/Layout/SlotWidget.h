@@ -3,13 +3,30 @@
 #include "Widget/Widget.h"
 #include "Drawable.h"
 #include "Style.h"
-#include "UserInterfaceGen.h"
+#include "SlotWidget.gen.h"
 
 namespace Ry
 {
 	class USERINTERFACE_MODULE SlotWidget : public Widget
 	{
 	public:
+
+		GeneratedBody()
+
+		/**
+		 * The padding of the inner content of this box element.
+		 */
+		RefField()
+		float PaddingLeft;
+
+		RefField()
+		float PaddingRight;
+
+		RefField()
+		float PaddingTop;
+
+		RefField()
+		float PaddingBottom;
 
 		WidgetBeginArgs(SlotWidget)
 			WidgetProp(float, FillX)
@@ -22,6 +39,7 @@ namespace Ry
 		SlotWidget();
 		void Construct(Args& In);
 
+		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
 		void SetParent(Widget* Parent) override;
 		SlotWidget& Padding(float Pad);
@@ -71,12 +89,7 @@ namespace Ry
 		 */
 		SharedPtr<Ry::Widget> Child;
 
-		/**
-		 * The padding of the inner content of this box element.
-		 */
-		float PaddingLeft, PaddingRight, PaddingTop, PaddingBottom;
-
 		VAlign VerticalAlign;
 		HAlign HorizontalAlign;
-	};
+	} RefClass();
 }

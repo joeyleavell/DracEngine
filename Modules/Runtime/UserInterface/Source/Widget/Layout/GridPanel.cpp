@@ -65,7 +65,7 @@ namespace Ry
 		return NewSlot;
 	}
 
-	Ry::SharedPtr<PanelWidget::Slot> GridPanel::AppendSlot(Ry::SharedPtr<Widget> Widget)
+	Ry::SharedPtr<PanelWidgetSlot> GridPanel::AppendSlot(Ry::SharedPtr<Widget> Widget)
 	{
 		// Create widget
 		SharedPtr<GridPanel::Slot> PanelSlot = MakeShared(new GridPanel::Slot(Widget));

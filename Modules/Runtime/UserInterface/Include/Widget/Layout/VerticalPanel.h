@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Widget/Layout/PanelWidget.h"
-#include "UserInterfaceGen.h"
+#include "VerticalPanel.gen.h"
 
 namespace Ry
 {
@@ -10,15 +10,17 @@ namespace Ry
 	{		
 	public:
 
-		struct Slot : public PanelWidget::Slot
+		GeneratedBody()
+
+		struct Slot : public PanelWidgetSlot
 		{
 			Slot() :
-			PanelWidget::Slot()
+			PanelWidgetSlot()
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid) :
-			PanelWidget::Slot(Wid)
+			PanelWidgetSlot(Wid)
 			{
 			}
 
@@ -30,13 +32,13 @@ namespace Ry
 
 		};
 
-		WidgetBeginArgsSlot(VerticalPanel)
+		WidgetBeginArgsSlot(VerticalPanel, VerticalPanel::Slot)
 			WidgetProp(float, Pad)
 		WidgetEndArgs()
 
 		void Construct(Args& In);
 		static Slot MakeSlot();
-		virtual Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override;
+		Ry::SharedPtr<PanelWidgetSlot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override;
 
 		/**
 		 * Arrange widgets vertically.
@@ -49,6 +51,6 @@ namespace Ry
 
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
-	};
+	} RefClass();
 
 }

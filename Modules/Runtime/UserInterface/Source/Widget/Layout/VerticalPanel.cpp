@@ -4,7 +4,7 @@ namespace Ry
 {
 	void VerticalPanel::Construct(Args& In)
 	{
-		for (PanelWidget::Slot& Child : In.Slots)
+		for (PanelWidgetSlot& Child : In.Slots)
 		{
 			AppendSlot(Child.GetWidget());
 		}
@@ -16,7 +16,7 @@ namespace Ry
 		return NewSlot;
 	}
 
-	Ry::SharedPtr<PanelWidget::Slot> VerticalPanel::AppendSlot(Ry::SharedPtr<Ry::Widget> Widget)
+	Ry::SharedPtr<PanelWidgetSlot> VerticalPanel::AppendSlot(Ry::SharedPtr<Ry::Widget> Widget)
 	{
 		PanelWidget::AppendSlot(Widget);
 

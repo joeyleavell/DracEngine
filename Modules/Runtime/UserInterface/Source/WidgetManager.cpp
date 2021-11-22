@@ -3,6 +3,7 @@
 #include "File/File.h"
 #include "Widget/BorderWidget.h"
 #include "Widget/Label.h"
+#include "Widget/Layout/PanelWidget.h"
 
 using namespace rapidxml;
 
@@ -41,7 +42,7 @@ namespace Ry
 			catch(const parse_error& E)
 			{
 				// Failed to parse, don't cache
-				Ry::Log->LogErrorf("Failed to load widget from XML file due to parse error: %s", E.what());
+				Ry::Log->LogErrorf("Failed to load widget from XML file due to parse error: %s at %d", E.what(), E.where<char>());
 				return MakeShared<Ry::Widget>(nullptr);
 			}
 
@@ -67,7 +68,6 @@ namespace Ry
 
 		Ry::SharedPtr<Widget> Result;
 
-		
 		if(const Ry::ReflectedClass* WidgetClass = GetReflectedClass(Name))
 		{
 			// Create new widget
@@ -83,9 +83,13 @@ namespace Ry
 
 					if (const Ry::Field* Field = WidgetClass->FindFieldByName(AttribName))
 					{
-						// Assign string property
-						if(Field->Type->Name == "Ry::String")
+						// Strings
+						if(Field->Type->Name == GetType<Ry::String>()->Name)
 							(*Field->GetPtrToField<Ry::String>(Result.Get())) = Attrib->value();
+
+						// Floats
+						if (Field->Type->Name == GetType<float>()->Name)
+							(*Field->GetPtrToField<float>(Result.Get())) = Ry::ParseFloat(Attrib->value());
 					}
 					else
 					{
@@ -95,28 +99,65 @@ namespace Ry
 					Attrib = Attrib->next_attribute();
 				}
 
-				// Load all children of this widget
-				Ry::ArrayList<Ry::SharedPtr<Widget>> ChildrenWidgets;
-				xml_node<>* ChildNode = Node->first_node();
-				while(ChildNode)
+				if (Ry::PanelWidget* AsPanel = dynamic_cast<Ry::PanelWidget*>(Result.Get()))
 				{
-					Ry::SharedPtr<Widget> Result = LoadWidgetSingle(ChildNode);
-					ChildrenWidgets.Add(Result);
-					ChildNode = ChildNode->next_sibling();
+					// If this is a panel widget, expect all of the children to be slot widgets
+
+					xml_node<>* ChildNode = Node->first_node();
+					while (ChildNode)
+					{
+						CORE_ASSERTF(Ry::String(ChildNode->name()) == "Slot", "Children elements of PanelWidget must be named Slot");
+
+						// Count the number of children of the slot element
+
+						// Assert that this child slot has only a single child
+						CORE_ASSERTF((ChildNode->first_node() != nullptr) && (ChildNode->first_node()->next_sibling() == nullptr), "There must be only a single child of slot elements");
+
+						if(Ry::SharedPtr<Widget> SlotChild = LoadWidgetSingle(ChildNode->first_node()))
+						{
+							SharedPtr<PanelWidgetSlot> Slot = AsPanel->AppendSlot(SlotChild);
+							
+							// Set elements of panel slot
+							xml_attribute<>* Attrib = Node->first_attribute();
+							while (Attrib)
+							{
+								Attrib = Attrib->next_attribute();
+							}
+						}
+						else
+						{
+							Ry::Log->LogErrorf("Failed to load slot widget %s", ChildNode->first_node()->name());
+						}
+						
+						ChildNode = ChildNode->next_sibling();
+					}
+				}
+				else
+				{
+					// Since we're not a panel, children can be anything
+					
+					// Load all children of this widget
+					Ry::ArrayList<Ry::SharedPtr<Widget>> ChildrenWidgets;
+					xml_node<>* ChildNode = Node->first_node();
+					while (ChildNode)
+					{
+						Ry::SharedPtr<Widget> Result = LoadWidgetSingle(ChildNode);
+						ChildrenWidgets.Add(Result);
+						ChildNode = ChildNode->next_sibling();
+					}
+
+					if (Ry::SlotWidget* AsSlot = dynamic_cast<Ry::SlotWidget*>(Result.Get()))
+					{
+						// Assert that there is only 1 child widget
+						CORE_ASSERTF(ChildrenWidgets.GetSize() == 1 || ChildrenWidgets.GetSize() == 0, "There must either be 1 or 0 children of a slot widget");
+
+						if(ChildrenWidgets.GetSize() == 1 && ChildrenWidgets[0].IsValid())
+						{
+							AsSlot->SetChild(ChildrenWidgets[0]);
+						}
+					}
 				}
 
-				if(Ry::SlotWidget* AsSlot = dynamic_cast<Ry::SlotWidget*>(Result.Get()))
-				{
-					// Assert that there is only 1 child widget
-					CORE_ASSERTF(ChildrenWidgets.GetSize() == 1, "There must only be 1 child of a slot widget");
-
-					AsSlot->SetChild(ChildrenWidgets[0]);
-				}
-
-				// if (Ry::PanelWidget* AsPanel = dynamic_cast<Ry::PanelWidget*>(Result.Get()))
-				// {
-				// 	AsPanel->
-				// }
 			}
 			else
 			{

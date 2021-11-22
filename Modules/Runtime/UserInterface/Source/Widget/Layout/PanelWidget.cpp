@@ -12,6 +12,27 @@ namespace Ry
 	{
 	}
 
+	SharedPtr<Widget> PanelWidget::FindChildWidgetById(const Ry::String& Id) const
+	{
+		for (SharedPtr<Widget> Child : Children)
+		{
+			if(Child->GetId() == Id)
+			{
+				return Child;
+			}
+			else
+			{
+				SharedPtr<Widget> ChildWidget = Child->FindChildWidgetById(Id);
+				if(ChildWidget.IsValid())
+				{
+					return ChildWidget;
+				}
+			}
+		}
+
+		return SharedPtr<Widget>();
+	}
+
 	void PanelWidget::SetStyle(const Ry::StyleSet* Style)
 	{
 		Widget::SetStyle(Style);
@@ -22,7 +43,7 @@ namespace Ry
 		}
 	}
 
-	SharedPtr<PanelWidget::Slot> PanelWidget::AppendSlot(SharedPtr<Widget> Widget)
+	SharedPtr<PanelWidgetSlot> PanelWidget::AppendSlot(SharedPtr<Widget> Widget)
 	{
 		Children.Add(Widget);
 
@@ -31,7 +52,7 @@ namespace Ry
 		Widget->SetParent(this);
 		Widget->SetVisible(IsVisible(), true); // Child matches our visibility
 		
-		return SharedPtr<Slot>();
+		return SharedPtr<PanelWidgetSlot>();
 	}
 
 	void PanelWidget::OnShow(Ry::Batch* Batch)

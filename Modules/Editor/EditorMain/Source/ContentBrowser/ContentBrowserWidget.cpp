@@ -8,6 +8,7 @@
 #include "Widget/Layout/HorizontalPanel.h"
 #include "Widget/Layout/ScrollPane.h"
 #include "Widget/Input/Button.h"
+#include "WidgetManager.h"
 
 namespace Ry
 {
@@ -15,36 +16,27 @@ namespace Ry
 	{
 		this->TileIconStyle = TileIconStyle;
 		this->Name = Name;
+
+		Ry::SharedPtr<Widget> ItemWidget = LoadWidget("/Engine/UI/ContentBrowserItem.ui");
+
+		// Set the style of the icon
+		Icon = ItemWidget->FindChildWidget<Ry::BorderWidget>("Icon");
+		Icon->BoxStyleName = TileIconStyle;
+
+		// Set the name of the tile
+		Lab = ItemWidget->FindChildWidget<Ry::Label>("Name");
+		Lab->SetText(Name);
+
+		SetChild(ItemWidget);
+
 	}
 
 	ContentBrowserItem::~ContentBrowserItem()
 	{
-		//std::cout << "killing " << *Lab->GetText() << std::endl;
 	}
 
 	void ContentBrowserItem::Construct()
 	{
-		SetChild(
-			NewWidget(Ry::VerticalPanel)
-			+
-			VerticalPanel::MakeSlot()
-			[
-				NewWidgetAssign(Icon, Ry::BorderWidget)
-				.BoxStyleName(TileIconStyle)
-//				.DefaultImage(Tex)
-	//			.HoveredImage(Tex)
-//				.HoveredImageTint(WHITE.ScaleRGB(0.5f))
-				.Padding(30.0f)
-			]
-
-			+
-			VerticalPanel::MakeSlot()
-			[
-				NewWidgetAssign(Lab, Ry::Label)
-				.TextStyleName("Normal")
-				.Text(Name)
-			]
-		);
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -61,11 +53,21 @@ namespace Ry
 
 	ContentBrowserWidget::ContentBrowserWidget()
 	{
-		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		TextFont = Font->GenerateBitmapFont(20);
+		// VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
+		// TextFont = Font->GenerateBitmapFont(20);
+		
+		Ry::SharedPtr<Widget> ContentBrowser = LoadWidget("/Engine/UI/ContentBrowser.ui");
+		if(ContentBrowser.IsValid())
+		{
+			UpArrow     = ContentBrowser->FindChildWidget<Ry::Button>("UpArrow");
+			CurDirLabel = ContentBrowser->FindChildWidget<Ry::TextField>("CurrentDirectory");
+			Grid = ContentBrowser->FindChildWidget<Ry::GridPanel>("ContentGrid");
+		}
 
+		SetChild(ContentBrowser);
+		
 		// Create directory grid
-		SetChild(
+		/*SetChild(
 			NewWidget(VerticalPanel)
 			+ 
 			VerticalPanel::MakeSlot()
@@ -79,7 +81,6 @@ namespace Ry
 					[
 						// Up directory
 						NewWidgetAssign(UpArrow, Ry::Button)
-
 						[
 							NewWidget(BorderWidget)
 							.BoxStyleName("UpArrowIcon")
@@ -115,7 +116,7 @@ namespace Ry
 				]
 
 			]
-		);
+		);*/
 
 	}
 

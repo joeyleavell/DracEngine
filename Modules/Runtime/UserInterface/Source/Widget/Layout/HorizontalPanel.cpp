@@ -5,7 +5,7 @@ namespace Ry
 
 	void HorizontalPanel::Construct(HorizontalPanel::Args& In)
 	{
-		for (PanelWidget::Slot& Child : In.Slots)
+		for (PanelWidgetSlot& Child : In.Slots)
 		{
 			SharedPtr<Slot> Result = CastShared<Slot>(AppendSlot(Child.GetWidget()));
 			Result->SetPadding(Child.GetPadding());
@@ -78,7 +78,7 @@ namespace Ry
 		return Result;
 	}
 
-	Ry::SharedPtr<PanelWidget::Slot> HorizontalPanel::AppendSlot(Ry::SharedPtr<Ry::Widget> Widget)
+	Ry::SharedPtr<PanelWidgetSlot> HorizontalPanel::AppendSlot(Ry::SharedPtr<Ry::Widget> Widget)
 	{
 		PanelWidget::AppendSlot(Widget);
 

@@ -7,6 +7,7 @@
 #include "Style.h"
 #include "Keys.h"
 #include "Core/PlatformProcess.h"
+#include "TextField.gen.h"
 
 namespace Ry
 {
@@ -14,6 +15,11 @@ namespace Ry
 	class USERINTERFACE_MODULE TextField : public Widget
 	{
 	public:
+
+		GeneratedBody()
+
+		RefField()
+		Ry::String TextStyleName;
 
 		WidgetBeginArgs(TextField)
 			WidgetProp(Ry::String, Text)
@@ -37,8 +43,7 @@ namespace Ry
 		void Draw() override;
 
 		TextField& SetText(const Ry::String& Text);
-		TextField& SetStyle(BitmapFont* Font, const Color& Color);
-		TextField& SetFont(BitmapFont* Font);
+		TextField& SetStyle(const Ry::String& TextStyleName);
 		const Ry::String& GetText() const;
 
 		int32 FindClosestCursorIndex(int32 Offset);
@@ -72,13 +77,12 @@ namespace Ry
 		PrecomputedTextData ComputedTextData;
 		String Text;
 
-		TextStyle Style;
 		Ry::SharedPtr<BatchItemSet> ItemSet;
 
 		Ry::SharedPtr<BatchItem> CursorItem;
 		
 		Ry::SharedPtr<BatchItem> SelectionItem;
 
-	};
+	} RefClass();
 	
 }

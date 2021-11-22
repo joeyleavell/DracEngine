@@ -158,6 +158,8 @@ namespace Ry
 		else
 			Bat->Update(); // Just update batch
 
+		Bat->Render();
+
 	}
 
 }

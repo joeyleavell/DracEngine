@@ -282,42 +282,84 @@ namespace Ry
 				else
 					GeneratedSource << "\tC.ParentClass = nullptr;\\" << std::endl;
 
-				// Resize fields member
-				GeneratedSource << "\tC.Fields.SetSize(" << Record.Fields.size() << ");\\" << std::endl;
-
-				// Reflect all fields
-				for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++)
+				auto ReflectField = [this, QualifiedName](const FieldDecl* Decl, int FieldIndex) -> std::string
 				{
-					const FieldDecl* Decl = Record.Fields[FieldIndex];
-
 					std::string FieldType = Decl->getType().getAsString();
 
 					std::string FieldsVar = "C.Fields[" + std::to_string(FieldIndex) + "]";
 
-					GeneratedSource << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";\\" << std::endl;
-					GeneratedSource << "\t" << FieldsVar << ".Offset = offsetof(" << QualifiedName << ", " << Decl->getNameAsString() << ");\\" << std::endl;
+					std::ostringstream ReflectFieldsResult;
 
-					if(Decl->getType()->isIntegerType() 
+					ReflectFieldsResult << "\t" << FieldsVar << ".Name = \"" << Decl->getNameAsString() << "\";\\" << std::endl;
+					ReflectFieldsResult << "\t" << FieldsVar << ".Offset = offsetof(" << QualifiedName << ", " << Decl->getNameAsString() << ");\\" << std::endl;
+
+					if (Decl->getType()->isIntegerType()
 						|| Decl->getType()->isFloatingType()
 						|| IsRyString(Decl->getType())
 						|| IsArrayList(Decl->getType()))
 					{
-						GeneratedSource << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();\\" << std::endl;
-						GeneratedSource << "\t" << FieldsVar << ".ObjectClass = nullptr;\\" << std::endl;
+						ReflectFieldsResult << "\t" << FieldsVar << ".Type = GetType<" << FieldType << ">();\\" << std::endl;
+						ReflectFieldsResult << "\t" << FieldsVar << ".ObjectClass = nullptr;\\" << std::endl;
 					}
-					else if(Decl->getType()->isPointerType())
+					else if (Decl->getType()->isPointerType())
 					{
-						if(const CXXRecordDecl* PointerTo = Decl->getType()->getPointeeCXXRecordDecl())
+						if (const CXXRecordDecl* PointerTo = Decl->getType()->getPointeeCXXRecordDecl())
 						{
 							// Pointer type was already determined to have a valid pointer-to
 							std::string DeclQualifiedType = PointerTo->getQualifiedNameAsString();
-							GeneratedSource << "\t" << FieldsVar << ".Type = " << DeclQualifiedType << "::GetStaticType();\\" << std::endl;
-							GeneratedSource << "\t" << FieldsVar << ".ObjectClass = " << DeclQualifiedType << "::GetStaticClass();\\" << std::endl;
+							ReflectFieldsResult << "\t" << FieldsVar << ".Type = " << DeclQualifiedType << "::GetStaticType();\\" << std::endl;
+							ReflectFieldsResult << "\t" << FieldsVar << ".ObjectClass = " << DeclQualifiedType << "::GetStaticClass();\\" << std::endl;
 						}
 					}
-					
 
+					return ReflectFieldsResult.str();
+				};
+
+				std::ostringstream AllReflectedFields;
+
+				// Reflect all fields in this class
+				int CurrentFieldIndex = 0;
+				for (int FieldIndex = 0; FieldIndex < Record.Fields.size(); FieldIndex++, CurrentFieldIndex++)
+				{
+					const FieldDecl* Decl = Record.Fields[FieldIndex];
+
+					AllReflectedFields << ReflectField(Decl, CurrentFieldIndex);
 				}
+
+				// Reflect parent fields
+				if(Record.Decl->getNumBases() == 1)
+				{
+					CXXRecordDecl* CurrentParent = Record.Decl->bases_begin()->getType()->getAsCXXRecordDecl();
+					while (CurrentParent)
+					{
+						// Iterate through parent fields and check if they are eligable for reflection
+						for (auto FieldItr = CurrentParent->field_begin(); FieldItr != CurrentParent->field_end(); FieldItr++)
+						{
+							if (IsDeclReflected(*FieldItr))
+							{
+								// Reflect this field
+								AllReflectedFields << ReflectField(*FieldItr, CurrentFieldIndex);
+
+								CurrentFieldIndex++;
+							}
+						}
+
+						if (CurrentParent->getNumBases() == 1)
+						{
+							CurrentParent = CurrentParent->bases_begin()->getType()->getAsCXXRecordDecl();
+						}
+						else
+						{
+							CurrentParent = nullptr;
+						}
+					}
+				}
+
+				// Declare size of fields array based on the fields of this class and the parent class
+				GeneratedSource << "\tC.Fields.SetSize(" << CurrentFieldIndex << ");\\" << std::endl;
+
+				// Print all all of the reflected fields after we've declared the size
+				GeneratedSource << AllReflectedFields.str();
 
 				// Reflect all functions/methods
 				for (int FunctionIndex = 0; FunctionIndex < Record.Functions.size(); FunctionIndex++)
@@ -554,9 +596,6 @@ namespace Ry
 		// Set C++ standard
 		Args.push_back("-std=c++17");
 
-		// C++ standard lib
-		Args.push_back("-stdlib=libc++");
-
 		// TODO: need to do this in a more robust way for OSX
 		std::vector<std::string> SystemLibs = {
 			"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
@@ -632,10 +671,6 @@ int main(int ArgC, char** ArgV)
 	std::vector<std::string> Args;
 	for (int Arg = 1; Arg < ArgC; Arg++)
 		Args.push_back(ArgV[Arg]);
-
-	for (std::string Arg : Args)
-		std::cout << Arg << std::endl;
-	std::cout << std::endl;
 
 	// Arg spec: ./Tool <SouceFile> <HeaderFile> <OutputFile> [options]
 	// Options:

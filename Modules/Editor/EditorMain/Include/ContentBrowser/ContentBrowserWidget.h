@@ -39,8 +39,6 @@ namespace Ry
 	{
 	public:
 
-		Ry::SharedPtr<Ry::ScrollPane> Pane;
-
 		Ry::SharedPtr<TextField> CurDirLabel;
 		Ry::SharedPtr<Button> UpArrow;
 
@@ -55,7 +53,6 @@ namespace Ry
 
 	private:
 
-		BitmapFont* TextFont;
 		Texture* DirectoryTexture;
 		Texture* FileTexture;
 		Texture* UpArrowTexture;

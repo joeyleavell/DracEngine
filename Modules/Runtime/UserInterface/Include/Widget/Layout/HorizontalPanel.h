@@ -2,7 +2,7 @@
 
 #include "Widget/Layout/PanelWidget.h"
 #include "Core/Core.h"
-#include "UserInterfaceGen.h"
+#include "HorizontalPanel.gen.h"
 
 namespace Ry
 {
@@ -11,18 +11,20 @@ namespace Ry
 	{
 	public:
 
-		WidgetBeginArgsSlot(HorizontalPanel)
+		GeneratedBody()
+
+		WidgetBeginArgsSlot(HorizontalPanel, PanelWidgetSlot)
 		WidgetEndArgs()
 
-		struct Slot : public PanelWidget::Slot
+		struct Slot : public PanelWidgetSlot
 		{
 			Slot() :
-			PanelWidget::Slot()
+			PanelWidgetSlot()
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid) :
-			PanelWidget::Slot(Wid)
+			PanelWidgetSlot(Wid)
 			{
 			}
 		};
@@ -37,7 +39,7 @@ namespace Ry
 
 		SizeType ComputeSize() const override;
 
-		Ry::SharedPtr<PanelWidget::Slot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override;
+		Ry::SharedPtr<PanelWidgetSlot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override;
 
 		void ClearChildren() override;
 
@@ -45,6 +47,6 @@ namespace Ry
 
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 
-	};
+	} RefClass();
 
 }

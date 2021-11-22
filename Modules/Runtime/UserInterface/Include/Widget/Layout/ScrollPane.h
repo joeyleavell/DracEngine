@@ -3,7 +3,7 @@
 #include "Widget/Layout/PanelWidget.h"
 #include "2D/Batch/Batch.h"
 #include "Drawable.h"
-#include "UserInterfaceGen.h"
+#include "ScrollPane.gen.h"
 
 namespace Ry
 {
@@ -12,15 +12,23 @@ namespace Ry
 	{
 	public:
 
-		struct Slot : public PanelWidget::Slot
+		GeneratedBody()
+
+		RefField()
+		float Width;
+
+		RefField()
+		float Height;
+
+		struct Slot : public PanelWidgetSlot
 		{
 			Slot() :
-			PanelWidget::Slot()
+				PanelWidgetSlot()
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid):
-			PanelWidget::Slot(Wid)
+				PanelWidgetSlot(Wid)
 			{
 			}
 
@@ -32,11 +40,12 @@ namespace Ry
 
 		};
 
-		WidgetBeginArgsSlot(ScrollPane)
+		WidgetBeginArgsSlot(ScrollPane, ScrollPane::Slot)
 			WidgetProp(int32, Width)
 			WidgetProp(int32, Height)
-		WidgetEndArgs()
+			WidgetEndArgs()
 
+		ScrollPane();
 		void Construct(Args& In);
 		float GetVerticalScrollAmount();
 		float GetHorizontalScrollAmount();
@@ -45,7 +54,7 @@ namespace Ry
 		void SetHorizontalScrollAmount(float Scroll);
 		void SetVerticalScrollAmount(float Scroll);
 		static ScrollPane::Slot MakeSlot();
-		SharedPtr<PanelWidget::Slot> AppendSlot(SharedPtr<Widget> Widget) override;
+		SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget) override;
 		void Draw() override;
 		/**
 		 * Arrange widgets vertically.
@@ -69,7 +78,6 @@ namespace Ry
 		SizeType ComputeChildrenSize() const;
 
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
-		SizeType Size;
 
 		Ry::SharedPtr<BatchItem> DebugRect;
 
@@ -77,6 +85,9 @@ namespace Ry
 		float HorizontalScrollAmount;
 
 		float ScrollBarThickness;
+
+		Ry::SharedPtr<BatchItemSet> HorizontalBarItem;
+		Ry::SharedPtr<BatchItemSet> VerticalBarItem;
 
 		Ry::SharedPtr<BoxDrawable> VerticalScrollBar;
 		Ry::SharedPtr<BoxDrawable> HorizontalScrollBar;
@@ -88,6 +99,6 @@ namespace Ry
 		bool bAllowHorizontalScroll;
 
 		RectScissor LastClip;
-	};
+	} RefClass();
 
 }

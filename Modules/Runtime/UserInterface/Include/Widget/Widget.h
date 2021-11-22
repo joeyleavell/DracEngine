@@ -8,19 +8,19 @@
 #include "Core/Object.h"
 #include "Widget.gen.h"
 
-#define WidgetBeginArgsSlot(ClassName) \
+#define WidgetBeginArgsSlot(ClassName, SlotClass) \
 public: \
 struct Args \
 { \
 	typedef ClassName::Args WidgetArgsType; \
 	Ry::ArrayList<SharedPtr<Widget>> Children; \
-	Ry::ArrayList<ClassName::Slot> Slots; \
+	Ry::ArrayList<SlotClass> Slots; \
 	WidgetArgsType& operator [] (Ry::SharedPtr<Widget> Wid) \
 	{ \
 		Children.Add(Wid); \
 		return *this; \
 	} \
-	WidgetArgsType& operator+(ClassName::Slot WidgetSlot) \
+	WidgetArgsType& operator+(SlotClass WidgetSlot) \
 	{ \
 		Slots.Add(WidgetSlot); \
 		return *this; \
@@ -220,6 +220,19 @@ namespace Ry
 		GeneratedBody()
 
 		/**
+		 * A string that uniquely identifies this widget within a hierarchy. Must be unique.
+		 */
+		RefField()
+		Ry::String Id;
+
+		/**
+		 * The group of this widget. Does not need to be unique, used to group widgets together.
+		 */
+		RefField()
+		Ry::String Class;
+
+
+		/**
 		 * Delegates
 		 *
 		 * @param Ry::Widget* The widget whose render state is dirty
@@ -242,7 +255,8 @@ namespace Ry
 		Widget& SetRelativePosition(float X, float Y);
 		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight);
 		void MarkDirty(Widget* Self, bool bFullRefresh = false);
-
+		
+		virtual SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const { return Ry::SharedPtr<Widget>(); };
 		virtual void SetId(const Ry::String& Id);
 		virtual void SetClass(const Ry::String& Class);
 		virtual void SetStyle(const Ry::StyleSet* Style);
@@ -271,15 +285,17 @@ namespace Ry
 		virtual void OnShow(Ry::Batch* Batch) {}
 		virtual void OnHide(Ry::Batch* Batch) {};
 
+		template <typename WidgetClass>
+		SharedPtr<WidgetClass> FindChildWidget(Ry::String ChildWidgetId) const
+		{
+			return CastShared<WidgetClass>(FindChildWidgetById(ChildWidgetId));
+		}
+
 	protected:
 
 		const StyleSet* Style;
 
 		int32 GetWidgetID() const;
-
-		// Attributes used for identifying widgets from a parent
-		Ry::String Id;
-		Ry::String Class;
 
 		SizeType CachedSize;
 		Widget* Parent{};
@@ -298,6 +314,7 @@ namespace Ry
 		uint32 WidgetID;
 
 	} RefClass();
+
 
 	template<typename WidgetClass>
 	struct WidgetDecl

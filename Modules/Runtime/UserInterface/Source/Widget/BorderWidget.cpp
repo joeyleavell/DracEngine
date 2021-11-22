@@ -5,6 +5,7 @@ namespace Ry
 
 	BorderWidget::BorderWidget() : SlotWidget()
 	{
+		ItemSet = MakeItemSet();
 	}
 
 	void BorderWidget::Construct(Args& In)
@@ -19,6 +20,8 @@ namespace Ry
 		SlotWidget::Construct(ParentArgs);
 
 		BoxStyleName = In.mBoxStyleName;
+
+		ItemSet = MakeItemSet();
 		
 		//
 		// if (In.mDefaultImage.IsSet())
@@ -107,26 +110,26 @@ namespace Ry
 
 					if (BoxStyle.Pressed)
 					{
-						BoxStyle.Pressed->Show(Batch, WidgetLayer, GetPipelineState(this));
+						BoxStyle.Pressed->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if (BoxStyle.Hovered)
 					{
-						BoxStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
+						BoxStyle.Hovered->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if (BoxStyle.Default)
 					{
-						BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+						BoxStyle.Default->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 					}
 				}
 				else
 				{
 					if (BoxStyle.Hovered)
 					{
-						BoxStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
+						BoxStyle.Hovered->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 					}
 					else if (BoxStyle.Default)
 					{
-						BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+						BoxStyle.Default->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 					}
 				}
 			}
@@ -134,7 +137,7 @@ namespace Ry
 			{
 				if (BoxStyle.Default)
 				{
-					BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+					BoxStyle.Default->Show(ItemSet, Batch, WidgetLayer, GetPipelineState(this));
 				}
 			}
 
@@ -149,17 +152,17 @@ namespace Ry
 
 			if (BoxStyle.Default)
 			{
-				BoxStyle.Default->Hide(Batch);
+				BoxStyle.Default->Hide(ItemSet, Batch);
 			}
 
 			if (BoxStyle.Pressed)
 			{
-				BoxStyle.Pressed->Hide(Batch);
+				BoxStyle.Pressed->Hide(ItemSet, Batch);
 			}
 
 			if (BoxStyle.Hovered)
 			{
-				BoxStyle.Hovered->Hide(Batch);
+				BoxStyle.Hovered->Hide(ItemSet, Batch);
 			}
 
 		}
@@ -167,6 +170,7 @@ namespace Ry
 
 	void BorderWidget::Draw()
 	{
+		
 		if(!BoxStyleName.IsEmpty())
 		{
 			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
@@ -183,23 +187,22 @@ namespace Ry
 				{
 					if (IsPressed() && BoxStyle.Pressed)
 					{
-						BoxStyle.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+						BoxStyle.Pressed->Draw(ItemSet, (float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
 					}
 					else if (BoxStyle.Hovered)
 					{
-						BoxStyle.Hovered->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+						BoxStyle.Hovered->Draw(ItemSet, (float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
 					}
 				}
 				else if (BoxStyle.Default)
 				{
-					BoxStyle.Default->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					BoxStyle.Default->Draw(ItemSet, (float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
 				}
 
 			}
-
-			SlotWidget::Draw();
-
 		}
+
+		SlotWidget::Draw();
 	}
 
 	bool BorderWidget::HasVisual()

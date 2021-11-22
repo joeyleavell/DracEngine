@@ -22,7 +22,7 @@ namespace Ry
 		this->MinBarPosition = 0.1;
 		this->MaxBarPosition = 0.9;
 
-		for (PanelWidget::Slot& Child : In.Slots)
+		for (PanelWidgetSlot& Child : In.Slots)
 		{
 			SharedPtr<Slot> Result = CastShared<Slot>(AppendSlot(Child.GetWidget()));
 			Result->SetPadding(Child.GetPadding());
@@ -231,7 +231,7 @@ namespace Ry
 		}
 	}
 
-	SharedPtr<PanelWidget::Slot> Splitter::AppendSlot(SharedPtr<Widget> Widget)
+	SharedPtr<PanelWidgetSlot> Splitter::AppendSlot(SharedPtr<Widget> Widget)
 	{
 		PanelWidget::AppendSlot(Widget);
 

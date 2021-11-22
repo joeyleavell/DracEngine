@@ -19,7 +19,7 @@ namespace Ry
 
 	SizeType Label::ComputeSize() const
 	{
-		if (bTextSizeDirty)
+		if (bTextSizeDirty && Style)
 		{
 			const TextStyle& ResolvedTextStyle = Style->GetTextStyle(TextStyleName);
 
@@ -72,6 +72,12 @@ namespace Ry
 
 	void Label::OnShow(Ry::Batch* Batch)
 	{
+		// Check if text data needs to be computed. This handles the case where the text was loaded through reflection.
+		if (ComputedTextData.Lines.GetSize() == 0 && !Text.IsEmpty())
+		{
+			SetText(Text);
+		}
+
 		const TextStyle& TextStyle = Style->GetTextStyle(TextStyleName);
 
 		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), TextStyle.Font->GetAtlasTexture(), WidgetLayer);
@@ -84,6 +90,7 @@ namespace Ry
 
 	void Label::Draw()
 	{
+
 		if (IsVisible())
 		{
 			const TextStyle& TextStyle = Style->GetTextStyle(TextStyleName);

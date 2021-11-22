@@ -9,24 +9,6 @@
 
 namespace Ry
 {
-	class TestRefl : public Ry::Widget
-	{
-	public:
-		GeneratedBody()
-
-		RefField()
-		Ry::String TestString{ "test_string" };
-		
-		RefField()
-		Ry::ArrayList<int32> TestField{};
-
-		RefField()
-		float TestField2{ 20.2f };
-
-		RefField()
-		int64 TestField3 {};
-
-	} RefClass();
 	
 	class EditorUI : public Layer
 	{
