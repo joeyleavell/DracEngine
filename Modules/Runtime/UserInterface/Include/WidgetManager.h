@@ -36,9 +36,18 @@ namespace Ry
 		Ry::OAHashMap<Ry::String, SharedPtr<CachedWidget>> CachedWidgets;
 	};
 
-	extern WidgetManager Manager;
+	extern USERINTERFACE_MODULE WidgetManager Manager;
 
-	USERINTERFACE_MODULE SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path);
-	USERINTERFACE_MODULE SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path);
+	template<typename WidgetClass>
+	EXPORT_ONLY SharedPtr<WidgetClass> LoadWidget(Ry::AssetRef&& Path)
+	{
+		return CastShared<WidgetClass>(Manager.LoadWidget(Path));
+	}
+
+	template<typename WidgetClass>
+	EXPORT_ONLY SharedPtr<WidgetClass> LoadWidget(const Ry::AssetRef& Path)
+	{
+		return CastShared<WidgetClass>(Manager.LoadWidget(Path));
+	}
 
 }

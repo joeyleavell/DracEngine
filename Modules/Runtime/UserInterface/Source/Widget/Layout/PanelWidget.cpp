@@ -8,10 +8,6 @@ namespace Ry
 
 	}
 
-	void PanelWidget::Construct(Args& In)
-	{
-	}
-
 	SharedPtr<Widget> PanelWidget::FindChildWidgetById(const Ry::String& Id) const
 	{
 		for (SharedPtr<Widget> Child : Children)

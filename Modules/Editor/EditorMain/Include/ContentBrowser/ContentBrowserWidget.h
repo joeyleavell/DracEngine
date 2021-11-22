@@ -7,6 +7,7 @@
 #include "Widget/Input/Button.h"
 #include "Widget/Layout/ScrollPane.h"
 #include "Widget/Input/TextField.h"
+#include "ContentBrowserWidget.gen.h"
 
 namespace Ry
 {
@@ -39,6 +40,8 @@ namespace Ry
 	{
 	public:
 
+		GeneratedBody()
+
 		Ry::SharedPtr<TextField> CurDirLabel;
 		Ry::SharedPtr<Button> UpArrow;
 
@@ -53,12 +56,7 @@ namespace Ry
 
 	private:
 
-		Texture* DirectoryTexture;
-		Texture* FileTexture;
-		Texture* UpArrowTexture;
-
 		Ry::SharedPtr<GridPanel> Grid;
-
-	};
+	} RefClass();
 
 }

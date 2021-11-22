@@ -9,14 +9,6 @@ namespace Ry
 		ItemSet = MakeItemSet();
 	}
 
-	void Label::Construct(Args& In)
-	{
-		this->SetText(In.mText);
-		this->SetTextStyle(In.mTextStyleName);
-
-		this->bTextSizeDirty = true;
-	}
-
 	SizeType Label::ComputeSize() const
 	{
 		if (bTextSizeDirty && Style)

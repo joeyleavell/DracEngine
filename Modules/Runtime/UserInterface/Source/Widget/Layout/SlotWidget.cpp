@@ -3,28 +3,6 @@
 namespace Ry
 {
 
-	void SlotWidget::Construct(Args& In)
-	{
-		this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = In.mPadding;
-		this->VerticalAlign = In.mVerticalAlignment;
-		this->HorizontalAlign = In.mHorizontalAlignment;
-
-		if (In.mFillX.IsSet())
-		{
-			this->FillX(In.mFillX);
-		}
-
-		if (In.mFillY.IsSet())
-		{
-			this->FillY(In.mFillY);
-		}
-
-		if (In.Children.GetSize() == 1)
-		{
-			SetChild(In.Children[0]);
-		}
-	}
-
 	SharedPtr<Widget> SlotWidget::FindChildWidgetById(const Ry::String& Id) const
 	{
 		if(Child)
@@ -53,11 +31,11 @@ namespace Ry
 	{
 		this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = 0;
 
-		this->WidthMode = SizeMode::AUTO;
-		this->HeightMode = SizeMode::AUTO;
+		this->WidthMode = SIZE_MODE_AUTO;
+		this->HeightMode = SIZE_MODE_AUTO;
 
-		this->VerticalAlign = VAlign::TOP;
-		this->HorizontalAlign = HAlign::LEFT;
+		this->VerticalAlign = VERT_TOP_ALIGN;
+		this->HorizontalAlign = HOR_LEFT_ALIGN;
 	}
 
 	void SlotWidget::SetParent(Widget* Parent)
@@ -91,37 +69,37 @@ namespace Ry
 		return *this;
 	}
 
-	SlotWidget& SlotWidget::SetVerticalAlignment(VAlign Alignment)
-	{
-		this->ContentVAlign = Alignment;
-
-		return *this;
-	}
-
-	SlotWidget& SlotWidget::SetHorizontalAlignment(HAlign Alignment)
-	{
-		this->ContentHAlign = Alignment;
-
-		return *this;
-	}
+	// SlotWidget& SlotWidget::SetVerticalAlignment(uint8 Alignment)
+	// {
+	// 	this->ContentVAlign = Alignment;
+	//
+	// 	return *this;
+	// }
+	//
+	// SlotWidget& SlotWidget::SetHorizontalAlignment(HAlign Alignment)
+	// {
+	// 	this->ContentHAlign = Alignment;
+	//
+	// 	return *this;
+	// }
 
 	SlotWidget& SlotWidget::AutoWidth()
 	{
-		this->WidthMode = SizeMode::AUTO;
+		this->WidthMode = SIZE_MODE_AUTO;
 
 		return *this;
 	}
 
 	SlotWidget& SlotWidget::AutoHeight()
 	{
-		this->WidthMode = SizeMode::AUTO;
+		this->WidthMode = SIZE_MODE_AUTO;
 
 		return *this;
 	}
 
-	SlotWidget& SlotWidget::FillX(float FillX)
-	{
-		this->FillXPercent = FillX;
+	/*SlotWidget& SlotWidget::FillX(float FillX)
+	{ 
+		this->Fill = FillX;
 		this->WidthMode = SizeMode::PERCENTAGE;
 
 		return *this;
@@ -133,26 +111,26 @@ namespace Ry
 		this->HeightMode = SizeMode::PERCENTAGE;
 
 		return *this;
-	}
+	}*/
 
-	SlotWidget& SlotWidget::FillParent()
+	/*SlotWidget& SlotWidget::FillParent()
 	{
 		return FillX(1.0).FillY(1.0);
-	}
+	}*/
 
-	SlotWidget& SlotWidget::SetVAlign(VAlign VerticalAlign)
-	{
-		this->VerticalAlign = VerticalAlign;
-
-		return *this;
-	}
-
-	SlotWidget& SlotWidget::SetHAlign(HAlign HorizontalAlign)
-	{
-		this->HorizontalAlign = HorizontalAlign;
-
-		return *this;
-	}
+	// SlotWidget& SlotWidget::SetVAlign(VAlign VerticalAlign)
+	// {
+	// 	this->VerticalAlign = VerticalAlign;
+	//
+	// 	return *this;
+	// }
+	//
+	// SlotWidget& SlotWidget::SetHAlign(HAlign HorizontalAlign)
+	// {
+	// 	this->HorizontalAlign = HorizontalAlign;
+	//
+	// 	return *this;
+	// }
 
 	void SlotWidget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
 	{
@@ -170,7 +148,7 @@ namespace Ry
 		SizeType Result;
 
 		// Compute child size, only if needed otherwise we'd enter infinite recursion
-		if (Child && (WidthMode == SizeMode::AUTO || HeightMode == SizeMode::AUTO))
+		if (Child && (WidthMode == SIZE_MODE_AUTO || HeightMode == SIZE_MODE_AUTO))
 		{
 			ChildSize = Child->ComputeSize();
 		}
@@ -188,20 +166,20 @@ namespace Ry
 		// {
 		// }
 
-		if (WidthMode == SizeMode::PERCENTAGE)
+		if (WidthMode == SIZE_MODE_PERCENTAGE)
 		{
-			Result.Width = (int32)(ParentSize.Width * FillXPercent);
+			Result.Width = (int32)(ParentSize.Width * FillX);
 		}
-		else if (WidthMode == SizeMode::AUTO)
+		else if (WidthMode == SIZE_MODE_AUTO)
 		{
 			Result.Width = (int32)(PaddingLeft + PaddingRight + ChildSize.Width);
 		}
 
-		if (HeightMode == SizeMode::PERCENTAGE)
+		if (HeightMode == SIZE_MODE_PERCENTAGE)
 		{
-			Result.Height = (int32)(ParentSize.Height * FillYPercent);
+			Result.Height = (int32)(ParentSize.Height * FillY);
 		}
-		else if (HeightMode == SizeMode::AUTO)
+		else if (HeightMode == SIZE_MODE_AUTO)
 		{
 			Result.Height = (int32)(PaddingTop + PaddingBottom + ChildSize.Height);
 		}
@@ -236,35 +214,35 @@ namespace Ry
 			float RelX = PaddingLeft;
 			float RelY = PaddingBottom;
 
-			if (WidthMode == SizeMode::PERCENTAGE)
+			if (WidthMode == SIZE_MODE_PERCENTAGE)
 			{
 				RectScissor ThisSize = Widget::GetClipSpace(this);
 				switch ((uint32)HorizontalAlign)
 				{
-				case (uint32)HAlign::CENTER:
+				case (uint32)HOR_CENTER_ALIGN:
 					RelX = (ThisSize.Width - ChildSize.Width) / 2.0f;
 					break;
-				case (uint32)HAlign::LEFT:
+				case (uint32)HOR_LEFT_ALIGN:
 					RelX = PaddingLeft;
 					break;
-				case (uint32)HAlign::RIGHT:
+				case (uint32)HOR_RIGHT_ALIGN:
 					RelX = (float)(ThisSize.Width - ChildSize.Width - PaddingRight);
 					break;
 				}
 			}
 
-			if (HeightMode == SizeMode::PERCENTAGE)
+			if (HeightMode == SIZE_MODE_PERCENTAGE)
 			{
 				RectScissor ThisSize = Widget::GetClipSpace(this);
 				switch ((uint32)VerticalAlign)
 				{
-				case (uint32)VAlign::CENTER:
+				case (uint32)VERT_CENTER_ALIGN:
 					RelY = (ThisSize.Height - ChildSize.Height) / 2.0f;
 					break;
-				case (uint32)VAlign::TOP:
+				case (uint32)VERT_TOP_ALIGN:
 					RelY = ThisSize.Height - ChildSize.Height - PaddingTop;
 					break;
-				case (uint32)VAlign::BOTTOM:
+				case (uint32)VERT_BOTTOM_ALIGN:
 					RelY = PaddingBottom;
 					break;
 				}

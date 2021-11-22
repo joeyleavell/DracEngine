@@ -2,13 +2,6 @@
 
 namespace Ry
 {
-	void VerticalPanel::Construct(Args& In)
-	{
-		for (PanelWidgetSlot& Child : In.Slots)
-		{
-			AppendSlot(Child.GetWidget());
-		}
-	}
 
 	VerticalPanel::Slot VerticalPanel::MakeSlot()
 	{
@@ -41,13 +34,13 @@ namespace Ry
 			SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 			SizeType ContentSize = Widget->ComputeSize();
 
-			CurrentY += static_cast<int32>(ChildSlot->GetPadding().Bottom);
+			CurrentY += static_cast<int32>(ChildSlot->PaddingBottom);
 
 			// Set the widget's relative position
-			Widget->SetRelativePosition(static_cast<float>(ChildSlot->GetPadding().Left), static_cast<float>(CurrentY));
+			Widget->SetRelativePosition(static_cast<float>(ChildSlot->PaddingLeft), static_cast<float>(CurrentY));
 			Widget->Arrange();
 
-			CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Top);
+			CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->PaddingTop);
 
 		}
 	}
@@ -70,7 +63,7 @@ namespace Ry
 				SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
 				// Add horizontal padding
-				WidgetSize.Width += (int32)(ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right);
+				WidgetSize.Width += (int32)(ChildSlot->PaddingLeft + ChildSlot->PaddingRight);
 
 				// Check if max width
 				if (WidgetSize.Width > MaxChildWidth)
@@ -79,9 +72,9 @@ namespace Ry
 				}
 
 				// Calculate height
-				Result.Height += static_cast<int32>(ChildSlot->GetPadding().Top);
+				Result.Height += static_cast<int32>(ChildSlot->PaddingTop);
 				Result.Height += static_cast<int32>(WidgetSize.Height);
-				Result.Height += static_cast<int32>(ChildSlot->GetPadding().Bottom);
+				Result.Height += static_cast<int32>(ChildSlot->PaddingBottom);
 			}
 
 			Result.Width += MaxChildWidth;

@@ -2,6 +2,7 @@
 
 #include "Widget/Layout/PanelWidget.h"
 #include "Core/Core.h"
+#include "Slot/HorizontalPanelSlot.h"
 #include "HorizontalPanel.gen.h"
 
 namespace Ry
@@ -13,24 +14,7 @@ namespace Ry
 
 		GeneratedBody()
 
-		WidgetBeginArgsSlot(HorizontalPanel, PanelWidgetSlot)
-		WidgetEndArgs()
-
-		struct Slot : public PanelWidgetSlot
-		{
-			Slot() :
-			PanelWidgetSlot()
-			{
-			}
-
-			Slot(SharedPtr<Ry::Widget> Wid) :
-			PanelWidgetSlot(Wid)
-			{
-			}
-		};
-
-		void Construct(HorizontalPanel::Args& In);
-		static Slot MakeSlot();
+		static HorizontalPanelSlot MakeSlot();
 		
 		/**
 		 * Arrange widgets horizontally.
@@ -45,7 +29,7 @@ namespace Ry
 
 	private:
 
-		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
+		Ry::ArrayList<SharedPtr<HorizontalPanelSlot>> ChildrenSlots;
 
 	} RefClass();
 

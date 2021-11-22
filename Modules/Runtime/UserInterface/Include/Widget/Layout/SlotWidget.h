@@ -28,16 +28,32 @@ namespace Ry
 		RefField()
 		float PaddingBottom;
 
-		WidgetBeginArgs(SlotWidget)
-			WidgetProp(float, FillX)
-			WidgetProp(float, FillY)
-			WidgetPropDefault(float, Padding, 0.0f)
-			WidgetPropDefault(VAlign, VerticalAlignment, VAlign::CENTER)
-			WidgetPropDefault(HAlign, HorizontalAlignment, HAlign::CENTER)
-		WidgetEndArgs()
+		// Percentage parameters
+		RefField()
+		float FillX;
+
+		RefField()
+		float FillY;
+
+		RefField()
+		uint8 VerticalAlign;
+
+		RefField()
+		uint8 HorizontalAlign;
+
+		RefField()
+		uint8 ContentVAlign;
+
+		RefField()
+		uint8 ContentHAlign;
+
+		RefField()
+		uint8 WidthMode;
+
+		RefField()
+		uint8 HeightMode;
 
 		SlotWidget();
-		void Construct(Args& In);
 
 		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
@@ -45,15 +61,15 @@ namespace Ry
 		SlotWidget& Padding(float Pad);
 		SlotWidget& Padding(float Vertical, float Horizontal);
 		SlotWidget& Padding(float Left, float Right, float Top, float Bottom);
-		SlotWidget& SetVerticalAlignment(VAlign Alignment);
-		SlotWidget& SetHorizontalAlignment(HAlign Alignment);
+		//SlotWidget& SetVerticalAlignment(VAlign Alignment);
+		//SlotWidget& SetHorizontalAlignment(HAlign Alignment);
 		SlotWidget& AutoWidth();
 		SlotWidget& AutoHeight();
-		SlotWidget& FillX(float FillX);
-		SlotWidget& FillY(float FillY);
+		//SlotWidget& FillX(float FillX);
+		//SlotWidget& FillY(float FillY);
 		SlotWidget& FillParent();
-		SlotWidget& SetVAlign(VAlign VerticalAlign);
-		SlotWidget& SetHAlign(HAlign HorizontalAlign);
+		//SlotWidget& SetVAlign(VAlign VerticalAlign);
+		//SlotWidget& SetHAlign(HAlign HorizontalAlign);
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		SizeType ComputeSize() const override;
 		void SetVisible(bool bVisibility, bool bPropagate) override;
@@ -75,21 +91,9 @@ namespace Ry
 
 	private:
 
-		VAlign ContentVAlign;
-		HAlign ContentHAlign;
-		SizeMode WidthMode;
-		SizeMode HeightMode;
-
-		// Percentage parameters
-		float FillXPercent;
-		float FillYPercent;
-
 		/**
 		 * The child stored within this box element.
 		 */
 		SharedPtr<Ry::Widget> Child;
-
-		VAlign VerticalAlign;
-		HAlign HorizontalAlign;
 	} RefClass();
 }

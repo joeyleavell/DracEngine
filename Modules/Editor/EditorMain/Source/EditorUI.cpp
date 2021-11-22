@@ -36,7 +36,7 @@ namespace Ry
 
 		//TestRefl Object; 
 
-		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget("/Engine/UI/TestUI.ui");
+		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget<Ry::Widget>("/Engine/UI/TestUI.ui");
 		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
 
 		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
@@ -61,7 +61,13 @@ namespace Ry
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
 
 		// Build editor UI
-		NewWidgetAssign(Root, BorderWidget)
+		Root = LoadWidget<Ry::BorderWidget>("/Engine/UI/EditorMain.ui");
+		if(Root.IsValid())
+		{
+			BrowserWidget = Root->FindChildWidget<Ry::ContentBrowserWidget>("BrowserWidget");
+		}
+
+		/*NewWidgetAssign(Root, BorderWidget)
 		.HorAlign(HAlign::CENTER)
 		.VertAlign(VAlign::BOTTOM)
 		.FillX(1.0f)
@@ -106,7 +112,7 @@ namespace Ry
 
 			]
 
-		];
+		];*/
 		
 		// Create the content browser utility
 		ContentBrowse = new ContentBrowser(BrowserWidget);

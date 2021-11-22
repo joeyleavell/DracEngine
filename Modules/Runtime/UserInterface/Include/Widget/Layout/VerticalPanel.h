@@ -32,11 +32,6 @@ namespace Ry
 
 		};
 
-		WidgetBeginArgsSlot(VerticalPanel, VerticalPanel::Slot)
-			WidgetProp(float, Pad)
-		WidgetEndArgs()
-
-		void Construct(Args& In);
 		static Slot MakeSlot();
 		Ry::SharedPtr<PanelWidgetSlot> AppendSlot(Ry::SharedPtr<Ry::Widget> Widget) override;
 

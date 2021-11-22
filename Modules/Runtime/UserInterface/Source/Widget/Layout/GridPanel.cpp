@@ -3,20 +3,6 @@
 namespace Ry
 {
 
-	void GridPanel::Construct(Args& In)
-	{
-		PanelWidget::Args ParentArgs;
-		PanelWidget::Construct(ParentArgs);
-
-		SetCellWidth(In.mCellWidth);
-		SetCellHeight(In.mCellHeight);
-
-		for (Ry::SharedPtr<Widget>& Child : In.Children)
-		{
-			AppendSlot(Child);
-		}
-	}
-
 	bool GridPanel::IsSlotOccupied(int32 Row, int32 Col) const
 	{
 		SlotPosition Pos;
@@ -141,11 +127,11 @@ namespace Ry
 						// Place the widget in the middle of the cell
 
 						// Set the widget's relative position
-						Widget->SetRelativePosition(static_cast<float>(WidgetX + FoundSlot->GetPadding().Left), static_cast<float>(WidgetY + FoundSlot->GetPadding().Bottom));
+						Widget->SetRelativePosition(static_cast<float>(WidgetX + FoundSlot->PaddingLeft), static_cast<float>(WidgetY + FoundSlot->PaddingBottom));
 						Widget->Arrange();
 
-						CurrentX += FoundSlot->GetPadding().Right;
-						CurrentY += FoundSlot->GetPadding().Top;
+						CurrentX += FoundSlot->PaddingRight;
+						CurrentY += FoundSlot->PaddingTop;
 					}
 
 					bRowExists = true;

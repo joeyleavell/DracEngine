@@ -3,18 +3,6 @@
 namespace Ry
 {
 
-	void Button::Construct(Args& In)
-	{
-		SlotWidget::Args ParentArgs;
-		ParentArgs.mPadding = In.mPadding;
-		ParentArgs.mVerticalAlignment = In.mVerticalAlignment;
-		ParentArgs.mHorizontalAlignment = In.mHorizontalAlignment;
-		ParentArgs.mFillX = In.mFillX;
-		ParentArgs.mFillY = In.mFillY;
-		ParentArgs.Children = In.Children;
-		SlotWidget::Construct(ParentArgs);
-	}
-
 	void Button::OnHovered(const MouseEvent& MouseEv)
 	{
 		OnButtonHovered.Broadcast();

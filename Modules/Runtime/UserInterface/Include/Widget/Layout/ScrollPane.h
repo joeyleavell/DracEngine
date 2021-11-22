@@ -40,13 +40,7 @@ namespace Ry
 
 		};
 
-		WidgetBeginArgsSlot(ScrollPane, ScrollPane::Slot)
-			WidgetProp(int32, Width)
-			WidgetProp(int32, Height)
-			WidgetEndArgs()
-
 		ScrollPane();
-		void Construct(Args& In);
 		float GetVerticalScrollAmount();
 		float GetHorizontalScrollAmount();
 		void VerticalScroll(float Pixels);

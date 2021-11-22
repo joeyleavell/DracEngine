@@ -21,13 +21,7 @@ namespace Ry
 		RefField()
 		Ry::String TextStyleName;
 
-		WidgetBeginArgs(Label)
-			WidgetProp(Ry::String, Text)
-			WidgetProp(Ry::String, TextStyleName)
-		WidgetEndArgs()
-
 		Label();
-		void Construct(Args& In);
 		SizeType ComputeSize() const override;
 		Label& SetText(const Ry::String& Text);
 		Label& SetTextStyle(const Ry::String& StyleName);

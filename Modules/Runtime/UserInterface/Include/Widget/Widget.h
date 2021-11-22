@@ -8,60 +8,6 @@
 #include "Core/Object.h"
 #include "Widget.gen.h"
 
-#define WidgetBeginArgsSlot(ClassName, SlotClass) \
-public: \
-struct Args \
-{ \
-	typedef ClassName::Args WidgetArgsType; \
-	Ry::ArrayList<SharedPtr<Widget>> Children; \
-	Ry::ArrayList<SlotClass> Slots; \
-	WidgetArgsType& operator [] (Ry::SharedPtr<Widget> Wid) \
-	{ \
-		Children.Add(Wid); \
-		return *this; \
-	} \
-	WidgetArgsType& operator+(SlotClass WidgetSlot) \
-	{ \
-		Slots.Add(WidgetSlot); \
-		return *this; \
-	}
-
-#define WidgetBeginArgs(ClassName) \
-public: \
-struct Args \
-{ \
-	typedef ClassName::Args WidgetArgsType; \
-	Ry::ArrayList<SharedPtr<Widget>> Children; \
-	WidgetArgsType& operator [] (Ry::SharedPtr<Widget> Wid) \
-	{ \
-		Children.Add(Wid); \
-		return *this; \
-	} \
-
-#define WidgetPropDefault(Type, Name, Default) \
-OptionalValue<Type> m##Name = Default; \
-WidgetArgsType& Name(Type InAttrib) \
-{ \
-	m##Name = InAttrib; \
-	return *this; \
-}
-
-#define WidgetProp(Type, Name) \
-OptionalValue<Type> m##Name; \
-WidgetArgsType& Name(Type InAttrib) \
-{ \
-	m##Name = InAttrib; \
-	return *this; \
-}
-
-#define WidgetEndArgs() \
-};
-
-#define NewWidgetAssign(AssignTo, Type) Ry::WidgetDecl<Type>(AssignTo) << Type::Args()
-//#define NewWidget(Type) (*(new (Type)))
-
-#define NewWidget(Type) Ry::WidgetDecl<Type>() << Type::Args()
-
 namespace Ry
 {
 	struct Event;
@@ -197,21 +143,18 @@ namespace Ry
 		}
 	};
 
-	enum class SizeMode
-	{
-		AUTO,
-		PERCENTAGE
-	};
+	// TODO: be able to reflect enums?
+	
+	const uint8 SIZE_MODE_AUTO = 0;
+	const uint8 SIZE_MODE_PERCENTAGE = 1;
 
-	enum class VAlign
-	{
-		TOP, CENTER, BOTTOM
-	};
+	const uint8 VERT_TOP_ALIGN = 0;
+	const uint8 VERT_CENTER_ALIGN = 1;
+	const uint8 VERT_BOTTOM_ALIGN = 2;
 
-	enum class HAlign
-	{
-		LEFT, CENTER, RIGHT
-	};
+	const uint8 HOR_LEFT_ALIGN = 0;
+	const uint8 HOR_CENTER_ALIGN = 1;
+	const uint8 HOR_RIGHT_ALIGN = 2;
 
 	class USERINTERFACE_MODULE Widget : public Ry::Object
 	{
@@ -314,40 +257,5 @@ namespace Ry
 		uint32 WidgetID;
 
 	} RefClass();
-
-
-	template<typename WidgetClass>
-	struct WidgetDecl
-	{
-	private:
-
-		Ry::SharedPtr<WidgetClass>* Dst;
-
-	public:
-
-		WidgetDecl()
-		{
-			this->Dst = nullptr;
-		}
-
-		WidgetDecl(Ry::SharedPtr<WidgetClass>& AssignTo)
-		{
-			this->Dst = &AssignTo;
-		}
-
-		Ry::SharedPtr<WidgetClass> operator <<(typename WidgetClass::Args ConArgs)
-		{
-			Ry::SharedPtr<WidgetClass> NewWidget = MakeShared(new WidgetClass);
-
-			NewWidget->Construct(ConArgs);
-
-			if (Dst)
-			{
-				(*Dst) = NewWidget;
-			}
-
-			return NewWidget;
-		}
-	};
 
 }

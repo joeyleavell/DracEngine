@@ -28,15 +28,6 @@ namespace Ry
 		VerticalBarItem = MakeItemSet();
 	}
 
-	void ScrollPane::Construct(Args& In)
-	{
-
-		for (PanelWidgetSlot& Child : In.Slots)
-		{
-			AppendSlot(Child.GetWidget());
-		}
-	}
-
 	float ScrollPane::GetVerticalScrollAmount()
 	{
 		return VerticalScrollAmount;
@@ -172,16 +163,16 @@ namespace Ry
 			SizeType ContentSize = Widget->ComputeSize();
 
 			// Add top padding prior to setting relative position
-			CurrentY += static_cast<int32>(ChildSlot->GetPadding().Top);
+			CurrentY += static_cast<int32>(ChildSlot->PaddingTop);
 
-			float WidgetX = static_cast<float>(ChildSlot->GetPadding().Left - OffsetX);
+			float WidgetX = static_cast<float>(ChildSlot->PaddingLeft - OffsetX);
 			float WidgetY = static_cast<float>(CurrentY - OffsetY);
 
 			// Set the widget's relative position
 			Widget->SetRelativePosition(WidgetX, WidgetY);
 			Widget->Arrange();
 
-			CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->GetPadding().Bottom);
+			CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->PaddingBottom);
 		}
 
 	}
@@ -434,7 +425,7 @@ namespace Ry
 				SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
 
 				// Add horizontal padding
-				WidgetSize.Width += (int32)(ChildSlot->GetPadding().Left + ChildSlot->GetPadding().Right);
+				WidgetSize.Width += (int32)(ChildSlot->PaddingLeft + ChildSlot->PaddingRight);
 
 				// Check if max width
 				if (WidgetSize.Width > MaxChildWidth)
@@ -443,9 +434,9 @@ namespace Ry
 				}
 
 				// Calculate height
-				Result.Height += static_cast<int32>(ChildSlot->GetPadding().Top);
+				Result.Height += static_cast<int32>(ChildSlot->PaddingTop);
 				Result.Height += static_cast<int32>(WidgetSize.Height);
-				Result.Height += static_cast<int32>(ChildSlot->GetPadding().Bottom);
+				Result.Height += static_cast<int32>(ChildSlot->PaddingBottom);
 			}
 
 			Result.Width += MaxChildWidth;

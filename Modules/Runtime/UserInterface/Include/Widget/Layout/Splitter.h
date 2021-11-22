@@ -2,22 +2,26 @@
 
 #include "Widget/Layout/PanelWidget.h"
 #include "2D/Batch/Batch.h"
+#include "Splitter.gen.h"
 
 namespace Ry
 {
 
-	enum class SplitterType
-	{
-		VERTICAL,
-		HORIZONTAL
-	};
+	const uint8 SPLITTER_TYPE_VERT = 0;
+	const uint8 SPLITTER_TYPE_HOR = 1;
 
     class USERINTERFACE_MODULE Splitter : public Ry::PanelWidget
     {
     public:
 
-        SplitterType Type;
-		float BarThickness;
+    	GeneratedBody()
+
+    	RefField()
+        uint8 Type;
+
+    	RefField()
+    	float BarThickness;
+    	
 		float MinBarPosition;
 		float MaxBarPosition;
 
@@ -25,11 +29,6 @@ namespace Ry
     	 * Determines what percentage the bar is along at. In the range [0, 1].
     	 */
 		float BarPosition;
-
-		WidgetBeginArgsSlot(Splitter, PanelWidgetSlot)
-			WidgetProp(SplitterType, Type)
-			WidgetProp(float, BarThickness)
-		WidgetEndArgs()
 
 		struct Slot : public PanelWidgetSlot
 		{
@@ -48,7 +47,6 @@ namespace Ry
 
 		Splitter();
 
-		void Construct(Splitter::Args& In);
     	RectScissor GetClipSpace(const Widget* ForWidget) const override;
 		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates) override;
 		PipelineState GetPipelineState(const Widget* ForWidget) const override;
@@ -71,6 +69,6 @@ namespace Ry
 		Ry::SharedPtr<Ry::BatchItem> SplitterItem;
 
 
-    };
+    } RefClass();
 
 }

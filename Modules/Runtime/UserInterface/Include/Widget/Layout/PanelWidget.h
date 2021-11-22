@@ -14,12 +14,8 @@ namespace Ry
 	{
 	public:
 
-		WidgetBeginArgsSlot(PanelWidget, Ry::PanelWidgetSlot)
-		WidgetEndArgs()
-
 		PanelWidget();
 
-		void Construct(Args& In);
 		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
 		virtual SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget);

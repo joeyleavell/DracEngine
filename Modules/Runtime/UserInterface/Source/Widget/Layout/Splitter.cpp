@@ -4,31 +4,21 @@
 namespace Ry
 {
 
-	Splitter::Splitter() {};
+	Splitter::Splitter()
+	{
+		SplitterItem = MakeItem();
+
+		this->Type = SPLITTER_TYPE_HOR;
+		this->BarThickness = 20.0f;
+		this->BarPosition = 0.5f;
+		this->MinBarPosition = 0.1;
+		this->MaxBarPosition = 0.9;
+	};
 
 	Splitter::Slot Splitter::MakeSlot()
 	{
 		Splitter::Slot NewSlot;
 		return NewSlot;
-	}
-
-	void Splitter::Construct(Splitter::Args& In)
-	{
-		CORE_ASSERT(In.Slots.GetSize() <= 2);
-
-		this->Type = In.mType;
-		this->BarThickness = In.mBarThickness;
-		this->BarPosition = 0.5f;
-		this->MinBarPosition = 0.1;
-		this->MaxBarPosition = 0.9;
-
-		for (PanelWidgetSlot& Child : In.Slots)
-		{
-			SharedPtr<Slot> Result = CastShared<Slot>(AppendSlot(Child.GetWidget()));
-			Result->SetPadding(Child.GetPadding());
-		}
-
-		SplitterItem = MakeItem();
 	}
 
 	RectScissor Splitter::GetClipSpace(const Widget* ForWidget) const
@@ -40,7 +30,7 @@ namespace Ry
 		RectScissor OurSize = Widget::GetClipSpace(this);
 		//Point OurPos = GetAbsolutePosition();
 
-		if (Type == SplitterType::HORIZONTAL)
+		if (Type == SPLITTER_TYPE_HOR)
 		{
 			int32 SplitterWidth = std::round(OurSize.Width * BarPosition);
 
@@ -136,7 +126,7 @@ namespace Ry
 		WidgetA->SetRelativePosition(0, 0.0f);
 
 		// Arrange left to right
-		if(Type == SplitterType::HORIZONTAL)
+		if(Type == SPLITTER_TYPE_HOR)
 		{
 			float LeftWidth = OurSize.Width * BarPosition;
 			WidgetB->SetRelativePosition(std::round(LeftWidth + BarThickness), 0.0f);
@@ -159,7 +149,7 @@ namespace Ry
 			Point OurPos = GetAbsolutePosition();
 
 			// Calculate new bar position
-			if(Type == SplitterType::HORIZONTAL)
+			if(Type == SPLITTER_TYPE_HOR)
 			{
 				float DeltaX = std::floor(MouseEv.MouseX - (OurPos.X - BarThickness / 2.0f));
 				BarPosition = DeltaX / OurSize.Width;
@@ -189,7 +179,7 @@ namespace Ry
 		Point OurPos = GetAbsolutePosition();
 
 		RectScissor SplitterBarBounds;
-		if(Type == SplitterType::HORIZONTAL)
+		if(Type == SPLITTER_TYPE_HOR)
 		{
 			float PosX = std::ceil(OurPos.X + OurSize.Width * BarPosition);
 			SplitterBarBounds = RectScissor{ (int32)PosX, OurPos.Y, (int32)BarThickness, OurSize.Height };
@@ -260,7 +250,7 @@ namespace Ry
 		Point OurPos = GetAbsolutePosition();
 		
 		// Draw splitter bar
-		if(Type == SplitterType::HORIZONTAL)
+		if(Type == SPLITTER_TYPE_HOR)
 		{
 			float PosX = OurPos.X + std::round(  OurSize.Width * BarPosition);
 			Ry::BatchRectangle(SplitterItem, WHITE, PosX, OurPos.Y, BarThickness, OurSize.Height, 1.0f);

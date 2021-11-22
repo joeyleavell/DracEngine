@@ -3,14 +3,6 @@
 namespace Ry
 {
 
-	void TextField::Construct(Args& In)
-	{
-		this->SetText(In.mText);
-		//this->SetStyle(In.mFont, In.mColor);
-
-		this->bTextSizeDirty = true;
-	}
-
 	TextField::TextField() :
 		Widget()
 	{
@@ -24,7 +16,7 @@ namespace Ry
 
 	SizeType TextField::ComputeSize() const
 	{
-		if (bTextSizeDirty)
+		if (bTextSizeDirty && Style)
 		{
 			const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
 			

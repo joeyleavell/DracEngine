@@ -90,6 +90,11 @@ namespace Ry
 						// Floats
 						if (Field->Type->Name == GetType<float>()->Name)
 							(*Field->GetPtrToField<float>(Result.Get())) = Ry::ParseFloat(Attrib->value());
+
+						// uint8s
+						if (Field->Type->Name == GetType<uint8>()->Name)
+							(*Field->GetPtrToField<uint8>(Result.Get())) = (uint8) Ry::ParseInt(Attrib->value());
+
 					}
 					else
 					{
@@ -118,11 +123,41 @@ namespace Ry
 							SharedPtr<PanelWidgetSlot> Slot = AsPanel->AppendSlot(SlotChild);
 							
 							// Set elements of panel slot
-							xml_attribute<>* Attrib = Node->first_attribute();
-							while (Attrib)
+							if (const Ry::ReflectedClass* SlotClass = Slot->GetClass())
 							{
-								Attrib = Attrib->next_attribute();
+								xml_attribute<>* SlotAttrib = ChildNode->first_attribute();
+								while (SlotAttrib)
+								{
+									Ry::String SlotAttribName = SlotAttrib->name();
+
+									if (const Ry::Field* Field = SlotClass->FindFieldByName(SlotAttribName))
+									{
+										// Strings
+										if (Field->Type->Name == GetType<Ry::String>()->Name)
+											(*Field->GetPtrToField<Ry::String>(Slot.Get())) = SlotAttrib->value();
+
+										// Floats
+										if (Field->Type->Name == GetType<float>()->Name)
+											(*Field->GetPtrToField<float>(Slot.Get())) = Ry::ParseFloat(SlotAttrib->value());
+
+										// uint8s
+										if (Field->Type->Name == GetType<uint8>()->Name)
+											(*Field->GetPtrToField<uint8>(Slot.Get())) = (uint8)Ry::ParseInt(SlotAttrib->value());
+
+									}
+									else
+									{
+										Ry::Log->LogErrorf("Failed to find field with name %s in slot of class %s", *SlotAttribName, *Slot->GetClass()->Name);
+									}
+
+									SlotAttrib = SlotAttrib->next_attribute();
+								}
 							}
+							else
+							{
+								Ry::Log->LogErrorf("Failed to get slot class");
+							}
+
 						}
 						else
 						{
@@ -170,16 +205,6 @@ namespace Ry
 		}
 
 		return Result;
-	}
-
-	SharedPtr<Ry::Widget> LoadWidget(Ry::AssetRef&& Path)
-	{
-		return Manager.LoadWidget(Path);
-	}
-
-	SharedPtr<Ry::Widget> LoadWidget(const Ry::AssetRef& Path)
-	{
-		return Manager.LoadWidget(Path);
 	}
 	
 }

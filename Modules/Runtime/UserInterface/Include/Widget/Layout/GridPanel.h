@@ -52,13 +52,6 @@ namespace Ry
 			
 		};
 		
-		WidgetBeginArgsSlot(GridPanel, GridPanel::Slot)
-			WidgetProp(float, CellWidth)
-			WidgetProp(float, CellHeight)
-		WidgetEndArgs()
-
-		void Construct(Args& In);
-
 		Ry::SharedPtr<PanelWidgetSlot> AppendSlot(Ry::SharedPtr<Widget> Widget) override;
 
 		/**

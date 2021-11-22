@@ -5,14 +5,28 @@
 
 namespace Ry
 {
-	class PanelWidgetSlot
+	class PanelWidgetSlot : public Ry::Object
 	{
 	public:
 
 		GeneratedBody()
 
-		SizeMode Mode;
-		SizeType Size;
+		uint8 SizeMode;
+		//SizeMode Mode;
+		//SizeType Size;
+
+		RefField()
+		float PaddingLeft{};
+
+		RefField()
+		float PaddingRight{};
+
+		RefField()
+		float PaddingTop{};
+
+		RefField()
+		float PaddingBottom{};
+
 
 		PanelWidgetSlot()
 		{
@@ -38,15 +52,15 @@ namespace Ry
 		{
 			return Widget;
 		}
-
-		Margin GetPadding()
-		{
-			return SlotPadding;
-		}
+		//
+		// Margin GetPadding()
+		// {
+		// 	return SlotPadding;
+		// }
 
 		PanelWidgetSlot& SetPadding(float Padding)
 		{
-			this->SlotPadding = Padding;
+			this->PaddingLeft = PaddingRight = PaddingTop = PaddingBottom = Padding;
 
 			MarkWidgetDirty();
 
@@ -55,7 +69,7 @@ namespace Ry
 
 		PanelWidgetSlot& SetBottomPadding(float Padding)
 		{
-			this->SlotPadding.Bottom = Padding;
+			this->PaddingBottom = Padding;
 
 			MarkWidgetDirty();
 
@@ -64,7 +78,7 @@ namespace Ry
 
 		PanelWidgetSlot& SetTopPadding(float Padding)
 		{
-			this->SlotPadding.Top = Padding;
+			this->PaddingTop = Padding;
 
 			MarkWidgetDirty();
 
@@ -73,7 +87,7 @@ namespace Ry
 
 		PanelWidgetSlot& SetLeftPadding(float Padding)
 		{
-			this->SlotPadding.Left = Padding;
+			this->PaddingLeft = Padding;
 
 			MarkWidgetDirty();
 
@@ -82,7 +96,7 @@ namespace Ry
 
 		PanelWidgetSlot& SetRightPadding(float Padding)
 		{
-			this->SlotPadding.Right = Padding;
+			this->PaddingRight = Padding;
 
 			MarkWidgetDirty();
 
@@ -91,7 +105,9 @@ namespace Ry
 
 		PanelWidgetSlot& SetPadding(float Horizontal, float Vertical)
 		{
-			this->SlotPadding.Set(Horizontal, Vertical);
+			//this->SlotPadding.Set(Horizontal, Vertical);
+			this->PaddingLeft = PaddingRight = Horizontal;
+			this->PaddingTop = PaddingBottom = Vertical;
 
 			MarkWidgetDirty();
 
@@ -100,7 +116,10 @@ namespace Ry
 
 		PanelWidgetSlot& SetPadding(Margin Padding)
 		{
-			this->SlotPadding = Padding;
+			this->PaddingBottom = Padding.Bottom;
+			this->PaddingTop = Padding.Top;
+			this->PaddingLeft = Padding.Left;
+			this->PaddingRight = Padding.Right;
 
 			MarkWidgetDirty();
 
@@ -110,7 +129,6 @@ namespace Ry
 	protected:
 
 		SharedPtr<Ry::Widget> Widget;
-		Margin SlotPadding;
 
 		void MarkWidgetDirty()
 		{

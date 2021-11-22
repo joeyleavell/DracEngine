@@ -17,7 +17,7 @@ namespace Ry
 		this->TileIconStyle = TileIconStyle;
 		this->Name = Name;
 
-		Ry::SharedPtr<Widget> ItemWidget = LoadWidget("/Engine/UI/ContentBrowserItem.ui");
+		Ry::SharedPtr<Widget> ItemWidget = LoadWidget<Ry::Widget>("/Engine/UI/ContentBrowserItem.ui");
 
 		// Set the style of the icon
 		Icon = ItemWidget->FindChildWidget<Ry::BorderWidget>("Icon");
@@ -52,11 +52,8 @@ namespace Ry
 	}
 
 	ContentBrowserWidget::ContentBrowserWidget()
-	{
-		// VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		// TextFont = Font->GenerateBitmapFont(20);
-		
-		Ry::SharedPtr<Widget> ContentBrowser = LoadWidget("/Engine/UI/ContentBrowser.ui");
+	{		
+		Ry::SharedPtr<Widget> ContentBrowser = LoadWidget<Ry::Widget>("/Engine/UI/ContentBrowser.ui");
 		if(ContentBrowser.IsValid())
 		{
 			UpArrow     = ContentBrowser->FindChildWidget<Ry::Button>("UpArrow");
@@ -65,59 +62,6 @@ namespace Ry
 		}
 
 		SetChild(ContentBrowser);
-		
-		// Create directory grid
-		/*SetChild(
-			NewWidget(VerticalPanel)
-			+ 
-			VerticalPanel::MakeSlot()
-			[
-				NewWidget(BorderWidget)
-				[
-					NewWidget(HorizontalPanel)
-					+
-					HorizontalPanel::MakeSlot()
-					.SetBottomPadding(10.0f)
-					[
-						// Up directory
-						NewWidgetAssign(UpArrow, Ry::Button)
-						[
-							NewWidget(BorderWidget)
-							.BoxStyleName("UpArrowIcon")
-							.Padding(10.0f)
-						]
-					]
-
-					// Current Directory
-					+
-					HorizontalPanel::MakeSlot()
-					.SetBottomPadding(10.0f)
-					[
-						NewWidgetAssign(CurDirLabel, TextField)
-						.Color(WHITE)
-						.Font(TextFont)
-					]
-
-				]
-
-			]
-
-			+ VerticalPanel::MakeSlot()
-			[
-				NewWidgetAssign(Pane, ScrollPane)
-				.Width(600)
-				.Height(300)
-				
-				+ ScrollPane::MakeSlot()
-				[
-					NewWidgetAssign(Grid, GridPanel)
-					.CellWidth(200.0f)
-					.CellHeight(100.0f)
-				]
-
-			]
-		);*/
-
 	}
 
 	ContentBrowserWidget::~ContentBrowserWidget()

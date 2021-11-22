@@ -21,15 +21,7 @@ namespace Ry
 		RefField()
 		Ry::String TextStyleName;
 
-		WidgetBeginArgs(TextField)
-			WidgetProp(Ry::String, Text)
-			WidgetProp(BitmapFont*, Font)
-			WidgetProp(Ry::Color, Color)
-		WidgetEndArgs()
-
 		TextField();
-		void Construct(Args& In);
-
 		SizeType ComputeSize() const override;
 
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;

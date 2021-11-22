@@ -1,0 +1,23 @@
+<Ry::BorderWidget VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1">
+    <Ry::Splitter BarThickness="10.0" Type="0">
+        
+        <Slot>
+            <Ry::BorderWidget PaddingLeft="10.0" PaddingBottom="10.0" FillX="1.0">
+                <Ry::ContentBrowserWidget Id="BrowserWidget"/>
+            </Ry::BorderWidget>
+        </Slot>
+
+        <Slot>
+            <Ry::Splitter BarThickness="10.0" Type="1">
+                <Slot>
+                    <Ry::BorderWidget BoxStyleName="TestIcon1" PaddingLeft="75.0" PaddingRight="75.0" PaddingTop="75.0" PaddingBottom="75.0"/>
+                </Slot>
+
+                <Slot>
+                    <Ry::BorderWidget BoxStyleName="TestIcon2" PaddingLeft="75.0" PaddingRight="75.0" PaddingTop="75.0" PaddingBottom="75.0"/>
+                </Slot>
+            </Ry::Splitter>
+        </Slot>
+
+    </Ry::Splitter>
+</Ry::BorderWidget>
