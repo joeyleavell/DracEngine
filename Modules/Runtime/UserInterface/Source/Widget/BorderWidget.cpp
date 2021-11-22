@@ -18,171 +18,195 @@ namespace Ry
 		ParentArgs.Children = In.Children;
 		SlotWidget::Construct(ParentArgs);
 
-		if (In.mDefaultImage.IsSet())
-		{
-			this->DefaultImage(In.mDefaultImage, In.mDefaultImageTint);
-		}
-
-		if (In.mDefaultBox.IsSet())
-		{
-			this->BStyle.DefaultBox().Set(In.mDefaultBox);
-		}
-
-		if (In.mHoveredImage.IsSet())
-		{
-			this->HoveredImage(In.mHoveredImage, In.mHoveredImageTint);
-		}
-
-		if (In.mHoveredBox.IsSet())
-		{
-			this->BStyle.HoveredBox().Set(In.mHoveredBox);
-		}
-
-		if (In.mPressedImage.IsSet())
-		{
-			this->PressedImage(In.mPressedImage, In.mPressedImageTint);
-		}
-
-		if (In.mPressedBox.IsSet())
-		{
-			this->BStyle.PressedBox().Set(In.mPressedBox);
-		}
+		BoxStyleName = In.mBoxStyleName;
+		
+		//
+		// if (In.mDefaultImage.IsSet())
+		// {
+		// 	this->DefaultImage(In.mDefaultImage, In.mDefaultImageTint);
+		// }
+		//
+		// if (In.mDefaultBox.IsSet())
+		// {
+		// 	this->BStyle.DefaultBox().Set(In.mDefaultBox);
+		// }
+		//
+		// if (In.mHoveredImage.IsSet())
+		// {
+		// 	this->HoveredImage(In.mHoveredImage, In.mHoveredImageTint);
+		// }
+		//
+		// if (In.mHoveredBox.IsSet())
+		// {
+		// 	this->BStyle.HoveredBox().Set(In.mHoveredBox);
+		// }
+		//
+		// if (In.mPressedImage.IsSet())
+		// {
+		// 	this->PressedImage(In.mPressedImage, In.mPressedImageTint);
+		// }
+		//
+		// if (In.mPressedBox.IsSet())
+		// {
+		// 	this->BStyle.PressedBox().Set(In.mPressedBox);
+		// }
 
 	}
 
-	BorderWidget& BorderWidget::Box(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
-	{
-		return DefaultBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).HoveredBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).PressedBox(BackgroundColor, BorderColor, BorderRadius, BorderSize);
-	}
-
-	BorderWidget& BorderWidget::DefaultImage(Texture* Image, Color ImageTint)
-	{
-		BStyle.DefaultBoxImage().SetImageTint(ImageTint).SetTexture(Image);
-		return *this;
-	}
-
-	BorderWidget& BorderWidget::HoveredImage(Texture* Image, Color ImageTint)
-	{
-		BStyle.HoveredBoxImage().SetImageTint(ImageTint).SetTexture(Image);
-		return *this;
-	}
-
-	BorderWidget& BorderWidget::PressedImage(Texture* Image, Color ImageTint)
-	{
-		BStyle.PressedBoxImage().SetImageTint(ImageTint).SetTexture(Image);
-		return *this;
-	}
-
-	BorderWidget& BorderWidget::DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
-	{
-		BStyle.DefaultBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
-		return *this;
-	}
-
-	BorderWidget& BorderWidget::HoveredBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
-	{
-		BStyle.HoveredBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
-		return *this;
-	}
-
-	BorderWidget& BorderWidget::PressedBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
-	{
-		BStyle.PressedBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
-		return *this;
-	}
+	// BorderWidget& BorderWidget::Box(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
+	// {
+	// 	return DefaultBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).HoveredBox(BackgroundColor, BorderColor, BorderRadius, BorderSize).PressedBox(BackgroundColor, BorderColor, BorderRadius, BorderSize);
+	// }
+	//
+	// BorderWidget& BorderWidget::DefaultImage(Texture* Image, Color ImageTint)
+	// {
+	// 	BStyle.DefaultBoxImage().SetImageTint(ImageTint).SetTexture(Image);
+	// 	return *this;
+	// }
+	//
+	// BorderWidget& BorderWidget::HoveredImage(Texture* Image, Color ImageTint)
+	// {
+	// 	BStyle.HoveredBoxImage().SetImageTint(ImageTint).SetTexture(Image);
+	// 	return *this;
+	// }
+	//
+	// BorderWidget& BorderWidget::PressedImage(Texture* Image, Color ImageTint)
+	// {
+	// 	BStyle.PressedBoxImage().SetImageTint(ImageTint).SetTexture(Image);
+	// 	return *this;
+	// }
+	//
+	// BorderWidget& BorderWidget::DefaultBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
+	// {
+	// 	BStyle.DefaultBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
+	// 	return *this;
+	// }
+	//
+	// BorderWidget& BorderWidget::HoveredBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
+	// {
+	// 	BStyle.HoveredBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
+	// 	return *this;
+	// }
+	//
+	// BorderWidget& BorderWidget::PressedBox(const Color& BackgroundColor, const Color& BorderColor, int32 BorderRadius, int32 BorderSize)
+	// {
+	// 	BStyle.PressedBox().SetBackgroundColor(BackgroundColor).SetBorderColor(BorderColor).SetBorderRadius(BorderRadius).SetBorderSize(BorderSize);
+	// 	return *this;
+	// }
 
 	void BorderWidget::OnShow(Ry::Batch* Batch)
 	{
-		if (IsHovered())
+		if(!BoxStyleName.IsEmpty())
 		{
-			if (IsPressed())
+			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
+
+			if (IsHovered())
 			{
-				if (BStyle.Pressed)
+				if (IsPressed())
 				{
-					BStyle.Pressed->Show(Batch, WidgetLayer, GetPipelineState(this));
+
+					if (BoxStyle.Pressed)
+					{
+						BoxStyle.Pressed->Show(Batch, WidgetLayer, GetPipelineState(this));
+					}
+					else if (BoxStyle.Hovered)
+					{
+						BoxStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
+					}
+					else if (BoxStyle.Default)
+					{
+						BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+					}
 				}
-				else if (BStyle.Hovered)
+				else
 				{
-					BStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
-				}
-				else if (BStyle.Default)
-				{
-					BStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+					if (BoxStyle.Hovered)
+					{
+						BoxStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
+					}
+					else if (BoxStyle.Default)
+					{
+						BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+					}
 				}
 			}
 			else
 			{
-				if (BStyle.Hovered)
+				if (BoxStyle.Default)
 				{
-					BStyle.Hovered->Show(Batch, WidgetLayer, GetPipelineState(this));
-				}
-				else if (BStyle.Default)
-				{
-					BStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
+					BoxStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
 				}
 			}
-		}
-		else
-		{
-			if (BStyle.Default)
-			{
-				BStyle.Default->Show(Batch, WidgetLayer, GetPipelineState(this));
-			}
+
 		}
 	}
 
 	void BorderWidget::OnHide(Ry::Batch* Batch)
 	{
-		if (BStyle.Default)
+		if(!BoxStyleName.IsEmpty())
 		{
-			BStyle.Default->Hide(Batch);
-		}
+			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
 
-		if (BStyle.Pressed)
-		{
-			BStyle.Pressed->Hide(Batch);
-		}
+			if (BoxStyle.Default)
+			{
+				BoxStyle.Default->Hide(Batch);
+			}
 
-		if (BStyle.Hovered)
-		{
-			BStyle.Hovered->Hide(Batch);
+			if (BoxStyle.Pressed)
+			{
+				BoxStyle.Pressed->Hide(Batch);
+			}
+
+			if (BoxStyle.Hovered)
+			{
+				BoxStyle.Hovered->Hide(Batch);
+			}
+
 		}
 	}
 
 	void BorderWidget::Draw()
 	{
-		// Note: super function is called later on
-
-		if (IsVisible())
+		if(!BoxStyleName.IsEmpty())
 		{
-			Point Abs = GetAbsolutePosition();
-			SizeType ComputedSize = ComputeSize();
+			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
 
-			// choose from :default :hovered and :pressed styles
-			if (IsHovered())
+			// Note: super function is called later on
+
+			if (IsVisible())
 			{
-				if (IsPressed() && BStyle.Pressed)
+				Point Abs = GetAbsolutePosition();
+				SizeType ComputedSize = ComputeSize();
+
+				// choose from :default :hovered and :pressed styles
+				if (IsHovered())
 				{
-					BStyle.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					if (IsPressed() && BoxStyle.Pressed)
+					{
+						BoxStyle.Pressed->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					}
+					else if (BoxStyle.Hovered)
+					{
+						BoxStyle.Hovered->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					}
 				}
-				else if (BStyle.Hovered)
+				else if (BoxStyle.Default)
 				{
-					BStyle.Hovered->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
+					BoxStyle.Default->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
 				}
+
 			}
-			else if (BStyle.Default)
-			{
-				BStyle.Default->Draw((float)Abs.X, (float)Abs.Y, (float)ComputedSize.Width, (float)ComputedSize.Height);
-			}
+
+			SlotWidget::Draw();
 
 		}
-
-		SlotWidget::Draw();
 	}
 
 	bool BorderWidget::HasVisual()
 	{
-		return BStyle.Default || BStyle.Hovered || BStyle.Pressed;
+		const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
+
+		return BoxStyle.Default || BoxStyle.Hovered || BoxStyle.Pressed;
 	}
 
 	void BorderWidget::OnHovered(const MouseEvent& MouseEv)

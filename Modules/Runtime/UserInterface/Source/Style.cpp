@@ -17,32 +17,32 @@ namespace Ry
 
 	void StyleSet::AddTextStyle(Ry::String Name, const TextStyle& TextStyle)
 	{
-		TextStyles.insert(Name, TextStyle);
+		TextStyles.Insert(Name, TextStyle);
 	}
 
 	void StyleSet::AddBoxStyle(Ry::String Name, const BoxStyle& BoxStyle)
 	{
-		BoxStyles.insert(Name, BoxStyle);
+		BoxStyles.Insert(Name, BoxStyle);
 	}
 
 	void StyleSet::RemoveTextStyle(Ry::String Name)
 	{
-		TextStyles.remove(Name);
+		TextStyles.Remove(Name);
 	}
 
 	void StyleSet::RemoveBoxStyle(Ry::String Name)
 	{
-		BoxStyles.remove(Name);
+		BoxStyles.Remove(Name);
 	}
 
 	const TextStyle& StyleSet::GetTextStyle(Ry::String Name) const
 	{
-		return *TextStyles.get(Name);
+		return TextStyles.Get(Name);
 	}
 
 	const BoxStyle& StyleSet::GetBoxStyle(Ry::String Name) const
 	{
-		return *BoxStyles.get(Name);
+		return BoxStyles.Get(Name);
 	}
 
 	void RegisterStyle(Ry::String Name, const StyleSet* Set)

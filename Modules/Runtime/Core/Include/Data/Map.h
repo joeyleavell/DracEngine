@@ -110,12 +110,12 @@ namespace Ry
 			
 		}
 
-		V& Get(const K& Key)
+		V& Get(const K& Key) const
 		{
 			return Table.Get(Key).Value;
 		}
 
-		bool Contains(const K& Key)
+		bool Contains(const K& Key) const
 		{
 			return Table.Contains(Key);
 		}

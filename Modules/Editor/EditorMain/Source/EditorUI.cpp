@@ -11,12 +11,14 @@
 #include "Interface/RenderCommand.h"
 #include "ContentBrowser/ContentBrowserWidget.h"
 #include "WidgetManager.h"
+#include "EditorStyle.h"
 
 namespace Ry
 {
 	EditorUI::EditorUI(SwapChain* Parent):
 	Layer(Parent)
 	{
+		// Create the editor style
 		InitializeEditorStyle();
 		
 		std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
@@ -60,30 +62,6 @@ namespace Ry
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
 
-		BoxDrawable Default;
-		Default.SetBackgroundColor(WHITE.ScaleRGB(0.1f));
-		Default.SetBorderColor(GREEN);
-		Default.SetBorderRadius(10);
-		Default.SetBorderSize(0);
-
-		BoxDrawable Default2;
-		Default2.SetBackgroundColor(GREEN);
-		Default2.SetBorderColor(GREEN);
-		Default2.SetBorderRadius(10);
-		Default2.SetBorderSize(0);
-
-		BoxDrawable Default3;
-		Default3.SetBackgroundColor(BLUE);
-		Default3.SetBorderColor(BLUE);
-		Default3.SetBorderRadius(10);
-		Default3.SetBorderSize(0);
-
-		BoxDrawable Hovered;
-		Hovered.SetBackgroundColor(WHITE.ScaleRGB(0.05f));
-		Hovered.SetBorderColor(GREEN);
-		Hovered.SetBorderRadius(10);
-		Hovered.SetBorderSize(0);
-
 		// Build editor UI
 		NewWidgetAssign(Root, BorderWidget)
 		.HorAlign(HAlign::CENTER)
@@ -116,13 +94,15 @@ namespace Ry
 				+ Ry::Splitter::MakeSlot()
 				[
 					NewWidget(BorderWidget)
-					.DefaultBox(Default2)
+					.BoxStyleName("TestIcon1")
+		//			.DefaultBox(Default2)
 					.Padding(75.0f)
 				]
 				+ Ry::Splitter::MakeSlot()
 				[
 					NewWidget(BorderWidget)
-					.DefaultBox(Default3)
+					.BoxStyleName("TestIcon2")
+//					.DefaultBox(Default3)
 					.Padding(75.0f)
 				]
 
@@ -137,22 +117,6 @@ namespace Ry
 
 		// Initialize the directory now that the content browser is added to the root
 		ContentBrowse->SetDirectory("/Engine");
-	}
-
-	void EditorUI::InitializeEditorStyle()
-	{
-		// Load editor font
-		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
-		BitmapFont* NormalTextFont = Font->GenerateBitmapFont(20);
-
-		TextStyle NormalText;
-		NormalText.SetColor(WHITE);
-		NormalText.SetFont(NormalTextFont);
-
-		EditorStyle.AddTextStyle("Normal", NormalText);
-
-		// Register the style globally
-		RegisterStyle("Editor", &EditorStyle);
 	}
 
 	void EditorUI::Update(float Delta)

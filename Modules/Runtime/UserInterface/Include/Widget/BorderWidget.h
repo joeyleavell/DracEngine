@@ -20,15 +20,16 @@ namespace Ry
 			WidgetPropDefault(HAlign, HorAlign, HAlign::CENTER)
 			WidgetPropDefault(VAlign, VertAlign, VAlign::CENTER)
 			WidgetPropDefault(bool, HasStyle, true)
-			WidgetProp(Texture*, DefaultImage)
-			WidgetProp(Color, DefaultImageTint)
-			WidgetProp(Texture*, HoveredImage)
-			WidgetProp(Color, HoveredImageTint)
-			WidgetProp(Texture*, PressedImage)
-			WidgetProp(Color, PressedImageTint)
-			WidgetProp(BoxDrawable, DefaultBox)
-			WidgetProp(BoxDrawable, HoveredBox)
-			WidgetProp(BoxDrawable, PressedBox)
+			WidgetProp(Ry::String, BoxStyleName)
+			// WidgetProp(Texture*, DefaultImage)
+			// WidgetProp(Color, DefaultImageTint)
+			// WidgetProp(Texture*, HoveredImage)
+			// WidgetProp(Color, HoveredImageTint)
+			// WidgetProp(Texture*, PressedImage)
+			// WidgetProp(Color, PressedImageTint)
+			// WidgetProp(BoxDrawable, DefaultBox)
+			// WidgetProp(BoxDrawable, HoveredBox)
+			// WidgetProp(BoxDrawable, PressedBox)
 		WidgetEndArgs()
 
 		void Construct(Args& In);
@@ -51,10 +52,12 @@ namespace Ry
 
 	private:
 
+		Ry::String BoxStyleName;
+
 		/**
 		 * The styling for various states of this box element.
 		 */
-		BoxStyle BStyle;
+		//BoxStyle BStyle;
 		
 	};
 }

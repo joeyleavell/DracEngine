@@ -134,8 +134,8 @@ namespace Ry
 
 	private:
 
-		Ry::Map<Ry::String, TextStyle> TextStyles;
-		Ry::Map<Ry::String, BoxStyle> BoxStyles;
+		Ry::OAHashMap<Ry::String, TextStyle> TextStyles;
+		Ry::OAHashMap<Ry::String, BoxStyle> BoxStyles;
 
 	};
 

@@ -172,7 +172,7 @@ namespace Ry
 		}
 
 		template<typename K>
-		T& Get(const K& Key)
+		T& Get(const K& Key) const
 		{
 			uint32 HashValue = Ry::Hash(Key);
 			int32 Probe = 0;
@@ -260,7 +260,7 @@ namespace Ry
 		}
 
 		template<typename K>
-		bool Contains(const K& Value)
+		bool Contains(const K& Value) const
 		{
 			uint32 HashValue = Ry::Hash(Value);
 

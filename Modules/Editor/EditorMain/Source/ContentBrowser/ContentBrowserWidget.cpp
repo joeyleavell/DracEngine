@@ -11,10 +11,9 @@
 
 namespace Ry
 {
-	ContentBrowserItem::ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name)
+	ContentBrowserItem::ContentBrowserItem(Ry::String TileIconStyle, Ry::String Name)
 	{
-		this->Tex = Texture;
-		this->Font = Font;
+		this->TileIconStyle = TileIconStyle;
 		this->Name = Name;
 	}
 
@@ -31,9 +30,10 @@ namespace Ry
 			VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Icon, Ry::BorderWidget)
-				.DefaultImage(Tex)
-				.HoveredImage(Tex)
-				.HoveredImageTint(WHITE.ScaleRGB(0.5f))
+				.BoxStyleName(TileIconStyle)
+//				.DefaultImage(Tex)
+	//			.HoveredImage(Tex)
+//				.HoveredImageTint(WHITE.ScaleRGB(0.5f))
 				.Padding(30.0f)
 			]
 
@@ -41,8 +41,8 @@ namespace Ry
 			VerticalPanel::MakeSlot()
 			[
 				NewWidgetAssign(Lab, Ry::Label)
-				.Text(Name)
 				.TextStyleName("Normal")
+				.Text(Name)
 			]
 		);
 	}
@@ -64,9 +64,6 @@ namespace Ry
 		VectorFontAsset* Font = Ry::AssetMan->LoadAsset<VectorFontAsset>("/Engine/Fonts/arial.ttf", "font/truetype");
 		TextFont = Font->GenerateBitmapFont(20);
 
-		TextureAsset* UpArrowAsset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/up-arrow.png", "image");
-		UpArrowTexture = UpArrowAsset->CreateRuntimeTexture();
-
 		// Create directory grid
 		SetChild(
 			NewWidget(VerticalPanel)
@@ -85,12 +82,7 @@ namespace Ry
 
 						[
 							NewWidget(BorderWidget)
-							.DefaultImage(UpArrowTexture)
-							.DefaultImageTint(WHITE)
-							.HoveredImage(UpArrowTexture)
-							.HoveredImageTint(WHITE.ScaleRGB(0.8f))
-							.PressedImage(UpArrowTexture)
-							.PressedImageTint(WHITE.ScaleRGB(0.6f))
+							.BoxStyleName("UpArrowIcon")
 							.Padding(10.0f)
 						]
 					]
@@ -125,12 +117,6 @@ namespace Ry
 			]
 		);
 
-		TextureAsset* Asset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/Icon.png", "image");
-		DirectoryTexture = Asset->CreateRuntimeTexture();
-
-		TextureAsset* FileAsset = AssetMan->LoadAsset<TextureAsset>("/Engine/Textures/file.png", "image");
-		FileTexture = FileAsset->CreateRuntimeTexture();
-
 	}
 
 	ContentBrowserWidget::~ContentBrowserWidget()
@@ -145,7 +131,7 @@ namespace Ry
 
 	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddDirectory(Ry::String Name)
 	{
-		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem(DirectoryTexture, TextFont, Name));
+		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem("DirectoryIcon", Name));
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 		Grid->AppendSlot(AsWidget);
 
@@ -156,7 +142,7 @@ namespace Ry
 
 	Ry::SharedPtr<ContentBrowserItem> ContentBrowserWidget::AddFile(Ry::String Name)
 	{
-		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem(FileTexture, TextFont, Name));
+		Ry::SharedPtr<ContentBrowserItem> NewItem = MakeShared(new ContentBrowserItem("FileIcon", Name));
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 
 		Grid->AppendSlot(AsWidget);

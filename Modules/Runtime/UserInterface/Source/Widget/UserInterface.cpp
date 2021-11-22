@@ -53,8 +53,8 @@ namespace Ry
 
 		Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
 
-		Widget->SetVisible(true, true);
 		Widget->SetStyle(Style);
+		Widget->SetVisible(true, true);
 
 		Draw();
 	}

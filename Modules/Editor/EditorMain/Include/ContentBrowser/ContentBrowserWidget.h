@@ -17,7 +17,7 @@ namespace Ry
 
 		MulticastDelegate<ContentBrowserItem*> OnDoubleClick;
 
-		ContentBrowserItem(Texture* Texture, BitmapFont* Font, Ry::String Name);
+		ContentBrowserItem(Ry::String TileIconStyle, Ry::String Name);
 		virtual ~ContentBrowserItem();
 
 		void Construct();
@@ -29,9 +29,8 @@ namespace Ry
 		Ry::SharedPtr<BorderWidget> Icon;
 		Ry::SharedPtr<Label> Lab;
 
-		Texture* Tex;
-		BitmapFont* Font;
 		Ry::String Name;
+		Ry::String TileIconStyle;
 
 	};
 
