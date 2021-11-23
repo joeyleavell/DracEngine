@@ -198,7 +198,9 @@ namespace Ry
 		Widget& SetRelativePosition(float X, float Y);
 		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight);
 		void MarkDirty(Widget* Self, bool bFullRefresh = false);
-		
+		void SetVisible(bool bVisibility, bool bPropagate);
+
+		virtual void SetVisibleInternal(bool bVisibility, bool bPropagate);
 		virtual SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const { return Ry::SharedPtr<Widget>(); };
 		virtual void SetId(const Ry::String& Id);
 		virtual void SetClass(const Ry::String& Class);
@@ -221,7 +223,6 @@ namespace Ry
 		virtual bool OnKey(const KeyEvent& KeyEv);
 		virtual bool OnChar(const CharEvent& CharEv);
 		virtual bool OnEvent(const Event& Ev);
-		virtual void SetVisible(bool bVisibility, bool bPropagate);
 		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates);
 		virtual void Draw() {};
 		virtual SizeType ComputeSize() const { return SizeType{}; };

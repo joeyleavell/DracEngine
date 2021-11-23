@@ -310,9 +310,16 @@ namespace Ry
 
 	void Widget::SetVisible(bool bVisibility, bool bPropagate)
 	{
-		this->bVisible = bVisibility;
+		// Sets the actual value of visibility and ensures propagation
+		SetVisibleInternal(bVisibility, bPropagate);
 
+		// Actually marks the widget as dirty. Saves having to do this for each child widget.
 		MarkDirty(this);
+	}
+
+	void Widget::SetVisibleInternal(bool bVisibility, bool bPropagate)
+	{
+		this->bVisible = bVisibility;
 	}
 
 	void Widget::MarkDirty(Widget* Self, bool bFullRefresh)

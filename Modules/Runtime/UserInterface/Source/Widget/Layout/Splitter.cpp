@@ -151,7 +151,7 @@ namespace Ry
 			// Calculate new bar position
 			if(Type == SPLITTER_TYPE_HOR)
 			{
-				float DeltaX = std::floor(MouseEv.MouseX - (OurPos.X - BarThickness / 2.0f));
+				float DeltaX = std::floor(MouseEv.MouseX - OurPos.X - BarThickness / 2.0f);
 				BarPosition = DeltaX / OurSize.Width;
 			}
 			else // Vertical

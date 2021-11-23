@@ -61,6 +61,7 @@ namespace Ry
 
 	void UserInterface::Redraw()
 	{
+		
 		Bat->Clear();
 
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
@@ -93,7 +94,6 @@ namespace Ry
 			Bat->UpdatePipelineState(State);
 		}
 
-
 		Bat->Update();
 	}
 
@@ -115,11 +115,23 @@ namespace Ry
 	{
 		static Ry::ArrayList<PipelineState> PipelineStates;
 		static Ry::ArrayList<Widget*> AllChildren;
+		static Ry::ArrayList<Widget*> WidgetChildren;
 
 		// Takes care of widget visibility changes and widget swapping elements
-		Wid->OnHide(Bat);
-		if (Wid->IsVisible())
-			Wid->OnShow(Bat);
+		{
+			WidgetChildren.SoftClear();
+
+			// Add the widget and its children
+			Wid->GetAllChildren(WidgetChildren);
+			WidgetChildren.Add(Wid);
+
+			for (Widget* Child : WidgetChildren)
+			{
+				Child->OnHide(Bat);
+				if (Child->IsVisible())
+					Child->OnShow(Bat);
+			}
+		}
 
 		// Correctly places widget
 		Wid->Arrange();
@@ -156,9 +168,7 @@ namespace Ry
 		if (bFullRefresh)
 			Draw(); // Re-arrange everything, will also update batch
 		else
-			Bat->Update(); // Just update batch
-
-		Bat->Render();
+			Bat->Update(); // Just update batch, this assumes the dirty-ness doesn't affect the positioning of other widgets
 
 	}
 

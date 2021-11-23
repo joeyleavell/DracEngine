@@ -133,16 +133,16 @@ namespace Ry
 		return *this;
 	}
 
-	void PanelWidget::SetVisible(bool bVisibility, bool bPropagate)
+	void PanelWidget::SetVisibleInternal(bool bVisibility, bool bPropagate)
 	{
-		Widget::SetVisible(bVisibility, bPropagate);
+		Widget::SetVisibleInternal(bVisibility, bPropagate);
 
 		if (bPropagate)
 		{
 			for (SharedPtr<Widget> Child : Children)
 			{
 				// Set child to its own visibility, needs to refresh
-				Child->SetVisible(bVisibility, true);
+				Child->SetVisibleInternal(bVisibility, true);
 			}
 		}
 	}

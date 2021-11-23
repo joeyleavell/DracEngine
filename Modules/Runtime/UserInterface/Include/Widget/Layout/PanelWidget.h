@@ -25,7 +25,7 @@ namespace Ry
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		void Draw() override;
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget);
-		void SetVisible(bool bVisibility, bool bPropagate) override;
+		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;
 		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override;
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;

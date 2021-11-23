@@ -187,13 +187,13 @@ namespace Ry
 		return Result;
 	}
 
-	void SlotWidget::SetVisible(bool bVisibility, bool bPropagate)
+	void SlotWidget::SetVisibleInternal(bool bVisibility, bool bPropagate)
 	{
-		Widget::SetVisible(bVisibility, bPropagate);
-
-		if (bPropagate && Child)
+		Widget::SetVisibleInternal(bVisibility, bPropagate);
+		
+		if (Child && bPropagate)
 		{
-			Child->SetVisible(bVisibility, true);
+			Child->SetVisibleInternal(bVisibility, true);
 		}
 	}
 

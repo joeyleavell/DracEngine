@@ -72,7 +72,7 @@ namespace Ry
 		//SlotWidget& SetHAlign(HAlign HorizontalAlign);
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		SizeType ComputeSize() const override;
-		void SetVisible(bool bVisibility, bool bPropagate) override;
+		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
 		void Draw() override;
 		void Arrange() override;
 		void SetChild(Ry::SharedPtr<Ry::Widget> Child);
