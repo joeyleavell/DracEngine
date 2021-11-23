@@ -14,12 +14,6 @@ namespace Ry
 
 		GeneratedBody()
 
-		RefField()
-		float Width;
-
-		RefField()
-		float Height;
-
 		struct Slot : public PanelWidgetSlot
 		{
 			Slot() :

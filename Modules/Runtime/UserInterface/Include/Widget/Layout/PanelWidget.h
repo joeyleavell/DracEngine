@@ -34,10 +34,22 @@ namespace Ry
 		bool OnKey(const KeyEvent& KeyEv) override;
 		bool OnChar(const CharEvent& CharEv) override;
 		virtual void ClearChildren();
+		//RectScissor GetClipSpace(const Widget* ForWidget) const override;
+
+		//SizeType GetSlotSize(const Widget* ForWidget, bool bIncludePadding = false) const override;
+
+		SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
+		SizeType GetUnscaledOccupiedSize(const Widget* ForWidget) const override;
+		SizeType GetScaledOccupiedSize(const Widget* ForWidget) const override;
+
+		// int32 NormalizeWidth(int32 InWidth);
+		// int32 NormalizeHeight(int32 InHeight);
+
 
 	protected:
-
 		Ry::ArrayList<SharedPtr<Widget>> Children;
+		Ry::OAHashMap<Widget*, SharedPtr<PanelWidgetSlot>> WidgetSlots;
+
 	} RefClass();
 
 }

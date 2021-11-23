@@ -1,26 +1,28 @@
-<Ry::VerticalPanel>
-    
-    <Slot>
-        <Ry::BorderWidget>
-            <Ry::HorizontalPanel>
-                <Slot PaddingBottom="10.0">
-                    <Ry::Button Id="UpArrow">
-                        <Ry::BorderWidget BoxStyleName="UpArrowIcon" PaddingLeft="10.0" PaddingRight="10.0" PaddingTop="10.0" PaddingBottom="10.0"/>
-                    </Ry::Button>
-                </Slot>
-                <Slot PaddingBottom="10.0">
-                    <Ry::TextField Id="CurrentDirectory" TextStyleName="Normal"/>
-                </Slot>
-            </Ry::HorizontalPanel>
-        </Ry::BorderWidget>
-    </Slot>
+<Ry::BorderWidget VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1" PaddingLeft="10.0" PaddingRight="10.0" PaddingBottom="10.0" PaddingTop="10.0">
+    <Ry::VerticalPanel>
+        
+        <Slot bSizeToContent="1" HorizontalAlignMode="3">
+            <Ry::BorderWidget>
+                <Ry::HorizontalPanel>
+                    <Slot PaddingBottom="0.0">
+                        <Ry::Button Id="UpArrow">
+                            <Ry::BorderWidget BoxStyleName="UpArrowIcon" PaddingLeft="10.0" PaddingRight="10.0" PaddingTop="10.0" PaddingBottom="10.0"/>
+                        </Ry::Button>
+                    </Slot>
+                    <Slot PaddingBottom="0.0">
+                        <Ry::TextField Id="CurrentDirectory" TextStyleName="Normal"/>
+                    </Slot>
+                </Ry::HorizontalPanel>
+            </Ry::BorderWidget>
+        </Slot>
 
-    <Slot>
-        <Ry::ScrollPane Width="600" Height="300">        
-            <Slot>
-                <Ry::GridPanel Id="ContentGrid" CellWidth="200.0" CellHeight="100.0"/>
-            </Slot>
-        </Ry::ScrollPane>
-    </Slot>
+        <Slot SlotWidth="500.0" SlotHeight="300.0" HorizontalAlignMode="3" VerticalAlignMode="3">
+            <Ry::ScrollPane>
+                <Slot>
+                    <Ry::GridPanel Id="ContentGrid" CellWidth="200.0" CellHeight="100.0"/>
+                </Slot>
+            </Ry::ScrollPane>
+        </Slot>
 
-</Ry::VerticalPanel>
+    </Ry::VerticalPanel>
+</Ry::BorderWidget>

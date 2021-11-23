@@ -95,19 +95,7 @@ namespace Ry
 
 	SizeType Splitter::ComputeSize() const
 	{
-		SizeType ParentSize;
-
-		if (Parent)
-		{
-			ParentSize = Parent->ComputeSize();
-		}
-		else
-		{
-			ParentSize.Width = Ry::GetViewportWidth();
-			ParentSize.Height = Ry::GetViewportHeight();
-		}
-
-		return ParentSize;
+		return Widget::GetScaledSlotSize(this);
 	}
 
 	void Splitter::Arrange()
@@ -120,21 +108,24 @@ namespace Ry
 
 		SharedPtr<Widget> WidgetA = Children[0];
 		SharedPtr<Widget> WidgetB = Children[1];
+		SharedPtr<PanelWidgetSlot> SlotA = WidgetSlots.Get(WidgetA.Get());
+		SharedPtr<PanelWidgetSlot> SlotB = WidgetSlots.Get(WidgetB.Get());
+
 		RectScissor OurSize = Widget::GetClipSpace(this);
 
 		// Vertical or horizontal, widget A's position is always the same
-		WidgetA->SetRelativePosition(0, 0.0f);
+		WidgetA->SetRelativePosition(SlotA->PaddingLeft, SlotA->PaddingBottom);
 
 		// Arrange left to right
 		if(Type == SPLITTER_TYPE_HOR)
 		{
 			float LeftWidth = OurSize.Width * BarPosition;
-			WidgetB->SetRelativePosition(std::round(LeftWidth + BarThickness), 0.0f);
+			WidgetB->SetRelativePosition(std::round(LeftWidth + BarThickness) + SlotB->PaddingLeft, SlotB->PaddingBottom);
 		}
 		else // Vertical
 		{
 			float BottomHeight = OurSize.Height * BarPosition;
-			WidgetB->SetRelativePosition(0.0f, std::round(BottomHeight + BarThickness));
+			WidgetB->SetRelativePosition(SlotB->PaddingLeft, std::round(BottomHeight + BarThickness) + SlotB->PaddingBottom);
 		}
 
 		WidgetA->Arrange();
@@ -221,12 +212,77 @@ namespace Ry
 		}
 	}
 
+	SizeType Splitter::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		// Result is the same padding or no padding due to clipping
+		if (WidgetSlots.Contains(const_cast<Widget* const>(ForWidget)))
+		{
+			SizeType Size = ComputeSize();
+
+			SharedPtr<PanelWidgetSlot> SlotA = WidgetSlots.Get(Children[0].Get());
+			SharedPtr<PanelWidgetSlot> SlotB = WidgetSlots.Get(Children[1].Get());
+
+			SizeType Result;
+
+			if (Type == SPLITTER_TYPE_HOR)
+			{
+				// Left
+				if (ForWidget == Children[0].Get())
+				{
+					Result = SizeType{ (int32)(BarPosition * Size.Width), Size.Height };
+				}
+				else // Right
+				{
+					Result = SizeType{ Size.Width - (int32)(BarPosition * Size.Width), Size.Height };
+				}
+			}
+			else
+			{
+				// Bottom
+				if (ForWidget == Children[0].Get())
+				{
+					Result = SizeType{ Size.Width, (int32)(BarPosition * Size.Height) };
+				}
+				else // Top
+				{
+					Result = SizeType{ Size.Width, Size.Height - (int32)(BarPosition * Size.Height) };
+				}
+
+			}
+
+			if(ForWidget == Children[0].Get())
+			{
+				Result.Width  -= SlotA->PaddingLeft + SlotA->PaddingRight;
+				Result.Height -= SlotA->PaddingTop + SlotA->PaddingBottom;
+			}
+			else
+			{
+				Result.Width -= SlotB->PaddingLeft + SlotB->PaddingRight;
+				Result.Height -= SlotB->PaddingTop + SlotB->PaddingBottom;
+			}
+
+			return Result;
+		}
+
+		Ry::Log->LogErrorf("Error");
+
+		return SizeType{ 0, 0 };
+	}
+
+	SizeType Splitter::GetUnscaledSlotSize(const Widget* ForWidget) const
+	{
+		return GetScaledSlotSize(ForWidget);
+	}
+
 	SharedPtr<PanelWidgetSlot> Splitter::AppendSlot(SharedPtr<Widget> Widget)
 	{
 		PanelWidget::AppendSlot(Widget);
 
 		// Create widget
 		SharedPtr<Slot> SplitterSlot = MakeShared(new Slot(Widget));
+
+		WidgetSlots.Insert(Widget.Get(), SplitterSlot);
+
 		return SplitterSlot;
 	}
 

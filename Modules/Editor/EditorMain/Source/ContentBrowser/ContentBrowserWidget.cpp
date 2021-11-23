@@ -27,6 +27,12 @@ namespace Ry
 		Lab = ItemWidget->FindChildWidget<Ry::Label>("Name");
 		Lab->SetText(Name);
 
+		// Fill the space available to us
+		WidthMode = SIZE_MODE_AUTO;
+		HeightMode = SIZE_MODE_AUTO;
+//		FillX = 1.0f;
+//		FillY = 1.0f;
+
 		SetChild(ItemWidget);
 
 	}
@@ -52,7 +58,14 @@ namespace Ry
 	}
 
 	ContentBrowserWidget::ContentBrowserWidget()
-	{		
+	{
+		// Take up entire space available to us
+		WidthMode = SIZE_MODE_PERCENTAGE;
+		HeightMode = SIZE_MODE_PERCENTAGE;
+		FillX = 1.0f;
+		FillY = 1.0f;
+		VerticalAlign = VERT_BOTTOM_ALIGN;
+
 		Ry::SharedPtr<Widget> ContentBrowser = LoadWidget<Ry::Widget>("/Engine/UI/ContentBrowser.ui");
 		if(ContentBrowser.IsValid())
 		{

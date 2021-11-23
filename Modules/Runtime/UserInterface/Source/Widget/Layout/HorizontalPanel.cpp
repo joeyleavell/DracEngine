@@ -76,7 +76,42 @@ namespace Ry
 		// Create widget
 		SharedPtr<HorizontalPanelSlot> PanelSlot = MakeShared(new HorizontalPanelSlot(Widget));
 		ChildrenSlots.Add(PanelSlot);
+
+		WidgetSlots.Insert(Widget.Get(), PanelSlot);
+		
 		return PanelSlot;
+	}
+
+	SizeType HorizontalPanel::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		SizeType UnscaledOccupied = GetUnscaledOccupiedSize(ForWidget);
+		SizeType ThisSize = Widget::GetScaledSlotSize(this);
+
+		// Find out if the unscaled occupied (including padding) sizes can fit within our slot
+		float UnscaledWidthSum = 0.0f;
+		for (SharedPtr<Widget> Wid : Children)
+		{
+			SizeType Size = GetUnscaledOccupiedSize(Wid.Get());
+			UnscaledWidthSum += Size.Width;
+		}
+
+		// Squeeze down height if needed
+		if (UnscaledWidthSum > ThisSize.Width)
+		{
+			float Fraction = UnscaledOccupied.Width / (float)UnscaledWidthSum;
+			float NewHeight = ThisSize.Width * Fraction;
+			UnscaledOccupied.Width = (int32)NewHeight;
+		}
+
+		// Squeeze down width if necessary
+		//float Width = GetSlotSizeUnnormalized(const_cast<Widget* const>(ForWidget), true).Width;
+		if (UnscaledOccupied.Height > ThisSize.Height)
+		{
+			UnscaledOccupied.Height = ThisSize.Height;
+		}
+
+		return UnscaledOccupied;
 	}
 
 	void HorizontalPanel::ClearChildren()

@@ -42,12 +42,6 @@ namespace Ry
 		uint8 HorizontalAlign;
 
 		RefField()
-		uint8 ContentVAlign;
-
-		RefField()
-		uint8 ContentHAlign;
-
-		RefField()
 		uint8 WidthMode;
 
 		RefField()
@@ -88,6 +82,11 @@ namespace Ry
 		void OnUnhovered(const MouseEvent& MouseEv) override;
 		bool OnPressed(const MouseButtonEvent& MouseEv) override;
 		bool OnReleased(const MouseButtonEvent& MouseEv) override;
+		
+		SizeType GetScaledOccupiedSize(const Widget* ForWidget) const override;
+		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
+		SizeType GetUnscaledOccupiedSize(const Widget* ForWidget) const override;
+		SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
 
 	private:
 

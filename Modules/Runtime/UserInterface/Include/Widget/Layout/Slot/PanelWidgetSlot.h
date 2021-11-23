@@ -5,13 +5,39 @@
 
 namespace Ry
 {
+
+	const uint8 HOR_ALIGN_LEFT = 0;
+	const uint8 HOR_ALIGN_CENTER = 1;
+	const uint8 HOR_ALIGN_RIGHT = 2;
+	const uint8 HOR_ALIGN_FILL = 3;
+
+	const uint8 VERT_ALIGN_LEFT = 0;
+	const uint8 VERT_ALIGN_CENTER = 1;
+	const uint8 VERT_ALIGN_RIGHT = 2;
+	const uint8 VERT_ALIGN_FILL = 3;
+
 	class PanelWidgetSlot : public Ry::Object
 	{
 	public:
 
 		GeneratedBody()
 
-		uint8 SizeMode;
+		// TODO: support reflected bools
+		RefField()
+		uint8 bSizeToContent{false};
+		
+		RefField()
+		float SlotWidth{0.0f};
+
+		RefField()
+		float SlotHeight{0.0f};
+
+		RefField()
+		uint8 HorizontalAlignMode;
+
+		RefField()
+		uint8 VerticalAlignMode;
+
 		//SizeMode Mode;
 		//SizeType Size;
 

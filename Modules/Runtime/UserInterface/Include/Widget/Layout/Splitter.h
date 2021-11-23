@@ -62,6 +62,9 @@ namespace Ry
     	bool OnMouseEvent(const MouseEvent& MouseEv) override;
     	bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override;
 
+    	SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
+    	SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
+    	
     private:
 
 		bool bDragging = false;

@@ -27,6 +27,8 @@ namespace Ry
 
 		void ClearChildren() override;
 
+		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
+
 	private:
 
 		Ry::ArrayList<SharedPtr<HorizontalPanelSlot>> ChildrenSlots;

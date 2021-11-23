@@ -224,6 +224,17 @@ namespace Ry
 		virtual bool OnChar(const CharEvent& CharEv);
 		virtual bool OnEvent(const Event& Ev);
 		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates);
+
+		virtual SizeType GetScaledSlotSize(const Widget* ForWidget) const;
+
+		virtual SizeType GetUnscaledSlotSize(const Widget* ForWidget) const;
+
+		// Space that this widget would occupy without being scaled to accompany overflow
+		virtual SizeType GetUnscaledOccupiedSize(const Widget* ForWidget) const;
+
+		// Space that this widget actually ends up accupying after being scaled to account for overflow
+		virtual SizeType GetScaledOccupiedSize(const Widget* ForWidget) const;
+
 		virtual void Draw() {};
 		virtual SizeType ComputeSize() const { return SizeType{}; };
 		virtual void OnShow(Ry::Batch* Batch) {}

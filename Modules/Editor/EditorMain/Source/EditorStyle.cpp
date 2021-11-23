@@ -72,6 +72,13 @@ namespace Ry
 			EditorStyle.AddBoxStyle("FileIcon", FileIconStyle);
 		}
 
+		// Content browser background
+		{
+			BoxStyle ContentBrowserBackground;
+			ContentBrowserBackground.DefaultBox().SetBackgroundColor(WHITE.ScaleRGB(0.05f));
+			EditorStyle.AddBoxStyle("ContentBrowserBackground", ContentBrowserBackground);
+		}
+
 		// Register the style globally
 		RegisterStyle("Editor", &EditorStyle);
 	}

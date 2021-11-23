@@ -3,9 +3,9 @@
 namespace Ry
 {
 
-	VerticalPanel::Slot VerticalPanel::MakeSlot()
+	VerticalPanelSlot  VerticalPanel::MakeSlot()
 	{
-		VerticalPanel::Slot NewSlot;
+		VerticalPanelSlot NewSlot;
 		return NewSlot;
 	}
 
@@ -14,8 +14,11 @@ namespace Ry
 		PanelWidget::AppendSlot(Widget);
 
 		// Create widget
-		SharedPtr<Slot> PanelSlot = MakeShared(new Slot(Widget));
+		SharedPtr<VerticalPanelSlot > PanelSlot = MakeShared(new VerticalPanelSlot(Widget));
 		ChildrenSlots.Add(PanelSlot);
+
+		WidgetSlots.Insert(Widget.Get(), PanelSlot);
+
 		return PanelSlot;
 	}
 
@@ -29,10 +32,17 @@ namespace Ry
 
 		for (int32 VBoxIndex = 0; VBoxIndex < ChildrenSlots.GetSize(); VBoxIndex++)
 		{
-			SharedPtr<Slot> ChildSlot = ChildrenSlots[ChildrenSlots.GetSize() - VBoxIndex - 1];
-
+			SharedPtr<VerticalPanelSlot > ChildSlot = ChildrenSlots[ChildrenSlots.GetSize() - VBoxIndex - 1];
 			SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
-			SizeType ContentSize = Widget->ComputeSize();
+			SizeType ContentSize = GetScaledSlotSize(Widget.Get());
+			// if(ChildSlot->bSizeToContent)
+			// {
+			// 	ContentSize = Widget->ComputeSize();
+			// }
+			// else
+			// {
+			// 	ContentSize = SizeType{ (int32) ChildSlot->SlotWidth, (int32)ChildSlot->SlotHeight };
+			// }
 
 			CurrentY += static_cast<int32>(ChildSlot->PaddingBottom);
 
@@ -58,22 +68,22 @@ namespace Ry
 
 			int32 MaxChildWidth = 0;
 
-			for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
+			for (SharedPtr<VerticalPanelSlot > ChildSlot : ChildrenSlots)
 			{
-				SizeType WidgetSize = ChildSlot->GetWidget()->ComputeSize();
+				SizeType SlotSize = ChildSlot->GetWidget()->ComputeSize();// GetSlotSize(ChildSlot->GetWidget().Get());
 
 				// Add horizontal padding
-				WidgetSize.Width += (int32)(ChildSlot->PaddingLeft + ChildSlot->PaddingRight);
+				SlotSize.Width += (int32)(ChildSlot->PaddingLeft + ChildSlot->PaddingRight);
 
 				// Check if max width
-				if (WidgetSize.Width > MaxChildWidth)
+				if (SlotSize.Width > MaxChildWidth)
 				{
-					MaxChildWidth = WidgetSize.Width;
+					MaxChildWidth = SlotSize.Width;
 				}
 
 				// Calculate height
 				Result.Height += static_cast<int32>(ChildSlot->PaddingTop);
-				Result.Height += static_cast<int32>(WidgetSize.Height);
+				Result.Height += static_cast<int32>(SlotSize.Height);
 				Result.Height += static_cast<int32>(ChildSlot->PaddingBottom);
 			}
 
@@ -81,6 +91,8 @@ namespace Ry
 		}
 
 		return Result;
+
+		//return Widget::GetSlotSize(this);
 	}
 
 	void VerticalPanel::ClearChildren()
@@ -90,5 +102,36 @@ namespace Ry
 		ChildrenSlots.Clear();
 	}
 
+	SizeType VerticalPanel::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		SizeType UnscaledOccupied = GetUnscaledOccupiedSize(ForWidget);
+		SizeType ThisSize = Widget::GetScaledSlotSize(this);
+
+		// Find out if the unscaled occupied (including padding) sizes can fit within our slot
+		float UnscaledHeightSum = 0.0f;
+		for (SharedPtr<Widget> Wid : Children)
+		{
+			SizeType Size = GetUnscaledOccupiedSize(Wid.Get());
+			UnscaledHeightSum += Size.Height;
+		}
+
+		// Squeeze down height if needed
+		if (UnscaledHeightSum > ThisSize.Height)
+		{
+			float Fraction = UnscaledOccupied.Height / (float)UnscaledHeightSum;
+			float NewHeight = ThisSize.Height * Fraction;
+			UnscaledOccupied.Height = (int32)NewHeight;
+		}
+
+		// Squeeze down width if necessary
+		//float Width = GetSlotSizeUnnormalized(const_cast<Widget* const>(ForWidget), true).Width;
+		if (UnscaledOccupied.Width > ThisSize.Width)
+		{
+			UnscaledOccupied.Width = ThisSize.Width;
+		}
+
+		return UnscaledOccupied;
+	}
 
 }

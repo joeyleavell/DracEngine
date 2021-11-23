@@ -343,6 +343,55 @@ namespace Ry
 		OutStates.Add(GetPipelineState(nullptr));
 	}
 
+	SizeType Widget::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		if (!Parent)
+		{
+			return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+		}
+		else
+		{
+			return Parent->GetScaledSlotSize(this);
+		}
+	}
+
+	SizeType Widget::GetUnscaledSlotSize(const Widget* ForWidget) const
+	{
+		if (!Parent)
+		{
+			return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+		}
+		else
+		{
+			return Parent->GetUnscaledSlotSize(this);
+		}
+	}
+
+	SizeType Widget::GetScaledOccupiedSize(const Widget* ForWidget) const
+	{
+		if(!Parent)
+		{
+			return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+		}
+		else
+		{
+			return Parent->GetScaledOccupiedSize(this);
+		}
+	}
+
+	SizeType Widget::GetUnscaledOccupiedSize(const Widget* ForWidget) const
+	{
+		if (!Parent)
+		{
+			return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+		}
+		else
+		{
+			return Parent->GetUnscaledOccupiedSize(this);
+		}
+	}
+
+
 	int32 Widget::GetWidgetID() const
 	{
 		return WidgetID;

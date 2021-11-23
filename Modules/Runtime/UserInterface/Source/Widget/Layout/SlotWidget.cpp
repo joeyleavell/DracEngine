@@ -154,14 +154,13 @@ namespace Ry
 		}
 
 		// Compute parent size only if we need to
-		RectScissor ClipSpace = Widget::GetClipSpace(this);
-		ParentSize.Width = ClipSpace.Width;
-		ParentSize.Height = ClipSpace.Height;
+		if ((WidthMode == SIZE_MODE_PERCENTAGE || HeightMode == SIZE_MODE_PERCENTAGE))
+		{
+			SizeType SlotSize = Widget::GetScaledSlotSize(this);
+			ParentSize.Width = SlotSize.Width;
+			ParentSize.Height = SlotSize.Height;
+		}
 
-		// if (Parent && (WidthMode == SizeMode::PERCENTAGE || HeightMode == SizeMode::PERCENTAGE))
-		// {
-		// 	ParentSize = Parent->ComputeSize();
-		// }
 		// else
 		// {
 		// }
@@ -381,5 +380,80 @@ namespace Ry
 		return true;
 	}
 
+	SizeType SlotWidget::GetScaledOccupiedSize(const Widget* ForWidget) const
+	{
+		// Padding is guaranteed
+		SizeType SlotSize = GetScaledSlotSize(ForWidget);
+		SlotSize.Width += (PaddingLeft + PaddingRight);
+		SlotSize.Height += (PaddingTop + PaddingBottom);
+
+		return SlotSize;
+	}
+
+	SizeType SlotWidget::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		SizeType Unscaled = GetUnscaledOccupiedSize(ForWidget);
+		SizeType Ours = Widget::GetScaledSlotSize(this);
+		
+		if (Unscaled.Width > Ours.Width)
+			Unscaled.Width = Ours.Width - PaddingLeft - PaddingRight;
+		if (Unscaled.Height > Ours.Height)
+			Unscaled.Height = Ours.Height - PaddingTop - PaddingBottom;
+
+		return Unscaled;
+	}
+
+	SizeType SlotWidget::GetUnscaledSlotSize(const Widget* ForWidget) const
+	{
+		if (ForWidget == Child.Get())
+		{
+			int32 Width;
+			int32 Height;
+			SizeType ChildSize;
+			SizeType ParentSize;
+
+			if (Child && (WidthMode == SIZE_MODE_AUTO || HeightMode == SIZE_MODE_AUTO))
+				ChildSize = Child->ComputeSize();
+
+			if (WidthMode == SIZE_MODE_PERCENTAGE || HeightMode == SIZE_MODE_PERCENTAGE)
+			{
+				if (Parent)
+					ParentSize = Widget::GetScaledSlotSize(this); // Occupy a percentage of the size fully available to us
+				else
+					ParentSize = SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+			}
+
+			if (WidthMode == SIZE_MODE_AUTO)
+			{
+				Width = ChildSize.Width;
+			}
+			else
+			{
+				Width = (int32)(ParentSize.Width * FillX);
+			}
+
+			if (HeightMode == SIZE_MODE_AUTO)
+			{
+				Height = ChildSize.Height;
+			}
+			else
+			{
+				Height = (int32)(ParentSize.Height * FillY);
+			}
+
+			return SizeType{ Width, Height };
+		}
+
+		Ry::Log->LogError("Tried calling SlotWidget::GetSlotSize() with widget that is not this SlotWidget's child!");
+	}
+
+	SizeType SlotWidget::GetUnscaledOccupiedSize(const Widget* ForWidget) const
+	{
+		SizeType SlotSize = GetUnscaledSlotSize(ForWidget);
+		SlotSize.Width += (PaddingLeft + PaddingRight);
+		SlotSize.Height += (PaddingTop + PaddingBottom);
+
+		return SlotSize;
+	}
 
 }

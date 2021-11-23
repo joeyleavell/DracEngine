@@ -1,10 +1,10 @@
 <Ry::VerticalPanel>
 
-    <Slot>
+    <Slot bSizeToContent="1">
         <Ry::BorderWidget Id="Icon" BoxStyleName="FileIcon" PaddingLeft="30.0" PaddingTop="30.0" PaddingBottom="30.0" PaddingRight="30.0"/>
     </Slot>
 
-    <Slot>
+    <Slot bSizeToContent="1">
         <Ry::Label Id="Name" TextStyleName="Normal" Text="Placeholder"/>
     </Slot>
 

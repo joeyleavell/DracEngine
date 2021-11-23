@@ -242,4 +242,168 @@ namespace Ry
 		Children.Clear();
 	}
 
+	// SizeType PanelWidget::GetSlotSize(const Widget* ForWidget, bool bIncludePadding) const
+	// {
+	// 	//SharedPtr<PanelWidgetSlot> ThisSlot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+	// 	SizeType Unnormalized = GetSlotSizeUnnormalized(ForWidget);
+	// 	//Unnormalized.Width += ThisSlot->PaddingLeft + ThisSlot->PaddingRight;
+	// 	//Unnormalized.Height += ThisSlot->PaddingTop + ThisSlot->PaddingBottom;
+	//
+	// 	// Find out this slot's proportion of the total and normalize it
+	// 	float WidthSum = 0.0f;
+	// 	float HeightSum = 0.0f;
+	// 	for (SharedPtr<Widget> Wid : Children)
+	// 	{
+	// 		// Account for the padding
+	// 		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(Wid.Get());
+	// 		WidthSum += Slot->PaddingLeft + Slot->PaddingRight;
+	// 		HeightSum += Slot->PaddingTop + Slot->PaddingBottom;
+	//
+	// 		SizeType Size = GetSlotSizeUnnormalized(Wid.Get(), true);
+	// 		WidthSum += Size.Width;
+	// 		HeightSum += Size.Height;
+	// 	}
+	// 	
+	// 	// Check if a dimension has exceeded the max size. If it has, start squeezing down elements.
+	// 	/**/
+	//
+	// 	if (HeightSum > ThisSize.Height)
+	// 	{
+	// 		float Fraction = Unnormalized.Height / (float)HeightSum;
+	// 		float NewHeight = ThisSize.Height * Fraction;
+	// 		Unnormalized.Height = (int32)NewHeight;
+	// 	}
+	//
+	// 	return Unnormalized;
+	//
+	// }
+
+	SizeType PanelWidget::GetUnscaledSlotSize(const Widget* ForWidget) const
+	{
+		if (WidgetSlots.Contains(const_cast<Widget* const>(ForWidget)))
+		{
+			SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+			SizeType Size;
+
+			if (ForWidget)
+			{
+				if (Slot->bSizeToContent)
+				{
+					// This overrides every other size setting
+					Size = ForWidget->ComputeSize();
+				}
+				else
+				{
+					// First check 
+					int32 Width;
+					int32 Height;
+					SizeType ThisSize;
+
+					// GetScaledSlotSize will tell us the real size provided to us post scaling
+					if (Slot->HorizontalAlignMode == HOR_ALIGN_FILL || Slot->VerticalAlignMode == VERT_ALIGN_FILL)
+						ThisSize = Widget::GetScaledSlotSize(this);
+
+					if (Slot->HorizontalAlignMode == HOR_ALIGN_FILL)
+						Width = ThisSize.Width;
+					else
+						Width = Slot->SlotWidth;
+
+					if (Slot->VerticalAlignMode == VERT_ALIGN_FILL)
+						Height = ThisSize.Height;
+					else
+						Height = Slot->SlotHeight;
+
+					Size = SizeType{ (int32)Width, (int32)Height };
+				}
+			}
+
+			return Size;
+		}
+		else
+		{
+			Ry::Log->LogError("Tried to call PanelWidget::GetSlotSize on a widget that wasn't a child");
+		}
+
+		return SizeType{ 0, 0 };
+	}
+
+	SizeType PanelWidget::GetUnscaledOccupiedSize(const Widget* ForWidget) const
+	{
+		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		SizeType UnscaledSlotSize = GetUnscaledSlotSize(ForWidget);
+		UnscaledSlotSize.Width += Slot->PaddingLeft + Slot->PaddingRight;
+		UnscaledSlotSize.Height += Slot->PaddingBottom + Slot->PaddingTop;
+
+		return UnscaledSlotSize;
+	}
+
+	SizeType PanelWidget::GetScaledOccupiedSize(const Widget* ForWidget) const
+	{
+		// Padding is guaranteed
+		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		SizeType ScaledSlotSize = GetScaledSlotSize(ForWidget);
+		ScaledSlotSize.Width += Slot->PaddingLeft + Slot->PaddingRight;
+		ScaledSlotSize.Height += Slot->PaddingBottom + Slot->PaddingTop;
+
+		return ScaledSlotSize;
+	}
+
+	/*int32 PanelWidget::NormalizeWidth(int32 InWidth)
+	{
+		SizeType ThisSize = Widget::GetSlotSize(this);
+		float WidthSum = 0.0f;
+		
+		for (SharedPtr<Widget> Wid : Children)
+		{
+			// Account for the padding
+			SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(Wid.Get());
+			WidthSum += Slot->PaddingLeft + Slot->PaddingRight;
+
+			SizeType Size = GetSlotSizeUnnormalized(Wid.Get(), true);
+			WidthSum += Size.Width;
+		}
+
+		if (WidthSum > ThisSize.Width)
+		{
+			float Fraction = / (float)WidthSum;
+			float NewWidth = ThisSize.Width * Fraction;
+			Unnormalized.Width = (int32)NewWidth;
+		}
+	}
+
+	int32 PanelWidget::NormalizeHeight(int32 InHeight)
+	{
+	}*/
+
+
+	/*RectScissor PanelWidget::GetClipSpace(const Widget* ForWidget) const
+	{
+		if(!ForWidget)
+		{
+			Point Abs = GetAbsolutePosition();
+			SizeType Size = ComputeSize();
+			return RectScissor{ Abs.X, Abs.Y, Size.Width, Size.Height };
+		}
+		
+		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		if(Slot.IsValid())
+		{
+			Point Abs = Slot->GetWidget()->GetAbsolutePosition();
+			if(Slot->bSizeToContent)
+			{
+				// Return size of the content
+				SizeType ContentSize = Slot->GetWidget()->ComputeSize();
+				return RectScissor{ Abs.X, Abs.Y, ContentSize.Width, ContentSize.Height};
+			}
+			else
+			{
+				// Return specified size of the slot
+				return RectScissor{ Abs.X, Abs.Y, (int32)Slot->SlotWidth, (int32)Slot->SlotHeight };
+			}
+		}
+
+		Ry::Log->LogError("Slot did not exist for widget");
+
+		return RectScissor{ 0, 0, 0, 0 };
+	}*/
 }

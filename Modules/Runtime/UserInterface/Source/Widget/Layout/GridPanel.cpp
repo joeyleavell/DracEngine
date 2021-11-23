@@ -64,6 +64,8 @@ namespace Ry
 		Occupied.Insert(Next);
 		ChildrenSlots.Add(PanelSlot);
 
+		WidgetSlots.Insert(Widget.Get(), PanelSlot);
+
 		PanelWidget::AppendSlot(Widget);
 
 		MarkDirty(this);
@@ -203,6 +205,23 @@ namespace Ry
 		this->CellHeight = Size;
 
 		return *this;
+	}
+
+	SizeType GridPanel::GetScaledSlotSize(const Widget* ForWidget) const
+	{
+		// Result is the same including padding or not (for now)
+
+		if (WidgetSlots.Contains(const_cast<Widget* const>(ForWidget)))
+		{
+			return SizeType{ (int32)CellWidth, (int32)CellHeight };
+		}
+
+		return SizeType{ 0, 0 };
+	}
+
+	SizeType GridPanel::GetUnscaledSlotSize(const Widget* ForWidget) const
+	{
+		return GetScaledSlotSize(ForWidget);
 	}
 
 	void GridPanel::ClearChildren()

@@ -67,6 +67,9 @@ namespace Ry
 		GridPanel& SetCellWidth(float Size);
 		GridPanel& SetCellHeight(float Size);
 
+		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
+		SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
+
 	private:
 
 		bool IsSlotOccupied(int32 Row, int32 Col) const;
