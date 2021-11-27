@@ -60,6 +60,9 @@ namespace Ry
 
 	private:
 
+		bool ShouldShowVertScrollbar();
+		bool ShouldShowHorizontalScrollbar();
+
 		void GetVertScrollBarBounds(Point& OutPos, SizeType& OutSize);
 		void GetHorScrollBarBounds(Point& OutPos, SizeType& OutSize);
 		// Utility to compute the size of the children embedded within the scroll pane

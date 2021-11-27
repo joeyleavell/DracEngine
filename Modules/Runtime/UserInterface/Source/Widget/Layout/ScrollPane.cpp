@@ -238,8 +238,15 @@ namespace Ry
 		// Push scroll bar to last layer
 		// todo: come up with better way than this
 		RectScissor Scissor;
-		HorizontalScrollBar->Show(HorizontalBarItem, Batch, -1, GetPipelineState(this));
-		VerticalScrollBar->Show(VerticalBarItem, Batch, -1, GetPipelineState(this));
+		if(ShouldShowHorizontalScrollbar())
+		{
+			HorizontalScrollBar->Show(HorizontalBarItem, Batch, -1, GetPipelineState(this));
+		}
+
+		if(ShouldShowVertScrollbar())
+		{
+			VerticalScrollBar->Show(VerticalBarItem, Batch, -1, GetPipelineState(this));
+		}
 	}
 
 	void ScrollPane::OnHide(Ry::Batch* Batch)
@@ -397,6 +404,22 @@ namespace Ry
 		}
 
 		return PanelWidget::OnMouseEvent(MouseEv);
+	}
+
+	bool ScrollPane::ShouldShowVertScrollbar()
+	{
+		SizeType ThisSize = ComputeSize();
+		SizeType ChildrenSize = ComputeChildrenSize();
+
+		return ChildrenSize.Height > ThisSize.Height;
+	}
+
+	bool ScrollPane::ShouldShowHorizontalScrollbar()
+	{
+		SizeType ThisSize = ComputeSize();
+		SizeType ChildrenSize = ComputeChildrenSize();
+
+		return ChildrenSize.Width > ThisSize.Width;
 	}
 
 	void ScrollPane::GetVertScrollBarBounds(Point& OutPos, SizeType& OutSize)
