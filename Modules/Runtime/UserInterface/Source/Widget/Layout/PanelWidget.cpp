@@ -110,6 +110,7 @@ namespace Ry
 			}
 			else
 			{
+				
 				if (Child->IsVisible())
 				{
 					Child->SetVisible(false, true);

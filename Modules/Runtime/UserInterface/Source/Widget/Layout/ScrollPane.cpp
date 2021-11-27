@@ -6,7 +6,7 @@ namespace Ry
 	{
 		this->bAllowHorizontalScroll = true;
 
-		this->VerticalScrollAmount = 0.0f;
+		this->VerticalScrollAmount = 1.0f;
 		this->HorizontalScrollAmount = 0.0f;
 		this->ScrollBarThickness = 20.0f;
 		this->bVerticalBarPressed = false;

@@ -72,7 +72,7 @@ namespace Ry
 
 		Ry::SharedPtr<BatchItem> DebugRect;
 
-		float VerticalScrollAmount;
+		float VerticalScrollAmount = 1.0f;
 		float HorizontalScrollAmount;
 
 		float ScrollBarThickness;

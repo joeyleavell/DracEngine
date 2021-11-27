@@ -79,39 +79,40 @@ namespace Ry
 	void GridPanel::Arrange()
 	{
 		// Default margin: 5px
-		float CurrentY = static_cast<int32>(0);
 
 		// For each row, determine max width. That is the width of each cell.
 		// Apply the same logic for height
 
 		// Find max row/col
-		int32 MaxRow = 0;
-		bool bRowExists = true;
+		int32 MaxRows = CalcMaxRows();
+		int32 CurRow = MaxRows - 1;
 
-		while (bRowExists)
+		SizeType ThisSize = Widget::GetScaledSlotSize(this);
+
+		float CurrentY = static_cast<int32>(0.0f);
+
+		while (CurRow >= 0)
 		{
-			bRowExists = false;
 
 			float CurrentX = static_cast<int32>(0);
 
 			for (int32 Col = 0; Col < MaxCols; Col++)
 			{
 
-				if (IsSlotOccupied(MaxRow, Col))
+				if (IsSlotOccupied(CurRow, Col))
 				{
-					bRowExists = true;
-
 					// Find the slot with this position
 					Slot* FoundSlot = nullptr;
 					for (SharedPtr<Slot>& Sl : ChildrenSlots)
 					{
-						if (Sl->Row == MaxRow && Sl->Column == Col)
+						if (Sl->Row == CurRow && Sl->Column == Col)
 							FoundSlot = Sl.Get();
 					}
 
 					if (FoundSlot)
 					{
 						SharedPtr<Ry::Widget> Widget = FoundSlot->GetWidget();
+						SizeType WidgetSize = Widget->ComputeSize();
 
 						// Add padding now
 						//CurrentX += FoundSlot->GetPadding().Left;
@@ -136,7 +137,6 @@ namespace Ry
 						CurrentY += FoundSlot->PaddingTop;
 					}
 
-					bRowExists = true;
 				}
 
 				// Assume slot padding on left and right to be zero unless a slot is found
@@ -146,13 +146,14 @@ namespace Ry
 
 			CurrentY += CellHeight;
 
-			MaxRow++;
+			CurRow--;
 		}
 
 	}
 
 	SizeType GridPanel::ComputeSize() const
 	{
+		//return Widget::GetScaledSlotSize(this);
 		// Default margin: 5px
 		int32 SizeX = static_cast<int32>(MaxCols * CellWidth);
 		int32 SizeY = static_cast<int32>(0.0f);
@@ -222,6 +223,32 @@ namespace Ry
 	SizeType GridPanel::GetUnscaledSlotSize(const Widget* ForWidget) const
 	{
 		return GetScaledSlotSize(ForWidget);
+	}
+
+	int32 GridPanel::CalcMaxRows()
+	{
+		// Find max row/col
+		int32 MaxRow = 0;
+		bool bRowExists = true;
+
+		while (bRowExists)
+		{
+			MaxRow++;
+			bRowExists = false;
+
+			for (int32 Col = 0; Col < MaxCols; Col++)
+			{
+				if (IsSlotOccupied(MaxRow, Col))
+				{
+					bRowExists = true;
+					break;
+				}
+			}
+
+		}
+
+		return MaxRow;
+
 	}
 
 	void GridPanel::ClearChildren()

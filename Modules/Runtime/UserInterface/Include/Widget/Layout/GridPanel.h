@@ -72,6 +72,8 @@ namespace Ry
 
 	private:
 
+		int32 CalcMaxRows();
+
 		bool IsSlotOccupied(int32 Row, int32 Col) const;
 		SlotPosition FindFree();
 
