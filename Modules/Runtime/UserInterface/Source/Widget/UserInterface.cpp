@@ -111,7 +111,7 @@ namespace Ry
 		Bat->Update();
 	}
 
-	void UserInterface::RenderStateDirty(Widget * Wid, bool bFullRefresh)
+	void UserInterface::RenderStateDirty(Widget* Wid, bool bFullRefresh)
 	{
 		static Ry::ArrayList<PipelineState> PipelineStates;
 		static Ry::ArrayList<Widget*> AllChildren;
@@ -127,9 +127,23 @@ namespace Ry
 
 			for (Widget* Child : WidgetChildren)
 			{
-				Child->OnHide(Bat);
-				if (Child->IsVisible())
-					Child->OnShow(Bat);
+				if (Child == Wid)
+				{
+					Child->OnHide(Bat);
+					if (Child->IsVisible())
+						Child->OnShow(Bat);
+				}
+				else
+				{
+					if (Child->IsVisible())
+					{
+						Child->OnShow(Bat);
+					}
+					else
+					{
+						Child->OnHide(Bat);
+					}
+				}
 			}
 		}
 

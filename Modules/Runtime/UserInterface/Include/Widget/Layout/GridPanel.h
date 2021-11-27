@@ -33,20 +33,20 @@ namespace Ry
 		class Slot : public PanelWidgetSlot
 		{
 		public:
-			int32 Row;
-			int32 Column;
+			//int32 Row;
+			//int32 Column;
 
 			Slot() :
-			PanelWidgetSlot(),
-			Row(0),
-			Column(0)
+			PanelWidgetSlot()
+			//Row(0),
+			//Column(0)
 			{
 			}
 
 			Slot(SharedPtr<Ry::Widget> Wid) :
-			PanelWidgetSlot(Wid),
-			Row(0),
-			Column(0)
+			PanelWidgetSlot(Wid)
+			//Row(0),
+			//Column(0)
 			{
 			}
 			
@@ -63,21 +63,24 @@ namespace Ry
 		
 		static Slot MakeSlot(int32 Row, int32 Column);
 
-		GridPanel& SetMaxCols(int32 Max);
+	//	GridPanel& SetMaxCols(int32 Max);
 		GridPanel& SetCellWidth(float Size);
 		GridPanel& SetCellHeight(float Size);
 
 		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
 		SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
 
+		RectScissor GetClipSpace(const Widget* ForWidget) const override;
+
 	private:
 
-		int32 CalcMaxRows();
+		int32 CalcMaxRows() const;
+		int32 CalcMaxCols() const;
 
 		bool IsSlotOccupied(int32 Row, int32 Col) const;
 		SlotPosition FindFree();
 
-		int32 MaxCols = 5;
+	//	int32 MaxCols = 5;
 
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 

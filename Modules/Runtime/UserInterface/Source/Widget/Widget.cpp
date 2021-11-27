@@ -324,14 +324,13 @@ namespace Ry
 
 	void Widget::MarkDirty(Widget* Self, bool bFullRefresh)
 	{
-		if (Parent)
+		Widget* CurrentParent = Self;
+		while(CurrentParent && CurrentParent->Parent)
 		{
-			Parent->MarkDirty(Self, bFullRefresh);
+			CurrentParent = CurrentParent->Parent;
 		}
-		else
-		{
-			RenderStateDirty.Broadcast(Self, bFullRefresh);
-		}
+
+		CurrentParent->RenderStateDirty.Broadcast(Self, bFullRefresh);
 	}
 
 	void Widget::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
