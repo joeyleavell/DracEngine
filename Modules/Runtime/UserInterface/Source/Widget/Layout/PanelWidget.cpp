@@ -122,7 +122,7 @@ namespace Ry
 
 		if (bUpdateBatch)
 		{
-			MarkDirty(this);
+			//MarkDirty(this);
 		}
 
 	}

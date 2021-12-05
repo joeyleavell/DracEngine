@@ -45,7 +45,7 @@ namespace Ry
 	}
 
 
-	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Quadratic>
 	class OAPairIterator
 	{
 	public:
@@ -93,7 +93,7 @@ namespace Ry
 
 	};
 	
-	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Quadratic>
 	class EXPORT_ONLY OAHashMap
 	{
 	public:

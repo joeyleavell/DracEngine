@@ -4,14 +4,14 @@
 #include "Algorithm/Algorithm.h"
 #include "CoreGen.h"
 
-#define TABLE_SIZE 10
+#define TABLE_SIZE 8
 #define LOAD_FACTOR 0.75
 
 namespace Ry
 {
-	constexpr uint32 Probe_Linear(uint32 Hash, uint32 Probe, uint32 N)
+	constexpr uint32 Probe_Quadratic(uint32 Hash, uint32 Probe, uint32 N)
 	{
-		return (Hash + Probe) % N;
+		return (uint32) (Hash + 0.5 * Probe + 0.5 * Probe * Probe) % N;
 	}
 
 	template<typename T>

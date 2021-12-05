@@ -7,7 +7,7 @@
 namespace Ry
 {
 
-	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Quadratic>
 	class OASetIterator
 	{
 	public:
@@ -53,7 +53,7 @@ namespace Ry
 
 	};
 
-	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Linear>
+	template<typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Quadratic>
 	class EXPORT_ONLY OASet
 	{
 	public:

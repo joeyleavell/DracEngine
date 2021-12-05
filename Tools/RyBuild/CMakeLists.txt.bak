@@ -98,5 +98,5 @@ endif()
 
 # Python on windows is a DLL
 if(MSVC)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python311.dll DESTINATION .)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/Platform/Binary/x64/Windows/MSVC/python311.dll DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()

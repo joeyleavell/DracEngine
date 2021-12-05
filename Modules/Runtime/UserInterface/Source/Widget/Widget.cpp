@@ -339,7 +339,7 @@ namespace Ry
 		// Children widgets can have their own dynamic pipeline states, but most widgets don't implement this.
 		// One widget that does implement this is the splitter widget.
 
-		OutStates.Add(GetPipelineState(nullptr));
+		//OutStates.Add(GetPipelineState(nullptr));
 	}
 
 	SizeType Widget::GetScaledSlotSize(const Widget* ForWidget) const

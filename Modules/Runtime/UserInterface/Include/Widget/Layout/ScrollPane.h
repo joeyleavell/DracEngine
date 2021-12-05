@@ -49,6 +49,8 @@ namespace Ry
 		 */
 		void Arrange() override;
 		PipelineState GetPipelineState(const Widget* ForWidget) const override;
+		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates) override;
+
 		RectScissor GetClipSpace(const Widget* ForWidget) const override;
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;

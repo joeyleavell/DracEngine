@@ -145,10 +145,10 @@ namespace Ry
 			if (!(Clip == LastClip))
 			{
 				LastClip = Clip;
-				MarkDirty(this);
+				//MarkDirty(this);
 
 				// Already re-rendered everything, don't need to repeat
-				break;
+				//break;
 			}
 		}
 
@@ -189,11 +189,17 @@ namespace Ry
 
 	PipelineState ScrollPane::GetPipelineState(const Widget* ForWidget) const
 	{
+		static Ry::String StateId = Ry::to_string(GetWidgetID());
 		PipelineState State;
 		State.Scissor = GetClipSpace(ForWidget); // Scroll pane doesn't 
-		State.StateID = Ry::to_string(GetWidgetID());
+		State.StateID = StateId;
 
 		return State;
+	}
+
+	void ScrollPane::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	{
+		OutStates.Add(GetPipelineState(nullptr));
 	}
 
 	RectScissor ScrollPane::GetClipSpace(const Widget* ForWidget) const

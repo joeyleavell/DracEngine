@@ -99,7 +99,7 @@ namespace Ry
 		{
 			SharedPtr<Slot>& CurSlot = ChildrenSlots[SlotIndex];
 
-			int32 Row = CalcMaxRows() - SlotIndex / MaxCols - 1;
+			int32 Row = MaxRows - SlotIndex / MaxCols - 1;
 			int32 Col = SlotIndex % MaxCols;
 
 			// Find the slot with this position

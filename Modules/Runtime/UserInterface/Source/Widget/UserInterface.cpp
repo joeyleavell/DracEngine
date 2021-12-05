@@ -61,7 +61,9 @@ namespace Ry
 
 	void UserInterface::Redraw()
 	{
-		
+		static Ry::ArrayList<Widget*> Children;
+		static Ry::ArrayList<PipelineState> PipelineStates;
+
 		Bat->Clear();
 
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
@@ -74,24 +76,24 @@ namespace Ry
 		}
 
 		// Update the dynamic pipeline states of all children
-		static Ry::ArrayList<Widget*> AllChildren;
-		static Ry::ArrayList<PipelineState> PipelineStates;
 
-		PipelineStates.SoftClear();
-		AllChildren.SoftClear();
+		//PipelineStates.SoftClear();
+		//AllChildren.SoftClear();
 
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 		{
-			RootWidget->GetAllChildren(AllChildren);
-		}
-		for (Widget* Child : AllChildren)
-		{
-			Child->GetPipelineStates(PipelineStates);
-		}
+			Children.SoftClear();
+			PipelineStates.SoftClear();
 
-		for (const PipelineState& State : PipelineStates)
-		{
-			Bat->UpdatePipelineState(State);
+			RootWidget->GetAllChildren(Children);
+			for (Widget* Child : Children)
+			{
+				Child->GetPipelineStates(PipelineStates);
+			}
+			for (const PipelineState& State : PipelineStates)
+			{
+				Bat->UpdatePipelineState(State);
+			}
 		}
 
 		Bat->Update();
@@ -116,6 +118,8 @@ namespace Ry
 		static Ry::ArrayList<PipelineState> PipelineStates;
 		static Ry::ArrayList<Widget*> AllChildren;
 		static Ry::ArrayList<Widget*> WidgetChildren;
+		AllChildren.SoftClear();
+		PipelineStates.SoftClear();
 
 		// Takes care of widget visibility changes and widget swapping elements
 		{
@@ -147,37 +151,49 @@ namespace Ry
 			}
 		}
 
-		// Correctly places widget
-		Wid->Arrange();
 
 		// Takes care of position changes, element changes, etc.
-		Wid->Draw();
+		if (!bFullRefresh)
+		{
+			// Correctly places widget
+			Wid->Arrange();
+			Wid->Draw();
+		}
 
-		PipelineStates.SoftClear();
-		AllChildren.SoftClear();
+		//PipelineStates.SoftClear();
+		//AllChildren.SoftClear();
 
 		// Takes care of scissor changes
 		if (bFullRefresh)
 		{
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
+				AllChildren.SoftClear();
+				PipelineStates.SoftClear();
+
 				RootWidget->GetAllChildren(AllChildren);
+
+				for (Widget* Child : AllChildren)
+				{
+					Child->GetPipelineStates(PipelineStates);
+				}
+
+				for (const PipelineState& State : PipelineStates)
+				{
+					Bat->UpdatePipelineState(State);
+				}
+
 			}
 		}
 		else
 		{
-			AllChildren.Add(Wid);
+			Wid->GetPipelineStates(PipelineStates);
+			for (const PipelineState& State : PipelineStates)
+			{
+				Bat->UpdatePipelineState(State);
+			}
 		}
 
-		for (Widget* Child : AllChildren)
-		{
-			Child->GetPipelineStates(PipelineStates);
-		}
-
-		for (const PipelineState& State : PipelineStates)
-		{
-			Bat->UpdatePipelineState(State);
-		}
 
 		if (bFullRefresh)
 			Draw(); // Re-arrange everything, will also update batch
