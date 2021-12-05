@@ -85,15 +85,15 @@ namespace Ry
 					{
 						// Strings
 						if(Field->Type->Name == GetType<Ry::String>()->Name)
-							(*Field->GetPtrToField<Ry::String>(Result.Get())) = Attrib->value();
+							(*Field->GetMutablePtrToField<Ry::String>(Result.Get())) = Attrib->value();
 
 						// Floats
 						if (Field->Type->Name == GetType<float>()->Name)
-							(*Field->GetPtrToField<float>(Result.Get())) = Ry::ParseFloat(Attrib->value());
+							(*Field->GetMutablePtrToField<float>(Result.Get())) = Ry::ParseFloat(Attrib->value());
 
 						// uint8s
 						if (Field->Type->Name == GetType<uint8>()->Name)
-							(*Field->GetPtrToField<uint8>(Result.Get())) = (uint8) Ry::ParseInt(Attrib->value());
+							(*Field->GetMutablePtrToField<uint8>(Result.Get())) = (uint8) Ry::ParseInt(Attrib->value());
 
 					}
 					else
@@ -134,15 +134,15 @@ namespace Ry
 									{
 										// Strings
 										if (Field->Type->Name == GetType<Ry::String>()->Name)
-											(*Field->GetPtrToField<Ry::String>(Slot.Get())) = SlotAttrib->value();
+											(*Field->GetMutablePtrToField<Ry::String>(Slot.Get())) = SlotAttrib->value();
 
 										// Floats
 										if (Field->Type->Name == GetType<float>()->Name)
-											(*Field->GetPtrToField<float>(Slot.Get())) = Ry::ParseFloat(SlotAttrib->value());
+											(*Field->GetMutablePtrToField<float>(Slot.Get())) = Ry::ParseFloat(SlotAttrib->value());
 
 										// uint8s
 										if (Field->Type->Name == GetType<uint8>()->Name)
-											(*Field->GetPtrToField<uint8>(Slot.Get())) = (uint8)Ry::ParseInt(SlotAttrib->value());
+											(*Field->GetMutablePtrToField<uint8>(Slot.Get())) = (uint8)Ry::ParseInt(SlotAttrib->value());
 
 									}
 									else

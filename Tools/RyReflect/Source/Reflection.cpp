@@ -261,7 +261,7 @@ namespace Ry
 			GeneratedSource << "}\\" << std::endl;
 
 			GeneratedSource << "static const Ry::ReflectedClass* \\" << std::endl;
-			GeneratedSource << "GetStaticClass() \\" << std::endl;
+			GeneratedSource << "GetStaticClass()\\" << std::endl;
 			GeneratedSource << "{ \\" << std::endl;
 			{
 				// Declare class
@@ -372,7 +372,7 @@ namespace Ry
 			GeneratedSource << "}\\" << std::endl;
 
 			GeneratedSource << "virtual const Ry::ReflectedClass* \\" << std::endl;
-			GeneratedSource << "GetClass() \\" << std::endl;
+			GeneratedSource << "GetClass() const override\\" << std::endl;
 			GeneratedSource << "{ \\" << std::endl;
 			{
 				GeneratedSource << "\treturn " << QualifiedName << "::GetStaticClass();\\" << std::endl;

@@ -8,7 +8,7 @@ namespace Ry
 		
 	}
 
-	const ReflectedClass* Object::GetClass()
+	const ReflectedClass* Object::GetClass() const
 	{
 		return nullptr;
 	}
@@ -22,33 +22,33 @@ namespace Ry
 		{
 			// Unsigned integral types
 			if (RefField.Type->Class == TypeClass::UInt8)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<uint8>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<uint8>(&Object));
 			if (RefField.Type->Class == TypeClass::UInt16)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<uint16>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<uint16>(&Object));
 			if (RefField.Type->Class == TypeClass::UInt32)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<uint32>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<uint32>(&Object));
 			if (RefField.Type->Class == TypeClass::UInt64)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<uint64>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<uint64>(&Object));
 
 			// Signed integral types
 			if (RefField.Type->Class == TypeClass::Int8)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<int8>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<int8>(&Object));
 			if (RefField.Type->Class == TypeClass::Int16)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<int16>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<int16>(&Object));
 			if (RefField.Type->Class == TypeClass::Int32)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<int32>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<int32>(&Object));
 			if (RefField.Type->Class == TypeClass::Int64)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<int64>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<int64>(&Object));
 
 			// Floating point types
 			if (RefField.Type->Class == TypeClass::Float)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<float>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<float>(&Object));
 			if (RefField.Type->Class == TypeClass::Double)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<double>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<double>(&Object));
 
 			// Strings
 			if (RefField.Type->Class == TypeClass::String)
-				RootJson.Insert(RefField.Name, *RefField.GetPtrToField<Ry::String>(&Object));
+				RootJson.Insert(RefField.Name, *RefField.GetConstPtrToField<Ry::String>(&Object));
 		}
 
 		return RootJson;

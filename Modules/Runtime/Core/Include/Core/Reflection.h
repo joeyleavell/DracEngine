@@ -107,12 +107,21 @@ namespace Ry
 		Ry::ArrayList<DataType> TemplateTypes;
 
 		template<typename T, typename Object>
-		T* GetPtrToField(Object* Obj) const
+		T* GetMutablePtrToField(Object* Obj) const
 		{
 			uint8* AsByte     = reinterpret_cast<uint8*>(Obj);
 			uint8* ByteOffset = AsByte + Offset;
 
 			return reinterpret_cast<T*>(ByteOffset);
+		}
+
+		template<typename T, typename Object>
+		const T* GetConstPtrToField(const Object* Obj) const
+		{
+			const uint8* AsByte = reinterpret_cast<const uint8*>(Obj);
+			const uint8* ByteOffset = AsByte + Offset;
+
+			return reinterpret_cast<const T*>(ByteOffset);
 		}
 
 		Field()

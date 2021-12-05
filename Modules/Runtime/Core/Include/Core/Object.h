@@ -18,7 +18,7 @@ namespace Ry
 	{
 	public:
 		virtual ~Object();
-		virtual const ReflectedClass* GetClass();
+		virtual const ReflectedClass* GetClass() const;
 
 		static const Ry::ReflectedClass* GetStaticClass()
 		{

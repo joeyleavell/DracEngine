@@ -6,9 +6,31 @@
 #include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
 #include "EditorUI.gen.h"
+#include "Widget/Label.h"
+#include "EditorUI.gen.h"
 
 namespace Ry
 {
+
+	class TestObj : public Ry::Object
+	{
+	public:
+		GeneratedBody()
+
+		RefField()
+		int32 TestInt = 10;
+
+		RefField()
+		Ry::String TestString = "some string";
+
+		Ry::Label* ChildLabel;
+
+		TestObj()
+		{
+			ChildLabel = new Label;
+		}
+
+	} RefClass();
 	
 	class EditorUI : public Layer
 	{

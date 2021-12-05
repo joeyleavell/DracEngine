@@ -12,6 +12,7 @@
 #include "ContentBrowser/ContentBrowserWidget.h"
 #include "WidgetManager.h"
 #include "EditorStyle.h"
+#include "File/Serializer.h"
 
 namespace Ry
 {
@@ -40,7 +41,28 @@ namespace Ry
 		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
 
 		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
-		
+
+
+		Ry::Serializer Out;
+		Out.Open(Ry::AssetRef("/Engine/TestArchive.rasset").GetAbsolute());
+		{
+			// Out.WriteUByte(10);
+			// Out.WriteUShort(20);
+			// Out.WriteUInt(30);
+			// Out.WriteULongInt(40);
+			//
+			// Out.WriteByte(-10);
+			// Out.WriteShort(-20);
+			// Out.WriteInt(-30);
+			// Out.WriteLongInt(-40);
+			//
+			// Out.WriteString("hello");
+
+			TestObj Obj;
+			Out.WriteObject(&Obj);
+		}
+		Out.Close();
+
 		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
 //		std::cout << "Value " << NewRefl->Other << std::endl;
 		//TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
