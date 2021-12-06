@@ -45,9 +45,9 @@ namespace Ry
 
 		TestObj Obj;
 
-		//Package* NewPackage = new Package("/Engine/TestPackage.rasset");
-		//NewPackage->SetObject(&Obj);
-		//NewPackage->Save();
+		Package* NewPackage = new Package("/Engine/TestPackage.rasset");
+		NewPackage->SetObject(&Obj);
+		NewPackage->Save();
 
 		// Load packagedf
 		Package* Loaded = LoadPackage("/Engine/TestPackage.rasset");

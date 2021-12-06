@@ -20,8 +20,8 @@ namespace Ry
 		RefField()
 		Ry::Label* ChildLabel;
 
-		RefField()
-		int32 TestInt = 10;
+		//RefField()
+		//int32 TestInt = 10;
 
 		RefField()
 		Ry::String TestString = "some string";

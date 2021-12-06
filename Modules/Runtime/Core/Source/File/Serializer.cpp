@@ -146,6 +146,9 @@ namespace Ry
 		// Write out name of the field. You should be able to deduce the type of the field at runtime, so we don't store that.
 		WriteString(Field.Name);
 
+		// Write field's size
+		WriteULongInt(Field.Type->Size);
+
 		if (Field.ObjectClass) // Child objects
 		{
 			SerializeObjectField(Field, Obj);

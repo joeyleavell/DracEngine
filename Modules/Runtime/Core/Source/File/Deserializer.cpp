@@ -123,8 +123,9 @@ namespace Ry
 				// Iterate through all reflected fields and populate the class's data
 				for (int32 FieldIndex = 0; FieldIndex < FieldCount; FieldIndex++)
 				{
-					// Read field name
+					// Read field name and size
 					Ry::String FieldName = ReadString();
+					uint64 FieldSize = ReadULongInt();
 
 					if (const Field* FoundField = ReflectedClass->FindFieldByName(FieldName))
 					{
@@ -134,6 +135,17 @@ namespace Ry
 					{
 						// Todo: how do we handle this? Probably just ignore it since this could happen when an asset's data gets updated
 						Ry::Log->LogErrorf("Deserializer::ReadObject: Field that was serialized in %s was not found in reflected class %s. Has the class's data changed?", *InputFile, *ClassName);
+
+						// Skip over the rest of this field's bytes since we won't be able to extract this field
+						// Because ignore() only takes in an int32, this ensures we can also ignore int64's, although very unlikely.
+						uint64 ToIgnore = FieldSize;
+						while(ToIgnore > 0)
+						{
+							const uint32 IgnoreAmount = (uint32)std::min(FieldSize, (uint64)INT32_MAX);
+							Input.ignore(IgnoreAmount);
+							
+							ToIgnore -= IgnoreAmount;
+						}
 					}
 
 				}
