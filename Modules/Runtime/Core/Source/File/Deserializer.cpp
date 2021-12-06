@@ -1,10 +1,18 @@
 #include "File/Deserializer.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {
+	Deserializer::Deserializer()
+	{
+
+	}
+
 	void Deserializer::Open(const Ry::String& InputFile)
 	{
-		Input.open(*InputFile);
+		this->InputFile = InputFile;
+
+		Input.open(*InputFile, std::fstream::binary | std::fstream::in);
 	}
 
 	void Deserializer::Close()
@@ -38,7 +46,7 @@ namespace Ry
 		return Result;
 	}
 
-	uint32 Deserializer::ReadULongInt()
+	uint64 Deserializer::ReadULongInt()
 	{
 		char Num[8];
 		Input.read(Num, 8);
@@ -73,7 +81,7 @@ namespace Ry
 		return Result;
 	}
 
-	int32 Deserializer::ReadLongInt()
+	int64 Deserializer::ReadLongInt()
 	{
 		char Num[8];
 		Input.read(Num, 8);
@@ -95,4 +103,98 @@ namespace Ry
 
 		return Result;
 	}
+
+	Ry::Object* Deserializer::ReadObject()
+	{
+		Ry::String ClassName = ReadString();
+
+		const Ry::ReflectedClass* ReflectedClass = GetReflectedClass(ClassName);
+
+		if(ReflectedClass)
+		{
+			// Create a new instance of the class
+			Ry::Object* NewInstance = ReflectedClass->CreateInstance<Ry::Object>();
+
+			if(NewInstance)
+			{
+				// Get how many fields
+				uint32 FieldCount = ReadUInt();
+
+				// Iterate through all reflected fields and populate the class's data
+				for (int32 FieldIndex = 0; FieldIndex < FieldCount; FieldIndex++)
+				{
+					// Read field name
+					Ry::String FieldName = ReadString();
+
+					if (const Field* FoundField = ReflectedClass->FindFieldByName(FieldName))
+					{
+						DeserializeField(FoundField, NewInstance);
+					}
+					else
+					{
+						// Todo: how do we handle this? Probably just ignore it since this could happen when an asset's data gets updated
+						Ry::Log->LogErrorf("Deserializer::ReadObject: Field that was serialized in %s was not found in reflected class %s. Has the class's data changed?", *InputFile, *ClassName);
+					}
+
+				}
+			}
+			else
+			{
+				Ry::Log->LogErrorf("Deserializer::ReadObject: Failed to create new instance of object %s when reading object", *ClassName);
+			}
+
+			return NewInstance;
+		}
+		else
+		{
+			Ry::Log->LogErrorf("Deserializer::ReadObject: Failed to get reflected class of type %s", *ClassName);
+			return nullptr;
+		}
+
+	}
+
+	void Deserializer::DeserializeField(const Field* Field, Ry::Object* DstObject)
+	{
+		if(Field->ObjectClass) // Child object
+		{
+			DeserializeField_Helper<Ry::Object*>(Field, DstObject, &Deserializer::ReadObject);
+		}
+		else if(Field->Type->Name == GetType<Ry::String>()->Name) // Strings
+		{
+			DeserializeField_Helper<Ry::String>(Field, DstObject, &Deserializer::ReadString);
+		}
+		else if (Field->Type->Name == GetType<uint8>()->Name) // uint8
+		{
+			DeserializeField_Helper<uint8>(Field, DstObject, &Deserializer::ReadUByte);
+		}
+		else if (Field->Type->Name == GetType<uint16>()->Name) // uint16
+		{
+			DeserializeField_Helper<uint16>(Field, DstObject, &Deserializer::ReadUShort);
+		}
+		else if (Field->Type->Name == GetType<uint32>()->Name) // uint32
+		{
+			DeserializeField_Helper<uint32>(Field, DstObject, &Deserializer::ReadUInt);
+		}
+		else if (Field->Type->Name == GetType<uint64>()->Name) // uint64
+		{
+			DeserializeField_Helper<uint64>(Field, DstObject, &Deserializer::ReadULongInt);
+		}
+		else if (Field->Type->Name == GetType<int8>()->Name) // int8
+		{
+			DeserializeField_Helper<int8>(Field, DstObject, &Deserializer::ReadByte);
+		}
+		else if (Field->Type->Name == GetType<int16>()->Name) // int16
+		{
+			DeserializeField_Helper<int16>(Field, DstObject, &Deserializer::ReadShort);
+		}
+		else if (Field->Type->Name == GetType<int32>()->Name) // int32
+		{
+			DeserializeField_Helper<int32>(Field, DstObject, &Deserializer::ReadInt);
+		}
+		else if (Field->Type->Name == GetType<int64>()->Name) // int64
+		{
+			DeserializeField_Helper<int64>(Field, DstObject, &Deserializer::ReadLongInt);
+		}
+	}
+
 }

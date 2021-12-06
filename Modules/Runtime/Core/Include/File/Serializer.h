@@ -33,6 +33,7 @@ namespace Ry
 
 	private:
 
+		// Todo: support custom serialize
 		void SerializeField(const Ry::Field& Field, const Ry::Object* Obj);
 		void SerializeObjectField(const Ry::Field& Field, const Ry::Object* Obj);
 		void SerializeStringField(const Ry::Field& Field, const Ry::Object* Obj);

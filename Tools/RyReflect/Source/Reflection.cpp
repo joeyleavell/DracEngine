@@ -62,13 +62,14 @@ namespace Ry
 
 			if (BaseClassCount > 1)
 			{
+				std::cout << ClassName << " had more than one base class";
 				// There can only be one parent
 				return false;
 			}
 			if (BaseClassCount == 0)
 			{
 				// Eventual parent must always be object class
-				if (ClassName == "class Ry::Object")
+				if (ClassName == "class Ry::Object" || ClassName == "Ry::Object")
 					return true;
 				else
 					return false;
@@ -269,6 +270,9 @@ namespace Ry
 
 				// Reflected class name
 				GeneratedSource << "\tC.Name = \"" << Record.Name << "\";\\" << std::endl;
+
+				// Fully qualified class name
+				GeneratedSource << "\tC.QualifiedName = \"" << QualifiedName << "\";\\" << std::endl;
 
 				// Static size of class
 				GeneratedSource << "\tC.Size = sizeof(" << QualifiedName << ");\\" << std::endl;

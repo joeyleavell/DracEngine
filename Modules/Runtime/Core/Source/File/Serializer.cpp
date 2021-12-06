@@ -12,7 +12,7 @@ namespace Ry
 		this->OutFile = OutFile;
 
 		// Open file output stream
-		this->Output.open(*OutFile);
+		this->Output.open(*OutFile, std::fstream::out | std::fstream::binary);
 	}
 
 	void Serializer::Close()
@@ -90,10 +90,8 @@ namespace Ry
 		uint8 Byte2 = (Int >> 16) & 0xFF;
 		uint8 Byte3 = (Int >> 24) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
-		Output << Byte2;
-		Output << Byte3;
+		char Bytes[] = {(char) Byte0, (char)Byte1, (char)Byte2, (char)Byte3};
+		Output.write(Bytes, 4);
 	}
 
 	void Serializer::WriteLongInt(int64 LongInt)
@@ -119,7 +117,7 @@ namespace Ry
 
 	void Serializer::WriteString(const Ry::String& String)
 	{
-		WriteInt(String.getSize());
+		WriteUInt(String.getSize());
 		for(int32 Char = 0; Char < String.getSize(); Char++)
 		{
 			char Value = String[Char];
@@ -131,6 +129,12 @@ namespace Ry
 	{
 		const ReflectedClass* Class = Obj->GetClass();
 
+		// Start with the name of the class so we can resolve the root object type when the object is next read
+		WriteString(Class->QualifiedName);
+
+		// Write out how many fields there are
+		WriteUInt(Class->Fields.GetSize());
+
 		for (const Ry::Field& Field : Class->Fields)
 		{
 			SerializeField(Field, Obj);
@@ -139,6 +143,9 @@ namespace Ry
 
 	void Serializer::SerializeField(const Ry::Field& Field, const Ry::Object* Obj)
 	{
+		// Write out name of the field. You should be able to deduce the type of the field at runtime, so we don't store that.
+		WriteString(Field.Name);
+
 		if (Field.ObjectClass) // Child objects
 		{
 			SerializeObjectField(Field, Obj);
@@ -183,14 +190,18 @@ namespace Ry
 
 	void Serializer::SerializeObjectField(const Ry::Field& Field, const Ry::Object* Obj)
 	{
-		const Ry::Object* ChildObject = Field.GetConstPtrToField<Ry::Object>(Obj);
-		WriteObject(ChildObject);
+		if(Ry::Object* const* ChildObject = Field.GetConstPtrToField<Ry::Object*>(Obj))
+		{
+			WriteObject(*ChildObject);
+		}
 	}
 
 	void Serializer::SerializeStringField(const Ry::Field& Field, const Ry::Object* Obj)
 	{
-		const Ry::String* ChildString = Field.GetConstPtrToField<Ry::String>(Obj);
-		WriteString(*ChildString);
+		if(const Ry::String* ChildString = Field.GetConstPtrToField<Ry::String>(Obj))
+		{
+			WriteString(*ChildString);
+		}
 	}
 
 

@@ -154,6 +154,8 @@ namespace Ry
 		const ReflectedClass* ParentClass;
 
 		Ry::String Name;
+		Ry::String QualifiedName;
+
 		uint64_t Size;
 
 		const Ry::Field* FindFieldByName(const Ry::String& Name) const;

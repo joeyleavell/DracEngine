@@ -172,7 +172,8 @@ namespace RyBuild
 			// Output << R"(<NMakeOutput>)" << "$(SolutionDir)Binary\\RyRuntime-TestGame.exe" << R"(</NMakeOutput>)" << std::endl;
 			PrintIndents();
 
-			Output << R"(<NMakePreprocessorDefinitions>_Debug;_WINDLL;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>)" << std::endl;
+			// This forces debug, dll, and c++17 for intellisense purposes
+			Output << R"(<NMakePreprocessorDefinitions>_Debug;_WINDLL;_HAS_CXX17$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>)" << std::endl;
 			PrintIndents();
 
 			Output << R"(<OutDir>$(SolutionDir)Binary\</OutDir>)" << std::endl;

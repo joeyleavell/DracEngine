@@ -1,5 +1,6 @@
 #include "WidgetManager.h"
 #include "rapidxml.hpp"
+#include "File/AssetRef.h"
 #include "File/File.h"
 #include "Widget/BorderWidget.h"
 #include "Widget/Label.h"

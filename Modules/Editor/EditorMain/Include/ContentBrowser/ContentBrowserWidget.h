@@ -35,7 +35,6 @@ namespace Ry
 
 	};
 
-
 	class ContentBrowserWidget : public SlotWidget
 	{
 	public:

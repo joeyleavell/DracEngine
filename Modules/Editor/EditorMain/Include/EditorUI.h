@@ -18,16 +18,19 @@ namespace Ry
 		GeneratedBody()
 
 		RefField()
+		Ry::Label* ChildLabel;
+
+		RefField()
 		int32 TestInt = 10;
 
 		RefField()
 		Ry::String TestString = "some string";
 
-		Ry::Label* ChildLabel;
-
 		TestObj()
 		{
 			ChildLabel = new Label;
+			ChildLabel->Text = "this is some text";
+			ChildLabel->TextStyleName = "this is a text style";
 		}
 
 	} RefClass();

@@ -13,6 +13,7 @@
 #include "WidgetManager.h"
 #include "EditorStyle.h"
 #include "File/Serializer.h"
+#include "Package/Package.h"
 
 namespace Ry
 {
@@ -42,26 +43,17 @@ namespace Ry
 
 		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
 
+		TestObj Obj;
 
-		Ry::Serializer Out;
-		Out.Open(Ry::AssetRef("/Engine/TestArchive.rasset").GetAbsolute());
-		{
-			// Out.WriteUByte(10);
-			// Out.WriteUShort(20);
-			// Out.WriteUInt(30);
-			// Out.WriteULongInt(40);
-			//
-			// Out.WriteByte(-10);
-			// Out.WriteShort(-20);
-			// Out.WriteInt(-30);
-			// Out.WriteLongInt(-40);
-			//
-			// Out.WriteString("hello");
+		//Package* NewPackage = new Package("/Engine/TestPackage.rasset");
+		//NewPackage->SetObject(&Obj);
+		//NewPackage->Save();
 
-			TestObj Obj;
-			Out.WriteObject(&Obj);
-		}
-		Out.Close();
+		// Load packagedf
+		Package* Loaded = LoadPackage("/Engine/TestPackage.rasset");
+		const Ry::Object* RootObject = Loaded->GetOrLoadRoot();
+
+		std::cout << "test" << std::endl;
 
 		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
 //		std::cout << "Value " << NewRefl->Other << std::endl;

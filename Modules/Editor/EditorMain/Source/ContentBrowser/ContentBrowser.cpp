@@ -1,5 +1,6 @@
 #include "ContentBrowser/ContentBrowser.h"
 #include "File/File.h"
+#include <filesystem>
 #include "ContentBrowser/ContentBrowserWidget.h"
 
 namespace Ry
@@ -47,13 +48,19 @@ namespace Ry
 		// Iterate paths in directory
 		for(auto& Path : CurDirItr)
 		{
-			
+			bool bIsDirectory = Filesystem::is_directory(Path);
+			bool bIsRAsset = Path.path().extension() == ".rasset";
+
+			// Only show files of type .rasset
+			if (!bIsDirectory && !bIsRAsset)
+				continue;
+
 			// Create a browser node for this
 			BrowserNode Node;
 			Node.Name = Path.path().stem().string().c_str();
 			Node.bDirectory = Filesystem::is_directory(Path);
 
-			if(Node.bDirectory)
+			if (Node.bDirectory)
 			{
 				Node.Widget = Browser->AddDirectory(Node.Name);
 			}
@@ -62,7 +69,7 @@ namespace Ry
 				Node.Widget = Browser->AddFile(Node.Name);
 			}
 
-			if(Node.Widget)
+			if (Node.Widget)
 			{
 				Node.Widget->OnDoubleClick.AddMemberFunction(this, &ContentBrowser::OpenNode);
 				Nodes.insert(Node.Widget.Get(), Node);

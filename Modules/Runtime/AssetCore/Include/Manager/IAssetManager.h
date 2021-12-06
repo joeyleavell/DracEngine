@@ -2,6 +2,7 @@
 
 #include "Core/String.h"
 #include "Asset.h"
+#include "File/AssetRef.h"
 
 namespace Ry
 {
