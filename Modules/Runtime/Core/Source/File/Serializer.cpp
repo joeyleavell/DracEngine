@@ -5,6 +5,7 @@ namespace Ry
 
 	Serializer::Serializer()
 	{
+
 	}
 
 	void Serializer::Open(const Ry::String& OutFile)
@@ -23,7 +24,7 @@ namespace Ry
 
 	void Serializer::WriteUByte(uint8 Byte)
 	{
-		Output << Byte;
+		GetOutStream() << Byte;
 	}
 
 	void Serializer::WriteUShort(uint16 Short)
@@ -31,8 +32,8 @@ namespace Ry
 		uint8 Byte0 = (Short) & 0xFF;
 		uint8 Byte1 = (Short >> 8) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
+		GetOutStream() << Byte0;
+		GetOutStream() << Byte1;
 	}
 
 	void Serializer::WriteUInt(uint32 Int)
@@ -42,10 +43,10 @@ namespace Ry
 		uint8 Byte2 = (Int >> 16) & 0xFF;
 		uint8 Byte3 = (Int >> 24) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
-		Output << Byte2;
-		Output << Byte3;
+		GetOutStream() << Byte0;
+		GetOutStream() << Byte1;
+		GetOutStream() << Byte2;
+		GetOutStream() << Byte3;
 	}
 
 	void Serializer::WriteULongInt(uint64 LongInt)
@@ -59,19 +60,19 @@ namespace Ry
 		uint8 Byte6 = (LongInt >> 48) & 0xFF;
 		uint8 Byte7 = (LongInt >> 56) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
-		Output << Byte2;
-		Output << Byte3;
-		Output << Byte4;
-		Output << Byte5;
-		Output << Byte6;
-		Output << Byte7;
+		GetOutStream() << Byte0;
+		GetOutStream() << Byte1;
+		GetOutStream() << Byte2;
+		GetOutStream() << Byte3;
+		GetOutStream() << Byte4;
+		GetOutStream() << Byte5;
+		GetOutStream() << Byte6;
+		GetOutStream() << Byte7;
 	}
 
 	void Serializer::WriteByte(int8 Byte)
 	{
-		Output << Byte;
+		GetOutStream() << Byte; 
 	}
 
 	void Serializer::WriteShort(int16 Short)
@@ -79,8 +80,8 @@ namespace Ry
 		uint8 Byte0 = (Short) & 0xFF;
 		uint8 Byte1 = (Short >> 8) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
+		GetOutStream() << Byte0;
+		GetOutStream() << Byte1;
 	}
 
 	void Serializer::WriteInt(int32 Int)
@@ -91,7 +92,7 @@ namespace Ry
 		uint8 Byte3 = (Int >> 24) & 0xFF;
 
 		char Bytes[] = {(char) Byte0, (char)Byte1, (char)Byte2, (char)Byte3};
-		Output.write(Bytes, 4);
+		GetOutStream().write(Bytes, 4);
 	}
 
 	void Serializer::WriteLongInt(int64 LongInt)
@@ -105,14 +106,19 @@ namespace Ry
 		uint8 Byte6 = (LongInt >> 48) & 0xFF;
 		uint8 Byte7 = (LongInt >> 56) & 0xFF;
 
-		Output << Byte0;
-		Output << Byte1;
-		Output << Byte2;
-		Output << Byte3;
-		Output << Byte4;
-		Output << Byte5;
-		Output << Byte6;
-		Output << Byte7;
+		GetOutStream() << Byte0;
+		GetOutStream() << Byte1;
+		GetOutStream() << Byte2;
+		GetOutStream() << Byte3;
+		GetOutStream() << Byte4;
+		GetOutStream() << Byte5;
+		GetOutStream() << Byte6;
+		GetOutStream() << Byte7;
+	}
+
+	void Serializer::WriteBytes(const char* Bytes, uint64 Count)
+	{
+		GetOutStream().write(Bytes, Count);
 	}
 
 	void Serializer::WriteString(const Ry::String& String)
@@ -141,54 +147,91 @@ namespace Ry
 		}
 	}
 
+	// int32 Serializer::ComputeFieldSize(const Field& Field)
+	// {
+	// 	// Computes the number of bytes that will be produced 
+	// 	if(Field.Type->Class == TypeClass::ArrayList)
+	// 	{
+	// 		// Num elements * sizeof(element)
+	// 	}
+	// 	else if(Field.Type->Class == TypeClass::Object)
+	// 	{
+	// 		// Sum of the sizes of all fields + header
+	// 	}
+	// 	else if(Field.Type->Class == TypeClass::String)
+	// 	{
+	// 		// Num of characters * size(character) + header bytes
+	// 	}
+	// 	else
+	// 	{
+	// 		// Primitive type size
+	// 		return Field.Type->Size;
+	// 	}
+	// }
+
 	void Serializer::SerializeField(const Ry::Field& Field, const Ry::Object* Obj)
 	{
 		// Write out name of the field. You should be able to deduce the type of the field at runtime, so we don't store that.
 		WriteString(Field.Name);
 
-		// Write field's size
-		WriteULongInt(Field.Type->Size);
+		// Note: We defer writing out the field's size until the field has been fully output to the temporary ostringstream so we don't need fancy code to calculate the field's final output size
+		//WriteULongInt(Field.Type->Size);
 
-		if (Field.ObjectClass) // Child objects
+		PushFieldStream();
 		{
-			SerializeObjectField(Field, Obj);
+			if (Field.ObjectClass) // Child objects
+			{
+				SerializeObjectField(Field, Obj);
+			}
+			else if (Field.Type->Class == TypeClass::ArrayList) // Array list type
+			{
+				SerializeArrayField(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<Ry::String>()->Name) // Strings
+			{
+				SerializeStringField(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<uint8>()->Name) // uint8
+			{
+				SerializeIntField<uint8>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<uint16>()->Name) // uint16
+			{
+				SerializeIntField<uint16>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<uint32>()->Name) // uint32
+			{
+				SerializeIntField<uint32>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<uint64>()->Name) // uint64
+			{
+				SerializeIntField<uint64>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<int8>()->Name) // int8
+			{
+				SerializeIntField<int8>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<int16>()->Name) // int16
+			{
+				SerializeIntField<int16>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<int32>()->Name) // int32
+			{
+				SerializeIntField<int32>(Field, Obj);
+			}
+			else if (Field.Type->Name == GetType<int64>()->Name) // int64
+			{
+				SerializeIntField<int64>(Field, Obj);
+			}
 		}
-		else if(Field.Type->Name == GetType<Ry::String>()->Name) // Strings
-		{
-			SerializeStringField(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<uint8>()->Name) // uint8
-		{
-			SerializeIntField<uint8>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<uint16>()->Name) // uint16
-		{
-			SerializeIntField<uint16>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<uint32>()->Name) // uint32
-		{
-			SerializeIntField<uint32>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<uint64>()->Name) // uint64
-		{
-			SerializeIntField<uint64>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<int8>()->Name) // int8
-		{
-			SerializeIntField<int8>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<int16>()->Name) // int16
-		{
-			SerializeIntField<int16>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<int32>()->Name) // int32
-		{
-			SerializeIntField<int32>(Field, Obj);
-		}
-		else if (Field.Type->Name == GetType<int64>()->Name) // int64
-		{
-			SerializeIntField<int64>(Field, Obj);
-		}
+		std::string OutData = PopFieldStream();
+		uint64 DataSize = OutData.size();
+
+		// Now we write out the size of the field
+		WriteULongInt(DataSize);
+
+		// Output the rest of the bytes
+		WriteBytes(OutData.c_str(), DataSize);
 	}
 
 	void Serializer::SerializeObjectField(const Ry::Field& Field, const Ry::Object* Obj)
@@ -206,6 +249,23 @@ namespace Ry
 			WriteString(*ChildString);
 		}
 	}
+
+	void Serializer::SerializeArrayField(const Ry::Field& Field, const Ry::Object* Obj)
+	{
+		const DataType* TemplateType = Field.Type->TemplateTypes[0];
+
+		if(TemplateType->Class == TypeClass::Object)
+		{
+			SerializeArrayField_Helper<const Ry::Object*>(Field, Obj, &Serializer::WriteObject);
+		}
+		else if(TemplateType->Name == GetType<uint32>()->Name)
+		{
+			SerializeArrayField_Helper<uint32>(Field, Obj, &Serializer::WriteUInt);
+		}
+
+		//if (Ry::Object* const* ChildObject = Field.GetConstPtrToField<Ry::Object*>(Obj))
+	}
+
 
 
 }

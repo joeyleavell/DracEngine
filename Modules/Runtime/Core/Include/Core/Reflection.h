@@ -62,6 +62,8 @@ namespace Ry
 		Ry::String Name;
 		uint64 Size;
 
+		Ry::ArrayList<const DataType*> TemplateTypes;
+
 		bool IsObject()
 		{
 			return Class == TypeClass::Object;
@@ -102,9 +104,6 @@ namespace Ry
 		Ry::String Name;
 		uint64 Offset;
 		const Ry::ReflectedClass* ObjectClass; // If this type is an object, this value represents the class of he object
-
-		// Only applicable for ArrayLists at the moment
-		Ry::ArrayList<DataType> TemplateTypes;
 
 		template<typename T, typename Object>
 		T* GetMutablePtrToField(Object* Obj) const
@@ -220,9 +219,16 @@ const Ry::ReflectedClass* GetClass()
 template<typename T>
 const Ry::DataType* GetTypeImpl(Ry::TypeTag<T>)
 {
-	static Ry::DataType Default{};
-	Default.Name = "<default type>";
-	return &Default;
+	static Ry::DataType Result;
+	Result.Name = "<unknown type>";
+	return &Result;
+}
+
+// Pointer-to get type impl
+template<typename T>
+const Ry::DataType* GetTypeImpl(Ry::TypeTag<T*>)
+{
+	return T::GetStaticType();
 }
 
 template<typename T>
@@ -234,7 +240,7 @@ const Ry::DataType* GetTypeImpl(Ry::TypeTag<Ry::ArrayList<T>> ArrayListTag)
 	Result.Size = sizeof(Ry::ArrayList<T>);
 	Result.Name = "Ry::ArrayList<" + InnerType->Name + ">";
 	Result.Class = Ry::TypeClass::ArrayList;
-	//Result.TemplateTypes.Add(InnerType);
+	Result.TemplateTypes.Add(InnerType);
 
 	return &Result;
 };

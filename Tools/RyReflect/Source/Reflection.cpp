@@ -166,9 +166,11 @@ namespace Ry
 			if (Type->isIntegerType() || Type->isFloatingType())
 				return true;
 
-			if (const CXXRecordDecl* Record = Type->getAsCXXRecordDecl())
+			if (const CXXRecordDecl* Record = Type->getPointeeCXXRecordDecl())
+			{
 				if (IsValidReflectionClass(Record))
 					return true;
+			}
 			
 			return false;
 		}
@@ -186,13 +188,13 @@ namespace Ry
 
 			if(Type->isStructureOrClassType())
 			{
+
 				if(IsRyString(CanonType))
 				{
 					return true;
 				}
 				else if(IsArrayList(Type))
 				{
-
 					// Create an AST visitor for the template parameters
 					struct SpecificationArgumentVisitor : public clang::RecursiveASTVisitor<SpecificationArgumentVisitor>
 					{

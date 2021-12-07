@@ -51,7 +51,17 @@ namespace Ry
 		char Num[8];
 		Input.read(Num, 8);
 
-		uint64 Result = (Num[0] >> 0) | (Num[1] >> 8) | (Num[2] >> 16) | (Num[3] >> 24) | (Num[4] >> 0) | (Num[5] >> 8) | (Num[6] >> 16) | (Num[7] >> 24);
+		uint8* AsUInt64 = reinterpret_cast<uint8*>(Num);
+		
+		uint64 Result = ((uint64)AsUInt64[0] << 0L) |
+			((uint64)AsUInt64[1] << 8L) |
+			((uint64)AsUInt64[2] << 16L) |
+			((uint64)AsUInt64[3] << 24L) |
+			((uint64)AsUInt64[4] << 32L) |
+			((uint64)AsUInt64[5] << 40L) |
+			((uint64)AsUInt64[6] << 48L) |
+			((uint64)AsUInt64[7] << 56L);
+
 		return Result;
 	}
 
@@ -101,6 +111,9 @@ namespace Ry
 			Result[Index] = Next;
 		}
 
+		// Append the null terminator
+		Result[Size] = '\0';
+
 		return Result;
 	}
 
@@ -129,23 +142,14 @@ namespace Ry
 
 					if (const Field* FoundField = ReflectedClass->FindFieldByName(FieldName))
 					{
-						DeserializeField(FoundField, NewInstance);
+						DeserializeField(FoundField, NewInstance, FieldSize);
 					}
 					else
 					{
 						// Todo: how do we handle this? Probably just ignore it since this could happen when an asset's data gets updated
-						Ry::Log->LogErrorf("Deserializer::ReadObject: Field that was serialized in %s was not found in reflected class %s. Has the class's data changed?", *InputFile, *ClassName);
+						Ry::Log->LogErrorf("Deserializer::ReadObject: Field %s that was serialized in %s was not found in reflected class %s. Has the class's data changed?", *FieldName, *InputFile, *ClassName);
 
-						// Skip over the rest of this field's bytes since we won't be able to extract this field
-						// Because ignore() only takes in an int32, this ensures we can also ignore int64's, although very unlikely.
-						uint64 ToIgnore = FieldSize;
-						while(ToIgnore > 0)
-						{
-							const uint32 IgnoreAmount = (uint32)std::min(FieldSize, (uint64)INT32_MAX);
-							Input.ignore(IgnoreAmount);
-							
-							ToIgnore -= IgnoreAmount;
-						}
+						IgnoreBytes(FieldSize);
 					}
 
 				}
@@ -165,11 +169,29 @@ namespace Ry
 
 	}
 
-	void Deserializer::DeserializeField(const Field* Field, Ry::Object* DstObject)
+	void Deserializer::IgnoreBytes(uint64 Count)
+	{
+		// Skip over the rest of this field's bytes since we won't be able to extract this field
+		// Because ignore() only takes in an int32, this ensures we can also ignore int64's, although very unlikely.
+		uint64 ToIgnore = Count;
+		while (ToIgnore > 0)
+		{
+			const uint32 IgnoreAmount = (uint32)std::min(ToIgnore, (uint64)INT32_MAX);
+			Input.ignore(IgnoreAmount);
+
+			ToIgnore -= IgnoreAmount;
+		}
+	}
+
+	void Deserializer::DeserializeField(const Field* Field, Ry::Object* DstObject, uint64 FieldSize)
 	{
 		if(Field->ObjectClass) // Child object
 		{
 			DeserializeField_Helper<Ry::Object*>(Field, DstObject, &Deserializer::ReadObject);
+		}
+		else if(Field->Type->Class == TypeClass::ArrayList)
+		{
+			DeserializeArrayListField(Field, DstObject);
 		}
 		else if(Field->Type->Name == GetType<Ry::String>()->Name) // Strings
 		{
@@ -207,6 +229,25 @@ namespace Ry
 		{
 			DeserializeField_Helper<int64>(Field, DstObject, &Deserializer::ReadLongInt);
 		}
+		else
+		{
+			Ry::Log->LogErrorf("Unsupported data type %s, skipping", *Field->Type->Name);
+
+			// Skip bytes
+			IgnoreBytes(FieldSize);
+		}
+	}
+
+	void Deserializer::DeserializeArrayListField(const Field* Field, Ry::Object* DstObject)
+	{
+		Ry::String ElementType = ReadString();
+
+		// Check if this is an object type
+		if(GetReflectedClass(ElementType) || ElementType == "Ry::Object")
+		{
+			DeserializeArrayListField_Helper<Ry::Object*>(Field, DstObject, &Deserializer::ReadObject);
+		}
+
 	}
 
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Object.gen.h"
 #include "Json/Json.h"
+#include "Object.gen.h"
 
 #ifndef GeneratedBody
 	#define GeneratedBody()\
@@ -12,13 +12,22 @@
 
 namespace Ry
 {
-	class ReflectedClass;
+	class DataType;
 
 	class CORE_MODULE Object
 	{
 	public:
 		virtual ~Object();
 		virtual const ReflectedClass* GetClass() const;
+
+		static const DataType* GetStaticType() 
+		{
+			static Ry::DataType Result;
+			Result.Class = TypeClass::Object;
+			Result.Name = "Ry::Object";
+			Result.Size = sizeof(Ry::Object);
+			return &Result; 
+		};
 
 		static const Ry::ReflectedClass* GetStaticClass()
 		{

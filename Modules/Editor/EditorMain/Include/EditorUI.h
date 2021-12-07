@@ -20,17 +20,31 @@ namespace Ry
 		RefField()
 		Ry::Label* ChildLabel;
 
-		//RefField()
-		//int32 TestInt = 10;
+		RefField()
+		Ry::ArrayList<Ry::Object*> IntArray;
 
 		RefField()
-		Ry::String TestString = "some string";
+		int32 TestInt = 10;
+
+		RefField()
+		Ry::String TestString = "Another string";
+
+		RefField()
+		Ry::String TestString2 = "some string";
+
 
 		TestObj()
 		{
 			ChildLabel = new Label;
 			ChildLabel->Text = "this is some text";
 			ChildLabel->TextStyleName = "this is a text style";
+
+			//IntArray = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+			Label* Test = new Ry::Label{};
+			Test->Text = "label1";
+			IntArray.Add(Test);
+			IntArray.Add(new Ry::Label);
+			IntArray.Add(new Ry::Label);
 		}
 
 	} RefClass();

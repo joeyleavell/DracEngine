@@ -32,8 +32,40 @@ namespace Ry
 
 	private:
 
+		void IgnoreBytes(uint64 Count);
+
 		// Todo: support custom deserialize
-		void DeserializeField(const Field* Field, Ry::Object* DstObject);
+		void DeserializeField(const Field* Field, Ry::Object* DstObject, uint64 FieldSize);
+
+		void DeserializeArrayListField(const Field* Field, Ry::Object* DstObject);
+
+		template<typename ArrayListType>
+		void DeserializeArrayListField_Helper(const Field* Field, Ry::Object* DstObject, ArrayListType (Ry::Deserializer::* DeserializeFunction)())
+		{
+			int32 ElementCount = ReadUInt();
+
+			if (Ry::ArrayList<ArrayListType>* PtrToArrayList = Field->GetMutablePtrToField<Ry::ArrayList<ArrayListType>>(DstObject))
+			{
+				Ry::ArrayList<ArrayListType> NewArrayList;
+
+				for(int32 Index = 0; Index < ElementCount; Index++)
+				{
+					// Load the element by calling the deserialize function
+					ArrayListType StoredObject = (this->*DeserializeFunction)();
+
+					// Append it to the modifiable array list
+					NewArrayList.Add(StoredObject);
+				}
+
+				// Set the existing array list
+				*PtrToArrayList = NewArrayList;
+			}
+			else
+			{
+				Ry::Log->LogErrorf("Deserializer::DeserializeField_Helper: Failed to get mutable ptr to field %s in object of class %s", *Field->Name, *DstObject->GetClass()->Name);
+			}
+		}
+
 
 		/**
 		 * Generic method to deserialize a field, given a function pointer to a function in this class that takes no arguments.
