@@ -147,28 +147,6 @@ namespace Ry
 		}
 	}
 
-	// int32 Serializer::ComputeFieldSize(const Field& Field)
-	// {
-	// 	// Computes the number of bytes that will be produced 
-	// 	if(Field.Type->Class == TypeClass::ArrayList)
-	// 	{
-	// 		// Num elements * sizeof(element)
-	// 	}
-	// 	else if(Field.Type->Class == TypeClass::Object)
-	// 	{
-	// 		// Sum of the sizes of all fields + header
-	// 	}
-	// 	else if(Field.Type->Class == TypeClass::String)
-	// 	{
-	// 		// Num of characters * size(character) + header bytes
-	// 	}
-	// 	else
-	// 	{
-	// 		// Primitive type size
-	// 		return Field.Type->Size;
-	// 	}
-	// }
-
 	void Serializer::SerializeField(const Ry::Field& Field, const Ry::Object* Obj)
 	{
 		// Write out name of the field. You should be able to deduce the type of the field at runtime, so we don't store that.
@@ -258,12 +236,43 @@ namespace Ry
 		{
 			SerializeArrayField_Helper<const Ry::Object*>(Field, Obj, &Serializer::WriteObject);
 		}
-		else if(TemplateType->Name == GetType<uint32>()->Name)
+		else if(TemplateType->Class == TypeClass::String)
+		{
+			SerializeArrayField_Helper<Ry::String, const Ry::String&>(Field, Obj, &Serializer::WriteString);
+		}
+		else if (TemplateType->Name == GetType<uint8>()->Name)
+		{
+			SerializeArrayField_Helper<uint8>(Field, Obj, &Serializer::WriteUInt);
+		}
+		else if (TemplateType->Name == GetType<uint16>()->Name)
+		{
+			SerializeArrayField_Helper<uint16>(Field, Obj, &Serializer::WriteUShort);
+		}
+		else if (TemplateType->Name == GetType<uint16>()->Name)
 		{
 			SerializeArrayField_Helper<uint32>(Field, Obj, &Serializer::WriteUInt);
 		}
+		else if(TemplateType->Name == GetType<uint64>()->Name)
+		{
+			SerializeArrayField_Helper<uint64>(Field, Obj, &Serializer::WriteULongInt);
+		}
+		else if (TemplateType->Name == GetType<int8>()->Name)
+		{
+			SerializeArrayField_Helper<int8>(Field, Obj, &Serializer::WriteInt);
+		}
+		else if (TemplateType->Name == GetType<int16>()->Name)
+		{
+			SerializeArrayField_Helper<int16>(Field, Obj, &Serializer::WriteShort);
+		}
+		else if (TemplateType->Name == GetType<int16>()->Name)
+		{
+			SerializeArrayField_Helper<int32>(Field, Obj, &Serializer::WriteInt);
+		}
+		else if (TemplateType->Name == GetType<int64>()->Name)
+		{
+			SerializeArrayField_Helper<int64>(Field, Obj, &Serializer::WriteLongInt);
+		}
 
-		//if (Ry::Object* const* ChildObject = Field.GetConstPtrToField<Ry::Object*>(Obj))
 	}
 
 

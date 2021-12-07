@@ -54,8 +54,8 @@ namespace Ry
 		void SerializeStringField(const Ry::Field& Field, const Ry::Object* Obj);
 		void SerializeArrayField(const Ry::Field& Field, const Ry::Object* Obj);
 
-		template<typename T>
-		void SerializeArrayField_Helper(const Ry::Field& Field, const Ry::Object* Obj, void (Ry::Serializer::* SerializeFunction)(T ToSerialize))
+		template<typename T, typename SerializeParam = T>
+		void SerializeArrayField_Helper(const Ry::Field& Field, const Ry::Object* Obj, void (Ry::Serializer::* SerializeFunction)(SerializeParam ToSerialize))
 		{
 			if(const Ry::ArrayList<T>* ArrayRef = Field.GetConstPtrToField<Ry::ArrayList<T>, Ry::Object>(Obj))
 			{

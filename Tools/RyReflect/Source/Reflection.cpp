@@ -166,6 +166,13 @@ namespace Ry
 			if (Type->isIntegerType() || Type->isFloatingType())
 				return true;
 
+			// Must be a string, cannot be a nested container (for now)
+			if (IsRyString(Type))
+			{
+				return true;
+			}
+
+			// Pointer to class type (must be a reflected object)
 			if (const CXXRecordDecl* Record = Type->getPointeeCXXRecordDecl())
 			{
 				if (IsValidReflectionClass(Record))

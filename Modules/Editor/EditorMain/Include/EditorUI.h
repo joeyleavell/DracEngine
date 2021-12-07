@@ -21,7 +21,7 @@ namespace Ry
 		Ry::Label* ChildLabel;
 
 		RefField()
-		Ry::ArrayList<Ry::Object*> IntArray;
+		Ry::ArrayList<Ry::String> IntArray;
 
 		RefField()
 		int32 TestInt = 10;
@@ -40,11 +40,13 @@ namespace Ry
 			ChildLabel->TextStyleName = "this is a text style";
 
 			//IntArray = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-			Label* Test = new Ry::Label{};
-			Test->Text = "label1";
-			IntArray.Add(Test);
-			IntArray.Add(new Ry::Label);
-			IntArray.Add(new Ry::Label);
+			// Label* Test = new Ry::Label{};
+			// Test->Text = "label1";
+			// IntArray.Add(Test);
+			// IntArray.Add(new Ry::Label);
+			// IntArray.Add(new Ry::Label);
+
+			IntArray = { "string1", "string2", "string3" };
 		}
 
 	} RefClass();

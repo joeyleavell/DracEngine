@@ -96,7 +96,17 @@ namespace Ry
 		char Num[8];
 		Input.read(Num, 8);
 
-		int64 Result = (Num[0] >> 0) | (Num[1] >> 8) | (Num[2] >> 16) | (Num[3] >> 24) | (Num[4] >> 0) | (Num[5] >> 8) | (Num[6] >> 16) | (Num[7] >> 24);
+		uint8* AsUInt64 = reinterpret_cast<uint8*>(Num);
+
+		int64 Result = ((uint64)AsUInt64[0] << 0L) |
+			((uint64)AsUInt64[1] << 8L) |
+			((uint64)AsUInt64[2] << 16L) |
+			((uint64)AsUInt64[3] << 24L) |
+			((uint64)AsUInt64[4] << 32L) |
+			((uint64)AsUInt64[5] << 40L) |
+			((uint64)AsUInt64[6] << 48L) |
+			((uint64)AsUInt64[7] << 56L);
+
 		return Result;
 	}
 
@@ -247,7 +257,42 @@ namespace Ry
 		{
 			DeserializeArrayListField_Helper<Ry::Object*>(Field, DstObject, &Deserializer::ReadObject);
 		}
-
+		else if(ElementType == GetType<Ry::String>()->Name)
+		{
+			DeserializeArrayListField_Helper<Ry::String>(Field, DstObject, &Deserializer::ReadString);
+		}
+		else if (ElementType == GetType<uint8>()->Name)
+		{
+			DeserializeArrayListField_Helper<uint8>(Field, DstObject, &Deserializer::ReadUByte);
+		}
+		else if (ElementType == GetType<uint16>()->Name)
+		{
+			DeserializeArrayListField_Helper<uint16>(Field, DstObject, &Deserializer::ReadUShort);
+		}
+		else if (ElementType == GetType<uint32>()->Name)
+		{
+			DeserializeArrayListField_Helper<uint32>(Field, DstObject, &Deserializer::ReadUInt);
+		}
+		else if (ElementType == GetType<uint64>()->Name)
+		{
+			DeserializeArrayListField_Helper<uint64>(Field, DstObject, &Deserializer::ReadULongInt);
+		}
+		else if (ElementType == GetType<int8>()->Name)
+		{
+			DeserializeArrayListField_Helper<int8>(Field, DstObject, &Deserializer::ReadByte);
+		}
+		else if (ElementType == GetType<int16>()->Name)
+		{
+			DeserializeArrayListField_Helper<int16>(Field, DstObject, &Deserializer::ReadShort);
+		}
+		else if (ElementType == GetType<int32>()->Name)
+		{
+			DeserializeArrayListField_Helper<int32>(Field, DstObject, &Deserializer::ReadInt);
+		}
+		else if (ElementType == GetType<int64>()->Name)
+		{
+			DeserializeArrayListField_Helper<int64>(Field, DstObject, &Deserializer::ReadLongInt);
+		}
 	}
 
 }
