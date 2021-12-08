@@ -74,13 +74,24 @@ namespace Ry
 	public:
 		GeneratedBody()
 
+		void SetObjectName(const Ry::String& NewName);
+		Ry::String GetObjectName() const;
+
+	protected:
+
 		RefField()
-		Ry::String ObjectName = "hi_test_name";
+		Ry::String ObjectName;
 
 	} RefClass();
 
-	//template<typename T>
-	//EXPORT_ONLY T* NewObject(Ry::String ObjectName);
+	template<typename T>
+	EXPORT_ONLY T* NewObject(Ry::String ObjectName)
+	{
+		T* NewObject = new T;
+		NewObject->SetObjectName(ObjectName);
+
+		return NewObject;
+	}
 
 	CORE_MODULE Json Jsonify(Ry::Object& Object);
 	

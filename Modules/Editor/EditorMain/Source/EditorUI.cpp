@@ -43,10 +43,10 @@ namespace Ry
 
 		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
 
-		TestObj Obj;
+		TestObj* Obj = NewObject<TestObj>("TestObject");
 
 		Package* NewPackage = new Package("/Engine/TestPackage.rasset");
-		NewPackage->SetObject(&Obj);
+		NewPackage->SetObject(Obj);
 		NewPackage->Save();
 
 		// Load packagedf

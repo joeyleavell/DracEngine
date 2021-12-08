@@ -8,6 +8,16 @@ namespace Ry
 		return nullptr;
 	}
 
+	void Object::SetObjectName(const Ry::String& NewName)
+	{
+		this->ObjectName = NewName;
+	}
+
+	Ry::String Object::GetObjectName() const
+	{
+		return ObjectName;
+	}
+
 	Json Jsonify(Ry::Object& Object)
 	{
 		Json RootJson = Json::CreateObject();
