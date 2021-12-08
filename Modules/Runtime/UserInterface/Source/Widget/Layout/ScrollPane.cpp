@@ -319,6 +319,7 @@ namespace Ry
 
 		if (MouseEv.ButtonID == 0)
 		{
+			bool bHandled = false;
 			// Mouse must be inside scroll bar rect to initiate drag
 			if (MouseEv.bPressed)
 			{
@@ -329,6 +330,8 @@ namespace Ry
 
 					// Store the initial delta Y position
 					RelativeScrollBarPressed.Y = (int32)(MouseEv.MouseY - VertLoc.Y);
+
+					bHandled = true;
 				}
 				else if (bHorBoundsTest && !bHorizontalBarPressed)
 				{
@@ -337,6 +340,8 @@ namespace Ry
 
 					// Store the initial delta Y position
 					RelativeScrollBarPressed.X = (int32)(MouseEv.MouseX - HorLoc.X);
+
+					bHandled = true;
 				}
 			}
 
@@ -347,7 +352,10 @@ namespace Ry
 				bHorizontalBarPressed = false;
 			}
 
-			return true;
+			if(bHandled)
+			{
+				return true;
+			}
 		}
 
 		return PanelWidget::OnMouseButtonEvent(MouseEv);

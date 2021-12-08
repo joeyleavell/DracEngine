@@ -9,6 +9,7 @@
 #include "Widget/Layout/ScrollPane.h"
 #include "Widget/Input/Button.h"
 #include "WidgetManager.h"
+#include "Buttons.h"
 
 namespace Ry
 {
@@ -35,14 +36,39 @@ namespace Ry
 
 		SetChild(ItemWidget);
 
+		this->bIsDragging = false;
+		this->bIsPressed = false;
+		this->bGhostShown = false;
+		GhostIconItemSet = MakeItemSet();
+
 	}
 
 	ContentBrowserItem::~ContentBrowserItem()
 	{
 	}
 
-	void ContentBrowserItem::Construct()
+	bool ContentBrowserItem::OnMouseButtonEvent(const MouseButtonEvent& MouseEv)
 	{
+		if(IsHovered() && !bIsDragging && MouseEv.ButtonID == MOUSE_BUTTON_LEFT && MouseEv.bPressed)
+		{
+			Offset.X = (int32) MouseEv.MouseX - Icon->GetAbsolutePosition().X;
+			Offset.Y = (int32) MouseEv.MouseY - Icon->GetAbsolutePosition().Y;
+
+			this->bIsPressed = true;
+			MarkDirty(this, true);
+			return true;
+		}
+
+		if(bIsPressed && MouseEv.ButtonID == MOUSE_BUTTON_LEFT && !MouseEv.bPressed)
+		{
+			this->bIsPressed = false;
+			this->bIsDragging = false;
+
+			MarkDirty(this, true);
+			return true;
+		}
+
+		return false;
 	}
 
 	bool ContentBrowserItem::OnMouseClicked(const MouseClickEvent& MouseEv)
@@ -55,6 +81,65 @@ namespace Ry
 		}
 
 		return false;
+	}
+
+	bool ContentBrowserItem::OnMouseDragged(const MouseDragEvent& MouseEv)
+	{
+		if(bIsPressed)
+		{
+			this->bIsDragging = true;
+			LastMouseX = MouseEv.MouseX;
+			LastMouseY = MouseEv.MouseY;
+
+			// MarkDirty; this widget needs a re-draw as the widget matches the x,y position of the mouse
+			MarkDirty(this, true);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void ContentBrowserItem::OnShow(Ry::Batch* Batch)
+	{
+		SlotWidget::OnShow(Batch);
+
+		if(bIsDragging && !bGhostShown)
+		{
+			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
+			IconStyle.Default->Show(GhostIconItemSet, Batch, GetWidgetID(), GetPipelineState(this));
+
+			bGhostShown = true;
+
+			// todo: weird flickering happens in vulkan if batch render isnt called here
+			//Batch->Render();
+		}
+	}
+
+	void ContentBrowserItem::OnHide(Ry::Batch* Batch)
+	{
+		SlotWidget::OnHide(Batch);
+
+		if(bGhostShown)
+		{
+			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
+			IconStyle.Default->Hide(GhostIconItemSet, Batch);
+			bGhostShown = false;
+
+			//Batch->Render();
+		}
+	}
+
+	void ContentBrowserItem::Draw()
+	{
+		SlotWidget::Draw();
+
+		if(bIsDragging)
+		{
+			SizeType Size = Icon->ComputeSize();
+			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
+			IconStyle.Default->Draw(GhostIconItemSet, LastMouseX - Offset.X, LastMouseY - Offset.Y, Size.Width, Size.Height);
+		}
 	}
 
 	ContentBrowserWidget::ContentBrowserWidget()
@@ -93,8 +178,6 @@ namespace Ry
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 		Grid->AppendSlot(AsWidget);
 
-		NewItem->Construct();
-
 		return NewItem;
 	}
 
@@ -104,8 +187,6 @@ namespace Ry
 		Ry::SharedPtr<Widget> AsWidget = CastShared<Widget>(NewItem);
 
 		Grid->AppendSlot(AsWidget);
-
-		NewItem->Construct();
 
 		return NewItem;
 	}

@@ -2,7 +2,7 @@
     <Ry::Splitter BarThickness="10.0" Type="0">
         
         <Slot HorizontalAlignMode="3" VerticalAlignMode="0" PaddingLeft="0.0" PaddingBottom="0.0" PaddingRight="0.0" PaddingTop="0.0">
-            <Ry::BorderWidget VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1">
+            <Ry::BorderWidget BoxStyleName="ContentBrowserBackground" VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1">
                 <Ry::ContentBrowserWidget Id="BrowserWidget"/>
             </Ry::BorderWidget>
         </Slot>

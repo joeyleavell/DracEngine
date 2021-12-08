@@ -21,17 +21,30 @@ namespace Ry
 		ContentBrowserItem(Ry::String TileIconStyle, Ry::String Name);
 		virtual ~ContentBrowserItem();
 
-		void Construct();
-
+		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override;
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
+		bool OnMouseDragged(const MouseDragEvent& MouseEv) override;
+
+		void OnShow(Ry::Batch* Batch) override;
+		void OnHide(Ry::Batch* Batch) override;
+		void Draw() override;
 
 	private:
 
+		Point Offset;
+		bool bIsPressed;
+		bool bIsDragging;
+		bool bGhostShown;
+
 		Ry::SharedPtr<BorderWidget> Icon;
 		Ry::SharedPtr<Label> Lab;
+		Ry::SharedPtr<Ry::BatchItemSet> GhostIconItemSet;
 
 		Ry::String Name;
 		Ry::String TileIconStyle;
+
+		float LastMouseX;
+		float LastMouseY;
 
 	};
 

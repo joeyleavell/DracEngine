@@ -84,8 +84,6 @@ namespace Ry
 
 	bool Widget::OnMouseButtonEvent(const MouseButtonEvent& MouseEv)
 	{
-		bool bHandled = false;
-
 		bool bCurrentlyPressed = false;
 		if (MouseEv.ButtonID == MOUSE_BUTTON_LEFT && MouseEv.bPressed)
 		{
@@ -96,16 +94,16 @@ namespace Ry
 		if (bCurrentlyPressed && !bPressed)
 		{
 			bPressed = true;
-			bHandled = OnPressed(MouseEv);
+			OnPressed(MouseEv);
 		}
 
 		if (!bCurrentlyPressed && bPressed)
 		{
 			bPressed = false;
-			bHandled = OnReleased(MouseEv);
+			OnReleased(MouseEv);
 		}
 
-		return bHandled;
+		return false;
 	}
 
 	bool Widget::OnMouseClicked(const MouseClickEvent& MouseEv)
