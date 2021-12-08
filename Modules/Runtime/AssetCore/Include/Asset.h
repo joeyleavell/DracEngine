@@ -6,15 +6,24 @@
 
 namespace Ry
 {
-		
-	class ASSETCORE_MODULE Asset : public Ry::Object
+
+	class ASSETCORE_MODULE NewAsset : public Ry::Object
 	{
 	public:
 
 		GeneratedBody()
 
-		Asset() = default;
-		virtual ~Asset() = default;
+		/**
+		 * Called when asset resources should be cleaned up.
+		 * I.e. freeing texture resources, file contents, etc.
+		 */
+		virtual void UnloadAsset() = 0;
+
+	} RefClass();
+		
+	class ASSETCORE_MODULE Asset
+	{
+	public:
 
 		template <class T>
 		T* As()
@@ -28,6 +37,6 @@ namespace Ry
 		 */
 		virtual void UnloadAsset() = 0;
 
-	} RefClass();
+	};
 	
 }

@@ -119,7 +119,14 @@ namespace Ry
 	{
 		if(IsHovered())
 		{
-			std::cout << "paths dropped" << std::endl;
+			// Create array list
+			Ry::ArrayList<Ry::String> ImportAssets;
+			for(int32 AssetIndex = 0; AssetIndex < PathDropEvent.PathCount; AssetIndex++)
+			{
+				ImportAssets.Add(PathDropEvent.Paths[AssetIndex]);
+			}
+
+			ImportAssetsCallback.Broadcast(ImportAssets);
 			return true;
 		}
 

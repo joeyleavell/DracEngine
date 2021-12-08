@@ -15,6 +15,9 @@ namespace Ry
 		AssetFactory() = default;
 		virtual ~AssetFactory() = default;
 
+		virtual void LoadAssetsNew(const Ry::String& Path, Ry::ArrayList<Asset*>& AssetDst) {};
+
+
 		/**
 		 * Called when an asset needs to be loaded. The factory should already know what type of asset it is loading.
 		 * @param Reference The path to the asset that needs to be loaded.

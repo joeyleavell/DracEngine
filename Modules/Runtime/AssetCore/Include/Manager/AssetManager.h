@@ -17,8 +17,10 @@ namespace Ry
 		virtual ~AssetManager() = default;
 
 		void UnloadAll() override;
+
 		void RegisterFactory(const Ry::String& AssetType, AssetFactory* Factory) override;
 		void UnregisterFactory(const Ry::String& AssetType) override;
+
 		bool UnloadAsset(const Ry::AssetRef& Reference) override;
 
 	protected:

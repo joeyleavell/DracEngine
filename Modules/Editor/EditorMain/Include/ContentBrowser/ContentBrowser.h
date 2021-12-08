@@ -27,6 +27,8 @@ namespace Ry
 
 		Ry::SharedPtr<ContentBrowserWidget> Browser;
 
+		void OnImportAssets(const Ry::ArrayList<Ry::String>& AssetPaths);
+
 	private:
 
 		void OpenNode(ContentBrowserItem* Item);

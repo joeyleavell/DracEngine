@@ -3,12 +3,7 @@
 namespace Ry
 {
 
-	Object::~Object()
-	{
-		
-	}
-
-	const ReflectedClass* Object::GetClass() const
+	const ReflectedClass* ObjectBase::GetClass() const
 	{
 		return nullptr;
 	}

@@ -9,7 +9,7 @@ namespace Ry
 	class Bitmap;
 	class Texture;
 
-	struct RENDERASSET_MODULE TextureAsset2 : public Asset
+	struct RENDERASSET_MODULE TextureAsset2 : public NewAsset
 	{
 		RefField()
 		uint32 Width;

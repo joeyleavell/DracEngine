@@ -69,7 +69,7 @@ namespace Ry
 			if (BaseClassCount == 0)
 			{
 				// Eventual parent must always be object class
-				if (ClassName == "class Ry::Object" || ClassName == "Ry::Object")
+				if (ClassName == "class Ry::ObjectBase" || ClassName == "Ry::ObjectBase")
 					return true;
 				else
 					return false;
@@ -79,7 +79,7 @@ namespace Ry
 				if (!ParentDecl)
 					return false;
 				
-				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::Object
+				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::ObjectBase
 				if (IsDeclReflected(Record) && IsValidReflectionClass(ParentDecl))
 					return true;
 				else
@@ -101,17 +101,17 @@ namespace Ry
 			if (BaseClassCount == 0)
 			{
 				// Eventual parent must always be object class
-				if (ClassName != "class Ry::Object")
-					ErrorMsg = "Reflected object must inherit from Ry::Object";
+				if (ClassName != "class Ry::ObjectBase")
+					ErrorMsg = "Reflected object must inherit from Ry::ObjectBase";
 			}
 			else
 			{
 				const CXXRecordDecl* ParentDecl = Record->bases_begin()->getType().getCanonicalType()->getAsCXXRecordDecl();
-				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::Object
+				// Base count == 1, check parent class is reflected, and then walk up the chain to try to find Ry::ObjectBase
 				if (!IsDeclReflected(Record))
 					ErrorMsg = "Reflected object's parent must be reflected";
 				else if(!ParentDecl)
-					ErrorMsg = "Reflected object must inherit from Ry::Object";
+					ErrorMsg = "Reflected object must inherit from Ry::ObjectBase";
 				else
 					CheckClassWithLog(Loc, ParentDecl);
 			}

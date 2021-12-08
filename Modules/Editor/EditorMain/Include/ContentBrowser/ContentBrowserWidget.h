@@ -41,6 +41,8 @@ namespace Ry
 
 		GeneratedBody()
 
+		MulticastDelegate<const Ry::ArrayList<Ry::String>&> ImportAssetsCallback;
+
 		Ry::SharedPtr<TextField> CurDirLabel;
 		Ry::SharedPtr<Button> UpArrow;
 

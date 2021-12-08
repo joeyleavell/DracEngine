@@ -11,10 +11,8 @@ namespace Ry
 
 		Widget->UpArrow->OnButtonReleased.AddMemberFunction(this, &ContentBrowser::UpDirectory);
 
-		// Add grid
-
-		// Initialize content browser to a directory (virtual)
-		// The virtual path will be translated to an absolute path for crawling
+		// Callback on assets imported
+		Widget->ImportAssetsCallback.AddMemberFunction(this, &ContentBrowser::OnImportAssets);
 	}
 
 	void ContentBrowser::UpDirectory()
@@ -79,6 +77,17 @@ namespace Ry
 
 		Browser->MarkDirty(Browser.Get());
 		
+	}
+
+	void ContentBrowser::OnImportAssets(const Ry::ArrayList<Ry::String>& AssetPaths)
+	{
+		std::cout << "Importing assets:" << std::endl;
+		for(const Ry::String& Asset : AssetPaths)
+		{
+			std::cout << "\t" << *Asset << std::endl;
+		}
+
+		// Call the correct asset importer
 	}
 
 	void ContentBrowser::OpenNode(ContentBrowserItem* Item)

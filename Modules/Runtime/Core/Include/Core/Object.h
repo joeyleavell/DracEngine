@@ -1,31 +1,33 @@
 #pragma once
 
-#include "Core/Core.h"
 #include "Json/Json.h"
-#include "Object.gen.h"
+#include "Core/String.h"
+#include "Reflection.h"
 
+// Define this prior to including the gen.h in case these haven't been defined yet
 #ifndef GeneratedBody
-	#define GeneratedBody()\
+#define GeneratedBody()\
 	static const ReflectedClass* GetStaticClass(){return nullptr;}; \
 	static const DataType* GetStaticType(){return nullptr; };
 #endif
+#include "Object.gen.h"
 
 namespace Ry
 {
 	class DataType;
 
-	class CORE_MODULE Object
+	class CORE_MODULE ObjectBase
 	{
 	public:
-		virtual ~Object();
+
 		virtual const ReflectedClass* GetClass() const;
 
-		static const DataType* GetStaticType() 
+		static const DataType* GetStaticType()
 		{
 			static Ry::DataType Result;
 			Result.Class = TypeClass::Object;
 			Result.Name = "Ry::Object";
-			Result.Size = sizeof(Ry::Object);
+			Result.Size = sizeof(Ry::ObjectBase);
 			return &Result; 
 		};
 
@@ -33,7 +35,7 @@ namespace Ry
 		{
 			static Ry::ReflectedClass C;
 			C.Name = "Object";
-			C.Size = sizeof(Ry::Object);
+			C.Size = sizeof(Ry::ObjectBase);
 			C.CreateInstanceFunction = nullptr; // Should never create objects directly
 			C.ParentClass = nullptr;
 			C.Fields.SetSize(0);
@@ -60,7 +62,25 @@ namespace Ry
 
 			return *AsT;
 		}
+
+	protected:
+
+		ObjectBase() = default;
+		virtual ~ObjectBase() = default;
 	};
+
+	class CORE_MODULE Object : public ObjectBase
+	{
+	public:
+		GeneratedBody()
+
+		RefField()
+		Ry::String ObjectName = "hi_test_name";
+
+	} RefClass();
+
+	//template<typename T>
+	//EXPORT_ONLY T* NewObject(Ry::String ObjectName);
 
 	CORE_MODULE Json Jsonify(Ry::Object& Object);
 	
