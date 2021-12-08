@@ -33,6 +33,7 @@ namespace Ry
 		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override;
 		bool OnKey(const KeyEvent& KeyEv) override;
 		bool OnChar(const CharEvent& CharEv) override;
+		bool OnPathDrop(const PathDropEvent& PathDropEv) override;
 		virtual void ClearChildren();
 		//RectScissor GetClipSpace(const Widget* ForWidget) const override;
 

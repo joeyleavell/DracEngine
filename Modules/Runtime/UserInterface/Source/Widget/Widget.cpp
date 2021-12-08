@@ -133,6 +133,11 @@ namespace Ry
 		return false;
 	}
 
+	bool Widget::OnPathDrop(const PathDropEvent& PathDropEv)
+	{
+		return false;
+	}
+
 	bool Widget::IsHovered()
 	{
 		return bHovered;
@@ -303,6 +308,11 @@ namespace Ry
 		{
 			const CharEvent& Char = static_cast<const CharEvent&>(Ev);
 			return OnChar(Char);
+		}
+		else if (Ev.Type == EVENT_PATH_DROP)
+		{
+			const PathDropEvent& PathDropEv = static_cast<const PathDropEvent&>(Ev);
+			return OnPathDrop(PathDropEv);
 		}
 
 		return false;

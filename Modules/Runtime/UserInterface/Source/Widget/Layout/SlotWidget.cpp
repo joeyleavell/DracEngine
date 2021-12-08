@@ -349,6 +349,16 @@ namespace Ry
 		return false;
 	}
 
+	bool SlotWidget::OnPathDrop(const PathDropEvent& PathDropEv)
+	{
+		if (Child)
+		{
+			return Child->OnPathDrop(PathDropEv);
+		}
+
+		return false;
+	}
+
 	Widget& SlotWidget::operator[](SharedPtr<Ry::Widget> Child)
 	{
 		SetChild(Child);

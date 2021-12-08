@@ -266,7 +266,16 @@ namespace Ry
 			GeneratedSource << "CreateInstance() \\" << std::endl; // Todo: create versions that take parameters
 			GeneratedSource << "{ \\" << std::endl;
 			{
-				GeneratedSource << "\treturn new " << QualifiedName << "; \\" << std::endl; // Instantiate
+				// Return null if this is an abtract record
+				if(Record.Decl->isAbstract())
+				{
+					// This is an error, can't try to instantiate an abstract class
+					GeneratedSource << "\tRy::Log->LogError(\"Tried instantiating abstract class;\"); return nullptr;\\" << std::endl; // Instantiate
+				}
+				else
+				{
+					GeneratedSource << "\treturn new " << QualifiedName << "; \\" << std::endl; // Instantiate
+				}
 			}
 			GeneratedSource << "}\\" << std::endl;
 
@@ -515,7 +524,9 @@ namespace Ry
 		{
 			// Generate reflection source
 			GeneratedSource << "#include \"Core/Reflection.h\"" << std::endl;
-			
+			GeneratedSource << "#include \"Core/Log.h\"" << std::endl;
+			GeneratedSource << "#include \"Core/Globals.h\"" << std::endl;
+
 			for(const ReflectedRecord& Rec : ReflectedRecords)
 			{
 				GenerateReflectedRecord(Rec);

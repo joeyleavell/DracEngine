@@ -53,6 +53,8 @@ namespace Ry
 
 		void ClearChildren();
 
+		bool OnPathDrop(const PathDropEvent& PathDropEv) override;
+
 	private:
 
 		Ry::SharedPtr<GridPanel> Grid;

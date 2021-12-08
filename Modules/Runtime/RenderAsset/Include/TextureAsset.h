@@ -1,13 +1,26 @@
 #pragma once
 
 #include "Asset.h"
-#include "RenderAssetGen.h"
+#include "TextureAsset.gen.h"
 
 namespace Ry
 {
 	
 	class Bitmap;
 	class Texture;
+
+	struct RENDERASSET_MODULE TextureAsset2 : public Asset
+	{
+		RefField()
+		uint32 Width;
+
+		RefField()
+		uint32 Height;
+
+		RefField()
+		Ry::ArrayList<uint8> TextureData;
+
+	} RefClass();
 	
 	class RENDERASSET_MODULE TextureAsset : public Asset
 	{

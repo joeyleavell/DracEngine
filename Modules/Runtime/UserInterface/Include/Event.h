@@ -13,6 +13,7 @@ namespace Ry
 	constexpr uint32 EVENT_MOUSE_SCROLL = 4;
 	constexpr uint32 EVENT_KEY          = 5;
 	constexpr uint32 EVENT_CHAR         = 6;
+	constexpr uint32 EVENT_PATH_DROP    = 7;
 
 	struct USERINTERFACE_MODULE Event
 	{
@@ -70,5 +71,10 @@ namespace Ry
 	{
 		int32 Codepoint;
 	};
-	
+
+	struct USERINTERFACE_MODULE PathDropEvent : public Event
+	{
+		int32 PathCount;
+		const char** Paths;
+	};
 }

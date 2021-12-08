@@ -222,6 +222,7 @@ namespace Ry
 		virtual bool OnMouseScroll(const MouseScrollEvent& MouseEv);
 		virtual bool OnKey(const KeyEvent& KeyEv);
 		virtual bool OnChar(const CharEvent& CharEv);
+		virtual bool OnPathDrop(const PathDropEvent& PathDropEv);
 		virtual bool OnEvent(const Event& Ev);
 		virtual void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates);
 

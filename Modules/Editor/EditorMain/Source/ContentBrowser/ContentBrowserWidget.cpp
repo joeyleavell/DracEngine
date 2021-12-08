@@ -114,5 +114,15 @@ namespace Ry
 	{
 		Grid->ClearChildren();
 	}
-	
+
+	bool ContentBrowserWidget::OnPathDrop(const PathDropEvent& PathDropEvent)
+	{
+		if(IsHovered())
+		{
+			std::cout << "paths dropped" << std::endl;
+			return true;
+		}
+
+		return false;
+	}
 }

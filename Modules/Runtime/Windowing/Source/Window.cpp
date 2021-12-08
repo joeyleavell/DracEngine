@@ -132,6 +132,7 @@ namespace Ry
 		glfwSetFramebufferSizeCallback(WindowResource, &FrameBufferSizeCallback);
 		glfwSetCursorPosCallback(WindowResource, &CursorPosCallback);
 		glfwSetWindowPosCallback(WindowResource, &WindowPosCallback);
+		glfwSetDropCallback(WindowResource, &PathDropCallback);
 
 		// Insert window into static map
 		Windows.insert(WindowResource, this);
@@ -295,6 +296,16 @@ namespace Ry
 		CharEvent Ev;
 		Ev.Type = EVENT_CHAR;
 		Ev.Codepoint = Codepoint;
+
+		OnEvent.Broadcast(Ev);
+	}
+
+	void Window::FirePathDropEvent(int32 PathCount, const char* Paths[])
+	{
+		PathDropEvent Ev;
+		Ev.Type = EVENT_PATH_DROP;
+		Ev.PathCount = PathCount;
+		Ev.Paths = Paths;
 
 		OnEvent.Broadcast(Ev);
 	}
@@ -571,9 +582,7 @@ namespace Ry
 
 	void Window::KeyCallback(::GLFWwindow* Window, int Key, int ScanCode, int Action, int Mods)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			KeyAction EngineAction;
 			if (Action == GLFW_PRESS)
@@ -605,9 +614,7 @@ namespace Ry
 
 	void Window::MouseButtonCallback(::GLFWwindow* Window, int Button, int Action, int Mods)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			MouseEventInfo& EventInfo = AssociatedWindow->ButtonsInfo[Button];
 
@@ -691,9 +698,7 @@ namespace Ry
 
 	void Window::ScrollCallback(::GLFWwindow* Window, double XOff, double YOff)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			AssociatedWindow->FireScrollEvent(XOff, YOff);
 
@@ -706,9 +711,7 @@ namespace Ry
 
 	void Window::CharacterEntryCallback(::GLFWwindow* Window, unsigned int Codepoint)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			AssociatedWindow->FireCharEvent(Codepoint);
 
@@ -721,39 +724,40 @@ namespace Ry
 
 	void Window::CursorPosCallback(::GLFWwindow* Window, double PosX, double PosY)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
+
 		}
 	}
 
 	void Window::WindowPosCallback(::GLFWwindow* Window, int32 PosX, int32 PosY)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			AssociatedWindow->WindowPosX = PosX;
 			AssociatedWindow->WindowPosY = PosY;
 		}
 	}
 
+	void Window::PathDropCallback(::GLFWwindow* Window, int32 PathCount, const char* Paths[])
+	{
+		if(Ry::Window* AssociatedWindow = FindWindow(Window))
+		{
+			AssociatedWindow->FirePathDropEvent(PathCount, Paths);
+		}
+	}
+
 	void Window::WindowSizeCallback(::GLFWwindow* Window, int NewWidth, int NewHeight)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if(Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
-
+			// TODO: Window size			
 		}
 	}
 
 	void Window::FrameBufferSizeCallback(::GLFWwindow* Window, int NewWidth, int NewHeight)
 	{
-		Ry::Window* AssociatedWindow = FindWindow(Window);
-
-		if (AssociatedWindow)
+		if (Ry::Window* AssociatedWindow = FindWindow(Window))
 		{
 			AssociatedWindow->bFramebufferResized = true;
 		}

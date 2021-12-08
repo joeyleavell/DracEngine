@@ -233,6 +233,18 @@ namespace Ry
 		return bHandled;
 	}
 
+	bool PanelWidget::OnPathDrop(const PathDropEvent& PathDropEv)
+	{
+		bool bHandled = Widget::OnPathDrop(PathDropEv);
+
+		for (SharedPtr<Widget> Child : Children)
+		{
+			bHandled |= Child->OnPathDrop(PathDropEv);
+		}
+
+		return bHandled;
+	}
+
 	void PanelWidget::ClearChildren()
 	{
 		for (SharedPtr<Widget> Child : Children)

@@ -77,6 +77,7 @@ namespace Ry
 		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override;
 		bool OnChar(const CharEvent& CharEv) override;
 		bool OnKey(const KeyEvent& KeyEv) override;
+		bool OnPathDrop(const PathDropEvent& PathDropEv) override;
 		Widget& operator[](SharedPtr<Ry::Widget> Child) override;
 		void OnHovered(const MouseEvent& MouseEv) override;
 		void OnUnhovered(const MouseEvent& MouseEv) override;

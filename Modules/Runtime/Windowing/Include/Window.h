@@ -153,6 +153,7 @@ namespace Ry
 		void FireButtonEvent(int32 Button, float XPos, float YPos, bool bPressed);
 		void FireKeyEvent(int32 KeyCode, KeyAction Action, int32 Mods);
 		void FireCharEvent(int32 Codepoint);
+		void FirePathDropEvent(int32 PathCount, const char* Paths[]);
 
 		bool bFramebufferResized = false;
 
@@ -191,6 +192,9 @@ namespace Ry
 		static void CharacterEntryCallback(::GLFWwindow* Window, unsigned int Codepoint);
 		static void CursorPosCallback(::GLFWwindow* Window, double PosX, double PosY);
 		static void WindowPosCallback(::GLFWwindow* Window, int32 PosX, int32 PosY);
+		static void PathDropCallback(::GLFWwindow* Window, int32 PathCount, const char* Paths[]);
+
+		typedef void (*GLFWdropfun)(GLFWwindow*, int, const char* []);
 
 	};
 

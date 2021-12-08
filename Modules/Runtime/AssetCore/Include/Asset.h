@@ -1,15 +1,18 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "AssetCoreGen.h"
-#include "Algorithm/Algorithm.h"
+#include "Core/Object.h"
+#include "Asset.gen.h"
 
 namespace Ry
 {
 		
-	class ASSETCORE_MODULE Asset
+	class ASSETCORE_MODULE Asset : public Ry::Object
 	{
 	public:
+
+		GeneratedBody()
+
 		Asset() = default;
 		virtual ~Asset() = default;
 
@@ -25,6 +28,6 @@ namespace Ry
 		 */
 		virtual void UnloadAsset() = 0;
 
-	};
+	} RefClass();
 	
 }
