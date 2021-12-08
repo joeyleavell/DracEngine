@@ -74,13 +74,11 @@ namespace Ry
 	public:
 		GeneratedBody()
 
-		void SetObjectName(const Ry::String& NewName);
-		Ry::String GetObjectName() const;
-
-	protected:
-
 		RefField()
 		Ry::String ObjectName;
+
+		void SetObjectName(const Ry::String& NewName);
+		Ry::String GetObjectName() const;
 
 	} RefClass();
 

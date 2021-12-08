@@ -45,12 +45,12 @@ namespace Ry
 
 		TestObj* Obj = NewObject<TestObj>("TestObject");
 
-		Package* NewPackage = new Package("/Engine/TestPackage.rasset");
+		/*Package* NewPackage = new Package("/Engine/TestPackage.rasset");
 		NewPackage->SetObject(Obj);
-		NewPackage->Save();
+		NewPackage->Save();*/
 
 		// Load packagedf
-		Package* Loaded = LoadPackage("/Engine/TestPackage.rasset");
+		Package* Loaded = LoadPackage("/Engine/avocado.rasset");
 		const Ry::Object* RootObject = Loaded->GetOrLoadRoot();
 
 		std::cout << "test" << std::endl;

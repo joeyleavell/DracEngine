@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Core/Globals.h"
 #include "stb_image.h"
+#include "File/File.h"
 
 namespace Ry
 {
@@ -71,4 +72,65 @@ namespace Ry
 		}
 	}
 
+	void TextureFactory::ImportAssets(const Ry::String& Path, Ry::ArrayList<NewAsset*>& NewAssets)
+	{
+		Ry::String ObjectName = Filesystem::path(*Path).stem().string().c_str();
+
+		int32 Width, Height, Channels;
+		uint8* PixelData = stbi_load(*Path, &Width, &Height, &Channels, 0);
+
+		if (!PixelData)
+		{
+			std::cerr << "Failed to load image: " << *Path << std::endl;
+		}
+		else
+		{
+			TextureAsset2* Result = NewObject<TextureAsset2>(ObjectName);
+			Result->Width = Width;
+			Result->Height = Height;
+
+			for(int32 PixelX = 0; PixelX < Width; PixelX++)
+			{
+				for (int32 PixelY = 0; PixelY < Height; PixelY++)
+				{
+					// Flip on the Y axis
+					int32 PixelIndex = (Height - PixelY - 1) * Width + PixelX;
+
+					uint8 Red = 0;
+					uint8 Green = 0;
+					uint8 Blue = 0;
+					uint8 Alpha = 255;
+
+					if (Channels >= 4)
+					{
+						Alpha = PixelData[PixelIndex * Channels + 3];
+					}
+
+					if (Channels >= 3)
+					{
+						Blue = PixelData[PixelIndex * Channels + 2];
+					}
+
+					if (Channels >= 2)
+					{
+						Green = PixelData[PixelIndex * Channels + 1];
+					}
+
+					if (Channels >= 1)
+					{
+						Red = PixelData[PixelIndex * Channels + 0];
+					}
+
+					// Insert pixel data
+					Result->TextureData.Add(Red);
+					Result->TextureData.Add(Green);
+					Result->TextureData.Add(Blue);
+					Result->TextureData.Add(Alpha);
+				}
+			}
+
+			// Insert the result asset
+			NewAssets.Add(Result);
+		}
+	}
 }

@@ -13,12 +13,6 @@ namespace Ry
 
 		GeneratedBody()
 
-		/**
-		 * Called when asset resources should be cleaned up.
-		 * I.e. freeing texture resources, file contents, etc.
-		 */
-		virtual void UnloadAsset() = 0;
-
 	} RefClass();
 		
 	class ASSETCORE_MODULE Asset

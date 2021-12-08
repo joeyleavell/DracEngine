@@ -33,7 +33,7 @@ namespace Ry
 		char Num[2];
 		Input.read(Num, 2);
 
-		uint16 Result = (Num[0] >> 0) | (Num[1] >> 8);
+		uint16 Result = (Num[0] << 0) | (Num[1] << 8);
 		return Result;
 	}
 
@@ -42,7 +42,7 @@ namespace Ry
 		char Num[4];
 		Input.read(Num, 4);
 
-		uint16 Result = (Num[0] >> 0) | (Num[1] >> 8) | (Num[2] >> 16) | (Num[3] >> 24);
+		uint32 Result = (Num[0] << 0) | (Num[1] << 8) | (Num[2] << 16) | (Num[3] << 24);
 		return Result;
 	}
 
@@ -78,7 +78,7 @@ namespace Ry
 		char Num[2];
 		Input.read(Num, 2);
 
-		int16 Result = (Num[0] >> 0) | (Num[1] >> 8);
+		int16 Result = (Num[0] << 0) | (Num[1] << 8);
 		return Result;
 	}
 
@@ -87,7 +87,7 @@ namespace Ry
 		char Num[4];
 		Input.read(Num, 4);
 
-		int16 Result = (Num[0] >> 0) | (Num[1] >> 8) | (Num[2] >> 16) | (Num[3] >> 24);
+		int32 Result = (Num[0] << 0) | (Num[1] << 8) | (Num[2] << 16) | (Num[3] << 24);
 		return Result;
 	}
 

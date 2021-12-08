@@ -242,13 +242,13 @@ namespace Ry
 		}
 		else if (TemplateType->Name == GetType<uint8>()->Name)
 		{
-			SerializeArrayField_Helper<uint8>(Field, Obj, &Serializer::WriteUInt);
+			SerializeArrayField_Helper<uint8>(Field, Obj, &Serializer::WriteUByte);
 		}
 		else if (TemplateType->Name == GetType<uint16>()->Name)
 		{
 			SerializeArrayField_Helper<uint16>(Field, Obj, &Serializer::WriteUShort);
 		}
-		else if (TemplateType->Name == GetType<uint16>()->Name)
+		else if (TemplateType->Name == GetType<uint32>()->Name)
 		{
 			SerializeArrayField_Helper<uint32>(Field, Obj, &Serializer::WriteUInt);
 		}
@@ -264,7 +264,7 @@ namespace Ry
 		{
 			SerializeArrayField_Helper<int16>(Field, Obj, &Serializer::WriteShort);
 		}
-		else if (TemplateType->Name == GetType<int16>()->Name)
+		else if (TemplateType->Name == GetType<int32>()->Name)
 		{
 			SerializeArrayField_Helper<int32>(Field, Obj, &Serializer::WriteInt);
 		}

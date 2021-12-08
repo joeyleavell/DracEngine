@@ -2,6 +2,7 @@
 #include "File/File.h"
 #include <filesystem>
 #include "ContentBrowser/ContentBrowserWidget.h"
+#include "Manager/IAssetManager.h"
 
 namespace Ry
 {
@@ -87,7 +88,11 @@ namespace Ry
 			std::cout << "\t" << *Asset << std::endl;
 		}
 
-		// Call the correct asset importer
+		// Invoke the asset importer
+		Ry::AssetMan->ImportAssets(CurrentDirectory, AssetPaths);
+
+		// Refresh the current directory
+		SetDirectory(CurrentDirectory);
 	}
 
 	void ContentBrowser::OpenNode(ContentBrowserItem* Item)

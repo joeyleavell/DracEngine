@@ -11,6 +11,8 @@ namespace Ry
 
 	struct RENDERASSET_MODULE TextureAsset2 : public NewAsset
 	{
+		GeneratedBody()
+
 		RefField()
 		uint32 Width;
 

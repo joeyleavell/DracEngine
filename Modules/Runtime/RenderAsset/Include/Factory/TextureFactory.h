@@ -12,6 +12,8 @@ namespace Ry
 	public:
 		TextureFactory() = default;
 		void LoadAssets(const Ry::AssetRef& Reference, std::vector<Asset*>& AssetDst) override;
+
+		void ImportAssets(const Ry::String& Path, Ry::ArrayList<NewAsset*>& AssetDst) override;
 	};
 	
 }

@@ -27,6 +27,9 @@ namespace Ry
 		virtual void RegisterFactory(const Ry::String& AssetType, AssetFactory* Factory) = 0;
 		virtual void UnregisterFactory(const Ry::String& AssetType) = 0;
 
+		virtual void ImportAssets(const Ry::AssetRef& ParentDirectory, const Ry::ArrayList<Ry::String> Paths);
+		virtual void ImportAsset(const Ry::AssetRef& ParentDirectory, const Ry::String& Path) = 0;
+
 		template<typename AssetClass>
 		AssetClass* LoadAsset(const Ry::AssetRef& Reference, const Ry::String& AssetType)
 		{

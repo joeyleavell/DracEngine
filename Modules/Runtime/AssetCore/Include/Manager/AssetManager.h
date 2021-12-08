@@ -23,6 +23,8 @@ namespace Ry
 
 		bool UnloadAsset(const Ry::AssetRef& Reference) override;
 
+		virtual void ImportAsset(const Ry::AssetRef& ParentDirectory, const Ry::String& Path);
+
 	protected:
 		
 		Asset* LoadAssetInternal(const Ry::AssetRef& Reference, const Ry::String& AssetType) override;

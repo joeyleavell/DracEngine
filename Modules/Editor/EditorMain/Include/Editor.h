@@ -54,11 +54,15 @@ namespace Ry
 
 			// Register asset factories
 			// TODO: these should be moved
+			TextureFactory* TextureImporter = new TextureFactory;
+
 			AssetMan->RegisterFactory("text", new TextFileFactory);
 			AssetMan->RegisterFactory("mesh/obj", new ObjMeshFactory);
 			AssetMan->RegisterFactory("font/truetype", new TrueTypeFontFactory);
-			AssetMan->RegisterFactory("image", new TextureFactory);
 			AssetMan->RegisterFactory("sound", new AudioFactory);
+
+			AssetMan->RegisterFactory("image", TextureImporter);
+			AssetMan->RegisterFactory("png", TextureImporter);
 		}
 
 		void InitRenderAPI()

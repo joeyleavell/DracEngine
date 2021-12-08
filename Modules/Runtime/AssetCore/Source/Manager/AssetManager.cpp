@@ -1,8 +1,10 @@
 #include "Manager/AssetManager.h"
 #include "Factory/AssetFactory.h"
 #include "Asset.h"
-
+#include "File/File.h"
 #include <iostream>
+
+#include "Package/Package.h"
 
 namespace Ry
 {
@@ -150,4 +152,54 @@ namespace Ry
 
 		return false;
 	}
+
+	void AssetManager::ImportAsset(const Ry::AssetRef& ParentDirectory, const Ry::String& Path)
+	{
+		Filesystem::path AssetPath = Filesystem::path(*Path);
+		Ry::String AssetName = AssetPath.stem().string().c_str();
+		Ry::String AssetTypeLower = AssetPath.extension().string().c_str();
+		AssetTypeLower = AssetTypeLower.to_lower();
+
+		// Trim off .
+		if(AssetTypeLower.getSize() > 0 && AssetTypeLower[0] == '.')
+		{
+			AssetTypeLower = AssetTypeLower.substring(1);
+		}
+
+		if (Factories.contains(AssetTypeLower))
+		{
+			AssetFactory** Factory = Factories.get(AssetTypeLower);
+
+			if (Factory)
+			{
+				Ry::ArrayList<NewAsset*> Results;
+				(*Factory)->ImportAssets(Path, Results);
+
+				// Create a new package for each loaded asset
+				for(const NewAsset* Asset : Results)
+				{
+					Ry::String PackageName = Asset->GetObjectName() + ".rasset";
+					Ry::String AbsolutePath = (Filesystem::path(*ParentDirectory.GetAbsolute()) / *PackageName).string().c_str();
+					Ry::String VirtualPath = Ry::File::AbsoluteToVirtual(AbsolutePath);
+
+					// Save new package
+					Ry::Package NewPackage(VirtualPath);
+					NewPackage.SetObject(Asset);
+					NewPackage.Save();
+				}
+
+			}
+			else
+			{
+				std::cerr << "The factory registered with asset type " << *AssetTypeLower << " was null" << std::endl;
+			}
+		}
+		else
+		{
+			std::cerr << "There is no factory registered with asset type " << *AssetTypeLower << std::endl;
+		}
+
+
+	}
+
 }
