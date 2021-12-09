@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 using namespace clang;
 using namespace clang::tooling;
@@ -137,11 +138,22 @@ namespace Ry
 					{
 						AnnotateAttr* AnnotationAttrib = static_cast<AnnotateAttr*>(Attrib);
 
-						if (AnnotationAttrib->getAnnotation().str() == "Reflect")
+						// TODO: this is where we would do some additional properties processing, treat as csv
+						std::string Specifiers = AnnotationAttrib->getAnnotation().str();
+						std::istringstream SpecifierInput(Specifiers);
+						std::string Specifier;
+						std::vector<std::string> SpecifiersArray;
+
+						while(std::getline(SpecifierInput, Specifier, ','))
 						{
-							return true;
+							SpecifiersArray.push_back(Specifier);
 						}
 
+						// Check if member has "Reflect" annotation
+						for(const std::string& Spec : SpecifiersArray)
+							if(Spec == "Reflect")
+								return true;
+	
 					}
 
 					++AttribItr;
@@ -441,6 +453,8 @@ namespace Ry
 
 			if (!IsDeclReflected(Declaration))
 				return;
+
+			std::cout << "Found reflected member" << std::endl;
 			
 			bool bIsRecord = Declaration->getKind() == Decl::CXXRecord;
 			bool bIsMethod = Declaration->getKind() == Decl::CXXMethod;

@@ -416,19 +416,22 @@ namespace Ry
 	extern RENDERING_MODULE VertexFormat VF_P_UV_N_T_Bi;
 
 	template <>
-	EXPORT_ONLY inline uint32 Hash(const Ry::Vertex1P1UV1N& Vert)
+	struct EXPORT_ONLY Hash<Vertex1P1UV1N>
 	{
-		float Data[30];
-		Vert.Pack(Data);
-
-		uint32 Seed = 31;
-
-		for (int32 El = 0; El < 8; El++)
+		uint32 operator()(const Ry::Vertex1P1UV1N& Vert) const
 		{
-			Seed ^= std::hash<float>{}(Data[El]) + 0x9e3779b9;// +(Seed << 6) + (Seed >> 2);
-		}
+			float Data[30];
+			Vert.Pack(Data);
 
-		return Seed;
-	}
+			uint32 Seed = 31;
+
+			for (int32 El = 0; El < 8; El++)
+			{
+				Seed ^= std::hash<float>{}(Data[El]) + 0x9e3779b9;// +(Seed << 6) + (Seed >> 2);
+			}
+
+			return Seed;
+		}
+	};
 
 }

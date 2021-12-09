@@ -392,7 +392,8 @@ namespace Ry
 
 		bool Contains(const K& key) const
 		{
-			uint32 HashValue = Ry::Hash(key);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(key);
 			uint32 Bucket = HashValue % TABLE_SIZE;
 			SetChain<K>* Chain = Table[Bucket];
 
@@ -410,7 +411,8 @@ namespace Ry
 
 		void Insert(const K& Value)
 		{
-			uint32 HashValue = Ry::Hash(Value);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(Value);
 			uint32 Bucket = HashValue % TABLE_SIZE;
 
 			// Travel to the last element in the bucket
@@ -449,7 +451,8 @@ namespace Ry
 
 		void Remove(const K& Value)
 		{
-			uint32 HashValue = Ry::Hash(Value);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(Value);
 			uint32 Bucket = HashValue % TABLE_SIZE;
 			SetChain<K>* Chain = Table[Bucket];
 

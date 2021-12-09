@@ -23,11 +23,11 @@ namespace Ry
 	// 	return reinterpret_cast<uint32>(Object);
 	// }
 
-	template <>
+	/*template <>
 	uint32 Hash<::GLFWwindow*>(::GLFWwindow* const& Object)
 	{
 		return reinterpret_cast<uint64>(Object);
-	}
+	}*/
 	
 	static Ry::Map<::GLFWwindow*, Window*> Windows;
 

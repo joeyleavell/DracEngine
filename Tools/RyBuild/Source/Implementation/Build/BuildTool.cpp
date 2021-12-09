@@ -260,12 +260,17 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 						// Print out header that source was just generated for
 						std::cout << "\t[" << (*CompletionIndex + 1) << " of " << AllHeaders->size() << "] " << HeaderPath.filename().string();
 						(*CompletionIndex)++;
-						if (!bResult && !StdOutAsString.empty())
-							std::cout << " [fail]: " << StdOutBuffer;
-						if (!bResult && !StdErrAsString.empty())
-							std::cout << " [fail]: " << StdErrAsString;
-						else
-							std::cout << std::endl;
+						if(!bResult)
+							std::cout << " [fail]: ";
+						else if(!StdOutAsString.empty() || !StdErrAsString.empty())
+							std::cout << ": " << std::endl;						
+						
+						if (!StdOutAsString.empty())
+							std::cout << StdOutBuffer;
+						if (!StdErrAsString.empty())
+							std::cout << StdErrAsString;
+							
+						std::cout << std::endl;
 					}
 					OutWriteLock.unlock();
 

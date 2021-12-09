@@ -88,13 +88,15 @@ namespace Ry
 	} RefClass();
 
 	template <>
-	inline uint32 HashImpl<Ry::SlotPosition>(HashTypeTag<Ry::SlotPosition>, const Ry::SlotPosition& Object)
+	struct EXPORT_ONLY Hash<Ry::SlotPosition>
 	{
-		uint32 Hash = 17;
-		Hash = Hash * 37 + Object.Col;
-		Hash = Hash * 37 + Object.Row;
-		return Hash;
-	}
-
+		uint32 operator()(const Ry::SlotPosition& Object) const
+		{
+			uint32 Hash = 17;
+			Hash = Hash * 37 + Object.Col;
+			Hash = Hash * 37 + Object.Row;
+			return Hash;
+		}
+	};
 
 }

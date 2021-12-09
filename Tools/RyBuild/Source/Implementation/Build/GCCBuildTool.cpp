@@ -57,6 +57,7 @@ bool GCCBuildTool::BuildSingleSource(const Module& TheModule, std::string Output
 	CmdArgs.push_back("-c");
 
 	CmdArgs.push_back("-Wall");
+	CmdArgs.push_back("-Wno-invalid-offsetof");
 
 	// Create output file name
 	std::string OutputFileName = Filesystem::path(SourceFile).stem().string() + ObjectFileExtension;

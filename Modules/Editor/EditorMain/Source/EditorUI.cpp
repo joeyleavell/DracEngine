@@ -38,6 +38,9 @@ namespace Ry
 
 		//TestRefl Object; 
 
+		RefDB.PrintAllReflectedClass();
+
+		const Ry::ReflectedClass* RefClass = GetReflectedClass("Ry::TestObj");
 		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget<Ry::Widget>("/Engine/UI/TestUI.ui");
 		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
 

@@ -8,6 +8,9 @@ namespace rapidxml
 {
 	template<class Ch>
 	class xml_node;
+
+	template<class Ch>
+	class xml_document;
 	
 }
 
@@ -28,7 +31,7 @@ namespace Ry
 		struct CachedWidget
 		{
 			Ry::String XmlContents;
-			rapidxml::xml_node<char>* Root;
+			rapidxml::xml_document<char>* Root;
 		};
 
 		SharedPtr<Ry::Widget> LoadWidgetSingle(rapidxml::xml_node<char>* Node);

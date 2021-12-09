@@ -6,7 +6,6 @@
 namespace Ry
 {
 
-
 	template<typename K, typename V>
 	struct OAMapContainer
 	{
@@ -33,17 +32,20 @@ namespace Ry
 
 	// Hash implementation for openly addressed hash containers
 	template <typename K, typename V>
-	EXPORT_ONLY uint32 Hash(OAMapContainer<K*, V> Object)
+	struct Hash<OAMapContainer<K, V>>
 	{
-		return Hash<K>(Object.Key);
-	}
+		uint32 operator()(OAMapContainer<K, V> Object) const
+		{
+			Ry::Hash<K> HashFunctor;
+			return HashFunctor(Object.Key);
+		}
+	};
 
-	template <typename K, typename V>
-	EXPORT_ONLY uint32 Hash(OAMapContainer<K, V> Object)
-	{
-		return Hash<K>(Object.Key);
-	}
-
+	// template <typename K, typename V>
+	// EXPORT_ONLY uint32 Hash(OAMapContainer<K, V> Object)
+	// {
+	// 	return Hash<K>(Object.Key);
+	// }
 
 	template<typename K, typename V, uint32 ProbeFunc(uint32 HashValue, uint32 Probe, uint32 TableSize) = Probe_Quadratic>
 	class OAPairIterator
@@ -399,7 +401,8 @@ namespace Ry
 
 		bool contains(const K& key) const
 		{
-			uint32 hash_value = Ry::Hash(key);
+			Ry::Hash<K> HashFunctor;
+			uint32 hash_value = HashFunctor(key);
 			uint32 bucket = hash_value % TABLE_SIZE;
 			MapChain<K, V>* chain = table[bucket];
 
@@ -417,7 +420,8 @@ namespace Ry
 
 		void insert(const K& key, const V& value)
 		{
-			uint32 hash_value = Ry::Hash(key);
+			Ry::Hash<K> HashFunctor;
+			uint32 hash_value = HashFunctor(key);
 			uint32 bucket = hash_value % TABLE_SIZE;
 			
 			// Travel to the last element in the bucket
@@ -457,7 +461,8 @@ namespace Ry
 
 		V* get(const K& key) const
 		{
-			uint32 hash_value = Ry::Hash(key);
+			Ry::Hash<K> HashFunctor;
+			uint32 hash_value = HashFunctor(key);
 			MapChain<K, V>* bucket = table[hash_value % TABLE_SIZE];
 
 			if (bucket == nullptr)
@@ -477,7 +482,8 @@ namespace Ry
 
 		void remove(const K& key)
 		{
-			uint32 hash_value = Ry::Hash(key);
+			Ry::Hash<K> HashFunctor;
+			uint32 hash_value = HashFunctor(key);
 			uint32 bucket = hash_value % TABLE_SIZE;
 			MapChain<K, V>* chain = table[bucket];
 

@@ -180,6 +180,8 @@ namespace Ry
 		const Ry::ReflectedClass* GetReflectedClass(const Ry::String& Name);
 		const Ry::ReflectedClass* GetReflectedClass(Ry::String&& Name);
 
+		void PrintAllReflectedClass() const;
+
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> GetClassIterator();
 	private:
 
@@ -232,6 +234,12 @@ const Ry::DataType* GetTypeImpl(Ry::TypeTag<T*>)
 }
 
 template<typename T>
+const Ry::DataType* GetType()
+{
+	return GetTypeImpl(Ry::TypeTag<T>{});
+};
+
+template<typename T>
 const Ry::DataType* GetTypeImpl(Ry::TypeTag<Ry::ArrayList<T>> ArrayListTag)
 {
 	static Ry::DataType Result;
@@ -244,13 +252,6 @@ const Ry::DataType* GetTypeImpl(Ry::TypeTag<Ry::ArrayList<T>> ArrayListTag)
 
 	return &Result;
 };
-
-template<typename T>
-const Ry::DataType* GetType()
-{
-	return GetTypeImpl(Ry::TypeTag<T>{});
-};
-
 
 REFLECT_PRIMITIVE(uint8, Ry::TypeClass::UInt8)
 REFLECT_PRIMITIVE(uint16, Ry::TypeClass::UInt16)
