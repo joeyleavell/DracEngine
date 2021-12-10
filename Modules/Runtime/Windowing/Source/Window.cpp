@@ -43,6 +43,11 @@ namespace Ry
 		}
 
 		return true;
+	}	
+	
+	void WINDOWING_MODULE ShutdownWindowing()
+	{
+		glfwTerminate();
 	}
 
 	void WindowingErrorCallback(int Error, const char* Desc)
@@ -517,7 +522,6 @@ namespace Ry
 		SwapChain->DeleteSwapChain();
 				
 		glfwDestroyWindow(WindowResource);
-		glfwTerminate();
 	}
 
 	float Window::GetCursorX()

@@ -24,6 +24,8 @@ namespace Ry
 	struct Event;
 
 	bool WINDOWING_MODULE InitWindowing();
+	void WINDOWING_MODULE ShutdownWindowing();
+	
 	void WindowingErrorCallback(int Error, const char* Description);
 
 

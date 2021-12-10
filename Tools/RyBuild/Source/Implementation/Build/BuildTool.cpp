@@ -170,7 +170,8 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 			&bGenerationSuccess,
 			&HeaderAcquisitionLock,
 			CompletionIndex, 
-			CurrentHeaderIndex
+			CurrentHeaderIndex,
+			ThreadSpawn
 		]()
 		{
 			int32_t RetrievedIndex = 0;
@@ -243,6 +244,11 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 					Args.push_back("-Define=COMPILE_MODULE_" + Data->ModuleNameCaps);
 					Args.push_back("-Define=RBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));
 
+					//for(const std::string& s : Args)
+					//{
+					//	std::cout << "\"" + s + "\"," << std::endl;
+					//}
+
 					int StdOutSize = 1024 * 1000;
 					char* StdOutBuffer = new char[StdOutSize];
 					char* StdErrBuffer = new char[StdOutSize];
@@ -281,6 +287,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 				}
 
 			}
+
 		});
 
 		ThreadPool.push_back(NewThread);

@@ -424,6 +424,7 @@ namespace Ry
 
 		std::chrono::time_point<std::chrono::high_resolution_clock> LastFps;
 		Ry::Window* EditorMainWindow;
+
 		Ry::UserInterface* UI;
 		Ry::Pipeline* Pipeline;
 		Ry::CommandBuffer* CommandBuffer;

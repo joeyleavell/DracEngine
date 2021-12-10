@@ -20,7 +20,10 @@ namespace Ry
 		int32 GetSwapChainHeight() const override;
 
 		RenderPass* GetDefaultRenderPass() override;
+
 	private:
+
+		static bool bIsGlewInitiailized;
 
 		int32 SwapChainWidth = 0;
 		int32 SwapChainHeight = 0;

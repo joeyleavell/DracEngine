@@ -23,6 +23,7 @@
 #include "File/File.h"
 #include "VulkanRenderAPI.h"
 #include "Core/PlatformProcess.h"
+#include "MainWindow/MainEditorWindow.h"
 
 namespace Ry
 {
@@ -112,8 +113,13 @@ namespace Ry
 			InitRenderAPI();
 			InitAssetSystem();
 
-			PrimaryWindow = new EditorWindow;
+			PrimaryWindow = new MainEditorWindow;
 			PrimaryWindow->Init();
+
+			CreateSecondaryWindow<Ry::EditorWindow>();
+
+			//SecondaryWindow = new EditorWindow;
+			//SecondaryWindow->Init();
 
 			// Startup initial editor window
 
@@ -163,6 +169,24 @@ namespace Ry
 				PrimaryWindow->Update(DeltaSeconds);
 				PrimaryWindow->Render();
 
+				// Update and render secondary windows
+				int32 SecondaryWindowIndex = 0;
+				while(SecondaryWindowIndex < SecondaryWindows.GetSize())
+				{
+					EditorWindow* Wnd = SecondaryWindows[SecondaryWindowIndex];
+					if(Wnd->WantsClose())
+					{
+						DestroySecondaryWindow(Wnd);
+					}
+					else
+					{
+						Wnd->Update(DeltaSeconds);
+						Wnd->Render();
+
+						SecondaryWindowIndex++;
+					}
+				}
+
 				// todo: secondary editor windows (dock)?
 
 				std::chrono::duration<double> DeltaLastFPS = CurFrame - LastFPS;
@@ -175,16 +199,38 @@ namespace Ry
 
 				FPS++;
 			}
+
+			ShutdownWindowing();
+		}
+
+		template<typename T>
+		T* CreateSecondaryWindow()
+		{
+			T* NewWindow = new T;
+			NewWindow->Init();
+
+			SecondaryWindows.Add(NewWindow);
+
+			return NewWindow;
+		}
+
+		void DestroySecondaryWindow(EditorWindow* Window)
+		{
+			Window->GetWindow()->Destroy();
+			SecondaryWindows.Remove(Window);
+
+			delete Window;
 		}
 
 	private:
+
+		Ry::MainEditorWindow* PrimaryWindow;
+		Ry::ArrayList<EditorWindow*> SecondaryWindows;
 
 		int32 FPS = 0;
 
 		std::chrono::high_resolution_clock::time_point LastFrame = std::chrono::high_resolution_clock::now();
 		std::chrono::high_resolution_clock::time_point LastFPS = std::chrono::high_resolution_clock::now();
-
-		EditorWindow* PrimaryWindow;
 
 	};
 	

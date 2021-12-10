@@ -453,8 +453,6 @@ namespace Ry
 
 			if (!IsDeclReflected(Declaration))
 				return;
-
-			std::cout << "Found reflected member" << std::endl;
 			
 			bool bIsRecord = Declaration->getKind() == Decl::CXXRecord;
 			bool bIsMethod = Declaration->getKind() == Decl::CXXMethod;

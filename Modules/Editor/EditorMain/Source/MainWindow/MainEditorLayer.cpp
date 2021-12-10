@@ -1,4 +1,4 @@
-#include "EditorUI.h"
+#include "MainWindow/MainEditorLayer.h"
 #include "Interface/RenderAPI.h"
 #include "Widget/UserInterface.h"
 #include "Widget/BorderWidget.h"
@@ -17,7 +17,7 @@
 
 namespace Ry
 {
-	EditorUI::EditorUI(SwapChain* Parent):
+	MainEditorLayer::MainEditorLayer(SwapChain* Parent):
 	Layer(Parent)
 	{
 		// Create the editor style
@@ -38,25 +38,25 @@ namespace Ry
 
 		//TestRefl Object; 
 
-		RefDB.PrintAllReflectedClass();
+		//RefDB.PrintAllReflectedClass();
 
-		const Ry::ReflectedClass* RefClass = GetReflectedClass("Ry::TestObj");
-		SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget<Ry::Widget>("/Engine/UI/TestUI.ui");
-		Json AsJson = Ry::Jsonify(*LoadedWid.Get());
+		//const Ry::ReflectedClass* RefClass = GetReflectedClass("Ry::TestObj");
+		//SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget<Ry::Widget>("/Engine/UI/TestUI.ui");
+		//Json AsJson = Ry::Jsonify(*LoadedWid.Get());
 
-		std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
+		//std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
 
-		TestObj* Obj = NewObject<TestObj>("TestObject");
+		//TestObj* Obj = NewObject<TestObj>("TestObject");
 
 		/*Package* NewPackage = new Package("/Engine/TestPackage.rasset");
 		NewPackage->SetObject(Obj);
 		NewPackage->Save();*/
 
 		// Load packagedf
-		Package* Loaded = LoadPackage("/Engine/avocado.rasset");
-		const Ry::Object* RootObject = Loaded->GetOrLoadRoot();
+		//Package* Loaded = LoadPackage("/Engine/avocado.rasset");
+		//const Ry::Object* RootObject = Loaded->GetOrLoadRoot();
 
-		std::cout << "test" << std::endl;
+		//std::cout << "test" << std::endl;
 
 		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
 //		std::cout << "Value " << NewRefl->Other << std::endl;
@@ -140,11 +140,11 @@ namespace Ry
 		ContentBrowse->SetDirectory("/Engine");
 	}
 
-	void EditorUI::Update(float Delta)
+	void MainEditorLayer::Update(float Delta)
 	{
 	}
 
-	void EditorUI::Render()
+	void MainEditorLayer::Render()
 	{
 		Bat->Render();
 
@@ -153,12 +153,12 @@ namespace Ry
 		Cmd->Submit();
 	}
 
-	bool EditorUI::OnEvent(const Event& Ev)
+	bool MainEditorLayer::OnEvent(const Event& Ev)
 	{		
 		return UI->OnEvent(Ev);
 	}
 
-	void EditorUI::OnResize(int32 Width, int32 Height)
+	void MainEditorLayer::OnResize(int32 Width, int32 Height)
 	{
 		// todo: cant re record primary command buffer here unless we explicitly re-record secondary buffers
 		// the below just marks the secondaries for needing recording
@@ -176,7 +176,7 @@ namespace Ry
 		// RecordCmds();
 	}
 
-	void EditorUI::RecordCmds()
+	void MainEditorLayer::RecordCmds()
 	{
 		Cmd->Reset();
 		

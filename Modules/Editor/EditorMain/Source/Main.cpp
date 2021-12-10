@@ -5,10 +5,9 @@
 #include "Application.h"
 #include "EntryPoint.h"
 #include "Core/PlatformProcess.h"
-#include "EditorMain.h"
 #include "CommandUtils.h"
 #include "Language/ShaderCompiler.h"
-#include "Editor.h"
+#include "EditorEntry.h"
 #include "Core/String.h"
 
 typedef Ry::AbstractGame* (*CreateGameFunction)(void);
