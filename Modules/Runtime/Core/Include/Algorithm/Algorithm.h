@@ -22,10 +22,10 @@ namespace Ry
 	template<typename T>
 	struct EXPORT_ONLY Hash
 	{
-		uint32 operator()(const T* Input) const
+		/*uint32 operator()(const T* Input) const
 		{
 			return static_cast<uint32>(reinterpret_cast<uintptr_t>(Input));			
-		}
+		}*/
 
 		uint32 operator()(const T& Input) const
 		{
@@ -34,11 +34,20 @@ namespace Ry
 	};
 
 	template<typename T>
+	struct EXPORT_ONLY Hash<T*>
+	{
+		uint32 operator()(const T* Input) const
+		{
+			return static_cast<uint32>(reinterpret_cast<uintptr_t>(Input));
+		}
+	};
+
+	template<typename T>
 	struct EXPORT_ONLY Hash<SharedPtr<T>>
 	{
 		uint32 operator()(const SharedPtr<T> Ptr) const
 		{
-			Ry::Hash<T> HashFunctor;
+			Ry::Hash<T*> HashFunctor;
 			return HashFunctor(Ptr.Get());
 		}		
 	};

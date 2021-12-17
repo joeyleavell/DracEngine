@@ -116,7 +116,7 @@ namespace Ry
 			PrimaryWindow = new MainEditorWindow;
 			PrimaryWindow->Init();
 
-			CreateSecondaryWindow<Ry::EditorWindow>();
+			//CreateSecondaryWindow<Ry::EditorWindow>();
 
 			//SecondaryWindow = new EditorWindow;
 			//SecondaryWindow->Init();
