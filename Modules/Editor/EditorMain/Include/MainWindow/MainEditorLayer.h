@@ -5,9 +5,8 @@
 #include "Widget/UserInterface.h"
 #include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
-#include "EditorUI.gen.h"
 #include "Widget/Label.h"
-#include "EditorUI.gen.h"
+#include "MainEditorLayer.gen.h"
 
 namespace Ry
 {
@@ -51,11 +50,11 @@ namespace Ry
 
 	} RefClass();
 	
-	class EditorUI : public Layer
+	class MainEditorLayer : public Layer
 	{
 	public:
 
-		EditorUI(SwapChain* Parent);
+		MainEditorLayer(SwapChain* Parent);
 
 		void Update(float Delta) override;
 		void Render() override;

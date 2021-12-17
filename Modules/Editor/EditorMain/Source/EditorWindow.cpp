@@ -4,12 +4,14 @@
 #include "Interface/RenderCommand.h"
 #include "SwapChain.h"
 #include "Event.h"
-#include "EditorUI.h"
 #include "Buttons.h"
 #include "Keys.h"
 
 namespace Ry
 {
+
+	bool EditorWindow::bRenderingEngineInitialized = false;
+
 	EditorWindow::EditorWindow()
 	{
 		EdWindow = nullptr;
@@ -17,17 +19,12 @@ namespace Ry
 
 	EditorWindow::~EditorWindow()
 	{
-		
+	
 	}
 
-	int32 EditorWindow::GetViewportWidth()
+	Window* EditorWindow::GetWindow()
 	{
-		return EdWindow->FindWindowWidth();
-	}
-
-	int32 EditorWindow::GetViewportHeight()
-	{
-		return EdWindow->FindWindowHeight();
+		return EdWindow;
 	}
 
 	void EditorWindow::InitWindow()
@@ -42,20 +39,12 @@ namespace Ry
 		{
 			Ry::Log->Log("Window created");
 		}
-
-		Ry::ViewportWidthDel.BindMemberFunction(this, &EditorWindow::GetViewportWidth);
-		Ry::ViewportHeightDel.BindMemberFunction(this, &EditorWindow::GetViewportHeight);
 	}
 
 	void EditorWindow::Init()
 	{
 		InitWindow();
-		Ry::InitRenderingEngine(); // Init rendering engine after init'ing window
 
-		// Init editor UI layer
-		EditorUI* UILayer = new EditorUI(EdWindow->GetSwapChain());
-		EdLayers.PushLayer(UILayer);
-		
 		Delegate<void, int32, int32> Resized;
 		Resized.BindMemberFunction(this, &EditorWindow::Resize);
 		EdWindow->AddWindowResizedDelegate(Resized);
@@ -97,4 +86,10 @@ namespace Ry
 	{
 		EdLayers.OnEvent(Ev);
 	}
+
+	LayerStack& EditorWindow::GetLayerStack()
+	{
+		return EdLayers;
+	}
+
 }

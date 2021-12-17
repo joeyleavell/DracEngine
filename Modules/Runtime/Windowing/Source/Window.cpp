@@ -23,11 +23,11 @@ namespace Ry
 	// 	return reinterpret_cast<uint32>(Object);
 	// }
 
-	template <>
+	/*template <>
 	uint32 Hash<::GLFWwindow*>(::GLFWwindow* const& Object)
 	{
 		return reinterpret_cast<uint64>(Object);
-	}
+	}*/
 	
 	static Ry::Map<::GLFWwindow*, Window*> Windows;
 
@@ -43,6 +43,11 @@ namespace Ry
 		}
 
 		return true;
+	}	
+	
+	void WINDOWING_MODULE ShutdownWindowing()
+	{
+		glfwTerminate();
 	}
 
 	void WindowingErrorCallback(int Error, const char* Desc)
@@ -517,7 +522,6 @@ namespace Ry
 		SwapChain->DeleteSwapChain();
 				
 		glfwDestroyWindow(WindowResource);
-		glfwTerminate();
 	}
 
 	float Window::GetCursorX()

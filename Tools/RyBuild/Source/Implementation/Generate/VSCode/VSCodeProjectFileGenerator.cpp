@@ -167,7 +167,8 @@ bool GenerateEngineProjectFiles_VSCode(std::string EngineRootPath, std::string C
 
       if(Filesystem::exists(LaunchPath))
       {
-        RootLaunchJson = json::parse(ReadFileAsString(LaunchPath.string()));
+        std::string LaunchJson = ReadFileAsString(LaunchPath.string());
+        RootLaunchJson = json::parse(LaunchJson);
       }
 
       std::vector<std::string> LaunchArgs;

@@ -5,6 +5,9 @@
 
 namespace Ry
 {
+
+	bool GLSwapChain2::bIsGlewInitiailized = false;
+
 	void GLSwapChain2::BeginFrame(::GLFWwindow* Window, bool bWindowDirty)
 	{
 		if(bWindowDirty)
@@ -13,7 +16,7 @@ namespace Ry
 		}
 
 		// Make the OpenGL context current
-		//glfwMakeContextCurrent(Window);
+		glfwMakeContextCurrent(Window);
 	}
 
 	void GLSwapChain2::EndFrame(::GLFWwindow* Window)
@@ -24,31 +27,35 @@ namespace Ry
 	bool GLSwapChain2::CreateSwapChain(::GLFWwindow* ParentWindow)
 	{
 		glfwGetFramebufferSize(ParentWindow, &SwapChainWidth, &SwapChainHeight);
-
 		glfwMakeContextCurrent(ParentWindow);
 
 		glfwSwapInterval(0);
 
 		// todo: Make this work with multiple contexts
-		if (glewInit() != GLEW_OK)
+		if(!bIsGlewInitiailized)
 		{
-			Ry::Log->LogError("Failed to init GLEW");
-			return false;
-		}
-		else
-		{
-			Ry::Log->Log("GLEW loaded");
+			if (glewInit() != GLEW_OK)
+			{
+				Ry::Log->LogError("Failed to init GLEW");
+				return false;
+			}
+			else
+			{
+				Ry::Log->Log("GLEW loaded");
 
-			int OpenGLMajor;
-			int OpenGLMinor;
-			int32 FBOSamples;
-			glGetIntegerv(GL_MAJOR_VERSION, &OpenGLMajor);
-			glGetIntegerv(GL_MINOR_VERSION, &OpenGLMinor);
-			glGetIntegerv(GL_MAX_FRAMEBUFFER_SAMPLES, &FBOSamples);
+				int OpenGLMajor;
+				int OpenGLMinor;
+				int32 FBOSamples;
+				glGetIntegerv(GL_MAJOR_VERSION, &OpenGLMajor);
+				glGetIntegerv(GL_MINOR_VERSION, &OpenGLMinor);
+				glGetIntegerv(GL_MAX_FRAMEBUFFER_SAMPLES, &FBOSamples);
 
-			// Todo: print other useful info here?
-			Ry::Log->Log("OpenGL version: " + Ry::to_string(OpenGLMajor) + "." + Ry::to_string(OpenGLMinor));
-			Ry::Log->Log("\tMax FBO samples: " + Ry::to_string(FBOSamples));
+				// Todo: print other useful info here?
+				Ry::Log->Log("OpenGL version: " + Ry::to_string(OpenGLMajor) + "." + Ry::to_string(OpenGLMinor));
+				Ry::Log->Log("\tMax FBO samples: " + Ry::to_string(FBOSamples));
+			}
+
+			bIsGlewInitiailized = true;
 		}
 
 		return true;

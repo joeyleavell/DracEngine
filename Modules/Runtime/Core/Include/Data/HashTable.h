@@ -174,7 +174,8 @@ namespace Ry
 		template<typename K>
 		T& Get(const K& Key) const
 		{
-			uint32 HashValue = Ry::Hash(Key);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(Key);
 			int32 Probe = 0;
 
 			while (Probe < TableSize)
@@ -197,7 +198,8 @@ namespace Ry
 		{
 			bool bInserted = false;
 
-			uint32 HashValue = Ry::Hash(Value);
+			Ry::Hash<T> HashFunctor;
+			uint32 HashValue = HashFunctor(Value);
 
 			int32 Probe = 0;
 			while (Probe < TableSize && !bInserted)
@@ -230,7 +232,8 @@ namespace Ry
 		template<typename K>
 		bool Remove(const K& Value)
 		{
-			uint32 HashValue = Ry::Hash(Value);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(Value);
 
 			int32 Probe = 0;
 			while (Probe < TableSize)
@@ -262,7 +265,8 @@ namespace Ry
 		template<typename K>
 		bool Contains(const K& Value) const
 		{
-			uint32 HashValue = Ry::Hash(Value);
+			Ry::Hash<K> HashFunctor;
+			uint32 HashValue = HashFunctor(Value);
 
 			int32 Probe = 0;
 			while (Probe < TableSize)

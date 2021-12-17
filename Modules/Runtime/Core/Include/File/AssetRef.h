@@ -28,10 +28,14 @@ namespace Ry
 		Ry::String Path;
 	};
 
-	template <>
-	inline uint32 HashImpl<Ry::AssetRef>(HashTypeTag<Ry::AssetRef>, const Ry::AssetRef& Object)
+	template<>
+	struct EXPORT_ONLY Hash<Ry::AssetRef>
 	{
-		return HashImpl<Ry::String>(HashTypeTag<Ry::String>{}, Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
-	}
+		uint32 operator()(const Ry::AssetRef& Object) const
+		{
+			Ry::Hash<Ry::String> HashFunctor;
+			return HashFunctor(Object.GetAbsolute()); // Hash the absolute because Engine/ and /Engine/ should map to the same entry
+		}
+	};
 
 }

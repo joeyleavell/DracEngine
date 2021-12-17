@@ -1,4 +1,5 @@
 #include "Widget/Layout/GridPanel.h"
+#include <cmath>
 
 namespace Ry
 {

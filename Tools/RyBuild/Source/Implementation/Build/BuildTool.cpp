@@ -170,7 +170,8 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 			&bGenerationSuccess,
 			&HeaderAcquisitionLock,
 			CompletionIndex, 
-			CurrentHeaderIndex
+			CurrentHeaderIndex,
+			ThreadSpawn
 		]()
 		{
 			int32_t RetrievedIndex = 0;
@@ -243,6 +244,11 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 					Args.push_back("-Define=COMPILE_MODULE_" + Data->ModuleNameCaps);
 					Args.push_back("-Define=RBUILD_TARGET_OS_" + ToUpper(OSToString(Settings.TargetPlatform.OS)));
 
+					//for(const std::string& s : Args)
+					//{
+					//	std::cout << "\"" + s + "\"," << std::endl;
+					//}
+
 					int StdOutSize = 1024 * 1000;
 					char* StdOutBuffer = new char[StdOutSize];
 					char* StdErrBuffer = new char[StdOutSize];
@@ -260,12 +266,17 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 						// Print out header that source was just generated for
 						std::cout << "\t[" << (*CompletionIndex + 1) << " of " << AllHeaders->size() << "] " << HeaderPath.filename().string();
 						(*CompletionIndex)++;
-						if (!bResult && !StdOutAsString.empty())
-							std::cout << " [fail]: " << StdOutBuffer;
-						if (!bResult && !StdErrAsString.empty())
-							std::cout << " [fail]: " << StdErrAsString;
-						else
-							std::cout << std::endl;
+						if(!bResult)
+							std::cout << " [fail]: ";
+						else if(!StdOutAsString.empty() || !StdErrAsString.empty())
+							std::cout << ": " << std::endl;						
+						
+						if (!StdOutAsString.empty())
+							std::cout << StdOutBuffer;
+						if (!StdErrAsString.empty())
+							std::cout << StdErrAsString;
+							
+						std::cout << std::endl;
 					}
 					OutWriteLock.unlock();
 
@@ -276,6 +287,7 @@ bool AbstractBuildTool::CreateGeneratedModuleSource()
 				}
 
 			}
+
 		});
 
 		ThreadPool.push_back(NewThread);

@@ -47,6 +47,26 @@ namespace Ry
 		}
 	}
 
+	void ReflectionDatabase::PrintAllReflectedClass() const
+	{
+		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> ClassesItr = ReflectedClasses.CreatePairIterator();
+
+		while(ClassesItr)
+		{
+			std::cout << *ClassesItr.GetKey() << ": ";
+			if(ClassesItr.GetValue())
+			{
+				std::cout << ClassesItr.GetValue()->Fields.GetSize() << std::endl;
+			}
+			else
+			{
+				std::cout << "nullptr" << std::endl;
+			}
+
+			++ClassesItr;
+		}
+	}
+
 	Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> ReflectionDatabase::GetClassIterator()
 	{
 		return ReflectedClasses.CreatePairIterator();

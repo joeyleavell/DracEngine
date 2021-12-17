@@ -27,18 +27,18 @@ namespace Ry
 		Ry::String AsVirtual = Path.GetVirtual();
 		if (CachedWidgets.Contains(AsVirtual))
 		{
-			return LoadWidgetSingle(CachedWidgets.Get(AsVirtual)->Root);
+			return LoadWidgetSingle(CachedWidgets.Get(AsVirtual)->Root->first_node());
 		}
 		else
 		{
 			SharedPtr<CachedWidget> NewCache = MakeShared(new CachedWidget);
 			NewCache->XmlContents = Ry::File::LoadFileAsString2(Path.GetAbsolute());
 
-			xml_document<> AltDoc;
+			xml_document<>* AltDoc = new xml_document<>;
 
 			try
 			{
-				AltDoc.parse<0>(*NewCache->XmlContents);
+				AltDoc->parse<0>(*NewCache->XmlContents);
 			}
 			catch(const parse_error& E)
 			{
@@ -48,10 +48,10 @@ namespace Ry
 			}
 
 			// Get first root node of XML
-			NewCache->Root = AltDoc.first_node();
+			NewCache->Root = AltDoc;
 
 			// Kick out if there are more than one root nodes, don't cache
-			if(AltDoc.last_node() != AltDoc.first_node())
+			if(AltDoc->last_node() != AltDoc->first_node())
 			{
 				Ry::Log->LogErrorf("Document %s has multiple root nodes, must only have one", *Path.GetVirtual());
 				return MakeShared<Ry::Widget>(nullptr);
@@ -59,7 +59,7 @@ namespace Ry
 
 			CachedWidgets.Insert(AsVirtual, NewCache);
 
-			return LoadWidgetSingle(NewCache->Root);
+			return LoadWidgetSingle(NewCache->Root->first_node());
 		}
 	}
 
