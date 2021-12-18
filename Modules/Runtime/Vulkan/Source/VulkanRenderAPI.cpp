@@ -61,6 +61,11 @@ namespace Ry
 		return new Ry::VulkanTexture(Ry::TextureUsage::STATIC, Filter);
 	}
 
+	RenderPass* VulkanRenderAPI::CreateRenderPass()
+	{
+		return new VulkanRenderPass;
+	}
+
 	bool InitVulkanAPI()
 	{
 		// Create a new Vulkan Render API and assign it to globals

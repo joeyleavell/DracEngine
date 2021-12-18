@@ -84,6 +84,7 @@ namespace Ry
 		Ry::CommandBuffer* Cmd;
 
 		Ry::Batch* Bat;
+		Ry::Batch* OffScreen;
 
 		UserInterface* UI;
 

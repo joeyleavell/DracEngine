@@ -65,7 +65,11 @@ namespace Ry
 		
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
-		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());
+		Bat = new Batch(ParentSC);
+
+		// Off screen rendering batch
+		OffScreen = new Batch(ParentSC, 600, 600);
+
 		//Bat->SetProjection(Ry::ortho4(0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight(), 0, -1.0f, -1.0f));
 
 		TestWorld = new World2D(Parent);
@@ -192,7 +196,7 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
-			Cmd->BeginRenderPass(ParentSC->GetDefaultRenderPass(), true);
+			Cmd->BeginRenderPass(true);
 			{
 
 				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)

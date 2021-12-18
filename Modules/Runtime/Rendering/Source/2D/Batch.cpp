@@ -15,6 +15,7 @@
 #include "Interface/RenderAPI.h"
 #include "Interface/RenderingResource.h"
 #include "Interface/RenderCommand.h"
+#include "Interface/RenderPass.h"
 #include "Interface/VertexArray.h"
 #include "Interface/Texture.h"
 
@@ -483,10 +484,11 @@ namespace Ry
 		
 	}
 
-	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass)
+	Batch::Batch(Ry::SwapChain* Target):
+	bUsesOffscreenRendering(false)
 	{
-		this->ParentPass = ParentPass;		
 		this->Swap = Target;
+		this->ParentPass = Swap->GetDefaultRenderPass();		
 		
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), 0.0f, (float)Ry::GetViewportHeight(), -1.0f, 1.0f);
@@ -495,6 +497,29 @@ namespace Ry
 		AddPipeline("Shape", "Shape");
 		AddPipeline("Texture", "Texture");
 		AddPipeline("Font", "Font");
+
+	}
+
+	Batch::Batch(Ry::SwapChain* Target, int32 RenderTargetWidth, int32 RenderTargetHeight)
+	:Batch(Target)
+	{
+		this->bUsesOffscreenRendering = true;
+		this->RenderTargetWidth = RenderTargetWidth;
+		this->RenderTargetHeight = RenderTargetHeight;
+
+		// Create new render pass
+		
+		/*FrameBufferDescription DefDesc;
+		int32 DefColor = DefDesc.AddSwapChainColorAttachment(this);
+		int32 DefDepth = DefDesc.AddDepthAttachment();
+
+		RenderPass* DefaultRenderPass = new RenderPass;
+		DefaultRenderPass->SetFramebufferDescription(DefDesc);
+		
+		int32 MainPass = DefaultRenderPass->CreateSubpass();
+		DefaultRenderPass->AddSubpassAttachment(MainPass, DefColor);
+		DefaultRenderPass->AddSubpassAttachment(MainPass, DefDepth);
+		DefaultRenderPass->CreateRenderPass();*/
 
 	}
 
@@ -934,6 +959,30 @@ namespace Ry
 				++PipelineItr;
 			}
 			
+		}
+	}
+
+	int32 Batch::GetRenderTargetWidth() const
+	{
+		if(bUsesOffscreenRendering)
+		{
+			return RenderTargetWidth;
+		}
+		else
+		{
+			return Swap->GetSwapChainWidth();
+		}
+	}
+
+	int32 Batch::GetRenderTargetHeight() const
+	{
+		if (bUsesOffscreenRendering)
+		{
+			return RenderTargetHeight;
+		}
+		else
+		{
+			return Swap->GetSwapChainHeight();
 		}
 	}
 

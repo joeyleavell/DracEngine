@@ -293,7 +293,8 @@ namespace Ry
 	{
 	public:
 
-		Batch(Ry::SwapChain* Target, Ry::RenderPass* ParentPass);
+		Batch(Ry::SwapChain* Target);
+		Batch(Ry::SwapChain* Target, int32 RenderTargetWidth, int32 RenderTargetHeight);
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
 
@@ -324,6 +325,13 @@ namespace Ry
 		void DeleteEmptyGroups();
 		
 	private:
+
+		int32 GetRenderTargetWidth() const;
+		int32 GetRenderTargetHeight() const;
+
+		int32 RenderTargetWidth;
+		int32 RenderTargetHeight;
+		bool bUsesOffscreenRendering;
 
 		void CreateLayersIfNeeded(int32 Index);
 

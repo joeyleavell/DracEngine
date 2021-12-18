@@ -2,9 +2,21 @@
 
 #include "Interface/RenderAPI.h"
 #include "OpenGLGen.h"
+#include "Interface/RenderPass.h"
 
 namespace Ry
 {
+
+	class GLRenderPass : public RenderPass
+	{
+	public:
+
+		bool CreateRenderPass() override
+		{
+			return true;
+		}
+		
+	};
 
 	/**
 	 * OpenGL implementation of rendering interface.
@@ -23,6 +35,7 @@ namespace Ry
 		ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0);
 		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC);
 		Texture* CreateTexture(TextureFiltering Filter);
+		RenderPass* CreateRenderPass() override;
 
 	private:
 

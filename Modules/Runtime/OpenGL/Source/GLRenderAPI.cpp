@@ -55,6 +55,11 @@ namespace Ry
 		return new GLTexture(TextureUsage::STATIC, Filter);
 	}
 
+	RenderPass* GLRenderAPI::CreateRenderPass()
+	{
+		return new GLRenderPass;
+	}
+
 	bool InitOGLRendering()
 	{
 		RendAPI = new GLRenderAPI;

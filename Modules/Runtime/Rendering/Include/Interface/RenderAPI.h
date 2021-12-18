@@ -35,6 +35,7 @@ namespace Ry
 		virtual ResourceLayout* CreateResourceSetDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) = 0;
 		virtual ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC) = 0;
 		virtual Texture* CreateTexture(TextureFiltering Filter) = 0;
+		virtual RenderPass* CreateRenderPass() = 0;
 
 		virtual Pipeline* CreatePipelineFromShader(const PipelineCreateInfo& CreateInfo, Shader* Src);
 

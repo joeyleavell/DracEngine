@@ -79,6 +79,7 @@ namespace Ry
 	struct RENDERING_MODULE BeginRenderPassCommand
 	{
 		Ry::RenderPass* RenderPass;
+		Framebuffer* SourceBuffer;
 		bool bUseSecondary;
 	};
 
@@ -160,13 +161,13 @@ namespace Ry
 				return;
 			}
 			
-			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), bUseSecondary};
+			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), nullptr, bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		
-		virtual void BeginRenderPass(Ry::RenderPass* RenderPass, bool bUseSecondary)
+		virtual void BeginRenderPass(Ry::RenderPass* RenderPass, Framebuffer* SourceBuffer, bool bUseSecondary)
 		{
-			BeginRenderPassCommand Cmd{ RenderPass, bUseSecondary};
+			BeginRenderPassCommand Cmd{ RenderPass, SourceBuffer, bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		

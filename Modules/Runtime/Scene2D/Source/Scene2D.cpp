@@ -325,8 +325,8 @@ namespace Ry
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
 
 		// Create batches
-		DynamicBatch = new Batch(Parent, Parent->GetDefaultRenderPass());
-		StaticBatch  = new Batch(Parent, Parent->GetDefaultRenderPass());
+		DynamicBatch = new Batch(Parent);
+		StaticBatch  = new Batch(Parent);
 
 		AllBatches = { StaticBatch, DynamicBatch };
 	}
