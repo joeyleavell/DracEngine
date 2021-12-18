@@ -107,9 +107,18 @@ namespace Ry
 		if(bIsDragging && !bGhostShown)
 		{
 			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
-			IconStyle.Default->Show(GhostIconItemSet, Batch, GetWidgetID(), GetPipelineState(this));
 
-			bGhostShown = true;
+			// Set state of "ghost" icon
+			{
+				PipelineState State = GetPipelineState(this);
+				State.StateID += "_Drag";
+				State.Scissor.Width = Ry::GetViewportWidth();
+				State.Scissor.Height = Ry::GetViewportHeight();
+
+				IconStyle.Default->Show(GhostIconItemSet, Batch, GetWidgetID(), State);
+
+				bGhostShown = true;
+			}
 
 			// todo: weird flickering happens in vulkan if batch render isnt called here
 			//Batch->Render();

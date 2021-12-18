@@ -7,6 +7,7 @@
 #include "ContentBrowser/ContentBrowser.h"
 #include "Widget/Label.h"
 #include "MainEditorLayer.gen.h"
+#include "World2D.h"
 
 namespace Ry
 {
@@ -49,6 +50,17 @@ namespace Ry
 		}
 
 	} RefClass();
+
+	class TestEntity : public Entity2D
+	{
+	public:
+		TestEntity(World2D* World):
+		Entity2D(World)
+		{
+			// Default root rect component
+			CreateComponent<RectComponent>(Static, Vector2{ 50.0f, 50.0f });
+		}
+	};
 	
 	class MainEditorLayer : public Layer
 	{
@@ -63,6 +75,8 @@ namespace Ry
 		void OnResize(int32 Width, int32 Height) override;
 
 	private:
+
+		Ry::World2D* TestWorld;
 		
 		// Record draw commands for primary editor window
 		void RecordCmds();

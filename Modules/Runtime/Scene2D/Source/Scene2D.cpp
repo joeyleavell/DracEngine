@@ -327,6 +327,8 @@ namespace Ry
 		// Create batches
 		DynamicBatch = new Batch(Parent, Parent->GetDefaultRenderPass());
 		StaticBatch  = new Batch(Parent, Parent->GetDefaultRenderPass());
+
+		AllBatches = { StaticBatch, DynamicBatch };
 	}
 
 	void Scene2D::AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
@@ -424,6 +426,7 @@ namespace Ry
 	void Scene2D::AddCustomBatch(Batch* Batch)
 	{
 		CustomBatches.Add(Batch);
+		AllBatches.Add(Batch);
 	}
 
 	void Scene2D::RecordCommands()
@@ -434,14 +437,28 @@ namespace Ry
 		{
 			Cmd->BeginRenderPass(SC->GetDefaultRenderPass());
 			{
-				int32 Layer = 0;
+				int32 MaxBatchLength = 0;
+				for (Batch* Custom : AllBatches)
+					if (Custom->GetLayerCount() > MaxBatchLength)
+						MaxBatchLength = Custom->GetLayerCount();
 
-				int32 MaxCustomLength = 0;
-				for (Batch* Custom : CustomBatches)
-					if (Custom->GetLayerCount() > MaxCustomLength)
-						MaxCustomLength = Custom->GetLayerCount();
+				int32 CurrentLayer = 0;
+				while(CurrentLayer < MaxBatchLength)
+				{
+					for(int32 BatchIndex = 0; BatchIndex < AllBatches.GetSize(); BatchIndex++)
+					{
+						Batch* Bat = AllBatches[BatchIndex];
+						if(CurrentLayer < Bat->GetLayerCount())
+						{
+							CommandBuffer* BatBuffer = Bat->GetCommandBuffer(CurrentLayer);
+							Cmd->DrawCommandBuffer(BatBuffer);
+						}
+					}
+
+					CurrentLayer++;
+				}
 			
-				while(Layer < StaticBatch->GetLayerCount() && Layer < DynamicBatch->GetLayerCount() && Layer < MaxCustomLength)
+				/*while (Layer < StaticBatch->GetLayerCount() && Layer < DynamicBatch->GetLayerCount() && Layer < MaxCustomLength)
 				{
 					// Draw static and dynamic batches
 					CommandBuffer* StaticBatBuffer  = StaticBatch->GetCommandBuffer(Layer);
@@ -490,6 +507,16 @@ namespace Ry
 						Cmd->DrawCommandBuffer(DynamicBatBuffer);
 					Layer++;
 				}
+
+				while (Layer < MaxCustomLength)
+				{
+				}
+				for (Batch* Custom : CustomBatches)
+				{
+					Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
+					Layer++;
+				}*/
+
 			}
 			Cmd->EndRenderPass();
 		}

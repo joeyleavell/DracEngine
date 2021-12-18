@@ -205,6 +205,8 @@ namespace Ry
 
 	private:
 
+		Ry::ArrayList<Batch*> AllBatches;
+
 		Ry::SwapChain* SC;
 
 		Ry::CommandBuffer* Cmd;

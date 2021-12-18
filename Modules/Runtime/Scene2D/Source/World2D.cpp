@@ -45,7 +45,7 @@ namespace Ry
 		PhysicsWorld->SetContactListener(B2ContactListener);
 		ContactListener = B2ContactListener;
 
-		this->Camera = new Camera2D { (float) SC->GetSwapChainWidth(), (float)SC->GetSwapChainHeight() };
+		this->Camera = new Camera2D { (float)SC->GetSwapChainWidth(),(float)SC->GetSwapChainHeight() };
 		this->CameraController = nullptr;
 	}
 

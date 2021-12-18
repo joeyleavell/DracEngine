@@ -16,7 +16,7 @@ namespace Ry
 		}
 
 		// Make the OpenGL context current
-		//glfwMakeContextCurrent(Window);
+		glfwMakeContextCurrent(Window);
 	}
 
 	void GLSwapChain2::EndFrame(::GLFWwindow* Window)

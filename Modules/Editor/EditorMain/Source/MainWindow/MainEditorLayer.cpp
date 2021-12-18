@@ -22,7 +22,7 @@ namespace Ry
 	{
 		// Create the editor style
 		InitializeEditorStyle();
-		
+
 		/*std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
 		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
 		while (Itr)
@@ -67,6 +67,13 @@ namespace Ry
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
 		Bat = new Batch(ParentSC, ParentSC->GetDefaultRenderPass());
 		//Bat->SetProjection(Ry::ortho4(0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight(), 0, -1.0f, -1.0f));
+
+		TestWorld = new World2D(Parent);
+
+		SharedPtr<TestEntity> NewEnt = MakeShared(new TestEntity(TestWorld));
+		TestWorld->AddEntity(NewEnt);
+
+		TestWorld->AddCustomBatch(Bat);
 
 		//Bat->SetLayerScissor(6, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
@@ -142,15 +149,18 @@ namespace Ry
 
 	void MainEditorLayer::Update(float Delta)
 	{
+		TestWorld->Update(Delta);
 	}
 
 	void MainEditorLayer::Render()
 	{
 		Bat->Render();
 
-		RecordCmds();
+		//RecordCmds();
 
-		Cmd->Submit();
+		//Cmd->Submit();
+
+		TestWorld->Draw();
 	}
 
 	bool MainEditorLayer::OnEvent(const Event& Ev)
