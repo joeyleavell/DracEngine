@@ -28,7 +28,9 @@ namespace Ry
 		GLRenderAPI() {};
 		virtual ~GLRenderAPI() = default;
 
-		CommandBuffer* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass* ParentRenderPass = nullptr);
+		CommandBuffer* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass* ParentRenderPass = nullptr) override;
+		CommandBuffer* CreateCommandBuffer(RenderPass* ParentRenderPass = nullptr) override;
+
 		VertexArray* CreateVertexArray(const Ry::VertexFormat& Format);
 		Shader* CreateShader(Ry::String VSAsset, Ry::String FSAsset);
 		Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo);
@@ -36,6 +38,8 @@ namespace Ry
 		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC);
 		Texture* CreateTexture(TextureFiltering Filter);
 		RenderPass* CreateRenderPass() override;
+
+		FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description) override;
 
 	private:
 

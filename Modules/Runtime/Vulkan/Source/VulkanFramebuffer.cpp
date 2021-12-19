@@ -5,8 +5,8 @@
 namespace Ry
 {
 
-	VulkanFrameBuffer::VulkanFrameBuffer(int32 Width, int32 Height) :
-	FrameBuffer(Width, Height, 1)
+	VulkanFrameBuffer::VulkanFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc) :
+	FrameBuffer(Width, Height, Desc)
 	{
 	}
 

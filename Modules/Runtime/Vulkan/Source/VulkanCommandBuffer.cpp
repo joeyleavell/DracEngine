@@ -192,8 +192,8 @@ namespace Ry
 		return &CmdBuffer;
 	}
 
-	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo) :
-	CommandBuffer(SC, SecondaryInfo)
+	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo Info) :
+	CommandBuffer(SC, Info)
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -207,6 +207,22 @@ namespace Ry
 
 		this->SwapChainVersion = VkSC->GetSwapchainVersion();		
 	}
+
+	VulkanCommandBuffer2::VulkanCommandBuffer2(SecondaryCommandBufferInfo Info):
+	CommandBuffer(Info)
+	{
+		// Just create a single command buffer
+		VkCommandBuffer NewCmdBuffer;
+		if (!CreateCmdBufferResource(NewCmdBuffer))
+		{
+			Ry::Log->LogError("Could not complete recording of Vulkan render command: failed to create command buffer");
+			return;
+		}
+
+		GeneratedBuffers.Add(NewCmdBuffer);
+
+	}
+
 
 	VulkanCommandBuffer2::~VulkanCommandBuffer2()
 	{

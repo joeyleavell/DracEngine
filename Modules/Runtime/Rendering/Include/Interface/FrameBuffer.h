@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
+#include "RenderPass.h"
 #include "RenderingGen.h"
 
 namespace Ry
@@ -19,7 +20,9 @@ namespace Ry
 	{
 
 	public:
-		FrameBuffer(uint32 Width, uint32 Height, int32 Samples);
+
+		// todo: this should eventually not be a pointer, currently is to allow vulkan to bypass creation
+		FrameBuffer(uint32 Width, uint32 Height, const FrameBufferDescription* Desc = nullptr);
 		virtual ~FrameBuffer() = default;
 
 		virtual void DeleteFramebuffer() = 0;

@@ -5,6 +5,7 @@
 #include "GLVertexArray.h"
 #include "GLResources.h"
 #include "GLRenderingState.h"
+#include "GLFrameBuffer.h"
 
 namespace Ry
 {
@@ -105,7 +106,24 @@ namespace Ry
 		// todo: only change state here if we switch render passes
 		
 		// Bind default framebuffer (for now)
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		if(Cmd->SourceBuffer)
+		{
+			// Bind default framebuffer
+			if(Ry::GLFrameBuffer* GLFbo = dynamic_cast<Ry::GLFrameBuffer*>(Cmd->SourceBuffer))
+			{
+				// Bind the framebuffer's handle
+				glBindFramebuffer(GL_FRAMEBUFFER, GLFbo->GetHandle());
+			}
+			else
+			{
+				Ry::Log->LogError("GLCommandBuffer::GLBeginRenderPass: Specified framebuffer was not an OpenGL framebuffer!");
+			}
+		}
+		else
+		{
+			// No source buffer specified, must be default buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 
 		// Force scissor test off for clearing screen
 		glDisable(GL_SCISSOR_TEST);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/Core.h"
 #include "RenderingGen.h"
 
@@ -8,7 +10,7 @@ namespace Ry
 
 	enum class AttachmentFormat
 	{
-		/** The same internet format that the target swap chain uses. */
+		/** The same internal format that the target swap chain uses. */
 		Color,
 		Depth,
 		Stencil

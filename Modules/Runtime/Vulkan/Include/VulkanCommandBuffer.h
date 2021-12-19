@@ -38,6 +38,8 @@ namespace Ry
 	public:
 
 		VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo SecondaryInfo = {});
+		VulkanCommandBuffer2(SecondaryCommandBufferInfo SecondaryInfo = {});
+
 		virtual ~VulkanCommandBuffer2();
 
 		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary);

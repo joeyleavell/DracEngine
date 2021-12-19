@@ -14,6 +14,7 @@
 #include "EditorStyle.h"
 #include "File/Serializer.h"
 #include "Package/Package.h"
+#include "Interface/RenderPass.h"
 
 namespace Ry
 {
@@ -68,7 +69,57 @@ namespace Ry
 		Bat = new Batch(ParentSC);
 
 		// Off screen rendering batch
-		OffScreen = new Batch(ParentSC, 600, 600);
+		FrameBufferDescription OffScreenDesc;
+		int32 MainColor = OffScreenDesc.AddColorAttachment();
+
+		// Create an off-screen pass with one color attachment in a single sub-pass
+		{
+			OffScreenPass = Ry::RendAPI->CreateRenderPass();
+			OffScreenPass->SetFramebufferDescription(OffScreenDesc);
+			int32 MainPass = OffScreenPass->CreateSubpass();
+			OffScreenPass->AddSubpassAttachment(MainPass, MainColor);
+			OffScreenPass->CreateRenderPass();			
+		}
+
+		// Create frame buffer for render pass
+		OffScreenFbo = Ry::RendAPI->CreateFrameBuffer(100, 100, OffScreenDesc);
+
+		OffScreenCmd = Ry::RendAPI->CreateCommandBuffer();
+
+		OffScreen = new Batch(OffScreenPass, 600, 600);
+
+		// Create a full-texture rect
+		SharedPtr<BatchItem> Rect = MakeItem();
+		BatchRectangle(Rect, BLUE, 0.0f, 0.0f, 100.0f, 100.0f, 0.0f);
+		OffScreen->AddItem(Rect, "Shape", PipelineState{}, nullptr, 0);
+
+		// Immediately update and render
+		OffScreen->Update();
+		OffScreen->Render();
+
+		// Record the off-screen cmd
+		OffScreenCmd->BeginCmd();
+		{
+			OffScreenCmd->BeginRenderPass(OffScreenPass, OffScreenFbo, true);
+			{
+				// Draw the batch buffers
+				for (int32 Layer = 0; Layer < OffScreen->GetLayerCount(); Layer++)
+				{
+					CommandBuffer* BatBuffer = OffScreen->GetCommandBuffer(Layer);
+
+					if (BatBuffer)
+					{
+						Cmd->DrawCommandBuffer(BatBuffer);
+					}
+				}
+
+			}
+			OffScreenCmd->EndRenderPass();
+		}
+		OffScreenCmd->EndCmd();
+
+		// Render the off-screen image
+		OffScreenCmd->Submit();
 
 		//Bat->SetProjection(Ry::ortho4(0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight(), 0, -1.0f, -1.0f));
 

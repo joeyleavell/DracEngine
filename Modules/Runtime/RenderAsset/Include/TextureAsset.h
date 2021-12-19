@@ -20,6 +20,12 @@ namespace Ry
 		uint32 Height;
 
 		RefField()
+		float Value;
+
+		RefField()
+		uint32 SomeData;
+
+		RefField()
 		Ry::ArrayList<uint8> TextureData;
 
 	} RefClass();

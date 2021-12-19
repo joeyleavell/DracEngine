@@ -3,14 +3,32 @@
 
 namespace Ry
 {
-	GLFrameBuffer::GLFrameBuffer(int32 Width, int32 Height, int32 Samples):
-	FrameBuffer(Width, Height, Samples)
+	GLFrameBuffer::GLFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc):
+	FrameBuffer(Width, Height, Desc)
 	{
 		// Generate GL framebuffer handle
 		glGenFramebuffers(1, &Handle);
 
 		// Initialize color attachment count to zero
 		this->ColorAttachmentCount = 0;
+
+		// Create attachments based on description
+
+		if(Desc)
+		{
+			// Bind framebufer
+			glBindFramebuffer(GL_FRAMEBUFFER, Handle);
+
+			// Create attachments
+
+			// Check status is valid
+			GLint Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (Status != GL_FRAMEBUFFER_COMPLETE)
+			{
+				std::cerr << "GL frame buffer " << Handle << " is not complete " << Status << std::endl;
+			}
+
+		}
 	}
 
 	void GLFrameBuffer::DeleteFramebuffer()

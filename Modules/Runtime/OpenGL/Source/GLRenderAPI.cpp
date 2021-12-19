@@ -8,6 +8,7 @@
 #include "GLRenderingState.h"
 #include "GLResources.h"
 #include "GLTexture.h"
+#include "GLFrameBuffer.h"
 #include "Interface/Texture.h"
 
 namespace Ry
@@ -21,6 +22,18 @@ namespace Ry
 		else
 		{
 			return new GLCommandBuffer(Target);
+		}
+	}
+
+	CommandBuffer* GLRenderAPI::CreateCommandBuffer(RenderPass* ParentRenderPass)
+	{
+		if(ParentRenderPass)
+		{
+			return new GLCommandBuffer(SecondaryCommandBufferInfo{true, ParentRenderPass});
+		}
+		else
+		{
+			return new GLCommandBuffer;
 		}
 	}
 
@@ -58,6 +71,11 @@ namespace Ry
 	RenderPass* GLRenderAPI::CreateRenderPass()
 	{
 		return new GLRenderPass;
+	}
+
+	FrameBuffer* GLRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description)
+	{
+		return new GLFrameBuffer(Width, Height, &Description);
 	}
 
 	bool InitOGLRendering()

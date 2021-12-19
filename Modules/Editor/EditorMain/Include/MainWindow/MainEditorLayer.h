@@ -5,6 +5,7 @@
 #include "Widget/UserInterface.h"
 #include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
+#include "Interface/FrameBuffer.h"
 #include "Widget/Label.h"
 #include "MainEditorLayer.gen.h"
 #include "World2D.h"
@@ -85,6 +86,11 @@ namespace Ry
 
 		Ry::Batch* Bat;
 		Ry::Batch* OffScreen;
+
+		RenderPass* OffScreenPass;
+		FrameBuffer* OffScreenFbo;
+
+		Ry::CommandBuffer* OffScreenCmd;
 
 		UserInterface* UI;
 

@@ -18,6 +18,11 @@ namespace Ry
 			BoundState = nullptr;
 		}
 
+		GLCommandBuffer(SecondaryCommandBufferInfo SecondaryInfo = {}) :
+		CommandBuffer(SecondaryInfo)
+		{
+			BoundState = nullptr;
+		}
 
 		bool CheckDirty() override;
 		void Submit() override;

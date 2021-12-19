@@ -27,6 +27,18 @@ namespace Ry
 		}
 	}
 
+	CommandBuffer* VulkanRenderAPI::CreateCommandBuffer(RenderPass* ParentRenderPass)
+	{
+		if(ParentRenderPass)
+		{
+			return new Ry::VulkanCommandBuffer2(SecondaryCommandBufferInfo{true, ParentRenderPass});
+		}
+		else
+		{
+			return new Ry::VulkanCommandBuffer2;
+		}
+	}
+
 	VertexArray* VulkanRenderAPI::CreateVertexArray(const Ry::VertexFormat& Format)
 	{
 		return new Ry::VulkanVertexArray(Format);
@@ -64,6 +76,11 @@ namespace Ry
 	RenderPass* VulkanRenderAPI::CreateRenderPass()
 	{
 		return new VulkanRenderPass;
+	}
+
+	FrameBuffer* VulkanRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description)
+	{
+		return new VulkanFrameBuffer(Width, Height, &Description);
 	}
 
 	bool InitVulkanAPI()

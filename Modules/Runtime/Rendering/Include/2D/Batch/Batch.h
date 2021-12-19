@@ -293,8 +293,11 @@ namespace Ry
 	{
 	public:
 
+		// Used in cases of off-screen rendering
+		Batch(RenderPass* RP, int32 RenderTargetWidth, int32 RenderTargetHeight);
+
+		// Used when rendering directly to screen
 		Batch(Ry::SwapChain* Target);
-		Batch(Ry::SwapChain* Target, int32 RenderTargetWidth, int32 RenderTargetHeight);
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
 
@@ -326,12 +329,10 @@ namespace Ry
 		
 	private:
 
-		int32 GetRenderTargetWidth() const;
-		int32 GetRenderTargetHeight() const;
+		void Init();
 
 		int32 RenderTargetWidth;
 		int32 RenderTargetHeight;
-		bool bUsesOffscreenRendering;
 
 		void CreateLayersIfNeeded(int32 Index);
 
@@ -349,52 +350,6 @@ namespace Ry
 		
 		Ry::Map<Ry::String, Ry::BatchPipeline*> Pipelines;
 		Ry::ArrayList<BatchLayer*> Layers;
-	};
-
-
-	class RENDERING_MODULE TextBatch
-	{
-	public:
-		TextBatch(Ry::SwapChain* Target, Shader* Shad = nullptr);
-
-		void Begin();
-
-		void RenderTextBodyWrapped(const Ry::Text& Text, float XPosition, float YPosition, float LineWidth);
-
-		void End();
-		void Flush();
-
-		void SetFont(BitmapFont* Font);
-		void SetColor(const Ry::Vector3& Color);
-
-	private:
-
-		void CreateResources(SwapChain* Swap);
-		void CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad);
-		void RecordCommands();
-
-		bool began;
-		BitmapFont* Font;
-		Ry::Vector3 Color;
-		//Shader* FontShader;
-		
-		Mesh* FontMesh;
-
-		Ry::ResourceSet* Resources[2];
-
-		// Texture resources
-		Ry::ResourceLayout* TextureResDesc;
-		Ry::ResourceSet* TextureRes;
-
-		// Scene resources
-		Ry::ResourceLayout* SceneResDesc;
-		Ry::ResourceSet* SceneRes;
-
-		Ry::CommandBuffer* CommandBuffer;
-
-		Ry::Pipeline* Pipeline;
-
-
 	};
 	
 }

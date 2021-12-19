@@ -16,6 +16,8 @@ namespace Ry
 	public:
 
 		CommandBuffer* CreateCommandBuffer(Ry::SwapChain* Target, RenderPass* ParentRenderPass = nullptr) override;
+		CommandBuffer* CreateCommandBuffer(RenderPass* ParentRenderPass = nullptr) override;
+	
 		VertexArray* CreateVertexArray(const Ry::VertexFormat& Format) override;
 		Shader* CreateShader(Ry::String VertexLoc, Ry::String FragmentLoc) override;
 		Pipeline* CreatePipeline(const PipelineCreateInfo& CreateInfo) override;
@@ -23,6 +25,8 @@ namespace Ry
 		ResourceSet* CreateResourceSet(const ResourceLayout* Desc, SwapChain* SC) override;
 		Texture* CreateTexture(TextureFiltering Filter) override;
 		RenderPass* CreateRenderPass() override;
+
+		FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description) override;
 
 
 	};

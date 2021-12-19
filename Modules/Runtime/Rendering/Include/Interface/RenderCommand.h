@@ -26,7 +26,7 @@ namespace Ry
 	class VertexArray;
 	class RenderPass;
 	class SwapChain;
-	class Framebuffer;
+	class FrameBuffer;
 	class ResourceSet;
 
 	struct RENDERING_MODULE SetViewportSizeCmd
@@ -79,7 +79,7 @@ namespace Ry
 	struct RENDERING_MODULE BeginRenderPassCommand
 	{
 		Ry::RenderPass* RenderPass;
-		Framebuffer* SourceBuffer;
+		FrameBuffer* SourceBuffer;
 		bool bUseSecondary;
 	};
 
@@ -117,9 +117,12 @@ namespace Ry
 		}
 
 		// todo: don't force early bind here, do so when beginning render pass
-		CommandBuffer(Framebuffer* Fb):
+		CommandBuffer(SecondaryCommandBufferInfo Info = {}):
 		Marker(0)
 		{
+			this->Swap = nullptr;
+			this->SecondaryInfo = Info;
+			
 			bDirty = false;
 			bOneTimeUse = true;
 			bImmediate = false;
@@ -165,7 +168,7 @@ namespace Ry
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		
-		virtual void BeginRenderPass(Ry::RenderPass* RenderPass, Framebuffer* SourceBuffer, bool bUseSecondary)
+		virtual void BeginRenderPass(Ry::RenderPass* RenderPass, FrameBuffer* SourceBuffer, bool bUseSecondary)
 		{
 			BeginRenderPassCommand Cmd{ RenderPass, SourceBuffer, bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);

@@ -21,7 +21,7 @@ namespace Ry
 				ParentList(ParentList),
 				CurrentIndex(Index)
 			{
-
+				
 			}
 			
 			const T& operator*() const

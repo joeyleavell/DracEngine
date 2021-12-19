@@ -1,4 +1,4 @@
-<Ry::BorderWidget VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1" PaddingLeft="10.0" PaddingRight="10.0" PaddingBottom="10.0" PaddingTop="10.0">
+<Ry::BorderWidget BoxStyleName="ContentBrowserBackground" VerticalAlign="0" HorizontalAlign="0" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1" PaddingLeft="10.0" PaddingRight="10.0" PaddingBottom="10.0" PaddingTop="10.0">
     <Ry::VerticalPanel>
         
         <Slot bSizeToContent="1" HorizontalAlignMode="3">

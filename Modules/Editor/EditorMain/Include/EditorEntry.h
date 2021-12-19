@@ -61,8 +61,8 @@ namespace Ry
 			AssetMan->RegisterFactory("mesh/obj", new ObjMeshFactory);
 			AssetMan->RegisterFactory("font/truetype", new TrueTypeFontFactory);
 			AssetMan->RegisterFactory("sound", new AudioFactory);
-
 			AssetMan->RegisterFactory("image", TextureImporter);
+
 			AssetMan->RegisterFactory("png", TextureImporter);
 		}
 

@@ -484,12 +484,28 @@ namespace Ry
 		
 	}
 
-	Batch::Batch(Ry::SwapChain* Target):
-	bUsesOffscreenRendering(false)
+	Batch::Batch(Ry::SwapChain* Target)
 	{
 		this->Swap = Target;
 		this->ParentPass = Swap->GetDefaultRenderPass();		
-		
+		this->RenderTargetWidth = Target->GetSwapChainWidth();
+		this->RenderTargetHeight = Target->GetSwapChainHeight();
+
+		Init();		
+	}
+
+	Batch::Batch(RenderPass* RP, int32 RTWidth, int32 RTHeight)
+	{
+		this->Swap = nullptr;
+		this->ParentPass = RP;
+		this->RenderTargetWidth = RTWidth;
+		this->RenderTargetHeight = RTHeight;
+
+		Init();
+	}
+
+	void Batch::Init()
+	{
 		View = Ry::id4();
 		Projection = Ry::ortho4(0, (float)Ry::GetViewportWidth(), 0.0f, (float)Ry::GetViewportHeight(), -1.0f, 1.0f);
 
@@ -497,30 +513,6 @@ namespace Ry
 		AddPipeline("Shape", "Shape");
 		AddPipeline("Texture", "Texture");
 		AddPipeline("Font", "Font");
-
-	}
-
-	Batch::Batch(Ry::SwapChain* Target, int32 RenderTargetWidth, int32 RenderTargetHeight)
-	:Batch(Target)
-	{
-		this->bUsesOffscreenRendering = true;
-		this->RenderTargetWidth = RenderTargetWidth;
-		this->RenderTargetHeight = RenderTargetHeight;
-
-		// Create new render pass
-		
-		/*FrameBufferDescription DefDesc;
-		int32 DefColor = DefDesc.AddSwapChainColorAttachment(this);
-		int32 DefDepth = DefDesc.AddDepthAttachment();
-
-		RenderPass* DefaultRenderPass = new RenderPass;
-		DefaultRenderPass->SetFramebufferDescription(DefDesc);
-		
-		int32 MainPass = DefaultRenderPass->CreateSubpass();
-		DefaultRenderPass->AddSubpassAttachment(MainPass, DefColor);
-		DefaultRenderPass->AddSubpassAttachment(MainPass, DefDepth);
-		DefaultRenderPass->CreateRenderPass();*/
-
 	}
 
 	void Batch::AddPipeline(Ry::String Name, Ry::String Shader)
@@ -535,10 +527,10 @@ namespace Ry
 
 		// Create new pipeline
 		Ry::PipelineCreateInfo CreateInfo;
-		CreateInfo.ViewportWidth = Swap->GetSwapChainWidth();
-		CreateInfo.ViewportHeight = Swap->GetSwapChainHeight();
+		CreateInfo.ViewportWidth = RenderTargetWidth;
+		CreateInfo.ViewportHeight = RenderTargetHeight;
 		CreateInfo.PipelineShader = ShaderToUse;
-		CreateInfo.RenderPass = Swap->GetDefaultRenderPass();
+		CreateInfo.RenderPass = ParentPass;
 		CreateInfo.Depth.bEnableDepthTest = false; // Turn off depth test
 		CreateInfo.Blend.bEnabled = true; // Enable blending
 
@@ -962,30 +954,6 @@ namespace Ry
 		}
 	}
 
-	int32 Batch::GetRenderTargetWidth() const
-	{
-		if(bUsesOffscreenRendering)
-		{
-			return RenderTargetWidth;
-		}
-		else
-		{
-			return Swap->GetSwapChainWidth();
-		}
-	}
-
-	int32 Batch::GetRenderTargetHeight() const
-	{
-		if (bUsesOffscreenRendering)
-		{
-			return RenderTargetHeight;
-		}
-		else
-		{
-			return Swap->GetSwapChainHeight();
-		}
-	}
-
 	void Batch::CreateLayersIfNeeded(int32 Index)
 	{
 		// Create layers as needed
@@ -995,8 +963,16 @@ namespace Ry
 
 			// Init depth
 			NewLayer->Depth = Layers.GetSize();
-			NewLayer->CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Swap, ParentPass);
 			NewLayer->bNeedsRecord = true;
+
+			if(Swap)
+			{
+				NewLayer->CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Swap, ParentPass);
+			}
+			else
+			{
+				NewLayer->CommandBuffer = Ry::RendAPI->CreateCommandBuffer(ParentPass);
+			}
 
 			Layers.Add(NewLayer);
 			RecordCommands(Layers.GetSize() - 1);
@@ -1020,7 +996,7 @@ namespace Ry
 				// Bind pipeline
 				AtLayer->CommandBuffer->BindPipeline(Key->Pipeline);
 
-				AtLayer->CommandBuffer->SetViewportSize(0, 0, (int32) Swap->GetSwapChainWidth(), (int32)Swap->GetSwapChainHeight());
+				AtLayer->CommandBuffer->SetViewportSize(0, 0, RenderTargetWidth, RenderTargetHeight);
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
@@ -1033,15 +1009,15 @@ namespace Ry
 						float Ph = Scissor.Height / ((float) Ry::GetViewportHeight());
 
 						AtLayer->CommandBuffer->SetScissorSize(
-							Px * Swap->GetSwapChainWidth(), 
-							Py * Swap->GetSwapChainHeight(), 
-							Pw * Swap->GetSwapChainWidth(), 
-							Ph * Swap->GetSwapChainHeight()
+							Px * RenderTargetWidth, 
+							Py * RenderTargetHeight, 
+							Pw * RenderTargetWidth, 
+							Ph * RenderTargetHeight
 						);
 					}
 					else
 					{
-						AtLayer->CommandBuffer->SetScissorSize(0, 0, (int32)Swap->GetSwapChainWidth(), (int32)Swap->GetSwapChainHeight());
+						AtLayer->CommandBuffer->SetScissorSize(0, 0, RenderTargetWidth, RenderTargetHeight);
 					}
 
 					if (!Group->Items.IsEmpty() || !Group->ItemSets.IsEmpty())
@@ -1062,159 +1038,6 @@ namespace Ry
 
 		}
 		AtLayer->CommandBuffer->EndCmd();
-	}
-
-	TextBatch::TextBatch(Ry::SwapChain* Target, Shader* Shad)
-	{
-		//this->FontShader = Ry::RenderAPI->make_shader(VF1P1UV, TEXT_VERT, TEXT_FRAG);
-
-		//this->FontMesh = new Mesh(VF1P1UV, BufferHint::DYNAMIC);
-		//this->FontMesh->GetMeshData()->SetShaderAll(FontShader);
-
-		this->began = false;
-
-		this->Font = nullptr;
-		this->Color = Ry::Vector3(1.0f, 1.0f, 1.0f);
-
-		CreateResources(Target);
-
-		// Initialize pipeline
-		CreatePipeline(VF1P1UV1C, Target, Shad ? Shad : GetShader("Font"));
-
-		// Create command buffer
-		CommandBuffer = Ry::RendAPI->CreateCommandBuffer(Target);
-		
-	}
-
-	void TextBatch::Begin()
-	{
-		CHECK_ENDED()
-		this->began = true;
-	}
-
-	void TextBatch::RenderTextBodyWrapped(const Ry::Text& Text, float XPosition, float YPosition, float LineWidth)
-	{
-
-	}
-
-	void TextBatch::End()
-	{
-		CHECK_BEGAN()
-
-		Flush();
-
-		this->began = false;
-	}
-
-	void TextBatch::Flush()
-	{
-		if (FontMesh->GetMeshData()->GetVertexCount() > 0)
-		{
-
-			
-			// todo: change where viewport width and height are accessed at
-			//FontShader->uniform_int32("HalfScreenWidth", Ry::GetViewportWidth() / 2);
-			//FontShader->uniform_int32("HalfScreenHeight", Ry::GetViewportHeight() / 2);
-			//FontShader->uniform_vec3("FontColor", Color);
-
-			//Font->GetAtlasTexture()->Bind();
-			{
-				// Update the mesh data for the new frame
-				FontMesh->Update();
-
-				// Render the new frame
-				// todo: mesh doesn't render directly
-				//FontMesh->Render(Primitive::TRIANGLE);
-
-				CommandBuffer->Submit();
-				
-				// Clear the data for this frame in preparation for next frame
-				FontMesh->Reset();
-			}
-		}
-	}
-	
-	void TextBatch::SetFont(Ry::BitmapFont* Font)
-	{
-		if(this->Font != Font && this->Font != nullptr)
-		{
-			Flush();
-		}
-		
-		this->Font = Font;
-	}
-
-	void TextBatch::SetColor(const Ry::Vector3& Color)
-	{
-		this->Color = Color;
-	}
-
-	void TextBatch::CreateResources(SwapChain* Swap)
-	{
-		SceneResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 0);
-		SceneResDesc->AddConstantBuffer(0, "Scene", {
-			DeclPrimitive(Float4x4, "ViewProj")
-			});
-		SceneResDesc->CreateDescription();
-
-		TextureResDesc = Ry::RendAPI->CreateResourceSetDescription({ ShaderStage::Vertex }, 1);
-		TextureResDesc->AddTextureBinding(0, "FontTexture");
-		TextureResDesc->CreateDescription();
-
-		// Create actual resource set now
-		SceneRes = Ry::RendAPI->CreateResourceSet(SceneResDesc, Swap);
-		SceneRes->CreateBuffer();
-
-		// Create texture resources
-		TextureRes = Ry::RendAPI->CreateResourceSet(TextureResDesc, Swap);
-		TextureRes->CreateBuffer();
-
-		Resources[0] = SceneRes;
-		Resources[1] = TextureRes;
-	}
-
-	void TextBatch::CreatePipeline(const VertexFormat& Format, Ry::SwapChain* SwapChain, Ry::Shader* Shad)
-	{
-		// Create new pipeline
-		Ry::PipelineCreateInfo CreateInfo;
-		CreateInfo.ViewportWidth = SwapChain->GetSwapChainWidth();
-		CreateInfo.ViewportHeight = SwapChain->GetSwapChainHeight();
-		CreateInfo.PipelineShader = Shad;
-		CreateInfo.VertFormat = Format;
-		CreateInfo.RenderPass = SwapChain->GetDefaultRenderPass();
-
-		// Add resource description to pipeline
-		CreateInfo.ResourceDescriptions.Add(SceneResDesc);
-
-		Pipeline = Ry::RendAPI->CreatePipeline(CreateInfo);
-		Pipeline->CreatePipeline();
-	}
-
-	void TextBatch::RecordCommands()
-	{
-		CommandBuffer->Reset();
-
-		CommandBuffer->BeginCmd();
-		{
-			//CommandBuffer->BeginRenderPass();
-			{
-				CommandBuffer->SetViewportSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
-				CommandBuffer->SetScissorSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
-
-				// Bind pipeline
-				CommandBuffer->BindPipeline(Pipeline);
-
-				// Bind resources
-				CommandBuffer->BindResources(Resources, 2);
-
-				// Draw the mesh
-				CommandBuffer->DrawVertexArrayIndexed(FontMesh->GetVertexArray(), FontMesh->GetMeshData()->Sections.Get(0).StartIndex, FontMesh->GetMeshData()->Sections.Get(0).Count);
-
-			}
-			//CommandBuffer->EndRenderPass();
-
-		}
-		CommandBuffer->EndCmd();
 	}
 	
 }

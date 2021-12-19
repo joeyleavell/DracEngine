@@ -481,7 +481,7 @@ namespace Ry
 		int32 MainPass = DefaultRenderPass->CreateSubpass();
 		DefaultRenderPass->AddSubpassAttachment(MainPass, DefColor);
 		DefaultRenderPass->AddSubpassAttachment(MainPass, DefDepth);
-		DefaultRenderPass->CreateRenderPass();		
+		DefaultRenderPass->CreateRenderPass();
 	}
 
 	RenderPass* VulkanSwapChain::GetDefaultRenderPass()
@@ -679,7 +679,8 @@ namespace Ry
 		// Create a framebuffer for each image view
 		for (size_t i = 0; i < SwapChainImageViews.GetSize(); i++)
 		{
-			VulkanFrameBuffer* NewFBO = new VulkanFrameBuffer(SwapChainExtent.width, SwapChainExtent.height);
+			// TODO: use new framebuffer attachment spec system
+			VulkanFrameBuffer* NewFBO = new VulkanFrameBuffer(SwapChainExtent.width, SwapChainExtent.height, nullptr);
 			NewFBO->AddAttachment(SwapChainImageViews[i]);
 			NewFBO->AddAttachment(DepthImageView);
 			NewFBO->CreateFrameBuffer(DefaultRenderPass->GetRenderPass());

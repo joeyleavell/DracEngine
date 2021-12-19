@@ -13,7 +13,7 @@ namespace Ry
 
 	public:
 
-		GLFrameBuffer(int32 Width, int32 Height, int32 Samples);
+		GLFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc);
 		virtual ~GLFrameBuffer() = default;
 
 		void DeleteFramebuffer() override;

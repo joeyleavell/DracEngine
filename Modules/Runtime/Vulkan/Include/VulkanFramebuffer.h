@@ -11,7 +11,7 @@ namespace Ry
 	{
 	public:
 
-		VulkanFrameBuffer(int32 Width, int32 Height);
+		VulkanFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc);
 		virtual ~VulkanFrameBuffer() = default;
 
 		void DeleteFramebuffer() override;
