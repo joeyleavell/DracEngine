@@ -78,9 +78,9 @@ namespace Ry
 		return new VulkanRenderPass;
 	}
 
-	FrameBuffer* VulkanRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description)
+	FrameBuffer* VulkanRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription& Description)
 	{
-		return new VulkanFrameBuffer(Width, Height, &Description);
+		return new VulkanFrameBuffer(Width, Height, RenderPass, &Description);
 	}
 
 	bool InitVulkanAPI()

@@ -13,31 +13,16 @@ namespace Ry
 
 	public:
 
-		GLFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc);
+		GLFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription* Desc);
 		virtual ~GLFrameBuffer() = default;
-
 		void DeleteFramebuffer() override;
+		void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) override;
 
-		// todo: figure out how to expose these operations in a generic manner
-		/************************************************************************/
-		/* Interface functions                                                  */
-		/************************************************************************/
-		// void Bind() override;
-		// void ClearAll(float Red, float Green, float Blue, float Alpha) override;
-		// Texture* CreateColorTexture() override;
-		// Texture* CreateDepthTexture() override;
-		// Texture* CreateStencilTexture() override;
-		// void SetColorAttachment(Texture* Texture, int32 AttachPoint) override;
-		// void SetDepthAttachment(Texture* Texture) override;
-		// void SetStencilAttachment(Texture* Texture) override;
-		// void BlitFramebuffer(const FrameBuffer* Dst, bool Color, bool Depth, bool Stencil, int32 ReadColorIndex, int32 WriteColorIndex) override;
-		// void ResizeBuffer(int32 IntendedWidth, int32 IntendedHeight) override;
-		
-		uint32 GetHandle()
-		{
-			return Handle;
-		}
-		
+		uint32 GetHandle();
+		GLuint GetColorAttachmentTexture(int32 AttachmentIndex) const;
+		bool HasDepthStencilAttachment() const;
+		GLuint GetDepthStencilAttachment() const;
+
 	private:
 		uint32 Handle;
 
@@ -46,10 +31,5 @@ namespace Ry
 		GLuint DepthStencilAttachment;
 		bool bHasDepthStencilAttachment = false;
 
-		//GLenum GLColorAttachments[MAX_COLOR_ATTACHMENTS];
-
-		// GLenum ColorIndexToGLColorAttachment(int32 ColorIndex);
-		// void CheckFramebufferStatus();
-		
 	};
 }

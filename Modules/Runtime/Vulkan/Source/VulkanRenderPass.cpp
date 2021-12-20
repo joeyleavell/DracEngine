@@ -154,7 +154,7 @@ namespace Ry
 		return bSuccess;
 	}
 
-	VkRenderPass VulkanRenderPass::GetRenderPass()
+	VkRenderPass VulkanRenderPass::GetRenderPass() const
 	{
 		return RenderPass;
 	}

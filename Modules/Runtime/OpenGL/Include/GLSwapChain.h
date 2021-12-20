@@ -20,6 +20,7 @@ namespace Ry
 		int32 GetSwapChainHeight() const override;
 
 		RenderPass* GetDefaultRenderPass() override;
+		FrameBuffer* GetDefaultFrameBuffer() override;
 
 	private:
 

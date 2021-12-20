@@ -39,7 +39,7 @@ namespace Ry
 		Texture* CreateTexture(TextureFiltering Filter);
 		RenderPass* CreateRenderPass() override;
 
-		FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description) override;
+		FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription& Description) override;
 
 	private:
 

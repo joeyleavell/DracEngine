@@ -81,4 +81,9 @@ namespace Ry
 		return nullptr;
 	}
 
+	FrameBuffer* GLSwapChain2::GetDefaultFrameBuffer()
+	{
+		return nullptr;
+	}
+
 }

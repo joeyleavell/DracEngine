@@ -12,11 +12,10 @@ namespace Ry
 	{
 	public:
 
-		VkRenderPass GetRenderPass();
+		VkRenderPass GetRenderPass() const;
 
 		bool CreateRenderPass() override;
 		void DeleteRenderPass() override;
-
 
 	private:
 

@@ -14,6 +14,7 @@ namespace Ry
 
 	class SwapChain;
 	class Texture;
+	class FrameBuffer;
 
 	class BufferMember
 	{

@@ -3,8 +3,8 @@
 
 namespace Ry
 {
-	GLFrameBuffer::GLFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription* Desc):
-	FrameBuffer(Width, Height, Desc)
+	GLFrameBuffer::GLFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription* Desc):
+	FrameBuffer(Width, Height, RenderPass, Desc)
 	{
 		// Generate GL framebuffer handle
 		glGenFramebuffers(1, &Handle);
@@ -88,6 +88,31 @@ namespace Ry
 	{
 		// Free framebuffer resource
 		glDeleteFramebuffers(1, &Handle);
+	}
+
+	void GLFrameBuffer::Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass)
+	{
+		// TODO: resize framebuffer
+	}
+
+	uint32 GLFrameBuffer::GetHandle()
+	{
+		return Handle;
+	}
+
+	GLuint GLFrameBuffer::GetColorAttachmentTexture(int32 AttachmentIndex) const
+	{
+		return ColorAttachments[AttachmentIndex];
+	}
+
+	bool GLFrameBuffer::HasDepthStencilAttachment() const
+	{
+		return bHasDepthStencilAttachment;
+	}
+
+	GLuint GLFrameBuffer::GetDepthStencilAttachment() const
+	{
+		return DepthStencilAttachment;
 	}
 
 	// void GLFrameBuffer::Bind()

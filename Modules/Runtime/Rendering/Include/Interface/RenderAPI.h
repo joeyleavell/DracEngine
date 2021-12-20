@@ -41,7 +41,7 @@ namespace Ry
 		virtual Texture* CreateTexture(TextureFiltering Filter) = 0;
 		virtual RenderPass* CreateRenderPass() = 0;
 
-		virtual FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description) = 0;
+		virtual FrameBuffer* CreateFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription& Description) = 0;
 
 		virtual Pipeline* CreatePipelineFromShader(const PipelineCreateInfo& CreateInfo, Shader* Src);
 

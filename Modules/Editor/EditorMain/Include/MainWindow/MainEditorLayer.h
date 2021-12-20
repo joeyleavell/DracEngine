@@ -87,8 +87,10 @@ namespace Ry
 		Ry::Batch* Bat;
 		Ry::Batch* OffScreen;
 
-		RenderPass* OffScreenPass;
+	//	RenderPass* OffScreenPass;
 		FrameBuffer* OffScreenFbo;
+
+		RenderPass* MainPass;
 
 		Ry::CommandBuffer* OffScreenCmd;
 

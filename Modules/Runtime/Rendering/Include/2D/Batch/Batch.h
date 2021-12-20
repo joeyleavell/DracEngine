@@ -296,8 +296,12 @@ namespace Ry
 		// Used in cases of off-screen rendering
 		Batch(RenderPass* RP, int32 RenderTargetWidth, int32 RenderTargetHeight);
 
-		// Used when rendering directly to screen
-		Batch(Ry::SwapChain* Target);
+		/**
+		 * This constructor is used when specifying a batch that is dependent on the swap chain.
+		 *
+		 * If the specified render pass is null, the default swap chain pass will be used.
+		 */
+		Batch(Ry::SwapChain* Target, Ry::RenderPass* Pass = nullptr);
 
 		void AddPipeline(Ry::String Name, Ry::String Shader);
 

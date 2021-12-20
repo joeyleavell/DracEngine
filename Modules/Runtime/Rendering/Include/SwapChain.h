@@ -9,6 +9,7 @@ namespace Ry
 {
 
 	class RenderPass;
+	class FrameBuffer;
 	class CommandBuffer;
 
 	class RENDERING_MODULE SwapChain
@@ -29,6 +30,7 @@ namespace Ry
 		virtual int32 GetSwapChainHeight() const = 0;
 
 		virtual RenderPass* GetDefaultRenderPass() = 0;
+		virtual FrameBuffer* GetDefaultFrameBuffer() = 0;
 		
 	};
 	

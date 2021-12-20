@@ -73,9 +73,9 @@ namespace Ry
 		return new GLRenderPass;
 	}
 
-	FrameBuffer* GLRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const FrameBufferDescription& Description)
+	FrameBuffer* GLRenderAPI::CreateFrameBuffer(int32 Width, int32 Height, const RenderPass* RenderPass, const FrameBufferDescription& Description)
 	{
-		return new GLFrameBuffer(Width, Height, &Description);
+		return new GLFrameBuffer(Width, Height, RenderPass, &Description);
 	}
 
 	bool InitOGLRendering()

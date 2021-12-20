@@ -1,4 +1,6 @@
 #include "GLResources.h"
+
+#include "GLFrameBuffer.h"
 #include "Core/Globals.h"
 #include "GLTexture.h"
 
@@ -257,14 +259,37 @@ namespace Ry
 
 	void GLResources::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
 	{
+		if (const GLFrameBuffer* GLFbo = dynamic_cast<const GLFrameBuffer*>(InputBuffer))
+		{
+			GLuint AttachmentHandle = GLFbo->GetColorAttachmentTexture(AttachmentIndex);
+
+			// TODO: Can a framebuffer color attachment be anything other than a GL_TEXTURE_2D?
+			BindTexture(TextureName, AttachmentHandle, GL_TEXTURE_2D);
+		}
+		else
+		{
+			Ry::Log->LogError("GLResources::BindFrameBufferAttachment: Passed in non-Gl framebuffer!");
+		}
 
 	}
 
 	void GLResources::BindTexture(Ry::String TextureName, const Ry::Texture* Resource)
 	{
+		if(const GLTexture* GLTex = dynamic_cast<const GLTexture*>(Resource))
+		{
+			BindTexture(TextureName, GLTex->GetHandle(), GLTex->GetTarget());
+		}
+		else
+		{
+			Ry::Log->LogError("GLResources::BindTexture: Passed in non-Gl texture!");
+		}
+	}
+
+	void GLResources::BindTexture(Ry::String TextureName, GLuint Handle, GLuint Target)
+	{
 		MappedTexture* NewMappedTexture = nullptr;
 
-		if(MappedTextures.contains(TextureName))
+		if (MappedTextures.contains(TextureName))
 		{
 			NewMappedTexture = *MappedTextures.get(TextureName);
 		}
@@ -277,14 +302,11 @@ namespace Ry
 			Textures++;
 		}
 
-		if(NewMappedTexture)
+		if (NewMappedTexture)
 		{
-			const GLTexture* GLTex = dynamic_cast<const GLTexture*>(Resource);
-			
-			NewMappedTexture->Texture = GLTex->GetHandle();
-			NewMappedTexture->Target = GLTex->GetTarget();
+			NewMappedTexture->Texture = Handle;
+			NewMappedTexture->Target = Target;
 		}
-
 	}
 
 	void GLResources::SetConstant(Ry::String BufferName, Ry::String Id, const void* Data)

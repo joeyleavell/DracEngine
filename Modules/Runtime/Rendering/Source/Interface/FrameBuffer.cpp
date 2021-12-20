@@ -3,7 +3,7 @@
 namespace Ry
 {
 	
-	FrameBuffer::FrameBuffer(uint32 Width, uint32 Height, const FrameBufferDescription* FbDesc):
+	FrameBuffer::FrameBuffer(uint32 Width, uint32 Height, const RenderPass* RenderPass, const FrameBufferDescription* FbDesc):
 	IntendedWidth(Width), IntendedHeight(Height)
 	{
 		// Null out the default texture attachments
@@ -16,6 +16,11 @@ namespace Ry
 		StencilAttachment = nullptr;
 
 		this->ColorAttachmentCount = 0;
+
+		if(FbDesc)
+		{
+			Description = *FbDesc;
+		}
 	};
 	
 }

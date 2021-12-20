@@ -234,7 +234,7 @@ namespace Ry
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
 		// Create as many command buffers as there are frame buffer images
-		for (uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+		for (uint32 Fb = 0; Fb < VkSC->SwapChainImageViews.GetSize(); Fb++)
 		{
 			VkCommandBuffer NewCmdBuffer;
 			if (!CreateCmdBufferResource(NewCmdBuffer))
@@ -257,7 +257,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary)
+	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VkFramebuffer Resource, VkExtent2D BufferExtent, Ry::RenderPass* RenderPass, bool bUseSecondary)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -270,9 +270,9 @@ namespace Ry
 		VkRenderPassBeginInfo RenderPassInfo{};
 		RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		RenderPassInfo.renderPass = VkRenderPass->GetRenderPass();
-		RenderPassInfo.framebuffer = Target->GetResource();
+		RenderPassInfo.framebuffer = Resource;
 		RenderPassInfo.renderArea.offset = { 0, 0 };
-		RenderPassInfo.renderArea.extent = Target->GetFrameBufferExtent();
+		RenderPassInfo.renderArea.extent = BufferExtent;
 
 		Ry::ArrayList<VkClearValue> ClearValues(2);
 		ClearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f }};
@@ -415,7 +415,7 @@ namespace Ry
 
 	}
 
-	void VulkanCommandBuffer2::ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, VulkanFrameBuffer* Target, uint8* Data, uint32& Marker)
+	void VulkanCommandBuffer2::ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, uint8* Data, uint32& Marker)
 	{
 		uint8 NextOpCode = Data[Marker];
 
@@ -424,7 +424,15 @@ namespace Ry
 		if (NextOpCode == OP_BEGIN_RENDER_PASS)
 		{
 			BeginRenderPassCommand* BeginCmd = ExtractToken<BeginRenderPassCommand>(Marker, Data);
-			RecordBeginRenderPass(CurrentCmdBuffer, Target, BeginCmd->RenderPass, BeginCmd->bUseSecondary);
+			if(VulkanFrameBuffer* SourceBuffer = dynamic_cast<VulkanFrameBuffer*>(BeginCmd->SourceBuffer))
+			{
+				RecordBeginRenderPass(CurrentCmdBuffer, SourceBuffer->GetFrameBufferForFrame(CmdBufferIndex), SourceBuffer->GetFrameBufferExtent(), BeginCmd->RenderPass, BeginCmd->bUseSecondary);
+			}
+			else
+			{
+				Ry::Log->LogError("VulkanCommandBuffer2::ParseOp: Specified non vulkan frame buffer for begin render pass");
+			}
+
 		}
 
 		if (NextOpCode == OP_END_RENDER_PASS)
@@ -510,14 +518,13 @@ namespace Ry
 
 		// Re-record all children buffers 
 
-		for (uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+		for (uint32 Fb = 0; Fb < VkSC->SwapChainImageViews.GetSize(); Fb++)
 		{
 			RecordForIndex(Fb);
 		}
 
 		SwapChainVersion = VkSC->GetSwapchainVersion();
 	}
-
 
 	void VulkanCommandBuffer2::Submit()
 	{		
@@ -582,7 +589,7 @@ namespace Ry
 				// Record all buffers, have to perform device wait to ensure no operations
 				vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
-				for(uint32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+				for(uint32 Fb = 0; Fb < VkSC->SwapChainImageViews.GetSize(); Fb++)
 				{
 					BuffersToRecord.Add(Fb);
 				}
@@ -594,7 +601,7 @@ namespace Ry
 				BuffersToRecord.Add(CurrentImageIndex);
 
 				// Dirty the images that are not the current one
-				for (int32 Fb = 0; Fb < VkSC->SwapChainFramebuffers.GetSize(); Fb++)
+				for (int32 Fb = 0; Fb < VkSC->SwapChainImageViews.GetSize(); Fb++)
 				{
 					if(Fb != CurrentImageIndex && !DirtyImages.Contains(Fb)) // todo: this should be an efficient set
 					{
@@ -690,7 +697,6 @@ namespace Ry
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
 		VkCommandBuffer BufferToRecord = GeneratedBuffers[Index];
-		VulkanFrameBuffer* Framebuffer = VkSC->SwapChainFramebuffers[Index];
 
 		VkBeginCmd(BufferToRecord);
 		{
@@ -700,7 +706,7 @@ namespace Ry
 			while (ReadBack < Marker)
 			{
 				// Parse op will directly change marker val
-				ParseOp(BufferToRecord, Index, Framebuffer, CmdBuffer, ReadBack);
+				ParseOp(BufferToRecord, Index, CmdBuffer, ReadBack);
 			}
 		}
 		VkEndCmd(BufferToRecord);

@@ -22,10 +22,11 @@ namespace Ry
 	public:
 
 		// todo: this should eventually not be a pointer, currently is to allow vulkan to bypass creation
-		FrameBuffer(uint32 Width, uint32 Height, const FrameBufferDescription* Desc = nullptr);
+		FrameBuffer(uint32 Width, uint32 Height, const RenderPass* RenderPass, const FrameBufferDescription* Desc = nullptr);
 		virtual ~FrameBuffer() = default;
 
 		virtual void DeleteFramebuffer() = 0;
+		virtual void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) = 0;
 
 		/// BEGIN INTERFACE
 		//virtual void Bind() = 0;
@@ -148,6 +149,8 @@ namespace Ry
 		Texture* DepthAttachment;
 		Texture* StencilAttachment;
 		int32 ColorAttachmentCount;
+
+		FrameBufferDescription Description;
 	};
 	
 }

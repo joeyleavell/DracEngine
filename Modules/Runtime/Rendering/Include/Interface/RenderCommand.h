@@ -164,7 +164,7 @@ namespace Ry
 				return;
 			}
 			
-			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), nullptr, bUseSecondary};
+			BeginRenderPassCommand Cmd{ Swap->GetDefaultRenderPass(), Swap->GetDefaultFrameBuffer(), bUseSecondary};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_BEGIN_RENDER_PASS);
 		}
 		

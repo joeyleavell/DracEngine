@@ -484,12 +484,20 @@ namespace Ry
 		
 	}
 
-	Batch::Batch(Ry::SwapChain* Target)
+	Batch::Batch(Ry::SwapChain* Target, Ry::RenderPass* Pass)
 	{
 		this->Swap = Target;
-		this->ParentPass = Swap->GetDefaultRenderPass();		
 		this->RenderTargetWidth = Target->GetSwapChainWidth();
 		this->RenderTargetHeight = Target->GetSwapChainHeight();
+
+		if(Pass)
+		{
+			this->ParentPass = Pass;
+		}
+		else
+		{
+			this->ParentPass = Swap->GetDefaultRenderPass();
+		}
 
 		Init();		
 	}
@@ -647,6 +655,9 @@ namespace Ry
 
 	void Batch::Resize(int32 Width, int32 Height)
 	{
+		this->RenderTargetWidth = Width;
+		this->RenderTargetHeight = Height;
+
 		Projection = Ry::ortho4(0.0f, (float) Width, (float)0.0f, (float) Height, -1.0f, 1.0f);
 
 		// Mark all layers as needing recording

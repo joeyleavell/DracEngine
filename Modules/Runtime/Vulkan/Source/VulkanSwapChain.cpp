@@ -19,6 +19,13 @@ namespace Ry
 
 		// Keeps track of how many times the swap chain has changed
 		this->SwapChainVersion = 0;
+
+		this->Framebuffer = nullptr;
+
+		// Create the default framebuffer description
+		DefaultColorAttachment = DefaultFramebufferDesc.AddSwapChainColorAttachment(this);
+		DefaultDepthAttachment = DefaultFramebufferDesc.AddSwapChainDepthAttachment(this);
+
 	}
 
 	void VulkanSwapChain::BeginFrame(::GLFWwindow* Window, bool bWindowDirty)
@@ -48,6 +55,7 @@ namespace Ry
 		bInFrame = true;
 
 		// If this frame is in use, wait on its fence so that we don't submit to this image until the previous one is complete
+		// todo: is this correct?
 		if (ImagesInFlight[AcquiredImageIndex] != VK_NULL_HANDLE)
 		{
 			vkWaitForFences(GVulkanContext->GetLogicalDevice(), 1, &ImagesInFlight[AcquiredImageIndex], VK_TRUE, UINT64_MAX);
@@ -109,7 +117,7 @@ namespace Ry
 
 		DeleteImageViews();
 
-		DeleteFramebuffers();
+		//DeleteFramebuffers();
 
 		DeleteRenderPass();
 
@@ -191,17 +199,6 @@ namespace Ry
 	{
 		DefaultRenderPass->DeleteRenderPass();
 		delete DefaultRenderPass;
-	}
-
-	void VulkanSwapChain::DeleteFramebuffers()
-	{
-		for(int32 Fb = 0; Fb < SwapChainFramebuffers.GetSize(); Fb++)
-		{
-			SwapChainFramebuffers[Fb]->DeleteFramebuffer();
-			delete SwapChainFramebuffers[Fb];
-		}
-
-		SwapChainFramebuffers.Clear();
 	}
 
 	void VulkanSwapChain::DeleteDescriptorPool()
@@ -472,21 +469,23 @@ namespace Ry
 
 	void VulkanSwapChain::CreateDefaultRenderpass()
 	{
-		FrameBufferDescription DefDesc;
-		int32 DefColor = DefDesc.AddSwapChainColorAttachment(this);
-		int32 DefDepth = DefDesc.AddDepthAttachment();
 		DefaultRenderPass = new VulkanRenderPass;
-		DefaultRenderPass->SetFramebufferDescription(DefDesc);
+		DefaultRenderPass->SetFramebufferDescription(DefaultFramebufferDesc);
 		
 		int32 MainPass = DefaultRenderPass->CreateSubpass();
-		DefaultRenderPass->AddSubpassAttachment(MainPass, DefColor);
-		DefaultRenderPass->AddSubpassAttachment(MainPass, DefDepth);
+		DefaultRenderPass->AddSubpassAttachment(MainPass, DefaultColorAttachment);
+		DefaultRenderPass->AddSubpassAttachment(MainPass, DefaultDepthAttachment);
 		DefaultRenderPass->CreateRenderPass();
 	}
 
 	RenderPass* VulkanSwapChain::GetDefaultRenderPass()
 	{
 		return DefaultRenderPass;
+	}
+
+	FrameBuffer* VulkanSwapChain::GetDefaultFrameBuffer()
+	{
+		return Framebuffer;
 	}
 
 	int32 VulkanSwapChain::GetSwapchainVersion()
@@ -516,7 +515,7 @@ namespace Ry
 		{
 			DeleteDepthResources();
 			DeleteImageViews();
-			DeleteFramebuffers();
+			//DeleteFramebuffers();
 			DeleteRenderPass();
 			vkDestroySwapchainKHR(GVulkanContext->GetLogicalDevice(), SwapChain, nullptr);
 		}
@@ -558,7 +557,6 @@ namespace Ry
 
 		SwapChainImageFormat = SurfaceFormat.format;
 		SwapChainExtent = Extent;
-
 
 		// Zero means there is no maximum
 		if (SwapChainSupport.Capabilities.maxImageCount > 0 && ImageCount > SwapChainSupport.Capabilities.maxImageCount)
@@ -674,10 +672,19 @@ namespace Ry
 
 	bool VulkanSwapChain::CreateFramebuffers()
 	{
+		if(!Framebuffer)
+		{
+			Framebuffer = new VulkanFrameBuffer(SwapChainExtent.width, SwapChainExtent.height, DefaultRenderPass, &DefaultFramebufferDesc);
+		}
+		else
+		{
+			Framebuffer->Recreate(SwapChainExtent.width, SwapChainExtent.height, DefaultRenderPass);
+		}
+
 		//SwapChainFramebuffers.resize(SwapChainImages.size());
 
 		// Create a framebuffer for each image view
-		for (size_t i = 0; i < SwapChainImageViews.GetSize(); i++)
+		/*for (size_t i = 0; i < SwapChainImageViews.GetSize(); i++)
 		{
 			// TODO: use new framebuffer attachment spec system
 			VulkanFrameBuffer* NewFBO = new VulkanFrameBuffer(SwapChainExtent.width, SwapChainExtent.height, nullptr);
@@ -704,7 +711,7 @@ namespace Ry
 			// 	Ry::Log->LogError("Failed to create Vulkan framebuffer");
 			// 	return false;
 			// }
-		}
+		}*/
 
 		return true;
 	}

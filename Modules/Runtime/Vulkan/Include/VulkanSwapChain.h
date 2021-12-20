@@ -5,6 +5,7 @@
 #include "vulkan/vulkan.h"
 #include <vector>
 #include "SwapChain.h"
+#include "Interface/RenderPass.h"
 #include "VulkanGen.h"
 
 struct GLFWwindow;
@@ -45,6 +46,11 @@ namespace Ry
 	{
 	public:
 
+		// Data pertaining to the default framebuffer description
+		FrameBufferDescription DefaultFramebufferDesc;
+		int32 DefaultColorAttachment;
+		int32 DefaultDepthAttachment;
+
 		VkSwapchainKHR SwapChain; // The swap chain that we created
 		Ry::ArrayList<VkImage> SwapChainImages; // The swap chain images we retrieved
 		VkFormat SwapChainImageFormat;
@@ -56,7 +62,8 @@ namespace Ry
 		VkDeviceMemory DepthImageMemory;
 		VkImageView DepthImageView;
 
-		Ry::ArrayList<VulkanFrameBuffer*> SwapChainFramebuffers;
+		VulkanFrameBuffer* Framebuffer;
+		//Ry::ArrayList<VulkanFrameBuffer*> SwapChainFramebuffers;
 
 		VulkanSwapChain();
 
@@ -69,6 +76,7 @@ namespace Ry
 		int32 GetSwapChainWidth() const override;
 		int32 GetSwapChainHeight() const override;
 		RenderPass* GetDefaultRenderPass() override;
+		FrameBuffer* GetDefaultFrameBuffer() override;
 
 		int32 GetSwapchainVersion();
 		void SubmitBuffer(const VkCommandBuffer& BufferToSubmit);
@@ -93,7 +101,6 @@ namespace Ry
 
 		void DeleteImageViews();
 		void DeleteRenderPass();
-		void DeleteFramebuffers();
 		void DeleteDescriptorPool();
 		void DeleteFramesInFlight();
 		void DeleteSurface();

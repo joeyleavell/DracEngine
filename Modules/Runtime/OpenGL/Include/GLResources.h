@@ -86,6 +86,8 @@ namespace Ry
 
 	private:
 
+		void BindTexture(Ry::String TextureName, GLuint Handle, GLuint Target);
+
 		void MapData(MappedUniformBuffer* Dst, const ConstantBuffer* Src);
 		void MapData_Helper(MappedUniformBuffer* Dst, const BufferMember* Member, Ry::String ParentId, int32& Marker);
 

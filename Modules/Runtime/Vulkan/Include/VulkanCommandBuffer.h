@@ -42,7 +42,7 @@ namespace Ry
 
 		virtual ~VulkanCommandBuffer2();
 
-		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VulkanFrameBuffer* Target, Ry::RenderPass* RenderPass, bool bUseSecondary);
+		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VkFramebuffer Resource, VkExtent2D BufferExtent, Ry::RenderPass* RenderPass, bool bUseSecondary);
 		void RecordEndRenderPass(VkCommandBuffer CmdBuffer);
 		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline);
 		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight);
@@ -52,8 +52,7 @@ namespace Ry
 		void RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstIndex, uint32 Count);
 		void RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer2* Secondary);
 
-
-		void ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, VulkanFrameBuffer* Target, uint8* Data, uint32& Marker);
+		void ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, uint8* Data, uint32& Marker);
 
 		bool CheckDirty() override;
 		void Submit() override;
