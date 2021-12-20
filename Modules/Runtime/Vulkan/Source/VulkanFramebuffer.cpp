@@ -125,6 +125,80 @@ namespace Ry
 		this->IntendedWidth = Width;
 		this->IntendedHeight = Height;
 
+		// Create non swap based attachments up here
+		for (int32 AttachDescIndex = 0; AttachDescIndex < Description.Attachments.GetSize(); AttachDescIndex++)
+		{
+			AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
+
+			VkImage ResultImage;
+			VkImageView ResultImageView;
+			VkDeviceMemory ResultMemory;
+
+			VkFormat ImageFormat;
+			VkImageUsageFlags UsageFlags;
+			VkImageAspectFlags AspectFlags;
+
+			if(Desc.Format == AttachmentFormat::Color)
+			{
+				ImageFormat = VK_FORMAT_R8G8B8A8_SRGB;
+
+				// Color attachment, and sampling in case attachment is used as input
+				UsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+
+				AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+			}
+			else
+			{
+				// Format for both depth and stencil buffer
+				ImageFormat = VK_FORMAT_D24_UNORM_S8_UINT;
+
+				// Color attachment, and sampling in case attachment is used as input
+				UsageFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+
+				// This is used as both a depth and stencil buffer
+				AspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			}
+
+			if (!CreateImage(
+				GetIntendedWidth(),
+				GetIntendedHeight(),
+				ImageFormat,
+				VK_IMAGE_TILING_OPTIMAL,
+				UsageFlags, 
+				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				ResultImage,
+				ResultMemory
+			))
+			{
+				Ry::Log->LogError("Failed to create a color image");
+			}
+
+			if (!CreateImageView(
+				ResultImageView,
+				ResultImage,
+				ImageFormat,
+				AspectFlags
+			))
+			{
+				Ry::Log->LogError("Failed to create an image view for the depth image");
+			}
+
+			if (Desc.Format == AttachmentFormat::Color)
+			{
+				CreatedColorDeviceMemory.Insert(AttachDescIndex, ResultMemory);
+				CreatedColorImageViews.Insert(AttachDescIndex, ResultImageView);
+				CreateColorImages.Insert(AttachDescIndex, ResultImage);
+			}
+			else
+			{
+				// There can only be a single depth/stencil attachment
+				CreatedDepthDeviceMemory = ResultMemory;
+				CreatedDepthImageView = ResultImageView;
+				CreatedDepthImage = ResultImage;
+			}
+
+		}
+
 		if(ReferencingSwapChain)
 		{
 			// Resize frame-buffers to correct amount
@@ -137,8 +211,10 @@ namespace Ry
 				bool bUseDepthStencil = false;
 				bool bUseSwapDeptchStencil = false;
 
-				for (const AttachmentDescription& Desc : Description.Attachments)
+				for (int32 AttachDescIndex = 0; AttachDescIndex < Description.Attachments.GetSize(); AttachDescIndex++)
 				{
+					const AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
+
 					if(Desc.Format == AttachmentFormat::Color)
 					{
 						if(Desc.ReferencingSwapChain)
@@ -147,10 +223,10 @@ namespace Ry
 							VkImageView& SwapChainImageView = ReferencingSwapChain->SwapChainImageViews[ImageIndex];
 							Attachments.Add(SwapChainImageView);
 						}
-						else
+						else if(CreatedColorImageViews.Contains(AttachDescIndex))
 						{
-							// Create new device memory, image, and image view for this attachment
-							Ry::Log->LogError("Needs implementing");
+							VkImageView& CreatedImageView = CreatedColorImageViews.Get(AttachDescIndex);
+							Attachments.Add(CreatedImageView);
 						}
 					}
 					else if(Desc.Format == AttachmentFormat::Depth || Desc.Format == AttachmentFormat::Stencil)
@@ -173,8 +249,8 @@ namespace Ry
 					}
 					else
 					{
-						// Create new device memory, image, and image view for this attachment
-						Ry::Log->LogError("Needs implementing");
+						// Add the created depth image view
+						Attachments.Add(CreatedDepthImageView);
 					}
 				}
 

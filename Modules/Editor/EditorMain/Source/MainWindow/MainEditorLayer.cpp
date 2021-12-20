@@ -70,20 +70,23 @@ namespace Ry
 		int32 Color1 = PassDesc.AddColorAttachment(); // Extra color attachment
 
 		// Create main pass
+
 		MainPass = Ry::RendAPI->CreateRenderPass();
+		MainPass->SetFramebufferDescription(PassDesc);
 
 		int32 OffScreenPass = MainPass->CreateSubpass();
-		MainPass->AddSubpassAttachment(OffScreenPass, Color1);
+		MainPass->AddSubpassAttachment(OffScreenPass, SwapColor);
+		MainPass->AddSubpassAttachment(OffScreenPass, SwapDepth);
 
-		int32 OnScreenPass = MainPass->CreateSubpass();
-		MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
-		MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
+		MainPass->CreateRenderPass();
 
-		MainPass->CreateSubpass();
+//		int32 OnScreenPass = MainPass->CreateSubpass();
+//		MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
+//		MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
 
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
-		Bat = new Batch(ParentSC);
+		Bat = new Batch(ParentSC, MainPass);
 
 		// Off screen rendering batch
 		FrameBufferDescription OffScreenDesc;
@@ -234,11 +237,11 @@ namespace Ry
 	{
 		Bat->Render();
 
-		//RecordCmds();
+		RecordCmds();
 
-		//Cmd->Submit();
+		Cmd->Submit();
 
-		TestWorld->Draw();
+		//TestWorld->Draw();
 	}
 
 	bool MainEditorLayer::OnEvent(const Event& Ev)

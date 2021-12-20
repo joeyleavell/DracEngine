@@ -29,6 +29,14 @@ namespace Ry
 
 	private:
 
+		Ry::OAHashMap<uint32, VkImageView> CreatedColorImageViews;
+		Ry::OAHashMap<uint32, VkDeviceMemory> CreatedColorDeviceMemory;
+		Ry::OAHashMap<uint32, VkImage> CreateColorImages;
+
+		VkDeviceMemory CreatedDepthDeviceMemory;
+		VkImageView CreatedDepthImageView;
+		VkImage CreatedDepthImage;
+
 		VulkanSwapChain* ReferencingSwapChain;
 
 		void CreateFramebuffers(int32 Width, int32 Height, const VulkanRenderPass* VkRP);

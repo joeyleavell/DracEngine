@@ -116,6 +116,7 @@ namespace Ry
 			VkPipelineStageFlags SourceStage;
 			VkPipelineStageFlags DestinationStage;
 
+			// TODO: There's probably a better way to organize this, maybe just specify it all up front
 			if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
 			{
 				Barrier.srcAccessMask = 0;

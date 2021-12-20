@@ -50,15 +50,22 @@ namespace Ry
 				}
 				else
 				{
-					// todo: figure out what to make the default framebuffer color format
-					Ry::Log->LogError("Non supported vulkan attachment");
-					return false;
+					NewAttachment.format = VK_FORMAT_R8G8B8A8_SRGB; // Standard format of custom color attachments
+					NewAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 				}
 			}
 			else if (Desc.Format == AttachmentFormat::Depth)
 			{
-				// Find the best format for a depth attachment
-				FindDepthFormat(NewAttachment.format);
+				if(Desc.ReferencingSwapChain)
+				{
+					// Find the best format for a depth attachment
+					FindDepthFormat(NewAttachment.format);
+				}
+				else
+				{
+					NewAttachment.format = VK_FORMAT_D24_UNORM_S8_UINT; // Standard format of custom depth attachments
+				}
+
 				NewAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 				NewAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 				NewAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
