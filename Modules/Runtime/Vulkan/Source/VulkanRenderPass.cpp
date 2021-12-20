@@ -79,15 +79,15 @@ namespace Ry
 			Ry::ArrayList<VkAttachmentReference> ColorAttachmentRefs;
 			Ry::ArrayList<VkAttachmentReference> DepthStencilAttachmentRefs;
 
-			for(int32 RefIndex = 0; RefIndex < SubPass->UsedAttachments.GetSize(); RefIndex++)
+			for(int32 AttachIndex = 0; AttachIndex < SubPass->UsedAttachments.GetSize(); AttachIndex++)
 			{
-				AttachmentDescription AttachDesc = Description.Attachments[SubPass->UsedAttachments[RefIndex]];
+				AttachmentDescription AttachDesc = Description.Attachments[AttachIndex];
 
 				VkAttachmentReference AttachmentRef{};
-				AttachmentRef.attachment = RefIndex; // Set the attachment index to the reference index
+				AttachmentRef.attachment = SubPass->UsedAttachments.Contains(AttachIndex) ? AttachIndex : VK_ATTACHMENT_UNUSED; // Set the attachment index to element in UsedAttachments
 
 				// Set the optimal layout for this subpass
-				if(AttachDesc.Format == AttachmentFormat::Color)
+				if (AttachDesc.Format == AttachmentFormat::Color)
 				{
 					AttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 					ColorAttachmentRefs.Add(AttachmentRef);
@@ -97,12 +97,17 @@ namespace Ry
 					AttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 					DepthStencilAttachmentRefs.Add(AttachmentRef);
 
-					if(DepthStencilAttachmentRefs.GetSize() > 1)
+					if (DepthStencilAttachmentRefs.GetSize() > 1)
 					{
 						Ry::Log->LogError("More than one depth pass specified, only 1 depth pass supported");
 						return false;
 					}
 				}
+			}
+			for(int32 RefIndex = 0; RefIndex < SubPass->UsedAttachments.GetSize(); RefIndex++)
+			{
+				AttachmentDescription AttachDesc = Description.Attachments[SubPass->UsedAttachments[RefIndex]];
+
 
 			}
 

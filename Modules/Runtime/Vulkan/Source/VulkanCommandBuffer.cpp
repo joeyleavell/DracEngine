@@ -90,33 +90,7 @@ namespace Ry
 		// Bind the descriptor set
 		vkCmdBindDescriptorSets(CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PipelineLayout, 0, 1, &DescSet, 0, nullptr);
 	}
-	
-	void VulkanCommandBuffer::BeginRenderPass(Ry::RenderPass* RenderPass)
-	{
-		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
-	
-		if(!VkRenderPass)
-		{
-			Ry::Log->LogError("A non-Vulkan render pass was passed into BeginRenderPass()");
-			return;
-		}
-		
-		VkRenderPassBeginInfo RenderPassInfo{};
-		RenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		RenderPassInfo.renderPass = VkRenderPass->GetRenderPass();
-		RenderPassInfo.framebuffer = Target->GetResource();
-		RenderPassInfo.renderArea.offset = { 0, 0 };
-		RenderPassInfo.renderArea.extent = Target->GetFrameBufferExtent();
-	
-		VkClearValue ClearColor;
-		ClearColor.color = VkClearColorValue {{0.0f, 0.0f, 0.0f, 1.0f}};
-		ClearColor.depthStencil = VkClearDepthStencilValue{};
 
-		RenderPassInfo.clearValueCount = 1;
-		RenderPassInfo.pClearValues = &ClearColor;
-	
-		vkCmdBeginRenderPass(CmdBuffer, &RenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	}
 	
 	void VulkanCommandBuffer::EndRenderPass(Ry::RenderPass* RenderPass)
 	{
@@ -274,11 +248,24 @@ namespace Ry
 		RenderPassInfo.renderArea.offset = { 0, 0 };
 		RenderPassInfo.renderArea.extent = BufferExtent;
 
-		Ry::ArrayList<VkClearValue> ClearValues(2);
-		ClearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f }};
-		ClearValues[1].depthStencil = { 1.0f, 0};
+		Ry::ArrayList<VkClearValue> ClearValues;
+		FrameBufferDescription Description = RenderPass->GetFboDescription();
+		for(const AttachmentDescription& Desc : Description.Attachments)
+		{
+			VkClearValue Clear;
+			if (Desc.Format == AttachmentFormat::Color)
+			{
+				Clear.color = { 0.0f, 0.0f, 0.0f, 1.0f };
+			}
+			else
+			{
+				Clear.depthStencil = { 1.0f, 0 };
+			}
 
-		RenderPassInfo.clearValueCount = 2;
+			ClearValues.Add(Clear);
+		}
+
+		RenderPassInfo.clearValueCount = ClearValues.GetSize();
 		RenderPassInfo.pClearValues = ClearValues.GetData();
 
 		if(bUseSecondary)

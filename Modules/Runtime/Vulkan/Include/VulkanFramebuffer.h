@@ -19,23 +19,19 @@ namespace Ry
 		void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) override;
 
 		VkExtent2D GetFrameBufferExtent() const;
-
-		VkExtent2D GetFrameBufferExtent();
-		void AddAttachment(VkImageView Attach);
-		void CreateFrameBuffer(VkRenderPass RenderPass);
-		VkFramebuffer GetResource();
-
 		VkFramebuffer GetFrameBufferForFrame(int32 FrameIndex);
 
 	private:
 
 		Ry::OAHashMap<uint32, VkImageView> CreatedColorImageViews;
 		Ry::OAHashMap<uint32, VkDeviceMemory> CreatedColorDeviceMemory;
-		Ry::OAHashMap<uint32, VkImage> CreateColorImages;
+		Ry::OAHashMap<uint32, VkImage> CreatedColorImages;
+		Ry::OAHashMap<uint32, VkSampler> CreatedColorSamplers;
 
 		VkDeviceMemory CreatedDepthDeviceMemory;
 		VkImageView CreatedDepthImageView;
 		VkImage CreatedDepthImage;
+		VkSampler CreatedDepthSampler;
 
 		VulkanSwapChain* ReferencingSwapChain;
 
@@ -43,10 +39,6 @@ namespace Ry
 		void DeleteFramebuffers();
 
 		void OnSwapChainDirty();
-
-		VkFramebuffer Resource;
-		// todo: delete this
-		Ry::ArrayList<VkImageView> Attachments;
 
 		// This is an array because if we depend on a swap chain, we have to maintain one framebuffer per swap chain image/image view
 		Ry::ArrayList<VkFramebuffer> FboResources;

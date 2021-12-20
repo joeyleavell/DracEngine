@@ -102,7 +102,6 @@ namespace Ry
 	
 		void BindDescriptorSet(VkPipelineLayout PipelineLayout, VkDescriptorSet DescSet);
 	
-		void BeginRenderPass(Ry::RenderPass* RenderPass) override;
 		void EndRenderPass(Ry::RenderPass* RenderPass) override;
 		void BindPipeline(Ry::Pipeline* Pipeline) override;
 		void DrawVertexArray(Ry::VertexArray* VertexArray) override;

@@ -65,34 +65,35 @@ namespace Ry
 		//std::cout << "Value " << Refl.TestField << std::endl;
 
 		FrameBufferDescription PassDesc;
-		int32 SwapColor = PassDesc.AddSwapChainColorAttachment(Parent);
-		int32 SwapDepth = PassDesc.AddSwapChainDepthAttachment(Parent);
 		int32 Color1 = PassDesc.AddColorAttachment(); // Extra color attachment
+		int32 SwapColor = PassDesc.AddSwapChainColorAttachment(Parent);
+		//int32 Depth = PassDesc.AddDepthAttachment();
 
 		// Create main pass
+		OffScreenPass = Ry::RendAPI->CreateRenderPass();
+		OffScreenPass->SetFramebufferDescription(PassDesc);
+		{
+			int32 OffScreenSub = OffScreenPass->CreateSubpass();
+			OffScreenPass->AddSubpassAttachment(OffScreenSub, Color1);
+			//OffScreenPass->AddSubpassAttachment(OffScreenSub, Depth);
+		}
+		OffScreenPass->CreateRenderPass();
 
+		// Main pass will use result from off-screen pass
 		MainPass = Ry::RendAPI->CreateRenderPass();
 		MainPass->SetFramebufferDescription(PassDesc);
-
-		int32 OffScreenPass = MainPass->CreateSubpass();
-		MainPass->AddSubpassAttachment(OffScreenPass, SwapColor);
-		MainPass->AddSubpassAttachment(OffScreenPass, SwapDepth);
-
+		{
+			int32 OnScreenPass = MainPass->CreateSubpass();
+			MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
+		}
 		MainPass->CreateRenderPass();
 
-//		int32 OnScreenPass = MainPass->CreateSubpass();
-//		MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
-//		MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
+		// Create main rendering buffer
+		RenderingBuffer = Ry::RendAPI->CreateFrameBuffer(ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight(), OffScreenPass, PassDesc);
 
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
-		Bat = new Batch(ParentSC, MainPass);
-
-		// Off screen rendering batch
-		FrameBufferDescription OffScreenDesc;
-		int32 MainColor = OffScreenDesc.AddColorAttachment();
-		int32 MainDepth = OffScreenDesc.AddDepthAttachment();
-		int32 MainStencil = OffScreenDesc.AddStencilAttachment();
+		Bat = new Batch(ParentSC, OffScreenPass);
 
 		// Create an off-screen pass with one color attachment in a single sub-pass
 		{
@@ -110,7 +111,9 @@ namespace Ry
 		// Create frame buffer for render pass
 		//OffScreenFbo = Ry::RendAPI->CreateFrameBuffer(100, 100, OffScreenDesc);
 
-		OffScreenCmd = Ry::RendAPI->CreateCommandBuffer();
+		//ImposeSceneTextureResource = Ry::RendAPI->CreateResourceSet();
+
+		ImposeCmd = Ry::RendAPI->CreateCommandBuffer(ParentSC);
 
 		//OffScreen = new Batch(OffScreenPass, 600, 600);
 
@@ -124,25 +127,15 @@ namespace Ry
 		//OffScreen->Render();
 
 		// Record the off-screen cmd
-		//OffScreenCmd->BeginCmd();
+		ImposeCmd->BeginCmd();
 		{
-			/*OffScreenCmd->BeginRenderPass(OffScreenPass, OffScreenFbo, true);
+			ImposeCmd->BeginRenderPass(MainPass, RenderingBuffer, false);
 			{
-				// Draw the batch buffers
-				for (int32 Layer = 0; Layer < OffScreen->GetLayerCount(); Layer++)
-				{
-					CommandBuffer* BatBuffer = OffScreen->GetCommandBuffer(Layer);
-
-					if (BatBuffer)
-					{
-						Cmd->DrawCommandBuffer(BatBuffer);
-					}
-				}
 
 			}
-			OffScreenCmd->EndRenderPass();*/
+			ImposeCmd->EndRenderPass();
 		}
-		//OffScreenCmd->EndCmd();
+		ImposeCmd->EndCmd();
 
 		// Render the off-screen image
 		//OffScreenCmd->Submit();
@@ -274,7 +267,7 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
-			Cmd->BeginRenderPass(true);
+			Cmd->BeginRenderPass(OffScreenPass, RenderingBuffer, true);
 			{
 
 				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)

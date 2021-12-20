@@ -158,6 +158,8 @@ namespace Ry
 			}
 		}
 
+		const FrameBufferDescription& GetFboDescription() const;
+
 	protected:
 
 		FrameBufferDescription Description;

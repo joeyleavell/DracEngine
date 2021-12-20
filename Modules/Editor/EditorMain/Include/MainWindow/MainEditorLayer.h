@@ -85,14 +85,15 @@ namespace Ry
 		Ry::CommandBuffer* Cmd;
 
 		Ry::Batch* Bat;
-		Ry::Batch* OffScreen;
 
 	//	RenderPass* OffScreenPass;
-		FrameBuffer* OffScreenFbo;
+		FrameBuffer* RenderingBuffer;
 
+		RenderPass* OffScreenPass;
 		RenderPass* MainPass;
 
-		Ry::CommandBuffer* OffScreenCmd;
+		Ry::CommandBuffer* ImposeCmd;
+		Ry::ResourceSet* ImposeSceneTextureResource;
 
 		UserInterface* UI;
 

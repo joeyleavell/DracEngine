@@ -472,7 +472,7 @@ namespace Ry
 		CreateInfo.ppEnabledExtensionNames = InstanceExtCString;
 
 #if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
-		if(false)
+		if(true)
 		{
 			// Create the c string array of validation layers as these will also be used later in device creation
 			ValidationLayers = new char* [RequiredValidationLayers.GetSize()];

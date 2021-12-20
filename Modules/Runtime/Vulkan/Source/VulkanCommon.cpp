@@ -58,10 +58,25 @@ namespace Ry
 
 	void CopyBufferToImage(uint32 Width, uint32 Height, VkBuffer& SrcBuffer, VkImage& DstImage)
 	{
-		VulkanCommandBuffer CmdBuffer(nullptr);
-		CmdBuffer.CreateBuffer(GVulkanContext->GetCommandPool());
+		VkCommandBuffer CmdBuffer;
 
-		CmdBuffer.BeginRecording(true);
+		VkCommandBufferAllocateInfo AllocInfo{};
+		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
+		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
+
+		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &CmdBuffer) != VK_SUCCESS)
+		{
+			Ry::Log->LogError("Failed to create command buffer");
+			return ;
+		}
+
+		VkCommandBufferBeginInfo BeginInfo{};
+		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		BeginInfo.pInheritanceInfo = nullptr;
+		BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		if (vkBeginCommandBuffer(CmdBuffer, &BeginInfo) == VK_SUCCESS)
 		{
 			VkBufferImageCopy Region;
 			Region.bufferOffset = 0;
@@ -81,7 +96,7 @@ namespace Ry
 			};
 
 			vkCmdCopyBufferToImage(
-				*CmdBuffer.GetBuffer(),
+				CmdBuffer,
 				SrcBuffer,
 				DstImage,
 				VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -90,15 +105,47 @@ namespace Ry
 			);
 
 		}
-		CmdBuffer.EndRecording();
+		if (vkEndCommandBuffer(CmdBuffer) != VK_SUCCESS)
+		{
+			Ry::Log->LogError("Failed to end recording command buffer");
+		}
+
+		// Submit buffer
+		VkSubmitInfo SubmitInfo{};
+		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		SubmitInfo.commandBufferCount = 1;
+		SubmitInfo.pCommandBuffers = &CmdBuffer;
+		vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE);
+
+		// Wait for cmd to complete
+		vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue());
+
+		// Free cmd buffer
+		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
 	}
 
 	void TransitionImageLayout(VkImage& Image, VkImageLayout OldLayout, VkImageLayout NewLayout)
 	{
-		VulkanCommandBuffer CmdBuffer(nullptr);
-		CmdBuffer.CreateBuffer(GVulkanContext->GetCommandPool());
+		VkCommandBuffer CmdBuffer;
 
-		CmdBuffer.BeginRecording(true);
+		VkCommandBufferAllocateInfo AllocInfo{};
+		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
+		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
+
+		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &CmdBuffer) != VK_SUCCESS)
+		{
+			Ry::Log->LogError("Failed to create command buffer");
+			return;
+		}
+
+		VkCommandBufferBeginInfo BeginInfo{};
+		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		BeginInfo.pInheritanceInfo = nullptr;
+		BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+		if (vkBeginCommandBuffer(CmdBuffer, &BeginInfo) == VK_SUCCESS)
 		{
 			VkImageMemoryBarrier Barrier{};
 			Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -140,7 +187,7 @@ namespace Ry
 			}
 
 			vkCmdPipelineBarrier(
-				*CmdBuffer.GetBuffer(),
+				CmdBuffer,
 				SourceStage, DestinationStage,
 				0,
 				0, nullptr,
@@ -148,7 +195,21 @@ namespace Ry
 				1, &Barrier
 			);
 		}
-		CmdBuffer.EndRecording();
+		vkEndCommandBuffer(CmdBuffer);
+
+		// Submit buffer
+		VkSubmitInfo SubmitInfo{};
+		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		SubmitInfo.commandBufferCount = 1;
+		SubmitInfo.pCommandBuffers = &CmdBuffer;
+
+		vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE);
+
+		// Wait for cmd to complete
+		vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue());
+
+		// Free cmd buffer
+		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
 	}
 
 	bool CreateImage(uint32 Width, uint32 Height, VkFormat ImageFormat, VkImageTiling Tiling, VkImageUsageFlags Usage, VkMemoryPropertyFlags Props, VkImage& OutImage, VkDeviceMemory& OutMemory)

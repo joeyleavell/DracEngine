@@ -55,38 +55,6 @@ namespace Ry
 		FboResources.Clear();
 	}
 
-	VkExtent2D VulkanFrameBuffer::GetFrameBufferExtent()
-	{
-		return VkExtent2D{GetIntendedWidth(), GetIntendedHeight()};
-	}
-
-	void VulkanFrameBuffer::AddAttachment(VkImageView Attach)
-	{
-		Attachments.Add(Attach);
-	}
-
-	void VulkanFrameBuffer::CreateFrameBuffer(VkRenderPass RenderPass)
-	{
-		VkFramebufferCreateInfo FramebufferInfo{};
-		FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		FramebufferInfo.renderPass = RenderPass;
-		FramebufferInfo.attachmentCount = Attachments.GetSize();
-		FramebufferInfo.pAttachments = Attachments.GetData();
-		FramebufferInfo.width = GetIntendedWidth();
-		FramebufferInfo.height = GetIntendedHeight();
-		FramebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(GVulkanContext->GetLogicalDevice(), &FramebufferInfo, nullptr, &Resource) != VK_SUCCESS)
-		{
-			Ry::Log->LogError("Failed to create Vulkan framebuffer");
-		}		
-	}
-
-	VkFramebuffer VulkanFrameBuffer::GetResource()
-	{
-		return Resource;
-	}
-
 	VkFramebuffer VulkanFrameBuffer::GetFrameBufferForFrame(int32 FrameIndex)
 	{
 		if(ReferencingSwapChain)
@@ -130,9 +98,14 @@ namespace Ry
 		{
 			AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
 
+			// Only create attachments if there is a referencing swap chain
+			if (Desc.ReferencingSwapChain)
+				continue;
+
 			VkImage ResultImage;
 			VkImageView ResultImageView;
 			VkDeviceMemory ResultMemory;
+			VkSampler ResultSampler;
 
 			VkFormat ImageFormat;
 			VkImageUsageFlags UsageFlags;
@@ -183,11 +156,36 @@ namespace Ry
 				Ry::Log->LogError("Failed to create an image view for the depth image");
 			}
 
+			// Create sampler to use when reading this attachment
+			VkSamplerCreateInfo SamplerInfo{};
+			SamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+			SamplerInfo.magFilter = VK_FILTER_NEAREST; // Always use nearest filtering for attachments
+			SamplerInfo.minFilter = VK_FILTER_NEAREST; // Always use nearest filtering for attachments
+			SamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			SamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			SamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			SamplerInfo.anisotropyEnable = VK_FALSE;
+			SamplerInfo.maxAnisotropy = 0.0f;
+			SamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+			SamplerInfo.unnormalizedCoordinates = VK_FALSE;
+			SamplerInfo.compareEnable = VK_FALSE;
+			SamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+			SamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			SamplerInfo.mipLodBias = 0.0f;
+			SamplerInfo.minLod = 0.0f;
+			SamplerInfo.maxLod = 0.0f;
+
+			if (vkCreateSampler(GVulkanContext->GetLogicalDevice(), &SamplerInfo, nullptr, &ResultSampler) != VK_SUCCESS)
+			{
+				Ry::Log->LogError("Failed to create texture sampler");
+			}
+
 			if (Desc.Format == AttachmentFormat::Color)
 			{
 				CreatedColorDeviceMemory.Insert(AttachDescIndex, ResultMemory);
 				CreatedColorImageViews.Insert(AttachDescIndex, ResultImageView);
-				CreateColorImages.Insert(AttachDescIndex, ResultImage);
+				CreatedColorImages.Insert(AttachDescIndex, ResultImage);
+				CreatedColorSamplers.Insert(AttachDescIndex, ResultSampler);
 			}
 			else
 			{
@@ -195,6 +193,7 @@ namespace Ry
 				CreatedDepthDeviceMemory = ResultMemory;
 				CreatedDepthImageView = ResultImageView;
 				CreatedDepthImage = ResultImage;
+				CreatedDepthSampler = ResultSampler;
 			}
 
 		}
@@ -207,9 +206,6 @@ namespace Ry
 			for (uint32 ImageIndex = 0; ImageIndex < ReferencingSwapChain->SwapChainImageViews.GetSize(); ImageIndex++)
 			{
 				Ry::ArrayList<VkImageView> Attachments;
-
-				bool bUseDepthStencil = false;
-				bool bUseSwapDeptchStencil = false;
 
 				for (int32 AttachDescIndex = 0; AttachDescIndex < Description.Attachments.GetSize(); AttachDescIndex++)
 				{
@@ -232,25 +228,15 @@ namespace Ry
 					else if(Desc.Format == AttachmentFormat::Depth || Desc.Format == AttachmentFormat::Stencil)
 					{
 						// The creation of these are deferred
-						bUseDepthStencil = true;
 						if(Desc.ReferencingSwapChain)
 						{
-							bUseSwapDeptchStencil = true;
+							VkImageView& SwapChainImageView = ReferencingSwapChain->DepthImageView;
+							Attachments.Add(SwapChainImageView);
 						}
-					}
-				}
-
-				if(bUseDepthStencil)
-				{
-					if(bUseSwapDeptchStencil)
-					{
-						VkImageView& SwapChainImageView = ReferencingSwapChain->DepthImageView;
-						Attachments.Add(SwapChainImageView);
-					}
-					else
-					{
-						// Add the created depth image view
-						Attachments.Add(CreatedDepthImageView);
+						else
+						{
+							Attachments.Add(CreatedDepthImageView);
+						}
 					}
 				}
 
@@ -275,6 +261,7 @@ namespace Ry
 
 	void VulkanFrameBuffer::DeleteFramebuffers()
 	{
+		// todo: destroy all resources
 	}
 
 	void VulkanFrameBuffer::OnSwapChainDirty()

@@ -9,9 +9,6 @@ namespace Ry
 		// Generate GL framebuffer handle
 		glGenFramebuffers(1, &Handle);
 
-		// Initialize color attachment count to zero
-		this->ColorAttachmentCount = 0;
-
 		// Create attachments based on description
 
 		if(Desc)
