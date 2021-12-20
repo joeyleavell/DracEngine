@@ -41,6 +41,11 @@ namespace Ry
 	private:
 		uint32 Handle;
 
+		Ry::ArrayList<GLuint> ColorAttachments;
+
+		GLuint DepthStencilAttachment;
+		bool bHasDepthStencilAttachment = false;
+
 		//GLenum GLColorAttachments[MAX_COLOR_ATTACHMENTS];
 
 		// GLenum ColorIndexToGLColorAttachment(int32 ColorIndex);

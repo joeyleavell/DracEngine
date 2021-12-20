@@ -20,6 +20,59 @@ namespace Ry
 			glBindFramebuffer(GL_FRAMEBUFFER, Handle);
 
 			// Create attachments
+			int32 CurrentColorAttachment = 0;
+			for(const AttachmentDescription& AttachDesc : Desc->Attachments)
+			{	
+				if(AttachDesc.Format == AttachmentFormat::Color)
+				{
+					// Create new attachment as texture
+					// TODO: For depth and stencil attachments, these should probably be created as renderbuffer objects as an optimization					
+					GLuint TextureHandle;
+					glGenTextures(1, &TextureHandle);
+					
+					glBindTexture(GL_TEXTURE_2D, TextureHandle);
+					{
+						// Set texture filters to linear
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+						// Color attachments use the RGB format
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr); 	
+
+						// Determine attach index
+						GLuint AttachIndex = GL_COLOR_ATTACHMENT0 + CurrentColorAttachment;
+
+						// Attach texture to framebuffer
+						glFramebufferTexture2D(GL_FRAMEBUFFER, AttachIndex, GL_TEXTURE_2D, TextureHandle, 0);
+
+						// Save the created attachment for usage later
+						ColorAttachments.Add(TextureHandle);
+						CurrentColorAttachment++;
+					}
+				}
+				
+			}
+
+			if(Desc->bHasDepthAttachment || Desc->bHasStencilAttachment)
+			{
+				// Depth or stencil enabled always means depth+stencil in OpenGL
+				GLuint DepthStencilHandle;
+				glGenTextures(1, &DepthStencilHandle);
+				
+				glBindTexture(GL_TEXTURE_2D, DepthStencilHandle);
+				{
+					// Set texture filters to linear
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, Width, Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+
+					// Bind the stencil attachment
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthStencilHandle, 0);
+				}
+
+				DepthStencilAttachment = DepthStencilHandle;
+			}
 
 			// Check status is valid
 			GLint Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

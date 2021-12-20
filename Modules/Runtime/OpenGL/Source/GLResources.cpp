@@ -255,6 +255,11 @@ namespace Ry
 		}
 	}
 
+	void GLResources::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
+	{
+
+	}
+
 	void GLResources::BindTexture(Ry::String TextureName, const Ry::Texture* Resource)
 	{
 		MappedTexture* NewMappedTexture = nullptr;

@@ -71,13 +71,19 @@ namespace Ry
 		// Off screen rendering batch
 		FrameBufferDescription OffScreenDesc;
 		int32 MainColor = OffScreenDesc.AddColorAttachment();
+		int32 MainDepth = OffScreenDesc.AddDepthAttachment();
+		int32 MainStencil = OffScreenDesc.AddStencilAttachment();
 
 		// Create an off-screen pass with one color attachment in a single sub-pass
 		{
 			OffScreenPass = Ry::RendAPI->CreateRenderPass();
 			OffScreenPass->SetFramebufferDescription(OffScreenDesc);
+
+			// Add attachments to main sub-pass
 			int32 MainPass = OffScreenPass->CreateSubpass();
 			OffScreenPass->AddSubpassAttachment(MainPass, MainColor);
+			OffScreenPass->AddSubpassAttachment(MainPass, MainDepth);
+			OffScreenPass->AddSubpassAttachment(MainPass, MainStencil);
 			OffScreenPass->CreateRenderPass();			
 		}
 

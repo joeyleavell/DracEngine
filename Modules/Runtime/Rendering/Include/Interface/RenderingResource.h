@@ -190,8 +190,8 @@ namespace Ry
 		virtual bool Update() = 0;
 		virtual void FlushBuffer(int32 Frame) = 0;
 
+		virtual void BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex) = 0;
 		virtual void BindTexture(Ry::String TextureName, const Ry::Texture* Resource) = 0;
-
 		virtual void SetConstant(Ry::String BufferName, Ry::String Id, const void* Data) = 0;
 
 		const ResourceLayout* GetInfo() const

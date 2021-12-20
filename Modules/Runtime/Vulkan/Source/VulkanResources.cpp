@@ -113,6 +113,11 @@ namespace Ry
 		}
 	}
 
+	void VulkanResourceSet::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
+	{
+
+	}
+
 	void VulkanResourceSet::BindTexture(Ry::String TextureName, const Ry::Texture* Resource)
 	{
 		const VulkanTexture* VkTexture = dynamic_cast<const VulkanTexture*>(Resource);

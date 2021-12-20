@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
+#include "Core/Globals.h"
 #include "RenderingGen.h"
 
 namespace Ry
@@ -31,6 +32,9 @@ namespace Ry
 
 		Ry::ArrayList<AttachmentDescription> Attachments;
 
+		bool bHasDepthAttachment = false;
+		bool bHasStencilAttachment = false;
+
 		int32 AddSwapChainColorAttachment(SwapChain* SC)
 		{
 			AttachmentDescription NewDesc;
@@ -44,11 +48,18 @@ namespace Ry
 
 		int32 AddSwapChainDepthAttachment(SwapChain* SC)
 		{
+			if(bHasDepthAttachment)
+			{
+				Ry::Log->LogError("More than one depth attachment added to framebuffer description!");
+			}
+
 			AttachmentDescription NewDesc;
 			NewDesc.Format = AttachmentFormat::Depth;
 			NewDesc.ReferencingSwapChain = SC;
 
 			Attachments.Add(NewDesc);
+
+			bHasDepthAttachment = true;
 
 			return Attachments.GetSize() - 1;
 		}
@@ -65,10 +76,33 @@ namespace Ry
 
 		int32 AddDepthAttachment()
 		{
+			if(bHasDepthAttachment)
+			{
+				Ry::Log->LogError("More than one depth attachment added to framebuffer description!");
+			}
+
 			AttachmentDescription NewDesc;
 			NewDesc.Format = AttachmentFormat::Depth;
+			Attachments.Add(NewDesc);
+
+			bHasDepthAttachment = true;
+
+			return Attachments.GetSize() - 1;
+		}
+
+		int32 AddStencilAttachment()
+		{
+			if(bHasStencilAttachment)
+			{
+				Ry::Log->LogError("More than one stencil attachment added to framebuffer description!");
+			}
+
+			AttachmentDescription NewDesc;
+			NewDesc.Format = AttachmentFormat::Stencil;
 
 			Attachments.Add(NewDesc);
+
+			bHasStencilAttachment = true;
 
 			return Attachments.GetSize() - 1;
 		}
