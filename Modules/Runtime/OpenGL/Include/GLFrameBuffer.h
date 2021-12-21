@@ -17,6 +17,7 @@ namespace Ry
 		virtual ~GLFrameBuffer() = default;
 		void DeleteFramebuffer() override;
 		void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) override;
+		const ColorAttachment* GetColorAttachment(int32 AttachmentIndex) const override;
 
 		uint32 GetHandle();
 		GLuint GetColorAttachmentTexture(int32 AttachmentIndex) const;

@@ -92,6 +92,11 @@ namespace Ry
 		// TODO: resize framebuffer
 	}
 
+	const ColorAttachment* GLFrameBuffer::GetColorAttachment(int32 AttachmentIndex) const
+	{
+		return nullptr;
+	}
+
 	uint32 GLFrameBuffer::GetHandle()
 	{
 		return Handle;

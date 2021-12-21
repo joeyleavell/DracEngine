@@ -51,7 +51,7 @@ namespace Ry
 				else
 				{
 					NewAttachment.format = VK_FORMAT_R8G8B8A8_SRGB; // Standard format of custom color attachments
-					NewAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+					NewAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // This attachment will most likely be read afterwards by a shader
 				}
 			}
 			else if (Desc.Format == AttachmentFormat::Depth)

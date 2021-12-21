@@ -13,6 +13,7 @@
 #include "WidgetManager.h"
 #include "EditorStyle.h"
 #include "File/Serializer.h"
+#include "Interface/RenderingResource.h"
 #include "Package/Package.h"
 #include "Interface/RenderPass.h"
 
@@ -64,32 +65,35 @@ namespace Ry
 		//TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
 		//std::cout << "Value " << Refl.TestField << std::endl;
 
-		FrameBufferDescription PassDesc;
-		int32 Color1 = PassDesc.AddColorAttachment(); // Extra color attachment
-		int32 SwapColor = PassDesc.AddSwapChainColorAttachment(Parent);
-		//int32 Depth = PassDesc.AddDepthAttachment();
+		FrameBufferDescription OffScreenDesc;
+		int32 Color = OffScreenDesc.AddColorAttachment(); // Extra color attachment
+
+		FrameBufferDescription OnScreenDesc;
+		int32 SwapColor = OnScreenDesc.AddSwapChainColorAttachment(ParentSC);
+		int32 SwapDepth = OnScreenDesc.AddSwapChainDepthAttachment(ParentSC);
 
 		// Create main pass
 		OffScreenPass = Ry::RendAPI->CreateRenderPass();
-		OffScreenPass->SetFramebufferDescription(PassDesc);
+		OffScreenPass->SetFramebufferDescription(OffScreenDesc);
 		{
 			int32 OffScreenSub = OffScreenPass->CreateSubpass();
-			OffScreenPass->AddSubpassAttachment(OffScreenSub, Color1);
-			//OffScreenPass->AddSubpassAttachment(OffScreenSub, Depth);
+			OffScreenPass->AddSubpassAttachment(OffScreenSub, Color);
 		}
 		OffScreenPass->CreateRenderPass();
 
 		// Main pass will use result from off-screen pass
 		MainPass = Ry::RendAPI->CreateRenderPass();
-		MainPass->SetFramebufferDescription(PassDesc);
+		MainPass->SetFramebufferDescription(OnScreenDesc);
 		{
 			int32 OnScreenPass = MainPass->CreateSubpass();
 			MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
+			MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
 		}
 		MainPass->CreateRenderPass();
 
-		// Create main rendering buffer
-		RenderingBuffer = Ry::RendAPI->CreateFrameBuffer(ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight(), OffScreenPass, PassDesc);
+		// Create on and off screen framebuffers
+		OffScreenBuffer = Ry::RendAPI->CreateFrameBuffer(ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight(), OffScreenPass, OffScreenDesc);
+		OnScreenBuffer = Ry::RendAPI->CreateFrameBuffer(ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight(), MainPass, OnScreenDesc);
 
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
@@ -113,8 +117,6 @@ namespace Ry
 
 		//ImposeSceneTextureResource = Ry::RendAPI->CreateResourceSet();
 
-		ImposeCmd = Ry::RendAPI->CreateCommandBuffer(ParentSC);
-
 		//OffScreen = new Batch(OffScreenPass, 600, 600);
 
 		// Create a full-texture rect
@@ -127,15 +129,6 @@ namespace Ry
 		//OffScreen->Render();
 
 		// Record the off-screen cmd
-		ImposeCmd->BeginCmd();
-		{
-			ImposeCmd->BeginRenderPass(MainPass, RenderingBuffer, false);
-			{
-
-			}
-			ImposeCmd->EndRenderPass();
-		}
-		ImposeCmd->EndCmd();
 
 		// Render the off-screen image
 		//OffScreenCmd->Submit();
@@ -148,6 +141,52 @@ namespace Ry
 		TestWorld->AddEntity(NewEnt);
 
 		TestWorld->AddCustomBatch(Bat);
+
+		Ry::Shader* ImposeShader = Ry::GetOrCompileShader("Impose", "Vertex/Impose", "Fragment/Impose");
+		PipelineCreateInfo CreateInfo;
+		CreateInfo.RenderPass = MainPass;
+		CreateInfo.Blend.bEnabled = false;
+		CreateInfo.Depth.bEnableDepthTest = false;
+		CreateInfo.bEnableScissorTest = true;
+		CreateInfo.PipelineShader = ImposeShader;
+		CreateInfo.ViewportWidth = ParentSC->GetSwapChainWidth();
+		CreateInfo.ViewportHeight= ParentSC->GetSwapChainHeight();
+		ImposePipeline = Ry::RendAPI->CreatePipelineFromShader(CreateInfo, ImposeShader);
+		ImposePipeline->CreatePipeline();
+
+		Ry::ResourceSet* ImposeResource = Ry::RendAPI->CreateResourceSet(ImposeShader->GetFragmentReflectionData().GetResources()[0], ParentSC);
+		ImposeResource->BindFrameBufferAttachment("SceneTexture", OffScreenBuffer, 0);
+		ImposeResource->CreateBuffer();
+		ImposeResources.Add(ImposeResource);
+
+		ScreenMesh = new Ry::Mesh(ImposeShader->GetVertexFormat());
+		ScreenMesh->GetMeshData()->AddVertex(
+		{
+				-1.0, -1.0, 0.0,
+				0.0, 1.0,
+				0.0, 0.0, 0.0
+		});
+		ScreenMesh->GetMeshData()->AddVertex(
+			{
+					-1.0, 1.0, 0.0,
+					0.0, 0.0,
+					0.0, 0.0, 0.0
+		});
+		ScreenMesh->GetMeshData()->AddVertex(
+			{
+					1.0, 1.0, 0.0,
+					1.0, 0.0,
+					0.0, 0.0, 0.0
+		});
+		ScreenMesh->GetMeshData()->AddVertex(
+			{
+					1.0, -1.0, 0.0,
+					1.0, 1.0,
+					0.0, 0.0, 0.0
+		});
+		ScreenMesh->GetMeshData()->AddTriangle(0, 1, 2);
+		ScreenMesh->GetMeshData()->AddTriangle(2, 3, 0);
+		ScreenMesh->Update();
 
 		//Bat->SetLayerScissor(6, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
 		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
@@ -267,7 +306,7 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
-			Cmd->BeginRenderPass(OffScreenPass, RenderingBuffer, true);
+			Cmd->BeginRenderPass(OffScreenPass, OffScreenBuffer, true);
 			{
 
 				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)
@@ -280,6 +319,19 @@ namespace Ry
 					}
 				}
 
+			}
+			Cmd->EndRenderPass();
+
+			Cmd->BeginRenderPass(MainPass, OnScreenBuffer, false);
+			{
+				Cmd->BindPipeline(ImposePipeline);
+
+				Cmd->SetViewportSize(0, 0, ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight());
+				Cmd->SetScissorSize(0, 0, ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight());
+
+				Cmd->BindResources(ImposeResources.GetData(), ImposeResources.GetSize());
+
+				Cmd->DrawVertexArrayIndexed(ScreenMesh->GetVertexArray(), 0, ScreenMesh->GetMeshData()->GetIndexCount());
 			}
 			Cmd->EndRenderPass();
 		}

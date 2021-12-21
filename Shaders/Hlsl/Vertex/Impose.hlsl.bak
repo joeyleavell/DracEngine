@@ -16,7 +16,7 @@ VertexOutput main(VertexInput In)
 {
 	// Pass data straight through
 	VertexOutput Out;
-	Out.VertPos = float4(In.VertPos, 1.0);
+	Out.VertPos = float4(In.VertPos, 1.0)
 	Out.VertUV = In.VertUV;
 	Out.VertNormal = In.VertNormal;
 	

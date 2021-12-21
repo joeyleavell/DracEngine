@@ -170,6 +170,7 @@ namespace Ry
 		void BindTexture(Ry::String TextureName, const Ry::Texture* Resource) override;
 		void SetConstant(Ry::String BufferName, Ry::String Id, const void* Data) override;
 
+		void BindTexture(const Ry::String TextureName, VkImageView Image, VkSampler Sampler);
 		void CreateUniformBuffers(VulkanSwapChain* SwapChain);
 		void CreateDescriptorSets(VulkanSwapChain* SwapChain);
 		void UpdateDescriptorSet(VulkanSwapChain* SwapChain, int32 SwapChainImageIndex);

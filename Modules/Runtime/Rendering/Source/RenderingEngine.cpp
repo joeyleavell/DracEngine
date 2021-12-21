@@ -36,7 +36,7 @@ namespace Ry
 		// Compile standard shaders
 		Ry::Log->Log("Compiling shaders");
 		{
-			CompileShader("Impose", "/Engine/Shaders/Vertex/Impose.glv", "/Engine/Shaders/Fragment/Impose.glf");
+			//CompileShader("Impose", "/Engine/Shaders/Vertex/Impose.glv", "/Engine/Shaders/Fragment/Impose.glf");
 			CompileShader("PhongDirectional", "/Engine/Shaders/Vertex/Phong.glv", "/Engine/Shaders/Fragment/PhongDirectional.glf");
 
 			CompileShader("Texture", "Vertex/Texture", "Fragment/Texture");

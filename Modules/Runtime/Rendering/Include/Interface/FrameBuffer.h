@@ -20,6 +20,7 @@ namespace Ry
 
 		virtual void DeleteFramebuffer() = 0;
 		virtual void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) = 0;
+		virtual const ColorAttachment* GetColorAttachment(int32 AttachmentIndex) const = 0;
 
 		uint32 GetIntendedWidth() const
 		{

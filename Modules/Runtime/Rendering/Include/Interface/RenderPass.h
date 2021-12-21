@@ -8,6 +8,7 @@ namespace Ry
 {
 
 	class SwapChain;
+	class FrameBuffer;
 
 	enum class AttachmentFormat
 	{
@@ -17,6 +18,11 @@ namespace Ry
 		Stencil
 	};
 
+	struct RENDERING_MODULE ColorAttachment
+	{
+		virtual ~ColorAttachment() = default;
+	};
+
 	class AttachmentDescription
 	{
 	public:
@@ -24,6 +30,9 @@ namespace Ry
 		int32 Samples = 1;
 		AttachmentFormat Format;
 		SwapChain* ReferencingSwapChain = nullptr;
+
+		// Used if we want to share attachments between framebuffers
+		const ColorAttachment* ExistingAttachment = nullptr;
 	};
 
 	class FrameBufferDescription
@@ -40,6 +49,17 @@ namespace Ry
 			AttachmentDescription NewDesc;
 			NewDesc.Format = AttachmentFormat::Color;
 			NewDesc.ReferencingSwapChain = SC;
+
+			Attachments.Add(NewDesc);
+
+			return Attachments.GetSize() - 1;
+		}
+
+		int32 AddColorAttachment(const ColorAttachment* Reference)
+		{
+			AttachmentDescription NewDesc;
+			NewDesc.Format = AttachmentFormat::Color;
+			NewDesc.ExistingAttachment = Reference;
 
 			Attachments.Add(NewDesc);
 

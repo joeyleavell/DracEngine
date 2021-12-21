@@ -115,7 +115,21 @@ namespace Ry
 
 	void VulkanResourceSet::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
 	{
-
+		if(const VulkanFrameBuffer* VkFB = dynamic_cast<const VulkanFrameBuffer*>(InputBuffer))
+		{
+			if(const VulkanColorAttachment* Attachment = dynamic_cast<const VulkanColorAttachment*>(VkFB->GetColorAttachment(AttachmentIndex)))
+			{
+				BindTexture(TextureName, Attachment->ImageView, Attachment->Sampler);
+			}
+			else
+			{
+				Ry::Log->LogErrorf("VulkanResourceSet::BindFrameBufferAttachment: Color attachment at index %d was invalid", AttachmentIndex);
+			}
+		}
+		else
+		{
+			Ry::Log->LogError("VulkanResourceSet::BindFrameBufferAttachment: Invalid InputBuffer");
+		}
 	}
 
 	void VulkanResourceSet::BindTexture(Ry::String TextureName, const Ry::Texture* Resource)
@@ -123,9 +137,17 @@ namespace Ry
 		const VulkanTexture* VkTexture = dynamic_cast<const VulkanTexture*>(Resource);
 		assert(VkTexture != nullptr);
 
+		if(VkTexture)
+		{
+			BindTexture(TextureName, VkTexture->GetImageView(), VkTexture->GetSampler());
+		}
+	}
+
+	void VulkanResourceSet::BindTexture(const Ry::String TextureName, VkImageView Image, VkSampler Sampler)
+	{
 		MappedTexture* Map = nullptr;
 
-		if(MappedTextures.Contains(TextureName))
+		if (MappedTextures.Contains(TextureName))
 		{
 			Map = MappedTextures.Get(TextureName);
 		}
@@ -135,24 +157,24 @@ namespace Ry
 			MappedTextures.Insert(TextureName, Map);
 		}
 
-		if(Map)
+		if (Map)
 		{
-			Map->Image = VkTexture->GetImageView();
-			Map->Sampler = VkTexture->GetSampler();
+			Map->Image = Image;
+			Map->Sampler = Sampler;
 		}
 
 		// Update descriptor sets if we've already created them
-		if(DescriptorSets.GetSize() > 0)
+		if (DescriptorSets.GetSize() > 0)
 		{
 			VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 			int FlightIndex = VkSC->GetCurrentImageIndex();
 
-			if(FlightIndex < 0)
+			if (FlightIndex < 0)
 			{
 				// Device wait, not in a frame so we have to update all (not efficient)			
 				vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
-				for(int32 Index = 0; Index < VkSC->SwapChainImages.GetSize(); Index++)
+				for (int32 Index = 0; Index < VkSC->SwapChainImages.GetSize(); Index++)
 				{
 					UpdateDescriptorSet(VkSC, Index);
 				}
@@ -164,7 +186,7 @@ namespace Ry
 
 				for (int32 Index = 0; Index < VkSC->SwapChainImages.GetSize(); Index++)
 				{
-					if(Index != FlightIndex && !DirtyFrames.Contains(Index))
+					if (Index != FlightIndex && !DirtyFrames.Contains(Index))
 					{
 						DirtyFrames.Add(Index);
 					}
@@ -174,7 +196,6 @@ namespace Ry
 			}
 
 		}
-
 	}
 
 	void VulkanResourceSet::SetConstant(Ry::String BufferName, Ry::String Id, const void* Data)

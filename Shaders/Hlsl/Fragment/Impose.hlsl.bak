@@ -18,7 +18,9 @@ PixelOutput main(PixelInput In)
 {
 	PixelOutput Out;
 
-	float4 Pixel = SceneTextureSampler.Sample(SceneTexture, In.VertUV);
+	// Sample scene texture
+	float4 Pixel = SceneTexture.Sample(SceneTextureSampler, In.VertUV);
+	Pixel = 0.5;
 
 	// Simply set the output to the scene texture's pixel value
 	Out.PixelColor = Pixel;	

@@ -83,6 +83,16 @@ namespace Ry
 
 	}
 
+	const ColorAttachment* VulkanFrameBuffer::GetColorAttachment(int32 AttachmentIndex) const
+	{
+		if(CreatedColorAttachments.Contains(AttachmentIndex))
+		{
+			return CreatedColorAttachments.Get(AttachmentIndex);
+		}
+
+		return nullptr;
+	}
+
 	VkExtent2D VulkanFrameBuffer::GetFrameBufferExtent() const
 	{
 		return VkExtent2D{ GetIntendedWidth(), GetIntendedHeight() };
@@ -98,14 +108,15 @@ namespace Ry
 		{
 			AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
 
-			// Only create attachments if there is a referencing swap chain
-			if (Desc.ReferencingSwapChain)
+			// Only create attachments if there is no referencing swap chain or existing attachment
+			if (Desc.ReferencingSwapChain || Desc.ExistingAttachment)
 				continue;
 
-			VkImage ResultImage;
-			VkImageView ResultImageView;
-			VkDeviceMemory ResultMemory;
-			VkSampler ResultSampler;
+			VulkanColorAttachment* NewAttachment = new VulkanColorAttachment;
+			// VkImage ResultImage;
+			// VkImageView ResultImageView;
+			// VkDeviceMemory ResultMemory;
+			// VkSampler ResultSampler;
 
 			VkFormat ImageFormat;
 			VkImageUsageFlags UsageFlags;
@@ -139,16 +150,16 @@ namespace Ry
 				VK_IMAGE_TILING_OPTIMAL,
 				UsageFlags, 
 				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				ResultImage,
-				ResultMemory
+				NewAttachment->Image,
+				NewAttachment->DeviceMemory
 			))
 			{
 				Ry::Log->LogError("Failed to create a color image");
 			}
 
 			if (!CreateImageView(
-				ResultImageView,
-				ResultImage,
+				NewAttachment->ImageView,
+				NewAttachment->Image,
 				ImageFormat,
 				AspectFlags
 			))
@@ -175,86 +186,94 @@ namespace Ry
 			SamplerInfo.minLod = 0.0f;
 			SamplerInfo.maxLod = 0.0f;
 
-			if (vkCreateSampler(GVulkanContext->GetLogicalDevice(), &SamplerInfo, nullptr, &ResultSampler) != VK_SUCCESS)
+			if (vkCreateSampler(GVulkanContext->GetLogicalDevice(), &SamplerInfo, nullptr, &NewAttachment->Sampler) != VK_SUCCESS)
 			{
 				Ry::Log->LogError("Failed to create texture sampler");
 			}
 
 			if (Desc.Format == AttachmentFormat::Color)
 			{
-				CreatedColorDeviceMemory.Insert(AttachDescIndex, ResultMemory);
-				CreatedColorImageViews.Insert(AttachDescIndex, ResultImageView);
-				CreatedColorImages.Insert(AttachDescIndex, ResultImage);
-				CreatedColorSamplers.Insert(AttachDescIndex, ResultSampler);
+				// Only insert the color attachment for created attachments
+				CreatedColorAttachments.Insert(AttachDescIndex, NewAttachment);
 			}
 			else
 			{
 				// There can only be a single depth/stencil attachment
-				CreatedDepthDeviceMemory = ResultMemory;
-				CreatedDepthImageView = ResultImageView;
-				CreatedDepthImage = ResultImage;
-				CreatedDepthSampler = ResultSampler;
+				// For now, we're just copying over from the "color" attachment
+				CreatedDepthDeviceMemory = NewAttachment->DeviceMemory;
+				CreatedDepthImageView = NewAttachment->ImageView;
+				CreatedDepthImage = NewAttachment->Image;
+				CreatedDepthSampler = NewAttachment->Sampler;
 			}
 
 		}
 
-		if(ReferencingSwapChain)
+		// Resize frame-buffers to correct amount
+		int32 ResourceCount = ReferencingSwapChain ? ReferencingSwapChain->SwapChainImageViews.GetSize() : 1;
+
+		for (uint32 ImageIndex = 0; ImageIndex < ResourceCount; ImageIndex++)
 		{
-			// Resize frame-buffers to correct amount
-			FboResources.SetSize(ReferencingSwapChain->SwapChainImageViews.GetSize());
+			Ry::ArrayList<VkImageView> Attachments;
 
-			for (uint32 ImageIndex = 0; ImageIndex < ReferencingSwapChain->SwapChainImageViews.GetSize(); ImageIndex++)
+			for (int32 AttachDescIndex = 0; AttachDescIndex < Description.Attachments.GetSize(); AttachDescIndex++)
 			{
-				Ry::ArrayList<VkImageView> Attachments;
+				const AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
 
-				for (int32 AttachDescIndex = 0; AttachDescIndex < Description.Attachments.GetSize(); AttachDescIndex++)
+				if(Desc.Format == AttachmentFormat::Color)
 				{
-					const AttachmentDescription& Desc = Description.Attachments[AttachDescIndex];
-
-					if(Desc.Format == AttachmentFormat::Color)
+					if(Desc.ReferencingSwapChain)
 					{
-						if(Desc.ReferencingSwapChain)
-						{
-							// Simply use the image view from the swap chain
-							VkImageView& SwapChainImageView = ReferencingSwapChain->SwapChainImageViews[ImageIndex];
-							Attachments.Add(SwapChainImageView);
-						}
-						else if(CreatedColorImageViews.Contains(AttachDescIndex))
-						{
-							VkImageView& CreatedImageView = CreatedColorImageViews.Get(AttachDescIndex);
-							Attachments.Add(CreatedImageView);
-						}
+						// Simply use the image view from the swap chain
+						VkImageView& SwapChainImageView = ReferencingSwapChain->SwapChainImageViews[ImageIndex];
+						Attachments.Add(SwapChainImageView);
 					}
-					else if(Desc.Format == AttachmentFormat::Depth || Desc.Format == AttachmentFormat::Stencil)
+					else if(Desc.ExistingAttachment)
 					{
-						// The creation of these are deferred
-						if(Desc.ReferencingSwapChain)
+						if(const VulkanColorAttachment* VkCA = dynamic_cast<const VulkanColorAttachment*>(Desc.ExistingAttachment))
 						{
-							VkImageView& SwapChainImageView = ReferencingSwapChain->DepthImageView;
-							Attachments.Add(SwapChainImageView);
+							const VkImageView& ExistingImageView = VkCA->ImageView;
+							Attachments.Add(ExistingImageView);
 						}
 						else
 						{
-							Attachments.Add(CreatedDepthImageView);
+							Ry::Log->LogError("VulkanFrameBuffer::CreateFramebuffers: Invalid color attachment");
 						}
 					}
+					else if(CreatedColorAttachments.Contains(AttachDescIndex))
+					{
+						VkImageView& CreatedImageView = CreatedColorAttachments.Get(AttachDescIndex)->ImageView;
+						Attachments.Add(CreatedImageView);
+					}
 				}
-
-				VkFramebufferCreateInfo FramebufferInfo{};
-				FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-				FramebufferInfo.renderPass = VkRP->GetRenderPass();
-				FramebufferInfo.attachmentCount = Attachments.GetSize();
-				FramebufferInfo.pAttachments = Attachments.GetData();
-				FramebufferInfo.width = IntendedWidth;
-				FramebufferInfo.height = IntendedHeight;
-				FramebufferInfo.layers = 1;
-
-				if (vkCreateFramebuffer(GVulkanContext->GetLogicalDevice(), &FramebufferInfo, nullptr, &FboResources[ImageIndex]) != VK_SUCCESS)
+				else if(Desc.Format == AttachmentFormat::Depth || Desc.Format == AttachmentFormat::Stencil)
 				{
-					Ry::Log->LogError("Failed to create Vulkan framebuffer");
+					// The creation of these are deferred
+					if(Desc.ReferencingSwapChain)
+					{
+						VkImageView& SwapChainImageView = ReferencingSwapChain->DepthImageView;
+						Attachments.Add(SwapChainImageView);
+					}
+					else
+					{
+						Attachments.Add(CreatedDepthImageView);
+					}
 				}
-
 			}
+
+			VkFramebufferCreateInfo FramebufferInfo{};
+			FramebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			FramebufferInfo.renderPass = VkRP->GetRenderPass();
+			FramebufferInfo.attachmentCount = Attachments.GetSize();
+			FramebufferInfo.pAttachments = Attachments.GetData();
+			FramebufferInfo.width = IntendedWidth;
+			FramebufferInfo.height = IntendedHeight;
+			FramebufferInfo.layers = 1;
+
+			if (vkCreateFramebuffer(GVulkanContext->GetLogicalDevice(), &FramebufferInfo, nullptr, &FboResources[ImageIndex]) != VK_SUCCESS)
+			{
+				Ry::Log->LogError("Failed to create Vulkan framebuffer");
+			}
+
 		}
 
 	}

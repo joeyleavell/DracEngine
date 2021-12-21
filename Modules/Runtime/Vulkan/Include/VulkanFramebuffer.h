@@ -8,6 +8,14 @@
 namespace Ry
 {
 
+	struct VulkanColorAttachment : public Ry::ColorAttachment
+	{
+		VkImageView ImageView;
+		VkDeviceMemory DeviceMemory;
+		VkImage Image;
+		VkSampler Sampler;
+	};
+
 	class VULKAN_MODULE VulkanFrameBuffer : public Ry::FrameBuffer
 	{
 	public:
@@ -18,15 +26,14 @@ namespace Ry
 		void DeleteFramebuffer() override;
 		void Recreate(uint32 Width, uint32 Height, const RenderPass* NewRenderPass) override;
 
+		const ColorAttachment* GetColorAttachment(int32 AttachmentIndex) const override;
+
 		VkExtent2D GetFrameBufferExtent() const;
 		VkFramebuffer GetFrameBufferForFrame(int32 FrameIndex);
 
 	private:
 
-		Ry::OAHashMap<uint32, VkImageView> CreatedColorImageViews;
-		Ry::OAHashMap<uint32, VkDeviceMemory> CreatedColorDeviceMemory;
-		Ry::OAHashMap<uint32, VkImage> CreatedColorImages;
-		Ry::OAHashMap<uint32, VkSampler> CreatedColorSamplers;
+		Ry::OAHashMap<int32, VulkanColorAttachment*> CreatedColorAttachments;
 
 		VkDeviceMemory CreatedDepthDeviceMemory;
 		VkImageView CreatedDepthImageView;
