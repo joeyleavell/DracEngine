@@ -77,6 +77,14 @@ namespace Ry
 
 	private:
 
+		void UpdateFullScreenRect();
+		void CreateRenderPass();
+
+		FrameBufferDescription OffScreenDesc;
+		FrameBufferDescription OnScreenDesc;
+
+		SharedPtr<BatchItem> FullScreenRect;
+
 		Ry::World2D* TestWorld;
 		
 		// Record draw commands for primary editor window
@@ -84,21 +92,17 @@ namespace Ry
 
 		Ry::CommandBuffer* Cmd;
 
-		Ry::Batch* Bat;
+		Ry::Batch* OffScreenBatch;
+		Ry::Batch* OnScreenBatch;
 
-	//	RenderPass* OffScreenPass;
 		FrameBuffer* OffScreenBuffer;
 		FrameBuffer* OnScreenBuffer;
+		int32 SwapColor;
+		int32 SwapDepth;
+		int32 Color;
 
-		Ry::Pipeline* ImposePipeline;
-
-		RenderPass* OffScreenPass;
-		RenderPass* MainPass;
-
-		Ry::ArrayList<Ry::ResourceSet*> ImposeResources;
-
-		Ry::CommandBuffer* ImposeCmd;
-		Ry::ResourceSet* ImposeSceneTextureResource;
+		RenderPass* OffScreenPass{};
+		RenderPass* MainPass{};
 
 		Ry::Mesh* ScreenMesh;
 

@@ -102,17 +102,22 @@ namespace Ry
 
 	void GLCommandBuffer::GLBeginRenderPass(Ry::BeginRenderPassCommand* Cmd)
 	{
-
-		// todo: only change state here if we switch render passes
-		
 		// Bind default framebuffer (for now)
 		if(Cmd->SourceBuffer)
 		{
 			// Bind default framebuffer
 			if(Ry::GLFrameBuffer* GLFbo = dynamic_cast<Ry::GLFrameBuffer*>(Cmd->SourceBuffer))
 			{
-				// Bind the framebuffer's handle
-				glBindFramebuffer(GL_FRAMEBUFFER, GLFbo->GetHandle());
+				if(GLFbo->IsDefaultAlias())
+				{
+					// This framebuffer is just an alias for the default framebuffer object
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				}
+				else
+				{
+					// Bind the framebuffer's handle
+					glBindFramebuffer(GL_FRAMEBUFFER, GLFbo->GetHandle());
+				}
 			}
 			else
 			{

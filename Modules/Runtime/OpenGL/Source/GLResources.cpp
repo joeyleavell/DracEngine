@@ -257,18 +257,18 @@ namespace Ry
 		}
 	}
 
-	void GLResources::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
+	void GLResources::BindFrameBufferAttachment(Ry::String TextureName, const Ry::ColorAttachment* ColorAttachment)
 	{
-		if (const GLFrameBuffer* GLFbo = dynamic_cast<const GLFrameBuffer*>(InputBuffer))
+		if (const GLColorAttachment* GLAttachment= dynamic_cast<const GLColorAttachment*>(ColorAttachment))
 		{
-			GLuint AttachmentHandle = GLFbo->GetColorAttachmentTexture(AttachmentIndex);
+			GLuint AttachmentHandle = GLAttachment->AttachmentHandle;
 
 			// TODO: Can a framebuffer color attachment be anything other than a GL_TEXTURE_2D?
 			BindTexture(TextureName, AttachmentHandle, GL_TEXTURE_2D);
 		}
 		else
 		{
-			Ry::Log->LogError("GLResources::BindFrameBufferAttachment: Passed in non-Gl framebuffer!");
+			Ry::Log->LogError("GLResources::BindFrameBufferAttachment: Invalid GL color attachment");
 		}
 
 	}

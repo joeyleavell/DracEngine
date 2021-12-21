@@ -3,6 +3,11 @@ cbuffer Scene : register(b0, space0)
 	float4x4 ViewProjection;
 }
 
+cbuffer Group : register(b0, space1)
+{
+	float FlipTexture;
+}
+
 struct VertexInput
 {
 	float3 Position : SV_Position;

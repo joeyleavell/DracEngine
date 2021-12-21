@@ -1,6 +1,6 @@
 // Sampler/texture combo for font texture
-SamplerState BatchTextureSampler : register(t0, space1);
-Texture2D <float4> BatchTexture : register(t0, space1);
+SamplerState BatchTextureSampler : register(t0, space2);
+Texture2D <float4> BatchTexture : register(t0, space2);
 
 struct PixelOutput
 {

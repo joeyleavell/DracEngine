@@ -125,7 +125,7 @@ namespace Ry
 
 		void Show(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::Batch* Batch, int32 Layer, PipelineState State) override
 		{
-			Batch->AddItemSet(ItemSet, "Shape", State, nullptr, Layer);
+			Batch->AddItemSet(ItemSet, "Shape", State, (Texture*) nullptr, Layer);
 		}
 
 		void Hide(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::Batch* Batch) override

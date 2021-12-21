@@ -98,7 +98,7 @@ namespace Ry
 		return VkExtent2D{ GetIntendedWidth(), GetIntendedHeight() };
 	}
 
-	void VulkanFrameBuffer::CreateFramebuffers(int32 Width, int32 Height, const VulkanRenderPass* VkRP)
+	void VulkanFrameBuffer::CreateFramebuffers(uint32 Width, uint32 Height, const VulkanRenderPass* VkRP)
 	{
 		this->IntendedWidth = Width;
 		this->IntendedHeight = Height;
@@ -113,10 +113,6 @@ namespace Ry
 				continue;
 
 			VulkanColorAttachment* NewAttachment = new VulkanColorAttachment;
-			// VkImage ResultImage;
-			// VkImageView ResultImageView;
-			// VkDeviceMemory ResultMemory;
-			// VkSampler ResultSampler;
 
 			VkFormat ImageFormat;
 			VkImageUsageFlags UsageFlags;
@@ -204,6 +200,7 @@ namespace Ry
 				CreatedDepthImageView = NewAttachment->ImageView;
 				CreatedDepthImage = NewAttachment->Image;
 				CreatedDepthSampler = NewAttachment->Sampler;
+				bCreatedDepthAttachment = true;
 			}
 
 		}
@@ -280,13 +277,39 @@ namespace Ry
 
 	void VulkanFrameBuffer::DeleteFramebuffers()
 	{
-		// todo: destroy all resources
-	}
+		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
-	void VulkanFrameBuffer::OnSwapChainDirty()
-	{
+		// Delete frame buffers
+		for(VkFramebuffer Fbo : FboResources)
+		{
+			vkDestroyFramebuffer(GVulkanContext->GetLogicalDevice(), Fbo, nullptr);
+		}
 
-		// Whenever the swapchain goes dirty, we have to re-create the internal framebuffer objects
+		// Destroy created attachments
+		Ry::OAPairIterator<int32, VulkanColorAttachment*> AttachmentItr = CreatedColorAttachments.CreatePairIterator();
+		while(AttachmentItr)
+		{
+			VulkanColorAttachment* Attachment = AttachmentItr.GetValue();
+
+			vkDestroySampler(GVulkanContext->GetLogicalDevice(), Attachment->Sampler, nullptr);
+			vkDestroyImageView(GVulkanContext->GetLogicalDevice(), Attachment->ImageView, nullptr);
+			vkDestroyImage(GVulkanContext->GetLogicalDevice(), Attachment->Image, nullptr);
+			vkFreeMemory(GVulkanContext->GetLogicalDevice(), Attachment->DeviceMemory, nullptr);
+
+			++AttachmentItr;
+		}
+
+		// Free depth resource
+		if(bCreatedDepthAttachment)
+		{
+			vkDestroySampler(GVulkanContext->GetLogicalDevice(), CreatedDepthSampler, nullptr);
+			vkDestroyImageView(GVulkanContext->GetLogicalDevice(), CreatedDepthImageView, nullptr);
+			vkDestroyImage(GVulkanContext->GetLogicalDevice(), CreatedDepthImage, nullptr);
+			vkFreeMemory(GVulkanContext->GetLogicalDevice(), CreatedDepthDeviceMemory, nullptr);
+		}
+
+		FboResources.SoftClear();
+		CreatedColorAttachments.Clear();
 	}
 
 }

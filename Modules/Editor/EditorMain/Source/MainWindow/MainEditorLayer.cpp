@@ -25,54 +25,11 @@ namespace Ry
 		// Create the editor style
 		InitializeEditorStyle();
 
-		/*std::cout << "type name " << *GetType<Ry::ArrayList<unsigned long long int>>()->Name << std::endl;
-		Ry::OAPairIterator<Ry::String, const Ry::ReflectedClass*> Itr = RefDB.GetClassIterator();
-		while (Itr)
-		{
-			const Ry::ReflectedClass* Cl = Itr.GetValue();
-			std::cout << *Itr.GetKey() << std::endl;
-			for (const Ry::Field& Field : Cl->Fields)
-			{
-				std::cout << "\t" << *Field.Name << " " << *Field.Type->Name << std::endl;
-			}
-			++Itr;
-		}*/
+		Color = OffScreenDesc.AddColorAttachment(); // Extra color attachment
+		SwapColor = OnScreenDesc.AddSwapChainColorAttachment(ParentSC);
+		SwapDepth = OnScreenDesc.AddSwapChainDepthAttachment(ParentSC);
 
-		//TestRefl Object; 
-
-		//RefDB.PrintAllReflectedClass();
-
-		//const Ry::ReflectedClass* RefClass = GetReflectedClass("Ry::TestObj");
-		//SharedPtr<Ry::Widget> LoadedWid = Ry::LoadWidget<Ry::Widget>("/Engine/UI/TestUI.ui");
-		//Json AsJson = Ry::Jsonify(*LoadedWid.Get());
-
-		//std::cout << "Jsonified: \n" << *AsJson.Stringify() << std::endl;
-
-		//TestObj* Obj = NewObject<TestObj>("TestObject");
-
-		/*Package* NewPackage = new Package("/Engine/TestPackage.rasset");
-		NewPackage->SetObject(Obj);
-		NewPackage->Save();*/
-
-		// Load packagedf
-		//Package* Loaded = LoadPackage("/Engine/avocado.rasset");
-		//const Ry::Object* RootObject = Loaded->GetOrLoadRoot();
-
-		//std::cout << "test" << std::endl;
-
-		//TestReflection* NewRefl = GetReflectedClass("Ry::TestReflection")->CreateInstance<TestReflection>();
-//		std::cout << "Value " << NewRefl->Other << std::endl;
-		//TestRefl* Other = NewRefl->GetPropertyRef<TestRefl*>("Other2");
-		//std::cout << "Value " << Refl.TestField << std::endl;
-
-		FrameBufferDescription OffScreenDesc;
-		int32 Color = OffScreenDesc.AddColorAttachment(); // Extra color attachment
-
-		FrameBufferDescription OnScreenDesc;
-		int32 SwapColor = OnScreenDesc.AddSwapChainColorAttachment(ParentSC);
-		int32 SwapDepth = OnScreenDesc.AddSwapChainDepthAttachment(ParentSC);
-
-		// Create main pass
+		// Create off-screen pass. Shouldn't need to be re-created on re-size.
 		OffScreenPass = Ry::RendAPI->CreateRenderPass();
 		OffScreenPass->SetFramebufferDescription(OffScreenDesc);
 		{
@@ -81,15 +38,8 @@ namespace Ry
 		}
 		OffScreenPass->CreateRenderPass();
 
-		// Main pass will use result from off-screen pass
-		MainPass = Ry::RendAPI->CreateRenderPass();
-		MainPass->SetFramebufferDescription(OnScreenDesc);
-		{
-			int32 OnScreenPass = MainPass->CreateSubpass();
-			MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
-			MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
-		}
-		MainPass->CreateRenderPass();
+		// Main pass. This needs to be re-created on resize.
+		CreateRenderPass();
 
 		// Create on and off screen framebuffers
 		OffScreenBuffer = Ry::RendAPI->CreateFrameBuffer(ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight(), OffScreenPass, OffScreenDesc);
@@ -97,102 +47,28 @@ namespace Ry
 
 		// Initialize primary command buffer
 		Cmd = Ry::RendAPI->CreateCommandBuffer(Parent);
-		Bat = new Batch(ParentSC, OffScreenPass);
+		OffScreenBatch = new Batch(ParentSC, OffScreenPass);
 
-		// Create an off-screen pass with one color attachment in a single sub-pass
-		{
-			// OffScreenPass = Ry::RendAPI->CreateRenderPass();
-			// OffScreenPass->SetFramebufferDescription(OffScreenDesc);
-			//
-			// // Add attachments to main sub-pass
-			// int32 MainPass = OffScreenPass->CreateSubpass();
-			// OffScreenPass->AddSubpassAttachment(MainPass, MainColor);
-			// OffScreenPass->AddSubpassAttachment(MainPass, MainDepth);
-			// OffScreenPass->AddSubpassAttachment(MainPass, MainStencil);
-			// OffScreenPass->CreateRenderPass();			
-		}
+		// Compile impose shader, re-use Vertex/Shape vertex shader
+		Ry::CompileShader("Impose", "Vertex/Impose", "Fragment/Impose");
 
-		// Create frame buffer for render pass
-		//OffScreenFbo = Ry::RendAPI->CreateFrameBuffer(100, 100, OffScreenDesc);
-
-		//ImposeSceneTextureResource = Ry::RendAPI->CreateResourceSet();
-
-		//OffScreen = new Batch(OffScreenPass, 600, 600);
+		OnScreenBatch= new Batch(ParentSC, MainPass);
+		OnScreenBatch->AddPipeline("Impose", "Impose");
 
 		// Create a full-texture rect
-		SharedPtr<BatchItem> Rect = MakeItem();
-		BatchRectangle(Rect, BLUE, 0.0f, 0.0f, 100.0f, 100.0f, 0.0f);
-		//OffScreen->AddItem(Rect, "Shape", PipelineState{}, nullptr, 0);
+		FullScreenRect = MakeItem();
+		Ry::BatchTexture(FullScreenRect, WHITE, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.0f);
 
-		// Immediately update and render
-		//OffScreen->Update();
-		//OffScreen->Render();
-
-		// Record the off-screen cmd
-
-		// Render the off-screen image
-		//OffScreenCmd->Submit();
-
-		//Bat->SetProjection(Ry::ortho4(0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight(), 0, -1.0f, -1.0f));
+		// Add the item to the batch and update
+		UpdateFullScreenRect();
 
 		TestWorld = new World2D(Parent);
 
 		SharedPtr<TestEntity> NewEnt = MakeShared(new TestEntity(TestWorld));
 		TestWorld->AddEntity(NewEnt);
 
-		TestWorld->AddCustomBatch(Bat);
-
-		Ry::Shader* ImposeShader = Ry::GetOrCompileShader("Impose", "Vertex/Impose", "Fragment/Impose");
-		PipelineCreateInfo CreateInfo;
-		CreateInfo.RenderPass = MainPass;
-		CreateInfo.Blend.bEnabled = false;
-		CreateInfo.Depth.bEnableDepthTest = false;
-		CreateInfo.bEnableScissorTest = true;
-		CreateInfo.PipelineShader = ImposeShader;
-		CreateInfo.ViewportWidth = ParentSC->GetSwapChainWidth();
-		CreateInfo.ViewportHeight= ParentSC->GetSwapChainHeight();
-		ImposePipeline = Ry::RendAPI->CreatePipelineFromShader(CreateInfo, ImposeShader);
-		ImposePipeline->CreatePipeline();
-
-		Ry::ResourceSet* ImposeResource = Ry::RendAPI->CreateResourceSet(ImposeShader->GetFragmentReflectionData().GetResources()[0], ParentSC);
-		ImposeResource->BindFrameBufferAttachment("SceneTexture", OffScreenBuffer, 0);
-		ImposeResource->CreateBuffer();
-		ImposeResources.Add(ImposeResource);
-
-		ScreenMesh = new Ry::Mesh(ImposeShader->GetVertexFormat());
-		ScreenMesh->GetMeshData()->AddVertex(
-		{
-				-1.0, -1.0, 0.0,
-				0.0, 1.0,
-				0.0, 0.0, 0.0
-		});
-		ScreenMesh->GetMeshData()->AddVertex(
-			{
-					-1.0, 1.0, 0.0,
-					0.0, 0.0,
-					0.0, 0.0, 0.0
-		});
-		ScreenMesh->GetMeshData()->AddVertex(
-			{
-					1.0, 1.0, 0.0,
-					1.0, 0.0,
-					0.0, 0.0, 0.0
-		});
-		ScreenMesh->GetMeshData()->AddVertex(
-			{
-					1.0, -1.0, 0.0,
-					1.0, 1.0,
-					0.0, 0.0, 0.0
-		});
-		ScreenMesh->GetMeshData()->AddTriangle(0, 1, 2);
-		ScreenMesh->GetMeshData()->AddTriangle(2, 3, 0);
-		ScreenMesh->Update();
-
-		//Bat->SetLayerScissor(6, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
-		//Bat->SetLayerScissor(7, RectScissor{ 0, 0, Parent->GetSwapChainWidth(), Parent->GetSwapChainHeight() });
-
 		// Create UI
-		UI = new UserInterface(Bat, GetStyle("Editor"));
+		UI = new UserInterface(OffScreenBatch, GetStyle("Editor"));
 
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
@@ -203,53 +79,6 @@ namespace Ry
 		{
 			BrowserWidget = Root->FindChildWidget<Ry::ContentBrowserWidget>("BrowserWidget");
 		}
-
-		/*NewWidgetAssign(Root, BorderWidget)
-		.HorAlign(HAlign::CENTER)
-		.VertAlign(VAlign::BOTTOM)
-		.FillX(1.0f)
-		.FillY(1.0f)
-		[
-			NewWidget(Ry::Splitter)
-			.BarThickness(5.0f)
-			.Type(SplitterType::VERTICAL)
-
-			+ Ry::Splitter::MakeSlot()
-			[
-				NewWidget(Ry::BorderWidget)
-				//.DefaultBox(Default)
-				//.HoveredBox(Hovered)
-				.Padding(10.0f)
-				.FillX(1.0f)
-				[
-					NewWidgetAssign(BrowserWidget, Ry::ContentBrowserWidget)
-				]
-			]
-
-			+ Ry::Splitter::MakeSlot()
-			[
-				NewWidget(Ry::Splitter)
-				.BarThickness(4.0f)
-				.Type(SplitterType::HORIZONTAL)
-				
-				+ Ry::Splitter::MakeSlot()
-				[
-					NewWidget(BorderWidget)
-					.BoxStyleName("TestIcon1")
-		//			.DefaultBox(Default2)
-					.Padding(75.0f)
-				]
-				+ Ry::Splitter::MakeSlot()
-				[
-					NewWidget(BorderWidget)
-					.BoxStyleName("TestIcon2")
-//					.DefaultBox(Default3)
-					.Padding(75.0f)
-				]
-
-			]
-
-		];*/
 		
 		// Create the content browser utility
 		ContentBrowse = new ContentBrowser(BrowserWidget);
@@ -267,7 +96,8 @@ namespace Ry
 
 	void MainEditorLayer::Render()
 	{
-		Bat->Render();
+		OffScreenBatch->Render();
+		OnScreenBatch->Render();
 
 		RecordCmds();
 
@@ -286,18 +116,56 @@ namespace Ry
 		// todo: cant re record primary command buffer here unless we explicitly re-record secondary buffers
 		// the below just marks the secondaries for needing recording
 
-		Bat->SetRenderPass(ParentSC->GetDefaultRenderPass());
+		// Re-size framebuffers
+		//OffScreenBuffer->Recreate(Width, Height, )A
 
-		Bat->Resize(Width, Height);
+		// Re-create the render pass
+		CreateRenderPass();
+
+		// Re-create the framebuffer
+		OnScreenBuffer->Recreate(Width, Height, MainPass);
+		OffScreenBuffer->Recreate(Width, Height, OffScreenPass);
+
+		UpdateFullScreenRect();
+
+		OffScreenBatch->SetRenderPass(OffScreenPass);
+		OffScreenBatch->Resize(Width, Height);
+
+		OnScreenBatch->SetRenderPass(MainPass);
+		OnScreenBatch->Resize(Width, Height);
 
 		UI->Redraw();
 
 		TestWorld->Resize(Width, Height);
-		// ShapeBatch->Render();
-		// TextureBatch->Render();
-		// TextBatch->Render();
-		//
-		// RecordCmds();
+	}
+
+	void MainEditorLayer::UpdateFullScreenRect()
+	{
+		// Refreshes the color attachment, used when screen gets resized and framebuffer is re-createdq
+		OnScreenBatch->RemoveItem(FullScreenRect);
+
+		OnScreenBatch->AddItem(FullScreenRect, "Impose", PipelineState{}, OffScreenBuffer->GetColorAttachment(0));
+		OnScreenBatch->Update();
+	}
+
+	void MainEditorLayer::CreateRenderPass()
+	{
+		// Delete the current one if it exists
+		if (MainPass)
+		{
+			MainPass->DeleteRenderPass();
+			delete MainPass;
+		}
+
+		MainPass = Ry::RendAPI->CreateRenderPass();
+		MainPass->SetFramebufferDescription(OnScreenDesc);
+		{
+			int32 OnScreenPass = MainPass->CreateSubpass();
+			MainPass->AddSubpassAttachment(OnScreenPass, SwapColor);
+			MainPass->AddSubpassAttachment(OnScreenPass, SwapDepth);
+		}
+		MainPass->CreateRenderPass();
+
 	}
 
 	void MainEditorLayer::RecordCmds()
@@ -306,32 +174,17 @@ namespace Ry
 		
 		Cmd->BeginCmd();
 		{
+			// Off-screen render pass
 			Cmd->BeginRenderPass(OffScreenPass, OffScreenBuffer, true);
 			{
-
-				for (int32 Layer = 0; Layer < Bat->GetLayerCount(); Layer++)
-				{
-					CommandBuffer* BatBuffer = Bat->GetCommandBuffer(Layer);
-
-					if (BatBuffer)
-					{
-						Cmd->DrawCommandBuffer(BatBuffer);
-					}
-				}
-
+				OffScreenBatch->DrawCommandBuffers(Cmd);
 			}
 			Cmd->EndRenderPass();
 
-			Cmd->BeginRenderPass(MainPass, OnScreenBuffer, false);
+			// Composite off-screen into the on-screen buffer
+			Cmd->BeginRenderPass(MainPass, OnScreenBuffer, true);
 			{
-				Cmd->BindPipeline(ImposePipeline);
-
-				Cmd->SetViewportSize(0, 0, ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight());
-				Cmd->SetScissorSize(0, 0, ParentSC->GetSwapChainWidth(), ParentSC->GetSwapChainHeight());
-
-				Cmd->BindResources(ImposeResources.GetData(), ImposeResources.GetSize());
-
-				Cmd->DrawVertexArrayIndexed(ScreenMesh->GetVertexArray(), 0, ScreenMesh->GetMeshData()->GetIndexCount());
+				OnScreenBatch->DrawCommandBuffers(Cmd);
 			}
 			Cmd->EndRenderPass();
 		}

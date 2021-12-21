@@ -8,6 +8,11 @@ namespace Ry
 {
 	class GLTexture;
 
+	struct GLColorAttachment : public Ry::ColorAttachment
+	{
+		GLuint AttachmentHandle;
+	};
+
 	class GLFrameBuffer : public Ry::FrameBuffer
 	{
 
@@ -20,14 +25,20 @@ namespace Ry
 		const ColorAttachment* GetColorAttachment(int32 AttachmentIndex) const override;
 
 		uint32 GetHandle();
-		GLuint GetColorAttachmentTexture(int32 AttachmentIndex) const;
 		bool HasDepthStencilAttachment() const;
 		GLuint GetDepthStencilAttachment() const;
 
+		bool IsDefaultAlias() const;
+
 	private:
+
+		void CreateFramebuffer(uint32 Width, uint32 Height);
+
+		bool bDefaultFboAlias;
+
 		uint32 Handle;
 
-		Ry::ArrayList<GLuint> ColorAttachments;
+		Ry::ArrayList<GLColorAttachment*> ColorAttachments;
 
 		GLuint DepthStencilAttachment;
 		bool bHasDepthStencilAttachment = false;

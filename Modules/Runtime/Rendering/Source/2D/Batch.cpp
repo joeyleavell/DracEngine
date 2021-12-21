@@ -530,7 +530,8 @@ namespace Ry
 		Ry::BatchPipeline* NewPipeline = new Ry::BatchPipeline;
 
 		NewPipeline->SceneResDesc   = ShaderToUse->GetVertexReflectionData()[0];
-		NewPipeline->TextureResDesc = ShaderToUse->GetFragmentReflectionData()[1];
+		NewPipeline->GroupResDesc = ShaderToUse->GetVertexReflectionData()[1];
+		NewPipeline->TextureResDesc = ShaderToUse->GetFragmentReflectionData()[2];
 		NewPipeline->Format         = ShaderToUse->GetVertexFormat();
 
 		// Create new pipeline
@@ -554,33 +555,58 @@ namespace Ry
 
 	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
 	{
+		AddItem(Item, PipelineId, State, Text, nullptr, Layer);
+	}
+
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
+	{
+		AddItemSet(ItemSet, PipelineId, State, Text, nullptr, Layer);
+	}
+
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State,
+		const ColorAttachment* Attachment, int32 Layer)
+	{
+		AddItem(Item, PipelineId, State, nullptr, Attachment, Layer);
+	}
+
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State,
+		const ColorAttachment* Attachment, int32 Layer)
+	{
+		AddItemSet(ItemSet, PipelineId, State, nullptr, Attachment, Layer);
+	}
+
+	void Batch::AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Texture,
+		const ColorAttachment* Color, int32 Layer)
+	{
 		if (Layer < 0)
-			Layer = std::max(Layers.GetSize() - 1, 0);
+			Layer = Layers.GetSize() - 1;
 
-		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Text, Layer);
+		Layer = std::max(Layer, 0);
 
-		if(Group)
+		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Texture, Color, Layer);
+		if (Group)
 		{
 			Group->Items.Insert(Item);
 
 			Layers[Layer]->bNeedsRecord = true;
 		}
-
 	}
 
-	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> Item, Ry::String PipelineId, PipelineState Scissor, Texture* Text, int32 Layer)
+	void Batch::AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State,
+		Texture* Texture, const ColorAttachment* Color, int32 Layer)
 	{
 		if (Layer < 0)
 			Layer = Layers.GetSize() - 1;
 
-		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, Scissor, Text, Layer);
-		if(Group)
+		Layer = std::max(Layer, 0);
+
+		BatchGroup* Group = FindOrCreateBatchGroup(PipelineId, State, Texture, Color, Layer);
+		if (Group)
 		{
-			Group->ItemSets.Insert(Item);
+			Group->ItemSets.Insert(ItemSet);
 
 			Layers[Layer]->bNeedsRecord = true;
 		}
-
 	}
 
 	void Batch::RemoveItem(Ry::SharedPtr<BatchItem> Item)
@@ -843,9 +869,9 @@ namespace Ry
 		return nullptr;
 	}
 
-	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer)
+	BatchGroup* Batch::FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, const ColorAttachment* ColorAttach, int32 Layer)
 	{
-		BatchGroup* Existing = FindBatchGroup(Text, State, Layer);
+		BatchGroup* Existing = FindBatchGroup(Text, ColorAttach, State, Layer);
 
 		if(!Existing)
 		{
@@ -859,15 +885,35 @@ namespace Ry
 			NewGroup->OwningPipeline = (*Pipelines.get(PipelineId));
 			NewGroup->Text = Text;			
 			NewGroup->State = State;
+			NewGroup->Attachment = ColorAttach;
 			NewGroup->ResourceSets.Add(NewGroup->OwningPipeline->SceneResources);
 
+			NewGroup->GroupResources = Ry::RendAPI->CreateResourceSet(NewGroup->OwningPipeline->GroupResDesc, AtLayer->CommandBuffer->GetSwapChain());
+
+			// OpenGL color attachments need to be flipped
+			if(ColorAttach && *Ry::rplatform == RenderingPlatform::OpenGL)
+			{
+				NewGroup->GroupResources->SetFloatConstant("Group", "FlipTexture", 1.0f);
+			}
+			else
+			{
+				NewGroup->GroupResources->SetFloatConstant("Group", "FlipTexture", 0.0f);
+			}
+
+			NewGroup->GroupResources->CreateBuffer();
+
 			// Create a new texture resource if needed
-			if(Text)
+			if(Text || ColorAttach)
 			{
 				NewGroup->TextureResources = Ry::RendAPI->CreateResourceSet(NewGroup->OwningPipeline->TextureResDesc, AtLayer->CommandBuffer->GetSwapChain());
-				NewGroup->TextureResources->BindTexture("BatchTexture", Text);
+				if(Text)
+					NewGroup->TextureResources->BindTexture("BatchTexture", Text);
+				else if(ColorAttach)
+					NewGroup->TextureResources->BindFrameBufferAttachment("BatchTexture", ColorAttach);
+
 				NewGroup->TextureResources->CreateBuffer();
 
+				NewGroup->ResourceSets.Add(NewGroup->GroupResources);
 				NewGroup->ResourceSets.Add(NewGroup->TextureResources);
 			}
 			else
@@ -897,7 +943,7 @@ namespace Ry
 
 	}
 
-	BatchGroup* Batch::FindBatchGroup(Texture* Text, PipelineState State, int32 Layer)
+	BatchGroup* Batch::FindBatchGroup(Texture* Text, const ColorAttachment* ColorAttach, PipelineState State, int32 Layer)
 	{
 		if (Layer >= Layers.GetSize())
 			return nullptr;
@@ -908,7 +954,9 @@ namespace Ry
 		{
 			for (BatchGroup* Group : PipelineItr.GetValue())
 			{
-				if (Group->Text == Text && Group->State == State)
+				// Check if either the specified texture or color attachment matches
+				// TODO: make this more generic to allow batches to take in an arbitrary # of textures/attachments
+				if ((Group->Text == Text && Group->Attachment == ColorAttach) && Group->State == State)
 				{
 					return Group;
 				}
@@ -954,6 +1002,14 @@ namespace Ry
 						RemoveGroup->TextureResources = nullptr;
 					}
 
+					// todo: delete group resources
+					if (RemoveGroup->GroupResources)
+					{
+						RemoveGroup->GroupResources->DeleteBuffer();
+						delete RemoveGroup->GroupResources;
+						RemoveGroup->GroupResources = nullptr;
+					}
+
 					Layer->Groups.Get(PipelineItr.GetKey()).Remove(RemoveGroup);
 
 					delete RemoveGroup;
@@ -962,6 +1018,19 @@ namespace Ry
 				++PipelineItr;
 			}
 			
+		}
+	}
+
+	void Batch::DrawCommandBuffers(Ry::CommandBuffer* DstCmdBuffer)
+	{
+		for (int32 Layer = 0; Layer < GetLayerCount(); Layer++)
+		{
+			CommandBuffer* BatBuffer = GetCommandBuffer(Layer);
+
+			if (BatBuffer)
+			{
+				DstCmdBuffer->DrawCommandBuffer(BatBuffer);
+			}
 		}
 	}
 

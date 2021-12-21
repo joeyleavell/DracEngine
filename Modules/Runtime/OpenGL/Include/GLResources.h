@@ -74,7 +74,7 @@ namespace Ry
 		bool Update() override;
 		void FlushBuffer(int32 Frame) override;
 
-		void BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex) override;
+		void BindFrameBufferAttachment(Ry::String TextureName, const Ry::ColorAttachment* ColorAttachment) override;
 		void BindTexture(Ry::String TextureName, const Ry::Texture* Resource) override;
 
 		void SetConstant(Ry::String BufferName, Ry::String Id, const void* Data) override;

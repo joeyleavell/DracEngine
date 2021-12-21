@@ -35,6 +35,7 @@ namespace Ry
 
 		Ry::OAHashMap<int32, VulkanColorAttachment*> CreatedColorAttachments;
 
+		bool bCreatedDepthAttachment{};
 		VkDeviceMemory CreatedDepthDeviceMemory;
 		VkImageView CreatedDepthImageView;
 		VkImage CreatedDepthImage;
@@ -42,10 +43,8 @@ namespace Ry
 
 		VulkanSwapChain* ReferencingSwapChain;
 
-		void CreateFramebuffers(int32 Width, int32 Height, const VulkanRenderPass* VkRP);
+		void CreateFramebuffers(uint32 Width, uint32 Height, const VulkanRenderPass* VkRP);
 		void DeleteFramebuffers();
-
-		void OnSwapChainDirty();
 
 		// This is an array because if we depend on a swap chain, we have to maintain one framebuffer per swap chain image/image view
 		Ry::ArrayList<VkFramebuffer> FboResources;

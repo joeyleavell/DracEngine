@@ -70,6 +70,9 @@ namespace Ry
 		if (Count == 0)
 			return;
 
+		// TODO: This is horribly slow! Don't do this! The below vkMapMemory needs to be correctly synchronized
+		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+
 		int32 BufferSize = sizeof(T) * Count;
 
 		void* MappedMemory = nullptr;

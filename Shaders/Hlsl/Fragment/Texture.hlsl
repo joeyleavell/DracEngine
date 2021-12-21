@@ -1,5 +1,5 @@
-SamplerState BatchTextureSampler : register(t0, space1);
-Texture2D <float4> BatchTexture : register(t0, space1);
+SamplerState BatchTextureSampler : register(t0, space2);
+Texture2D <float4> BatchTexture : register(t0, space2);
 
 struct PixelInput
 {
@@ -21,6 +21,6 @@ PixelOutput main(PixelInput In)
 				
 	Res.PixelColor = In.VertColor * float4(TextureColor.r, TextureColor.g, TextureColor.b, TextureColor.a);
 	//Res.PixelColor = float4(TextureColor.a, TextureColor.a, TextureColor.a, 1.0f);
-	
+
 	return Res;
 }

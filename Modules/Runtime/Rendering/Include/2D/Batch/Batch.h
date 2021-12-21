@@ -82,6 +82,7 @@ namespace Ry
 	class Camera;
 	class Shader;
 	class Texture;
+	class ColorAttachment;
 	class BitmapFont;
 	class Pipeline;
 	class SwapChain;
@@ -231,6 +232,10 @@ namespace Ry
 
 		PipelineState State;
 		Texture* Text = nullptr;
+
+		// Alternative to specifying texture
+		const ColorAttachment* Attachment = nullptr;
+
 		Mesh* BatchMesh = nullptr;
 		Ry::ArrayList<ResourceSet*> ResourceSets;
 		
@@ -238,6 +243,7 @@ namespace Ry
 		Ry::OASet<Ry::SharedPtr<BatchItemSet>> ItemSets;
 
 		// Batch group specific resources
+		ResourceSet* GroupResources;
 		ResourceSet* TextureResources;
 
 		int LastIndexCount = -1;
@@ -259,6 +265,7 @@ namespace Ry
 
 		// Resource layouts
 		const Ry::ResourceLayout* SceneResDesc;
+		const Ry::ResourceLayout* GroupResDesc;
 		const Ry::ResourceLayout* TextureResDesc;
 	};
 
@@ -307,7 +314,15 @@ namespace Ry
 
 		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Texture = nullptr, int32 Layer = -1);
 		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State, Texture* Texture = nullptr, int32 Layer = -1);
-		
+
+		// Adds item using color attachment from framebuffer instead of texture
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, const ColorAttachment* Attachment, int32 Layer = -1);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State, const ColorAttachment* Attachment, int32 Layer = -1);
+
+		void AddItem(Ry::SharedPtr<BatchItem> Item, Ry::String PipelineId, PipelineState State, Texture* Texture, const ColorAttachment* Color, int32 Layer = -1);
+		void AddItemSet(Ry::SharedPtr<BatchItemSet> ItemSet, Ry::String PipelineId, PipelineState State, Texture* Texture, const ColorAttachment* Color, int32 Layer = -1);
+
+
 		void RemoveItem(Ry::SharedPtr<BatchItem> Item);
 		void RemoveItemSet(Ry::SharedPtr<BatchItemSet> ItemSet);
 
@@ -330,7 +345,9 @@ namespace Ry
 
 		// TODO: this function may be needed if memory usage gets too high
 		void DeleteEmptyGroups();
-		
+
+		void DrawCommandBuffers(Ry::CommandBuffer* DstCmdBuffer);
+
 	private:
 
 		void Init();
@@ -340,9 +357,10 @@ namespace Ry
 
 		void CreateLayersIfNeeded(int32 Index);
 
+		// TODO: improve FindOrCreateBatchGroup
 		// Finds a batch group for given state information
-		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, int32 Layer);
-		BatchGroup* FindBatchGroup(Texture* Text, PipelineState State, int32 Layer);
+		BatchGroup* FindOrCreateBatchGroup(Ry::String PipelineId, PipelineState State, Texture* Text, const ColorAttachment* ColorAttach, int32 Layer);
+		BatchGroup* FindBatchGroup(Texture* Text, const ColorAttachment* ColorAttach, PipelineState State, int32 Layer);
 
 		void RecordCommands(int32 Layer);
 

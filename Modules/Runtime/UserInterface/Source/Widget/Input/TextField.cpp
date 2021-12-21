@@ -65,10 +65,10 @@ namespace Ry
 		const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
 
 		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), ResolvedStyle.Font->GetAtlasTexture(), WidgetLayer + 1);
-		Batch->AddItem(CursorItem, "Shape", GetPipelineState(this), nullptr, WidgetLayer + 1);
+		Batch->AddItem(CursorItem, "Shape", GetPipelineState(this), (Texture*) nullptr, WidgetLayer + 1);
 
 		if (CursorPos != SelectionPos && SelectionPos >= 0)
-			Batch->AddItem(SelectionItem, "Shape", GetPipelineState(this), nullptr, WidgetLayer);
+			Batch->AddItem(SelectionItem, "Shape", GetPipelineState(this), (Texture*) nullptr, WidgetLayer);
 
 	}
 

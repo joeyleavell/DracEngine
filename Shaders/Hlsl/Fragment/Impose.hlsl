@@ -1,12 +1,12 @@
 // Sampler for the scene texture
-SamplerState SceneTextureSampler : register(t0, space0);
-Texture2D <float4> SceneTexture : register(t0, space0);
+SamplerState BatchTextureSampler : register(t0, space2);
+Texture2D <float4> BatchTexture : register(t0, space2);
 
 struct PixelInput
 {
 	float4 VertPos : SV_Position;
 	float2 VertUV : TEXCOORD;
-	float3 VertNormal : NORMAL;	
+	float4 VertColor : COLOR;
 };
 
 struct PixelOutput
@@ -19,11 +19,10 @@ PixelOutput main(PixelInput In)
 	PixelOutput Out;
 
 	// Sample scene texture
-	float4 Pixel = SceneTexture.Sample(SceneTextureSampler, In.VertUV);
-	Pixel = 1 - Pixel;
+	float4 Pixel = BatchTexture.Sample(BatchTextureSampler, In.VertUV);
 
 	// Simply set the output to the scene texture's pixel value
-	Out.PixelColor = Pixel;	
+	Out.PixelColor = float4(Pixel.r, Pixel.g, Pixel.b, 1.0);	
 	
 	return Out;
 }

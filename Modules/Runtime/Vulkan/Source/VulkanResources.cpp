@@ -113,22 +113,15 @@ namespace Ry
 		}
 	}
 
-	void VulkanResourceSet::BindFrameBufferAttachment(Ry::String TextureName, const Ry::FrameBuffer* InputBuffer, int32 AttachmentIndex)
+	void VulkanResourceSet::BindFrameBufferAttachment(Ry::String TextureName, const Ry::ColorAttachment* ColorAttachment)
 	{
-		if(const VulkanFrameBuffer* VkFB = dynamic_cast<const VulkanFrameBuffer*>(InputBuffer))
+		if(const VulkanColorAttachment* Attachment = dynamic_cast<const VulkanColorAttachment*>(ColorAttachment))
 		{
-			if(const VulkanColorAttachment* Attachment = dynamic_cast<const VulkanColorAttachment*>(VkFB->GetColorAttachment(AttachmentIndex)))
-			{
-				BindTexture(TextureName, Attachment->ImageView, Attachment->Sampler);
-			}
-			else
-			{
-				Ry::Log->LogErrorf("VulkanResourceSet::BindFrameBufferAttachment: Color attachment at index %d was invalid", AttachmentIndex);
-			}
+			BindTexture(TextureName, Attachment->ImageView, Attachment->Sampler);
 		}
 		else
 		{
-			Ry::Log->LogError("VulkanResourceSet::BindFrameBufferAttachment: Invalid InputBuffer");
+			Ry::Log->LogError("VulkanResourceSet::BindFrameBufferAttachment: Color attachment was invalid");
 		}
 	}
 

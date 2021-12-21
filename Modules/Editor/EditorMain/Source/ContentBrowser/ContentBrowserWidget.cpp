@@ -112,6 +112,8 @@ namespace Ry
 			{
 				PipelineState State = GetPipelineState(this);
 				State.StateID += "_Drag";
+				State.Scissor.X = 0;
+				State.Scissor.Y = 0;
 				State.Scissor.Width = Ry::GetViewportWidth();
 				State.Scissor.Height = Ry::GetViewportHeight();
 

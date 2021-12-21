@@ -291,7 +291,7 @@ namespace Ry
 	{
 		PanelWidget::OnShow(Batch);
 
-		Batch->AddItem(SplitterItem, "Shape", GetPipelineState(nullptr), nullptr, WidgetLayer + 1);
+		Batch->AddItem(SplitterItem, "Shape", GetPipelineState(nullptr), (Texture*) nullptr, WidgetLayer + 1);
 	}
 
 	void Splitter::OnHide(Ry::Batch* Batch)
