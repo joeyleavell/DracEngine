@@ -810,12 +810,8 @@ namespace Ry
 			// Check dirty will see if the command buffer needs to be re-recorded
 			if (Layer->bNeedsRecord)
 			{
-				if (!bWasDirty)
-				{
-					// Re-record commands
-					RecordCommands(Layer->Depth);
-				}
-
+				// Re-record commands
+				RecordCommands(Layer->Depth);
 				Layer->bNeedsRecord = false;
 			}
 			

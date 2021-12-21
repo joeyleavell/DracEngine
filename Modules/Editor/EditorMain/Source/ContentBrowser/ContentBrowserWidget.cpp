@@ -121,9 +121,6 @@ namespace Ry
 
 				bGhostShown = true;
 			}
-
-			// todo: weird flickering happens in vulkan if batch render isnt called here
-			//Batch->Render();
 		}
 	}
 
@@ -136,8 +133,6 @@ namespace Ry
 			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
 			IconStyle.Default->Hide(GhostIconItemSet, Batch);
 			bGhostShown = false;
-
-			//Batch->Render();
 		}
 	}
 
