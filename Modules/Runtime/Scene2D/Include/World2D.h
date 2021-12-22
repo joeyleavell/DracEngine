@@ -64,6 +64,7 @@ namespace Ry
 		void OnEntityDirty(Entity2D* Ent);
 
 		Ry::Scene2D* WorldScene;
+		Ry::Scene2DRenderer* SceneRenderer;
 
 		Ry::ArrayList < SharedPtr<Entity2D>> Entities;
 		Ry::ArrayList < SharedPtr<Entity2D>> KillEnts;

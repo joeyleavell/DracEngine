@@ -188,32 +188,40 @@ namespace Ry
 	{
 	public:
 
+		MulticastDelegate<Ry::SharedPtr<ScenePrimitive2D>> OnPrimitiveAdded;
+		MulticastDelegate<Ry::SharedPtr<ScenePrimitive2D>> OnPrimitiveRemoved;
+
 		Scene2D(Ry::SwapChain* Parent);
 
 		void AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemovePrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
+	private:
+
+		//void OnItemSetDirty(Ry::ScenePrimitive2D* Prim);
+
+		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> StaticPrimitives;
+		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> DynamicPrimitives;
+
+	};
+
+	class Scene2DRenderer
+	{
+	public:
+
+		Scene2DRenderer(Scene2D* Target, SwapChain* ParentSC);
+
 		void Update(float Delta);
-
 		void Render(Ry::Camera2D& Cam);
-
+		void AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
+		void RemovePrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void Resize(int32 Width, int32 Height);
-
-		void UpdateStatic();
 
 		void AddCustomBatch(Batch* Batch);
 
+		void UpdateStatic();
+
 	private:
-
-		Ry::ArrayList<Batch*> AllBatches;
-
-		Ry::SwapChain* SC;
-
-		Ry::CommandBuffer* Cmd;
-
-		void RecordCommands();
-
-		void OnItemSetDirty(Ry::ScenePrimitive2D* Prim);
 
 		void AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
@@ -221,14 +229,20 @@ namespace Ry
 		void AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
-		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> StaticPrimitives;
-		Ry::ArrayList<Ry::SharedPtr<ScenePrimitive2D>> DynamicPrimitives;
+		void RecordCommands();
+
+		Scene2D* TargetScene;
+
+		Ry::ArrayList<Batch*> AllBatches;
+
+		Ry::SwapChain* SC;
+
+		Ry::CommandBuffer* Cmd;
 
 		Ry::Batch* StaticBatch;
 		Ry::Batch* DynamicBatch;
+
 		Ry::ArrayList<Batch*> CustomBatches;
 		
 	};
-
-	
 }
