@@ -350,22 +350,18 @@ namespace Ry
 
 	}*/
 
-	Scene2DRenderer::Scene2DRenderer(Scene2D* Target, SwapChain* ParentSC)
+	Scene2DRenderer::Scene2DRenderer(Scene2D* Target, SwapChain* ParentSC, uint32 Width, uint32 Height)
 	{
 		this->TargetScene = Target;
 
 		this->SC = ParentSC;
 
-		Cmd = Ry::RendAPI->CreateCommandBuffer(ParentSC);
-
-		// Create batches
-		DynamicBatch = new Batch(ParentSC);
-		StaticBatch = new Batch(ParentSC);
-
-		AllBatches = { StaticBatch, DynamicBatch };
-
 		Target->OnPrimitiveAdded.AddMemberFunction(this, &Scene2DRenderer::AddPrimitive);
 		Target->OnPrimitiveRemoved.AddMemberFunction(this, &Scene2DRenderer::RemovePrimitive);
+
+		// Init the resources required to render this scene
+		InitResources(Width, Height);
+
 	}
 
 	void Scene2DRenderer::UpdateStatic()
@@ -373,21 +369,38 @@ namespace Ry
 		StaticBatch->Update();
 	}
 
+	const ColorAttachment* Scene2DRenderer::GetSceneTexture() const
+	{
+		return OffScreenFbo->GetColorAttachment(ColorAttachment);
+	}
+
+	void Scene2DRenderer::InitResources(uint32 Width, uint32 Height)
+	{
+		ColorAttachment = OffScreenDesc.AddColorAttachment(); // Extra color attachment
+
+		// Create off-screen pass. Shouldn't need to be re-created on re-size.
+		OffScreenPass = Ry::RendAPI->CreateRenderPass();
+		OffScreenPass->SetFramebufferDescription(OffScreenDesc);
+		{
+			int32 OffScreenSub = OffScreenPass->CreateSubpass();
+			OffScreenPass->AddSubpassAttachment(OffScreenSub, ColorAttachment);
+		}
+		OffScreenPass->CreateRenderPass();
+
+		OffScreenFbo = Ry::RendAPI->CreateFrameBuffer(Width, Height, OffScreenPass, OffScreenDesc);
+
+		// Create batches
+		DynamicBatch = new Batch(SC, OffScreenPass);
+		StaticBatch = new Batch(SC, OffScreenPass);
+
+		AllBatches = { StaticBatch, DynamicBatch };
+	}
+
 	void Scene2DRenderer::Update(float Delta)
 	{
 		// Update dynamic primitives and dynamic batch
 
 		DynamicBatch->Update();
-	}
-
-	void Scene2DRenderer::Resize(int32 Width, int32 Height)
-	{
-		// Update batches
-		StaticBatch->SetRenderPass(SC->GetDefaultRenderPass());
-		DynamicBatch->SetRenderPass(SC->GetDefaultRenderPass());
-
-		StaticBatch->Resize(Width, Height);
-		DynamicBatch->Resize(Width, Height);
 	}
 
 	void Scene2DRenderer::Render(Ry::Camera2D& Cam)
@@ -398,12 +411,46 @@ namespace Ry
 		// Render batches
 		DynamicBatch->Render();
 		StaticBatch->Render();
+	}
 
-		// Record commands
-		RecordCommands();
+	void Scene2DRenderer::DrawCommands(CommandBuffer* DstBuffer)
+	{
+		DstBuffer->BeginRenderPass(OffScreenPass, OffScreenFbo, true);
+		{
+			int32 MaxBatchLength = 0;
+			for (Batch* Custom : AllBatches)
+				if (Custom->GetLayerCount() > MaxBatchLength)
+					MaxBatchLength = Custom->GetLayerCount();
 
-		// Submit command buffer
-		Cmd->Submit();
+			int32 CurrentLayer = 0;
+			while (CurrentLayer < MaxBatchLength)
+			{
+				for (int32 BatchIndex = 0; BatchIndex < AllBatches.GetSize(); BatchIndex++)
+				{
+					Batch* Bat = AllBatches[BatchIndex];
+					if (CurrentLayer < Bat->GetLayerCount())
+					{
+						CommandBuffer* BatBuffer = Bat->GetCommandBuffer(CurrentLayer);
+						DstBuffer->DrawCommandBuffer(BatBuffer);
+					}
+				}
+
+				CurrentLayer++;
+			}
+		}
+		DstBuffer->EndRenderPass();
+	}
+
+	void Scene2DRenderer::Resize(int32 Width, int32 Height)
+	{
+		OffScreenFbo->Recreate(Width, Height, OffScreenPass);
+
+		// Update batches
+		//StaticBatch->SetRenderPass(OffScreenPass);
+		//DynamicBatch->SetRenderPass(OffScreenPass);
+
+		StaticBatch->Resize(Width, Height);
+		DynamicBatch->Resize(Width, Height);
 	}
 
 	void Scene2DRenderer::AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive)
@@ -430,100 +477,6 @@ namespace Ry
 		{
 			RemoveDynamicPrimitive(Primitive);
 		}
-	}
-
-	void Scene2DRenderer::RecordCommands()
-	{
-		Cmd->Reset();
-
-		Cmd->BeginCmd();
-		{
-			Cmd->BeginRenderPass(SC->GetDefaultRenderPass());
-			{
-				int32 MaxBatchLength = 0;
-				for (Batch* Custom : AllBatches)
-					if (Custom->GetLayerCount() > MaxBatchLength)
-						MaxBatchLength = Custom->GetLayerCount();
-
-				int32 CurrentLayer = 0;
-				while (CurrentLayer < MaxBatchLength)
-				{
-					for (int32 BatchIndex = 0; BatchIndex < AllBatches.GetSize(); BatchIndex++)
-					{
-						Batch* Bat = AllBatches[BatchIndex];
-						if (CurrentLayer < Bat->GetLayerCount())
-						{
-							CommandBuffer* BatBuffer = Bat->GetCommandBuffer(CurrentLayer);
-							Cmd->DrawCommandBuffer(BatBuffer);
-						}
-					}
-
-					CurrentLayer++;
-				}
-
-				/*while (Layer < StaticBatch->GetLayerCount() && Layer < DynamicBatch->GetLayerCount() && Layer < MaxCustomLength)
-				{
-					// Draw static and dynamic batches
-					CommandBuffer* StaticBatBuffer  = StaticBatch->GetCommandBuffer(Layer);
-					CommandBuffer* DynamicBatBuffer = DynamicBatch->GetCommandBuffer(Layer);
-
-					if (DynamicBatBuffer)
-						Cmd->DrawCommandBuffer(DynamicBatBuffer);
-					if (StaticBatBuffer)
-						Cmd->DrawCommandBuffer(StaticBatBuffer);
-
-					for(Batch* Custom : CustomBatches)
-					{
-						Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
-					}
-
-					Layer++;
-				}
-
-				while (Layer < StaticBatch->GetLayerCount())
-				{
-					for (Batch* Custom : CustomBatches)
-					{
-						if (Layer < Custom->GetLayerCount())
-							Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
-					}
-
-					// Draw static and dynamic batches
-					CommandBuffer* StaticBatBuffer = StaticBatch->GetCommandBuffer(Layer);
-					if (StaticBatBuffer)
-						Cmd->DrawCommandBuffer(StaticBatBuffer);
-					Layer++;
-
-				}
-
-				while (Layer < DynamicBatch->GetLayerCount())
-				{
-					for (Batch* Custom : CustomBatches)
-					{
-						if (Layer < Custom->GetLayerCount())
-							Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
-					}
-
-					// Draw static and dynamic batches
-					CommandBuffer* DynamicBatBuffer = DynamicBatch->GetCommandBuffer(Layer);
-					if (DynamicBatBuffer)
-						Cmd->DrawCommandBuffer(DynamicBatBuffer);
-					Layer++;
-				}
-
-				while (Layer < MaxCustomLength)
-				{
-				}
-				for (Batch* Custom : CustomBatches)
-				{
-					Cmd->DrawCommandBuffer(Custom->GetCommandBuffer(Layer));
-					Layer++;
-				}*/
-
-			}
-			Cmd->EndRenderPass();
-		}
-		Cmd->EndCmd();
 	}
 
 	void Scene2DRenderer::AddCustomBatch(Batch* Batch)

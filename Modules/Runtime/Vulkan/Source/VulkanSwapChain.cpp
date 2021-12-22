@@ -164,6 +164,7 @@ namespace Ry
 		PoolInfo.poolSizeCount = PoolSizes.GetSize();
 		PoolInfo.pPoolSizes = PoolSizes.GetData();
 		PoolInfo.maxSets = static_cast<uint32_t>(SwapChainImages.GetSize()) * MaxValues;
+		PoolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
 		if (vkCreateDescriptorPool(GVulkanContext->GetLogicalDevice(), &PoolInfo, nullptr, &DescriptorPool) != VK_SUCCESS)
 		{

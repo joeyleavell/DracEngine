@@ -8,6 +8,7 @@
 #include "2D/Batch/Batch.h"
 #include "Animation.h"
 #include "Transform.h"
+#include "Interface/FrameBuffer.h"
 
 namespace Ry
 {
@@ -205,14 +206,16 @@ namespace Ry
 
 	};
 
-	class Scene2DRenderer
+	class SCENE2D_MODULE Scene2DRenderer
 	{
 	public:
 
-		Scene2DRenderer(Scene2D* Target, SwapChain* ParentSC);
+		Scene2DRenderer(Scene2D* Target, SwapChain* ParentSC, uint32 Width, uint32 Height);
 
 		void Update(float Delta);
 		void Render(Ry::Camera2D& Cam);
+		void DrawCommands(CommandBuffer* DstBuffer);
+
 		void AddPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemovePrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void Resize(int32 Width, int32 Height);
@@ -221,7 +224,11 @@ namespace Ry
 
 		void UpdateStatic();
 
+		const ColorAttachment* GetSceneTexture() const;
+
 	private:
+
+		void InitResources(uint32 Width, uint32 Height);
 
 		void AddDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemoveDynamicPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
@@ -229,15 +236,18 @@ namespace Ry
 		void AddStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 		void RemoveStaticPrimitive(Ry::SharedPtr<ScenePrimitive2D> Primitive);
 
-		void RecordCommands();
+		void RecordCommands(CommandBuffer* DstBuffer);
 
 		Scene2D* TargetScene;
+
+		FrameBufferDescription OffScreenDesc;
+		RenderPass* OffScreenPass;
+		FrameBuffer* OffScreenFbo;
+		int32 ColorAttachment;
 
 		Ry::ArrayList<Batch*> AllBatches;
 
 		Ry::SwapChain* SC;
-
-		Ry::CommandBuffer* Cmd;
 
 		Ry::Batch* StaticBatch;
 		Ry::Batch* DynamicBatch;

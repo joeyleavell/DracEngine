@@ -3,7 +3,7 @@ cbuffer Scene : register(b0, space0)
 	float4x4 ViewProjection;
 }
 
-cbuffer Group : register(b0, space1)
+cbuffer Group : register(b1, space1)
 {
 	float FlipTexture;
 }

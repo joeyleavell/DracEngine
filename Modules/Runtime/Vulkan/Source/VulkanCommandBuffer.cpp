@@ -298,11 +298,9 @@ namespace Ry
 		BoundPipeline = VPipeline;
 	}
 
-	void VulkanCommandBuffer2::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight)
+	void VulkanCommandBuffer2::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight)
 	{
-		int32 Height = Swap->GetSwapChainHeight();
-		
-		int32 ConvertedY = Height - (ScissorY + ScissorHeight);
+		int32 ConvertedY = TargetHeight - (ScissorY + ScissorHeight);
 
 		VkRect2D Scissor;
 		Scissor.offset = { ScissorX, ConvertedY};
@@ -311,11 +309,11 @@ namespace Ry
 		vkCmdSetScissor(CmdBuffer, 0, 1, &Scissor);
 	}
 
-	void VulkanCommandBuffer2::RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight)
+	void VulkanCommandBuffer2::RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight, int32 TargetWidth, int32 TargetHeight)
 	{
 		VkViewport ViewportParams;
 		ViewportParams.x = (float) ViewportX;
-		ViewportParams.y = (float) (Swap->GetSwapChainHeight() + ViewportY);// ViewportY;
+		ViewportParams.y = (float) (TargetHeight + ViewportY);// ViewportY;
 		ViewportParams.minDepth = 0.0f;
 		ViewportParams.maxDepth = 1.0f;
 		ViewportParams.width = (float) ViewportWidth;
@@ -371,7 +369,7 @@ namespace Ry
 
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
 
-		if (!VkArray->DeviceIndexBuffer)
+		if (!VkArray->StagingIndexBuffer)
 		{
 			Ry::Log->LogError("Vulkan vertex buffer had no index buffer in DrawVertexArrayIndexed()");
 			return;
@@ -443,13 +441,13 @@ namespace Ry
 		if (NextOpCode == OP_SET_VIEWPORT_SIZE)
 		{
 			SetViewportSizeCmd* Cmd = ExtractToken<SetViewportSizeCmd>(Marker, Data);
-			RecordSetViewportSize(CurrentCmdBuffer, Cmd->ViewportX, Cmd->ViewportY, Cmd->ViewportWidth, Cmd->ViewportHeight);
+			RecordSetViewportSize(CurrentCmdBuffer, Cmd->ViewportX, Cmd->ViewportY, Cmd->ViewportWidth, Cmd->ViewportHeight, Cmd->TargetWidth, Cmd->TargetHeight);
 		}
 
 		if (NextOpCode == OP_SET_SCISSOR_SIZE)
 		{
 			SetViewportScissorCmd* Cmd = ExtractToken<SetViewportScissorCmd>(Marker, Data);
-			RecordSetScissorSize(CurrentCmdBuffer, Cmd->ScissorX, Cmd->ScissorY, Cmd->ScissorWidth, Cmd->ScissorHeight);
+			RecordSetScissorSize(CurrentCmdBuffer, Cmd->ScissorX, Cmd->ScissorY, Cmd->ScissorWidth, Cmd->ScissorHeight, Cmd->TargetWidth, Cmd->TargetHeight);
 		}
 
 		if (NextOpCode == OP_DRAW_VERTEX_ARRAY)

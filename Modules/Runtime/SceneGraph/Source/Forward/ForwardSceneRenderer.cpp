@@ -200,8 +200,8 @@ namespace Ry
 			StaticCmdBuffer->BindPipeline(Pipeline);
 
 			// Set the viewport/scissor size state for the pipeline
-			StaticCmdBuffer->SetViewportSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
-			StaticCmdBuffer->SetScissorSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
+			StaticCmdBuffer->SetViewportSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight(), (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
+			StaticCmdBuffer->SetScissorSize(0, 0, (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight(), (int32)Ry::GetViewportWidth(), (int32)Ry::GetViewportHeight());
 
 			// For each material in each primitive:
 			// Bind its associated resources, and call draw

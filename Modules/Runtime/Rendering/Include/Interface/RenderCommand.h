@@ -35,6 +35,8 @@ namespace Ry
 		int32 ViewportY;
 		int32 ViewportWidth;
 		int32 ViewportHeight;
+		int32 TargetWidth;
+		int32 TargetHeight;
 	};
 
 	struct RENDERING_MODULE SetViewportScissorCmd
@@ -43,6 +45,8 @@ namespace Ry
 		int32 ScissorY;
 		uint32 ScissorWidth;
 		uint32 ScissorHeight;
+		int32 TargetWidth;
+		int32 TargetHeight;
 	};
 	
 	struct RENDERING_MODULE BindPipelineCommand
@@ -179,15 +183,15 @@ namespace Ry
 			PushCmdDataNoData(OP_END_RENDER_PASS);
 		}
 
-		virtual void SetViewportSize(int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight)
+		virtual void SetViewportSize(int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight, int32 TargetWidth, int32 TargetHeight)
 		{
-			SetViewportSizeCmd Cmd{ ViewportX, ViewportY, ViewportWidth, ViewportHeight};
+			SetViewportSizeCmd Cmd{ ViewportX, ViewportY, ViewportWidth, ViewportHeight, TargetWidth, TargetHeight};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_SET_VIEWPORT_SIZE);
 		}
 
-		virtual void SetScissorSize(int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight)
+		virtual void SetScissorSize(int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight)
 		{
-			SetViewportScissorCmd Cmd{ ScissorX, ScissorY, ScissorWidth, ScissorHeight };
+			SetViewportScissorCmd Cmd{ ScissorX, ScissorY, ScissorWidth, ScissorHeight, TargetWidth, TargetHeight};
 			PushCmdData(&Cmd, sizeof(Cmd), OP_SET_SCISSOR_SIZE);
 		}
 

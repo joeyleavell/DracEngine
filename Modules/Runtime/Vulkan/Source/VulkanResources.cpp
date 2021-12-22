@@ -64,6 +64,8 @@ namespace Ry
 			
 			++Itr;
 		}
+
+		vkFreeDescriptorSets(GVulkanContext->GetLogicalDevice(), VkSC->DescriptorPool, DescriptorSets.GetSize(), DescriptorSets.GetData());
 		
 	}
 

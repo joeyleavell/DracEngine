@@ -52,6 +52,8 @@ namespace Ry
 
 	} RefClass();
 
+	extern Texture* Tex;
+
 	class TestEntity : public Entity2D
 	{
 	public:
@@ -59,7 +61,10 @@ namespace Ry
 		Entity2D(World)
 		{
 			// Default root rect component
-			CreateComponent<RectComponent>(Static, Vector2{ 50.0f, 50.0f });
+		//	CreateComponent<RectComponent>(Static, Vector2{ 300.0f, 300.0f }, Vector2{0.5f, 0.5f}, BLUE);
+
+			TextureRegion Region(Tex);
+			CreateComponent<Texture2DComponent>(Static, Vector2{ 300.0f, 300.0f }, Vector2{ 0.5f, 0.5f }, Tex);
 		}
 	};
 	
@@ -74,6 +79,8 @@ namespace Ry
 		bool OnEvent(const Event& Ev) override;
 
 		void OnResize(int32 Width, int32 Height) override;
+
+		void SceneResized(uint32 Width, uint32 Height);
 
 	private:
 
@@ -92,24 +99,27 @@ namespace Ry
 
 		Ry::CommandBuffer* Cmd;
 
-		Ry::Batch* OffScreenBatch;
+		//Ry::Batch* OffScreenBatch;
 		Ry::Batch* OnScreenBatch;
+		//Ry::Batch* OnScreenBatch2;
 
-		FrameBuffer* OffScreenBuffer;
+		//FrameBuffer* OffScreenBuffer;
 		FrameBuffer* OnScreenBuffer;
 		int32 SwapColor;
 		int32 SwapDepth;
 		int32 Color;
 
-		RenderPass* OffScreenPass{};
+		//RenderPass* OffScreenPass{};
 		RenderPass* MainPass{};
 
-		Ry::Mesh* ScreenMesh;
+		//Ry::Mesh* ScreenMesh;
 
 		UserInterface* UI;
 
 		// Editor utility classes
 		ContentBrowser* ContentBrowse;
+
+		Scene2DRenderer* SceneRenderer;
 
 	};
 	

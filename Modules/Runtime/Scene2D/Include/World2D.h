@@ -40,14 +40,18 @@ namespace Ry
 
 		void Update(float Delta);
 
-		void UpdateStaticGeometry();
+		//void UpdateStaticGeometry();
 
 		// Todo: separate from main thread
-		void Draw();
+		//void Draw();
 
 		b2World* GetPhysicsWorld() const;
 
-		void AddCustomBatch(Batch* Batch);
+		//void AddCustomBatch(Batch* Batch);
+
+		Scene2D* GetScene() const;
+
+		Camera2D* GetCamera() const;
 
 	private:
 
@@ -64,7 +68,7 @@ namespace Ry
 		void OnEntityDirty(Entity2D* Ent);
 
 		Ry::Scene2D* WorldScene;
-		Ry::Scene2DRenderer* SceneRenderer;
+		//Ry::Scene2DRenderer* SceneRenderer;
 
 		Ry::ArrayList < SharedPtr<Entity2D>> Entities;
 		Ry::ArrayList < SharedPtr<Entity2D>> KillEnts;

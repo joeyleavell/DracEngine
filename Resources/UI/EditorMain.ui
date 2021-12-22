@@ -14,7 +14,7 @@
                 </Slot>
 
                 <Slot>
-                    <Ry::BorderWidget BoxStyleName="TestIcon2" PaddingLeft="75.0" PaddingRight="75.0" PaddingTop="75.0" PaddingBottom="75.0"/>
+                    <Ry::SceneView Id="SceneView"/>
                 </Slot>
             </Ry::Splitter>
         </Slot>

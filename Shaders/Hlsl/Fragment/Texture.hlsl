@@ -21,6 +21,8 @@ PixelOutput main(PixelInput In)
 				
 	Res.PixelColor = In.VertColor * float4(TextureColor.r, TextureColor.g, TextureColor.b, TextureColor.a);
 	//Res.PixelColor = float4(TextureColor.a, TextureColor.a, TextureColor.a, 1.0f);
+	//Res.PixelColor = float4(1.0, 0.0, 0.0, 1.0) + TextureColor;
+	//Res.PixelColor = float4(In.VertUV.x, In.VertUV.y, 0.0, 1.0);
 
 	return Res;
 }

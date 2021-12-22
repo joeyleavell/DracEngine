@@ -48,6 +48,10 @@ namespace Ry
 
 	void Camera2D::Resize(int32 Width, int32 Height)
 	{
+		//Projection = ortho4(0.0f, Width, 0.0f, Height, 1.0f, -1.0f);
+
+		//Projection = ortho4(-Width / 2.0f, static_cast<float>(Width / 2.0f), Height, 0, 1.0f, -1.0f);
+
 		Projection = ortho4(-Width/2.0f, static_cast<float>(Width/2.0f), -Height/2.0f, static_cast<float>(Height/2.0f), 1.0f, -1.0f);
 	}
 

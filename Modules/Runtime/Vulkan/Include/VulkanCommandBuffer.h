@@ -45,8 +45,8 @@ namespace Ry
 		void RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VkFramebuffer Resource, VkExtent2D BufferExtent, Ry::RenderPass* RenderPass, bool bUseSecondary);
 		void RecordEndRenderPass(VkCommandBuffer CmdBuffer);
 		void RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline);
-		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight);
-		void RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight);
+		void RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight);
+		void RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight, int32 TargetWidth, int32 TargetHeight);
 		void RecordBindResourceSet(VkCommandBuffer CmdBuffer, int32 CmdBufferIndex, BindResourcesCommand* Cmd);
 		void RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstVertex, uint32 Count);
 		void RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstIndex, uint32 Count);

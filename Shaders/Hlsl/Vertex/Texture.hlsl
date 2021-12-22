@@ -24,8 +24,9 @@ struct VertexOutput
 
 VertexOutput main(VertexInput In)
 {
+	float FlipTexture = 0.0;
 	VertexOutput Res;
-	Res.VertUV = In.VertUV;
+	Res.VertUV = float2(In.VertUV.x, FlipTexture * (1.0 - In.VertUV.y) + (1.0 - FlipTexture) * In.VertUV.y);
 	Res.VertColor = In.VertColor;
 	
 	// Transform the position by the model view projection matrix.

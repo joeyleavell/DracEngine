@@ -630,6 +630,8 @@ namespace Ry
 			Layer->bNeedsRecord = true;
 		}
 
+		DeleteEmptyGroups();
+
 	}
 
 	void Batch::RemoveItemSet(Ry::SharedPtr<BatchItemSet> Item)
@@ -649,6 +651,8 @@ namespace Ry
 
 			Layer->bNeedsRecord = true;
 		}
+
+		DeleteEmptyGroups();
 
 	}
 
@@ -970,6 +974,8 @@ namespace Ry
 		for(BatchLayer* Layer : Layers)
 		{
 
+			bool bRecordNow = false;
+
 			Ry::OAPairIterator<Ry::BatchPipeline*, Ry::ArrayList<BatchGroup*>> PipelineItr = Layer->Groups.CreatePairIterator();
 			while (PipelineItr)
 			{
@@ -977,7 +983,7 @@ namespace Ry
 
 				for (BatchGroup* Group : PipelineItr.GetValue())
 				{
-					//if (Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
+					if (Group->Items.GetSize() == 0 && Group->ItemSets.GetSize() == 0)
 					{
 						GroupsToRemove.Add(Group);
 					}
@@ -985,6 +991,7 @@ namespace Ry
 
 				for (BatchGroup* RemoveGroup : GroupsToRemove)
 				{
+					bRecordNow = true;
 					// Delete group batch mesh
 					RemoveGroup->BatchMesh->DeleteMesh();
 					delete RemoveGroup->BatchMesh;
@@ -998,7 +1005,6 @@ namespace Ry
 						RemoveGroup->TextureResources = nullptr;
 					}
 
-					// todo: delete group resources
 					if (RemoveGroup->GroupResources)
 					{
 						RemoveGroup->GroupResources->DeleteBuffer();
@@ -1013,8 +1019,14 @@ namespace Ry
 
 				++PipelineItr;
 			}
-			
+
+			if(bRecordNow)
+			{
+				RecordCommands(Layer->Depth);
+			}
+
 		}
+
 	}
 
 	void Batch::DrawCommandBuffers(Ry::CommandBuffer* DstCmdBuffer)
@@ -1072,10 +1084,17 @@ namespace Ry
 				// Bind pipeline
 				AtLayer->CommandBuffer->BindPipeline(Key->Pipeline);
 
-				AtLayer->CommandBuffer->SetViewportSize(0, 0, RenderTargetWidth, RenderTargetHeight);
+				AtLayer->CommandBuffer->SetViewportSize(0, 0, RenderTargetWidth, RenderTargetHeight, RenderTargetWidth, RenderTargetHeight);
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
+					if(RenderTargetWidth < 600)
+					{
+						std::cout << "test" << std::endl;
+					}
+					if (Group->BatchMesh->GetVertexArray()->GetIndexCount() <= 0)
+						continue;
+
 					RectScissor Scissor = Group->State.Scissor;
 					if(Scissor.IsEnabled())
 					{
@@ -1088,12 +1107,16 @@ namespace Ry
 							Px * RenderTargetWidth, 
 							Py * RenderTargetHeight, 
 							Pw * RenderTargetWidth, 
-							Ph * RenderTargetHeight
+							Ph * RenderTargetHeight,
+							RenderTargetWidth,
+							RenderTargetHeight
 						);
+						//AtLayer->CommandBuffer->SetScissorSize(0, 0, RenderTargetWidth, RenderTargetHeight);
+
 					}
 					else
 					{
-						AtLayer->CommandBuffer->SetScissorSize(0, 0, RenderTargetWidth, RenderTargetHeight);
+						AtLayer->CommandBuffer->SetScissorSize(0, 0, RenderTargetWidth, RenderTargetHeight, RenderTargetWidth, RenderTargetHeight);
 					}
 
 					if (!Group->Items.IsEmpty() || !Group->ItemSets.IsEmpty())

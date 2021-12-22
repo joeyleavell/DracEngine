@@ -34,7 +34,7 @@ namespace Ry
 	World2D::World2D(SwapChain* SC, Ry::Vector2 Gravity)
 	{
 		WorldScene = new Scene2D(SC);
-		SceneRenderer = new Scene2DRenderer(WorldScene, SC);
+		//SceneRenderer = new Scene2DRenderer(WorldScene, SC);
 
 		// Instantiate physics world
 		PhysicsWorld = new b2World(b2Vec2{Gravity.x, Gravity.y});
@@ -59,7 +59,7 @@ namespace Ry
 	void World2D::Resize(int32 Width, int32 Height)
 	{
 		Camera->Resize(Width, Height);
-		SceneRenderer->Resize(Width, Height);
+		//SceneRenderer->Resize(Width, Height);
 	}
 
 	void World2D::SetCameraController(Ry::CameraController2D* Controller)
@@ -121,7 +121,7 @@ namespace Ry
 			KillEnts.Clear();
 		}
 
-		SceneRenderer->Update(Delta);
+		//SceneRenderer->Update(Delta);
 
 		// Update camera
 		if (CameraController)
@@ -131,25 +131,35 @@ namespace Ry
 		Camera->Update();
 	}
 
-	void World2D::UpdateStaticGeometry()
+	/*void World2D::UpdateStaticGeometry()
 	{
 		SceneRenderer->UpdateStatic();
-	}
+	}*/
 
-	void World2D::Draw()
+	/*void World2D::Draw()
 	{
 		// Draw the scene
 		SceneRenderer->Render(*Camera);
-	}
+	}*/
 
 	b2World* World2D::GetPhysicsWorld() const
 	{
 		return PhysicsWorld;
 	}
 
-	void World2D::AddCustomBatch(Batch* Batch)
+	/*void World2D::AddCustomBatch(Batch* Batch)
 	{
 		SceneRenderer->AddCustomBatch(Batch);
+	}*/
+
+	Scene2D* World2D::GetScene() const
+	{
+		return WorldScene;
+	}
+
+	Camera2D* World2D::GetCamera() const
+	{
+		return Camera;
 	}
 
 	void World2D::OnBeginContact(b2Contact* Contact)

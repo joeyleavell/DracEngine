@@ -17,6 +17,9 @@ namespace Ry
 
 		this->StagingIndexBuffer = nullptr;
 		this->DeviceIndexBuffer = nullptr;
+
+		this->VertCount = 0;
+		this->IndexCount = 0;
 	}
 
 	void VulkanVertexArray::PushVertexData(float* Data, uint32 Vertices)
