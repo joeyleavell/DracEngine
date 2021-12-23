@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 #include "Interface/Pipeline.h"
-#include "SwapChain.h"
+#include "Interface/SwapChain.h"
 #include "Interface/RenderAPI.h"
 #include "Interface/RenderingResource.h"
 #include "Interface/RenderCommand.h"
@@ -1088,6 +1088,8 @@ namespace Ry
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
+					if (Group->BatchMesh->GetVertexArray()->GetIndexCount() <= 0 || Group->BatchMesh->GetVertexArray()->GetVertexCount() <= 0)
+						continue;
 
 					RectScissor Scissor = Group->State.Scissor;
 					if(Scissor.IsEnabled())

@@ -381,10 +381,6 @@ namespace Ry
 			Ry::Log->LogError("Failed to create Vulkan graphics pipeline");
 			return false;
 		}
-		else
-		{
-			Ry::Log->Log("Created Vulkan graphics pipeline");
-		}
 
 		return true;
 	}

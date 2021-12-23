@@ -4,7 +4,7 @@
 #include "VulkanSwapChain.h"
 #include "vulkan/vulkan.h"
 #include <vector>
-#include "SwapChain.h"
+#include "Interface/SwapChain.h"
 #include "Interface/RenderPass.h"
 #include "VulkanGen.h"
 

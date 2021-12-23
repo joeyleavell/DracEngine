@@ -7,7 +7,7 @@
 #include "GLSwapChain.h"
 #include "VulkanContext.h"
 #include "VulkanSwapChain.h"
-#include "SwapChain.h"
+#include "Interface/SwapChain.h"
 #include "Input.h"
 #include "Event.h"
 #include "Keys.h"
@@ -16,18 +16,6 @@
 
 namespace Ry
 {
-	
-	// template <>
-	// uint32 Hash<::GLFWwindow*>(const ::GLFWwindow* Object)
-	// {
-	// 	return reinterpret_cast<uint32>(Object);
-	// }
-
-	/*template <>
-	uint32 Hash<::GLFWwindow*>(::GLFWwindow* const& Object)
-	{
-		return reinterpret_cast<uint64>(Object);
-	}*/
 	
 	static Ry::Map<::GLFWwindow*, Window*> Windows;
 
