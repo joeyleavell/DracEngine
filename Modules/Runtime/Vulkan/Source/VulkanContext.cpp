@@ -73,9 +73,10 @@ namespace Ry
 			return false;
 		}
 
-		// Delete the dummy surface now that we've used it to find proper present queue family
-		DeleteDummySurface();
-		
+		// Delete the dummy surface and window now that we've used it to find proper present queue family
+		vkDestroySurfaceKHR(VulkanInstance, DummySurface, nullptr);
+		glfwDestroyWindow(DummyWindow);
+
 		return true;
 	}
 
@@ -159,25 +160,6 @@ namespace Ry
 				
 		return true;
 	}
-
-	// bool VulkanContext::RecreateSwapChain(::GLFWwindow* Window)
-	// {
-	// 	int Width = 0, Height = 0;
-	// 	glfwGetFramebufferSize(Window, &Width, &Height);
-	// 	while (Width == 0 || Height == 0)
-	// 	{
-	// 		glfwGetFramebufferSize(Window, &Width, &Height);
-	// 		glfwWaitEvents();
-	// 	}
-	//
-	// 	vkDeviceWaitIdle(LogicalDevice);
-	//
-	// 	CleanupSwapChain();
-	//
-	// 	SwapChain->CreateSwapChain(PhysicalDevice, LogicalDevice, Surface, Width, Height);
-	//
-	// 	return true;
-	// }
 
 	bool VulkanContext::CreateDummySurface()
 	{
@@ -384,15 +366,6 @@ namespace Ry
 		}
 
 		return true;
-	}
-
-	void VulkanContext::DeleteDummySurface()
-	{
-		// Destroy dummy surface
-		vkDestroySurfaceKHR(VulkanInstance, DummySurface, nullptr);
-
-		// Destroy dummy window
-		glfwDestroyWindow(DummyWindow);
 	}
 
 	bool VulkanContext::CreateVulkanInstance()

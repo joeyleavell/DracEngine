@@ -63,7 +63,6 @@ namespace Ry
 		VkImageView DepthImageView;
 
 		VulkanFrameBuffer* Framebuffer;
-		//Ry::ArrayList<VulkanFrameBuffer*> SwapChainFramebuffers;
 
 		VulkanSwapChain();
 

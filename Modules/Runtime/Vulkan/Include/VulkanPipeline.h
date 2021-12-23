@@ -11,38 +11,6 @@ namespace Ry
 	class VulkanShader;
 	class VulkanVertexArray;
 	class VulkanBuffer;
-	
-	// enum UniformDataType
-	// {
-	// 	Float,
-	// 	Float2,
-	// 	Float3,
-	// 	Float4,
-	// 	Mat2x2,
-	// 	Mat3x3,
-	// 	Mat4x4
-	// };
-	//
-	// struct UniformType
-	// {
-	// 	UniformDataType DataType;
-	// 	int32 SizeBytes;
-	// };
-	//
-	// class UniformDescription
-	// {
-	//
-	// private:
-	// 	
-	// };
-	//
-	// class VULKAN_MODULE Pipeline
-	// {
-	//
-	// private:
-	//
-	// 	Ry::Shader* Shader;
-	// };
 
 	class VULKAN_MODULE VulkanPipeline : public Ry::Pipeline
 	{

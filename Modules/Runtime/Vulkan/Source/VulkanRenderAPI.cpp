@@ -19,11 +19,11 @@ namespace Ry
 	{
 		if(ParentRenderPass)
 		{
-			return new Ry::VulkanCommandBuffer2(Target, SecondaryCommandBufferInfo{true, ParentRenderPass});
+			return new Ry::VulkanCommandBuffer(Target, SecondaryCommandBufferInfo{true, ParentRenderPass});
 		}
 		else
 		{
-			return new Ry::VulkanCommandBuffer2(Target);
+			return new Ry::VulkanCommandBuffer(Target);
 		}
 	}
 
@@ -31,11 +31,11 @@ namespace Ry
 	{
 		if(ParentRenderPass)
 		{
-			return new Ry::VulkanCommandBuffer2(SecondaryCommandBufferInfo{true, ParentRenderPass});
+			return new Ry::VulkanCommandBuffer(SecondaryCommandBufferInfo{true, ParentRenderPass});
 		}
 		else
 		{
-			return new Ry::VulkanCommandBuffer2;
+			return new Ry::VulkanCommandBuffer;
 		}
 	}
 

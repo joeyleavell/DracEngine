@@ -11,162 +11,7 @@
 namespace Ry
 {
 
-	VulkanCommandBuffer::VulkanCommandBuffer(VulkanFrameBuffer* TargetFramebuffer)
-	{
-		this->Target = TargetFramebuffer;
-	}
-	
-	VulkanCommandBuffer::~VulkanCommandBuffer()
-	{
-		
-	}
-	
-	bool VulkanCommandBuffer::CreateBuffer(VkCommandPool CommandPool)
-	{
-		VkCommandBufferAllocateInfo AllocInfo{};
-		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		AllocInfo.commandPool = CommandPool;
-		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
-
-	
-		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &CmdBuffer) != VK_SUCCESS)
-		{
-			Ry::Log->LogError("Failed to create command buffers!");
-			return false;
-		}
-		else
-		{
-			Ry::Log->Log("Created command buffers");
-			return true;
-		}
-	}
-	
-	void VulkanCommandBuffer::FreeBuffer(VkCommandPool CmdPool)
-	{
-		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), CmdPool, 1, &CmdBuffer);
-	}
-	
-	void VulkanCommandBuffer::BeginRecording(bool bImmediate)
-	{
-		this->bIsImmediate = bImmediate;
-		
-		VkCommandBufferBeginInfo BeginInfo{};
-		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		BeginInfo.pInheritanceInfo = nullptr;
-	
-		if(bImmediate)
-		{
-			BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // Optional
-		}
-		else
-		{
-			BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-		}
-	
-		
-		if (vkBeginCommandBuffer(CmdBuffer, &BeginInfo) != VK_SUCCESS)
-		{
-			Ry::Log->LogError("Failed to begin recording command buffer");
-		}
-	}
-	
-	void VulkanCommandBuffer::EndRecording()
-	{
-		if (vkEndCommandBuffer(CmdBuffer) != VK_SUCCESS)
-		{
-			Ry::Log->LogError("Failed to end recording command buffer");
-		}
-	
-		if(bIsImmediate)
-		{
-			SubmitBuffer(bIsImmediate);
-			vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
-		}
-	}
-	
-	void VulkanCommandBuffer::BindDescriptorSet(VkPipelineLayout PipelineLayout, VkDescriptorSet DescSet)
-	{
-		// Bind the descriptor set
-		vkCmdBindDescriptorSets(CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PipelineLayout, 0, 1, &DescSet, 0, nullptr);
-	}
-
-	
-	void VulkanCommandBuffer::EndRenderPass(Ry::RenderPass* RenderPass)
-	{
-		vkCmdEndRenderPass(CmdBuffer);
-	}
-	
-	void VulkanCommandBuffer::BindPipeline(Ry::Pipeline* Pipeline)
-	{
-		Ry::VulkanPipeline* VPipline = dynamic_cast<Ry::VulkanPipeline*>(Pipeline);
-	
-		if(!VPipline)
-		{
-			Ry::Log->LogError("Passed in a non vulkan pipeline to BindPipeline()");
-			return;
-		}
-		
-		vkCmdBindPipeline(CmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, VPipline->GraphicsPipeline);
-	}
-	
-	void VulkanCommandBuffer::DrawVertexArray(Ry::VertexArray* VertexArray)
-	{
-		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertexArray);
-	
-		// Bind the vertex buffer
-		VkBuffer VertexBuffers[] = { VkArray->StagingVertexBuffer->GetBufferObject() };
-		VkDeviceSize Offsets[] = { 0 };
-	
-		vkCmdBindVertexBuffers(CmdBuffer, 0, 1, VertexBuffers, Offsets);
-	
-		// Draw indexed depending on if the device index buffer has been created
-		if (VkArray->DeviceIndexBuffer)
-		{
-			vkCmdBindIndexBuffer(CmdBuffer, VkArray->DeviceIndexBuffer->GetBufferObject(), 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(CmdBuffer, VkArray->GetIndexCount(), 1, 0, 0, 0);
-		}
-		else
-		{
-			vkCmdDraw(CmdBuffer, VkArray->GetVertexCount(), 1, 0, 0);
-		}
-	}
-	
-	void VulkanCommandBuffer::SubmitBuffer(bool bSynchronous, VkSemaphore* WaitSemaphore, VkSemaphore* SignalSemaphore)
-	{
-		// Submit the command immediately
-		VkSubmitInfo SubmitInfo{};
-		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		SubmitInfo.commandBufferCount = 1;
-		SubmitInfo.pCommandBuffers = &CmdBuffer;
-	
-		if(WaitSemaphore)
-		{
-			SubmitInfo.waitSemaphoreCount = 1;
-			SubmitInfo.pWaitSemaphores = WaitSemaphore;
-		}
-	
-		if(SignalSemaphore)
-		{
-			SubmitInfo.signalSemaphoreCount = 1;
-			SubmitInfo.pSignalSemaphores = SignalSemaphore;
-		}
-	
-		vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE);
-	
-		if(bSynchronous)
-		{
-			vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue());
-		}
-	
-	}
-	
-	VkCommandBuffer* VulkanCommandBuffer::GetBuffer()
-	{
-		return &CmdBuffer;
-	}
-
-	VulkanCommandBuffer2::VulkanCommandBuffer2(SwapChain* SC, SecondaryCommandBufferInfo Info) :
+	VulkanCommandBuffer::VulkanCommandBuffer(SwapChain* SC, SecondaryCommandBufferInfo Info) :
 	CommandBuffer(SC, Info)
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
@@ -182,7 +27,7 @@ namespace Ry
 		this->SwapChainVersion = VkSC->GetSwapchainVersion();		
 	}
 
-	VulkanCommandBuffer2::VulkanCommandBuffer2(SecondaryCommandBufferInfo Info):
+	VulkanCommandBuffer::VulkanCommandBuffer(SecondaryCommandBufferInfo Info):
 	CommandBuffer(Info)
 	{
 		// Just create a single command buffer
@@ -198,12 +43,12 @@ namespace Ry
 	}
 
 
-	VulkanCommandBuffer2::~VulkanCommandBuffer2()
+	VulkanCommandBuffer::~VulkanCommandBuffer()
 	{
 		
 	}
 
-	void VulkanCommandBuffer2::CreateBuffers()
+	void VulkanCommandBuffer::CreateBuffers()
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -221,7 +66,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::FreeBuffers()
+	void VulkanCommandBuffer::FreeBuffers()
 	{
 		for (VkCommandBuffer Buff : GeneratedBuffers)
 		{
@@ -231,7 +76,7 @@ namespace Ry
 		GeneratedBuffers.Clear();
 	}
 
-	void VulkanCommandBuffer2::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VkFramebuffer Resource, VkExtent2D BufferExtent, Ry::RenderPass* RenderPass, bool bUseSecondary)
+	void VulkanCommandBuffer::RecordBeginRenderPass(VkCommandBuffer CmdBuffer, VkFramebuffer Resource, VkExtent2D BufferExtent, Ry::RenderPass* RenderPass, bool bUseSecondary)
 	{
 		VulkanRenderPass* VkRenderPass = dynamic_cast<VulkanRenderPass*>(RenderPass);
 
@@ -278,12 +123,12 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::RecordEndRenderPass(VkCommandBuffer CmdBuffer)
+	void VulkanCommandBuffer::RecordEndRenderPass(VkCommandBuffer CmdBuffer)
 	{
 		vkCmdEndRenderPass(CmdBuffer);
 	}
 
-	void VulkanCommandBuffer2::RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline)
+	void VulkanCommandBuffer::RecordBindPipeline(VkCommandBuffer CmdBuffer, Pipeline* Pipeline)
 	{
 		Ry::VulkanPipeline* VPipeline = dynamic_cast<Ry::VulkanPipeline*>(Pipeline);
 
@@ -298,7 +143,7 @@ namespace Ry
 		BoundPipeline = VPipeline;
 	}
 
-	void VulkanCommandBuffer2::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight)
+	void VulkanCommandBuffer::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight)
 	{
 		int32 ConvertedY = std::max((int32) (TargetHeight - (ScissorY + ScissorHeight)), 0);
 
@@ -309,7 +154,7 @@ namespace Ry
 		vkCmdSetScissor(CmdBuffer, 0, 1, &Scissor);
 	}
 
-	void VulkanCommandBuffer2::RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight, int32 TargetWidth, int32 TargetHeight)
+	void VulkanCommandBuffer::RecordSetViewportSize(VkCommandBuffer CmdBuffer, int32 ViewportX, int32 ViewportY, int32 ViewportWidth, int32 ViewportHeight, int32 TargetWidth, int32 TargetHeight)
 	{
 		VkViewport ViewportParams;
 		ViewportParams.x = (float) ViewportX;
@@ -322,7 +167,7 @@ namespace Ry
 		vkCmdSetViewport(CmdBuffer, 0, 1, &ViewportParams);
 	}
 
-	void VulkanCommandBuffer2::RecordBindResourceSet(VkCommandBuffer CmdBuffer, int32 CmdBufferIndex, BindResourcesCommand* Cmd)
+	void VulkanCommandBuffer::RecordBindResourceSet(VkCommandBuffer CmdBuffer, int32 CmdBufferIndex, BindResourcesCommand* Cmd)
 	{
 		Ry::ArrayList<VkDescriptorSet> DescriptorSets;
 		for(int32 Set = 0; Set < Cmd->SetCount; Set++)
@@ -350,7 +195,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstVertex, uint32 Count)
+	void VulkanCommandBuffer::RecordDrawVertexArray(VkCommandBuffer CmdBuffer, VertexArray* VertArray, uint32 FirstVertex, uint32 Count)
 	{
 		VulkanVertexArray* VkArray = dynamic_cast<VulkanVertexArray*>(VertArray);
 
@@ -363,7 +208,7 @@ namespace Ry
 		vkCmdDraw(CmdBuffer, VertexCount, 1, FirstVertex, 0);
 	}
 
-	void VulkanCommandBuffer2::RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray, 
+	void VulkanCommandBuffer::RecordDrawVertexArrayIndexed(VkCommandBuffer CmdBuffer, VertexArray* VertArray,
 		uint32 FirstIndex, uint32 Count)
 	{
 
@@ -393,14 +238,14 @@ namespace Ry
 
 	}
 
-	void VulkanCommandBuffer2::RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer2* Secondary)
+	void VulkanCommandBuffer::RecordCommandBuffer(VkCommandBuffer CmdBuffer, int32 Index, VulkanCommandBuffer* Secondary)
 	{
 
 		vkCmdExecuteCommands(CmdBuffer, 1, &Secondary->GeneratedBuffers[Index]);
 
 	}
 
-	void VulkanCommandBuffer2::ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, uint8* Data, uint32& Marker)
+	void VulkanCommandBuffer::ParseOp(VkCommandBuffer CurrentCmdBuffer, int32 CmdBufferIndex, uint8* Data, uint32& Marker)
 	{
 		uint8 NextOpCode = Data[Marker];
 
@@ -465,12 +310,12 @@ namespace Ry
 		if (NextOpCode == OP_COMMAND_BUFFER)
 		{
 			CommandBufferCommand* Cmd = ExtractToken<CommandBufferCommand>(Marker, Data);
-			RecordCommandBuffer(CurrentCmdBuffer, CmdBufferIndex, dynamic_cast<VulkanCommandBuffer2*>(Cmd->CmdBuffer));
+			RecordCommandBuffer(CurrentCmdBuffer, CmdBufferIndex, dynamic_cast<VulkanCommandBuffer*>(Cmd->CmdBuffer));
 		}
 
 	}
 
-	bool VulkanCommandBuffer2::CheckDirty()
+	bool VulkanCommandBuffer::CheckDirty()
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);		
 		int32 FrameIndex = VkSC->GetCurrentImageIndex();
@@ -490,7 +335,7 @@ namespace Ry
 		return false;
 	}
 
-	void VulkanCommandBuffer2::ForceRecord()
+	void VulkanCommandBuffer::ForceRecord()
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -511,8 +356,8 @@ namespace Ry
 		SwapChainVersion = VkSC->GetSwapchainVersion();
 	}
 
-	void VulkanCommandBuffer2::Submit()
-	{		
+	void VulkanCommandBuffer::Submit()
+	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
 		if(SwapChainVersion != VkSC->GetSwapchainVersion())
@@ -520,7 +365,7 @@ namespace Ry
 			// Force re-create all children
 			for(CommandBuffer* Child : SecondaryBuffers)
 			{
-				VulkanCommandBuffer2* VkCmd = dynamic_cast<VulkanCommandBuffer2*>(Child);
+				VulkanCommandBuffer* VkCmd = dynamic_cast<VulkanCommandBuffer*>(Child);
 
 				VkCmd->ForceRecord();
 			}
@@ -546,12 +391,12 @@ namespace Ry
 		bHasUpdatedThisFrame = false;
 	}
 
-	void VulkanCommandBuffer2::BeginCmd()
+	void VulkanCommandBuffer::BeginCmd()
 	{
 		Reset(); // Always implicitly reset command buffer
 	}
 
-	void VulkanCommandBuffer2::EndCmd()
+	void VulkanCommandBuffer::EndCmd()
 	{
 		if (!Swap)
 		{
@@ -618,7 +463,7 @@ namespace Ry
 		
 	}
 
-	void VulkanCommandBuffer2::VkBeginCmd(VkCommandBuffer NewBuffer)
+	void VulkanCommandBuffer::VkBeginCmd(VkCommandBuffer NewBuffer)
 	{
 		//vkResetCommandBuffer(NewBuffer, 0);
 		
@@ -659,7 +504,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::VkEndCmd(VkCommandBuffer NewBuffer)
+	void VulkanCommandBuffer::VkEndCmd(VkCommandBuffer NewBuffer)
 	{
 		if (vkEndCommandBuffer(NewBuffer) != VK_SUCCESS)
 		{
@@ -677,7 +522,7 @@ namespace Ry
 		// }
 	}
 
-	void VulkanCommandBuffer2::RecordForIndex(int32 Index)
+	void VulkanCommandBuffer::RecordForIndex(int32 Index)
 	{
 		VulkanSwapChain* VkSC = dynamic_cast<VulkanSwapChain*>(Swap);
 
@@ -697,7 +542,7 @@ namespace Ry
 		VkEndCmd(BufferToRecord);
 	}
 
-	bool VulkanCommandBuffer2::CreateCmdBufferResource(VkCommandBuffer& Result)
+	bool VulkanCommandBuffer::CreateCmdBufferResource(VkCommandBuffer& Result)
 	{
 		VkCommandBufferAllocateInfo AllocInfo{};
 		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -723,7 +568,7 @@ namespace Ry
 		}
 	}
 
-	void VulkanCommandBuffer2::FreeCmdBufferResource(VkCommandBuffer Buff)
+	void VulkanCommandBuffer::FreeCmdBufferResource(VkCommandBuffer Buff)
 	{
 		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &Buff);
 	}

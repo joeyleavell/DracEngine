@@ -20,6 +20,11 @@ namespace Ry
 	class VulkanCommandBuffer;
 	class SwapChain;
 
+	struct VulkanQueues
+	{
+		
+	};
+
 	class VULKAN_MODULE VulkanContext : public Ry::Context
 	{
 	private:
@@ -71,7 +76,6 @@ namespace Ry
 		bool PickPhysicalDevice();
 		bool CreateLogicalDevice();
 		bool CreateCommandPool();
-		void DeleteDummySurface();
 		bool IsDeviceSuitable(VkPhysicalDevice PhysicalDev);
 
 #if !defined(RYBUILD_CONFIG_SHIPPING) && defined(VULKAN_VALIDATION)

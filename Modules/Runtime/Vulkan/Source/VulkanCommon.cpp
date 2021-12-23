@@ -32,10 +32,63 @@ namespace Ry
 			{
 				OutQueues.GraphicsFamily = QueueFamIndex;
 			}
+
+			if(OutQueues.PresentFamily != OutQueues.GraphicsFamily)
+			{
+				Ry::Log->Log("Using separate queues for present and graphics");
+			}
 		}
 
 		delete[] FamilyProperies;
 
+	}
+
+	bool AllocCmdBuffer(VkCommandBuffer& OutBuffer, bool bSecondary)
+	{
+		VkCommandBufferAllocateInfo AllocInfo{};
+		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
+		AllocInfo.level = bSecondary ? VK_COMMAND_BUFFER_LEVEL_SECONDARY : VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		AllocInfo.commandBufferCount = 1;
+
+		return vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &OutBuffer) == VK_SUCCESS;
+	}
+
+	bool BeginCmd(const VkCommandBuffer& Buffer, bool bOneTimeUse)
+	{
+		VkCommandBufferBeginInfo BeginInfo{};
+		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		BeginInfo.pInheritanceInfo = nullptr;
+		BeginInfo.flags = bOneTimeUse ? VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT : 0;
+
+		return vkBeginCommandBuffer(Buffer, &BeginInfo) == VK_SUCCESS;
+	}
+
+	bool EndCmd(const VkCommandBuffer& Buffer)
+	{
+		return vkEndCommandBuffer(Buffer) == VK_SUCCESS;
+	}
+
+	bool SubmitAndFree(const VkCommandBuffer& CmdBuffer)
+	{
+		// Submit buffer
+		VkSubmitInfo SubmitInfo{};
+		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		SubmitInfo.commandBufferCount = 1;
+		SubmitInfo.pCommandBuffers = &CmdBuffer;
+		if(vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+		{
+			return false;
+		}
+
+		// Wait for cmd to complete since we are immediately freeing the command buffer.
+		if(!vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue()))
+		{
+			return false;
+		}
+
+		// Return the command buffer to the command pool
+		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
 	}
 
 	uint32 FindMemoryType(uint32 TypeFilter, VkMemoryPropertyFlags Props)
@@ -43,40 +96,29 @@ namespace Ry
 		VkPhysicalDeviceMemoryProperties MemProperties;
 		vkGetPhysicalDeviceMemoryProperties(GVulkanContext->GetPhysicalDevice(), &MemProperties);
 
-		for (uint32_t i = 0; i < MemProperties.memoryTypeCount; i++)
+		for (uint32_t MemoryPropertyIndex = 0; MemoryPropertyIndex < MemProperties.memoryTypeCount; MemoryPropertyIndex++)
 		{
-			if (TypeFilter & (1 << i) && (MemProperties.memoryTypes[i].propertyFlags & Props) == Props)
+			if (TypeFilter & (1 << MemoryPropertyIndex) && (MemProperties.memoryTypes[MemoryPropertyIndex].propertyFlags & Props) == Props)
 			{
-				return i;
+				return MemoryPropertyIndex;
 			}
 		}
 
 		Ry::Log->LogError("Could not find proper memory type");
 		
-		return -1;
+		return UINT32_MAX;
 	}
 
-	void CopyBufferToImage(uint32 Width, uint32 Height, VkBuffer& SrcBuffer, VkImage& DstImage)
+	void CopyBufferToImage(uint32 Width, uint32 Height, const VkBuffer& SrcBuffer, const VkImage& DstImage)
 	{
 		VkCommandBuffer CmdBuffer;
-
-		VkCommandBufferAllocateInfo AllocInfo{};
-		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
-		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
-
-		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &CmdBuffer) != VK_SUCCESS)
+		if(!AllocCmdBuffer(CmdBuffer))
 		{
-			Ry::Log->LogError("Failed to create command buffer");
-			return ;
+			Ry::Log->LogError("Failed to CopyBufferToImage: Command buffer creation failed");
+			return;
 		}
 
-		VkCommandBufferBeginInfo BeginInfo{};
-		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		BeginInfo.pInheritanceInfo = nullptr;
-		BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-		if (vkBeginCommandBuffer(CmdBuffer, &BeginInfo) == VK_SUCCESS)
+		if (BeginCmd(CmdBuffer, true))
 		{
 			VkBufferImageCopy Region;
 			Region.bufferOffset = 0;
@@ -105,47 +147,26 @@ namespace Ry
 			);
 
 		}
-		if (vkEndCommandBuffer(CmdBuffer) != VK_SUCCESS)
+
+		if (!EndCmd(CmdBuffer))
 		{
-			Ry::Log->LogError("Failed to end recording command buffer");
+			Ry::Log->LogError("CopyBufferToImage: Failed to end recording command buffer");
 		}
 
-		// Submit buffer
-		VkSubmitInfo SubmitInfo{};
-		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		SubmitInfo.commandBufferCount = 1;
-		SubmitInfo.pCommandBuffers = &CmdBuffer;
-		vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE);
-
-		// Wait for cmd to complete
-		vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue());
-
-		// Free cmd buffer
-		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
+		SubmitAndFree(CmdBuffer);
 	}
 
-	void TransitionImageLayout(VkImage& Image, VkImageLayout OldLayout, VkImageLayout NewLayout)
+	void TransitionImageLayout(const VkImage& Image, VkImageLayout OldLayout, VkImageLayout NewLayout)
 	{
 		VkCommandBuffer CmdBuffer;
 
-		VkCommandBufferAllocateInfo AllocInfo{};
-		AllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		AllocInfo.commandPool = GVulkanContext->GetCommandPool();
-		AllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		AllocInfo.commandBufferCount = 1;// (uint32_t)CommandBuffers.size();
-
-		if (vkAllocateCommandBuffers(GVulkanContext->GetLogicalDevice(), &AllocInfo, &CmdBuffer) != VK_SUCCESS)
+		if(!AllocCmdBuffer(CmdBuffer))
 		{
-			Ry::Log->LogError("Failed to create command buffer");
+			Ry::Log->LogError("TransitionImageLayout failed: Failed to create command buffer");
 			return;
 		}
 
-		VkCommandBufferBeginInfo BeginInfo{};
-		BeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		BeginInfo.pInheritanceInfo = nullptr;
-		BeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-		if (vkBeginCommandBuffer(CmdBuffer, &BeginInfo) == VK_SUCCESS)
+		if (BeginCmd(CmdBuffer, true))
 		{
 			VkImageMemoryBarrier Barrier{};
 			Barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -195,21 +216,12 @@ namespace Ry
 				1, &Barrier
 			);
 		}
-		vkEndCommandBuffer(CmdBuffer);
+		if(!EndCmd(CmdBuffer))
+		{
+			Ry::Log->LogError("TransitionImageLayout: Failed to end command buffer");
+		}
 
-		// Submit buffer
-		VkSubmitInfo SubmitInfo{};
-		SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		SubmitInfo.commandBufferCount = 1;
-		SubmitInfo.pCommandBuffers = &CmdBuffer;
-
-		vkQueueSubmit(GVulkanContext->GetGraphicsQueue(), 1, &SubmitInfo, VK_NULL_HANDLE);
-
-		// Wait for cmd to complete
-		vkQueueWaitIdle(GVulkanContext->GetGraphicsQueue());
-
-		// Free cmd buffer
-		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
+		SubmitAndFree(CmdBuffer);
 	}
 
 	bool CreateImage(uint32 Width, uint32 Height, VkFormat ImageFormat, VkImageTiling Tiling, VkImageUsageFlags Usage, VkMemoryPropertyFlags Props, VkImage& OutImage, VkDeviceMemory& OutMemory)
@@ -255,6 +267,12 @@ namespace Ry
 		return true;
 	}
 
+	void FreeImage(const VkImage& Image, const VkDeviceMemory& ImageMem)
+	{
+		vkFreeMemory(GVulkanContext->GetLogicalDevice(), ImageMem, nullptr);
+		vkDestroyImage(GVulkanContext->GetLogicalDevice(), Image, nullptr);
+	}
+
 	bool CreateImageView(VkImageView& OutView, const VkImage& ForImage, VkFormat Format, VkImageAspectFlags AspectFlags)
 	{
 		VkImageViewCreateInfo ViewInfo{};
@@ -270,7 +288,7 @@ namespace Ry
 
 		if (vkCreateImageView(GVulkanContext->GetLogicalDevice(), &ViewInfo, nullptr, &OutView) != VK_SUCCESS)
 		{
-			Ry::Log->LogError("Failed to create vulkan texture");
+			Ry::Log->LogError("Failed to create VkImageView");
 			return false;
 		}
 

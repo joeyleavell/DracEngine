@@ -28,6 +28,13 @@ namespace Ry
 
 	};
 
+	struct BufferRef
+	{
+		bool bIsPrimitive = false;
+		int32 Offset = 0;
+		int32 SlotSize = 0;
+	};
+
 	class PrimitiveBufferMember : public BufferMember
 	{
 	public:
@@ -115,13 +122,6 @@ namespace Ry
 				BufferMembers.Add(Member);
 			}
 		}
-		//
-		// StructBufferMember& AddStructMember(Ry::String Id, int32 ArraySize)
-		// {
-		// 	StructBufferMember* BufferMember = new StructBufferMember;
-		// 	BufferMembers.Add(BufferMember);
-		// 	return *BufferMember;
-		// }
 
 	};
 
@@ -202,6 +202,7 @@ namespace Ry
 		}
 
 		// Helper wrapper
+		// TODO: This template function is a great candidate for c++20 concepts!
 		template <typename MatrixOrVectorType>
 		void SetMatConstant(Ry::String Scene, Ry::String Id, MatrixOrVectorType MatrixOrVector)
 		{
@@ -219,5 +220,19 @@ namespace Ry
 		SwapChain* Swap;
 
 	};
+
+	namespace Std140Helpers
+	{
+		RENDERING_MODULE int32 CalcAlignmentRequirement(const BufferMember* Root);
+		RENDERING_MODULE int32 CalcAlignmentRequirement(ShaderPrimitiveDataType Primitive);
+		RENDERING_MODULE int32 CalcBufferSize(const ConstantBuffer* Buffer);
+		RENDERING_MODULE void CalcMemberSize(const BufferMember* Layout, int32& Offset);
+		RENDERING_MODULE int32 SizeOf(const ShaderPrimitiveDataType& PrimData);
+
+		RENDERING_MODULE void MapData_Helper(OAHashMap<Ry::String, BufferRef>& OutRefs, const BufferMember* Member, Ry::String ParentId, int32& Marker);
+		RENDERING_MODULE void MapData(OAHashMap<Ry::String, BufferRef>& OutRefs, const ConstantBuffer* Src);
+
+		RENDERING_MODULE void PrintData(const Ry::ArrayList<ConstantBuffer*> ConstantBuffers);
+	}
 	
 }

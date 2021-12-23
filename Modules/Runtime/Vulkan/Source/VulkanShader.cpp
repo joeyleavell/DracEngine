@@ -10,10 +10,6 @@ namespace Ry
 
 	bool VulkanShader::CreateSingleShader(const Ry::String& ShaderLoc, ShaderStage Stage, VkShaderModule& OutModule)
 	{
-		// Load the text file and immediately unload the asset
-		//Ry::String SourceCode = AssetMan->LoadAsset(HLSLSource, ASSET_TYPE_TEXT)->As<Ry::TextFileAsset>()->GetContents();
-		//AssetMan->UnloadAsset(HLSLSource);
-
 		uint8* SpirV = nullptr;
 		int32 Size = 0;
 		Ry::String ErrWarnMsg;
