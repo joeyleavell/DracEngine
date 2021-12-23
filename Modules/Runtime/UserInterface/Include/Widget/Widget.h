@@ -4,7 +4,7 @@
 #include "Core/Delegate.h"
 #include "Event.h"
 #include "Pipeline.h"
-#include "2D/Batch/Batch.h"
+#include "Batch.h"
 #include "Core/Object.h"
 #include "Widget.gen.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RenderingEngine.h"
-#include "2D/Batch/Batch.h"
+#include "Batch.h"
 #include "UserInterfaceGen.h"
 
 namespace Ry

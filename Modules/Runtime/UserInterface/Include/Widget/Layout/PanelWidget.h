@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Widget/Widget.h"
-#include <vector>
 #include "Data/ArrayList.h"
-#include "2D/Batch/Batch.h"
 #include "UserInterfaceGen.h"
 #include "Slot/PanelWidgetSlot.h"
 

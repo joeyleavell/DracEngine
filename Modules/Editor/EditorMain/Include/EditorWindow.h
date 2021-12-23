@@ -1,9 +1,7 @@
 #pragma once
 #include "LayerStack.h"
 #include "Window.h"
-#include "2D/Batch/Batch.h"
-#include "Input.h"
-#include "Timer.h"
+#include "Batch.h"
 
 namespace Ry
 {

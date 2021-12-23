@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Data/Map.h"
-#include "Algorithm/Algorithm.h"
 #include "Data/ArrayList.h"
 #include "Core/Memory/SharedPtr.h"
-#include "2D/Batch/Batch.h"
+#include "Batch.h"
 #include "Animation.h"
 #include "Transform.h"
 #include "FrameBuffer.h"

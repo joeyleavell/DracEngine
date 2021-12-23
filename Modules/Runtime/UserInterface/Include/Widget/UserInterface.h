@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Widget/Widget.h"
-#include "2D/Batch/Batch.h"
+#include "Batch.h"
 #include "Event.h"
 #include "UserInterfaceGen.h"
 

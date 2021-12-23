@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Layer.h"
-#include "2D/Batch/Batch.h"
+#include "Batch.h"
 #include "Widget/UserInterface.h"
-#include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
 #include "FrameBuffer.h"
 #include "Widget/Label.h"

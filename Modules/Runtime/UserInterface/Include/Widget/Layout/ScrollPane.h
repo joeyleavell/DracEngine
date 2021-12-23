@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Widget/Layout/PanelWidget.h"
-#include "2D/Batch/Batch.h"
 #include "Drawable.h"
 #include "ScrollPane.gen.h"
 
