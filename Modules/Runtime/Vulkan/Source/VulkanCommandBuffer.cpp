@@ -300,11 +300,11 @@ namespace Ry
 
 	void VulkanCommandBuffer2::RecordSetScissorSize(VkCommandBuffer CmdBuffer, int32 ScissorX, int32 ScissorY, uint32 ScissorWidth, uint32 ScissorHeight, int32 TargetWidth, int32 TargetHeight)
 	{
-		int32 ConvertedY = TargetHeight - (ScissorY + ScissorHeight);
+		int32 ConvertedY = std::max((int32) (TargetHeight - (ScissorY + ScissorHeight)), 0);
 
 		VkRect2D Scissor;
-		Scissor.offset = { ScissorX, ConvertedY};
-		Scissor.extent = VkExtent2D{ScissorWidth, ScissorHeight};
+		Scissor.offset = { std::max(ScissorX, 0), ConvertedY};
+		Scissor.extent = VkExtent2D{std::max(ScissorWidth, (uint32)0), std::max(ScissorHeight, (uint32)0)};
 
 		vkCmdSetScissor(CmdBuffer, 0, 1, &Scissor);
 	}

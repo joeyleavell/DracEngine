@@ -52,7 +52,7 @@ namespace Ry
 
 	} RefClass();
 
-	extern Texture* Tex;
+	extern Texture* Avocado;
 
 	class TestEntity : public Entity2D
 	{
@@ -63,8 +63,8 @@ namespace Ry
 			// Default root rect component
 		//	CreateComponent<RectComponent>(Static, Vector2{ 300.0f, 300.0f }, Vector2{0.5f, 0.5f}, BLUE);
 
-			TextureRegion Region(Tex);
-			CreateComponent<Texture2DComponent>(Static, Vector2{ 300.0f, 300.0f }, Vector2{ 0.5f, 0.5f }, Tex);
+			TextureRegion Region(Avocado);
+			CreateComponent<Texture2DComponent>(Static, Vector2{ 300.0f, 300.0f }, Vector2{ 0.5f, 0.5f }, Region);
 		}
 	};
 	

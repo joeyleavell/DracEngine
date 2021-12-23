@@ -20,7 +20,7 @@
 
 namespace Ry
 {
-	Texture* Tex{};
+	Texture* Avocado{};
 
 	MainEditorLayer::MainEditorLayer(SwapChain* Parent):
 	Layer(Parent)
@@ -28,7 +28,7 @@ namespace Ry
 		// Create the editor style
 		InitializeEditorStyle();
 
-		Tex = Ry::AssetMan->GetOrLoadAsset<TextureAsset>("/Engine/Textures/avocado.png", "image")->CreateRuntimeTexture();
+		Avocado = Ry::AssetMan->GetOrLoadAsset<TextureAsset>("/Engine/Textures/avocado.png", "image")->CreateRuntimeTexture();
 
 		//Color = OffScreenDesc.AddColorAttachment(); // Extra color attachment
 		SwapColor = OnScreenDesc.AddSwapChainColorAttachment(ParentSC);
@@ -101,10 +101,14 @@ namespace Ry
 
 		if(SceneView)
 		{
-			SizeType SceneViewSize = SceneView->ComputeSize();
+			SizeType Canvas = SceneView->ComputeSize();
+			TestWorld->Resize(Canvas.Width, Canvas.Height);
 		}
 
-		TestWorld->Resize(1080, 720);
+		if(SceneView)
+		{
+			SizeType SceneViewSize = SceneView->ComputeSize();
+		}
 
 		// Initialize the directory now that the content browser is added to the root
 		ContentBrowse->SetDirectory("/Engine");
@@ -116,7 +120,7 @@ namespace Ry
 
 	void MainEditorLayer::Update(float Delta)
 	{
-		TestWorld->GetCamera()->Transform.Position.y += 10.0f * Delta;
+		TestWorld->GetCamera()->Transform.Position.y -= 10.0f * Delta;
 		TestWorld->GetCamera()->Update();
 
 		TestWorld->Update(Delta);
@@ -171,7 +175,7 @@ namespace Ry
 		//OnScreenBatch2->SetRenderPass(MainPass);
 		//OnScreenBatch2->Resize(Width, Height);
 
-		TestWorld->Resize(Width, Height);
+		//TestWorld->Resize(Width, Height);
 
 		UI->Redraw();
 	}
