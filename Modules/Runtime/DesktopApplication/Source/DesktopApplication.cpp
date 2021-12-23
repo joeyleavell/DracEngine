@@ -13,7 +13,6 @@
 #include "GLRenderAPI.h"
 #include "VulkanRenderAPI.h"
 #include "RenderingEngine.h"
-#include "Scene.h"
 #include "Automate.h"
 #include "Window.h"
 #include "Core/Globals.h"
@@ -255,10 +254,6 @@ namespace Ry
 		// J.Leavell -- TODO: remove all opengl calls out of this class!
 		Ry::Log->Log("Initializing rendering engine");
 		Ry::InitRenderingEngine();
-
-		// Initialize scene
-		Ry::Log->Log("Initializing scene");
-		Ry::InitScene();
 
 		// Initialize ` system
 		Ry::Log->Log("Initializing audio");

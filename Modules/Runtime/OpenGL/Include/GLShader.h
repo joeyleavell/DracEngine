@@ -19,10 +19,6 @@ namespace Ry
 		GLShader(const Ry::String& VertLoc, const Ry::String& FragLoc);
 		virtual ~GLShader() = default;
 
-		/************************************************************************/
-		/* Interface functions                                                  */
-		/************************************************************************/
-
 		/**
 		 * Deletes this shader from the rendering interface. Do not use shader after calling this.
 		 */
@@ -39,10 +35,6 @@ namespace Ry
 
 		bool CreateShader(GLuint& OutHandle, int32 Type, const Ry::String& Reference);
 		bool ProgramStatusCheck(int32 Type, const String& Name);
-
-		// todo: move these to gl resources
-		// Map<Ry::String, int32> uniforms;
-		// GLint get_uniform_location(Ry::String name);
 
 	};
 

@@ -3,6 +3,7 @@
 
 namespace Ry
 {
+
 	namespace Std140Helpers
 	{
 		int32 SizeOf(const ShaderPrimitiveDataType& PrimData)

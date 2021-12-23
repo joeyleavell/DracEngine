@@ -11,8 +11,6 @@ namespace Ry
 	GLShader::GLShader(const Ry::String& VSAsset, const Ry::String& FSAsset):
 	Shader(VSAsset, FSAsset)
 	{
-		// todo: transpile source from hlsl to glsl
-		
 		// Create the entire OpenGL program.
 		this->ProgramHandle = glCreateProgram();
 
@@ -34,27 +32,12 @@ namespace Ry
 		glAttachShader(ProgramHandle, VertShaderHandle);
 		glAttachShader(ProgramHandle, FragShaderHandle);
 
-		// todo: this stuff should be explicitly defined in the shader
-		// for (int32 i = 0; i < format.attribute_count; i++)
-		// {
-		// 	VertexAttrib attrib = format.attributes[i];
-		// 	String name = attrib.Name;
-		// 	glBindAttribLocation(programHandle, i, *name);
-		// }
-
 		// Link and check the status.
 		glLinkProgram(ProgramHandle);
 		if(!ProgramStatusCheck(GL_LINK_STATUS, "link"))
 		{
 			return;
 		}
-
-		// Validate and check the status.
-		//glValidateProgram(ProgramHandle);
-		//if(!ProgramStatusCheck(GL_VALIDATE_STATUS, "validate"))
-		//{
-		//	return;
-		//}
 
 		// Detach and delete unneeded resource.
 		glDetachShader(ProgramHandle, VertShaderHandle);
@@ -65,10 +48,6 @@ namespace Ry
 
 	bool GLShader::CreateShader(GLuint& OutHandle, int32 Type, const Ry::String& ShaderLoc)
 	{
-		// Load the text file asset
-		//String HLSLShaderSource = AssetMan->LoadAsset(Reference, ASSET_TYPE_TEXT)->As<TextFileAsset>()->GetContents();
-		//AssetMan->UnloadAsset(Reference);
-
 		// Transpile the HLSL to GLSL
 		Ry::String OutGLSL;
 		Ry::String ErrWarn;
@@ -76,10 +55,6 @@ namespace Ry
 		{
 			Ry::Log->LogErrorf("Failed to compile shader %s:\n%s", *ShaderLoc, *ErrWarn);
 			return false;
-		}
-		else
-		{
-			std::cout << "Out glsl: \n" << *OutGLSL << std::endl << std::endl;
 		}
 
 		int32 Handle = glCreateShader(Type);

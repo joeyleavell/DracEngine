@@ -22,7 +22,6 @@ namespace Ry
 
 				// Broadcast scene size changed
 				OnSceneResized.Broadcast(Size.Width, Size.Height);
-				//OnSceneResized.Broadcast(300, 300);
 			}
 
 			Ry::BatchTexture(SceneTexture,

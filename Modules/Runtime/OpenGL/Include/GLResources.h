@@ -9,48 +9,21 @@
 namespace Ry
 {
 
-	int32 GLCalcAlignmentRequirement(const BufferMember* Root);
-	int32 GLCalcAlignmentRequirement(ShaderPrimitiveDataType Primitive);
-
-	int32 GLCalcBufferSize(const ConstantBuffer* Buffer);
-	void GLCalcMemberSize(const BufferMember* Layout, int32& Offset);
-	int32 GLSizeOf(const ShaderPrimitiveDataType& PrimData);
-
 	class OPENGL_MODULE GLResourceDescription : public ResourceLayout
 	{
 	public:
 
-		GLResourceDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0):
-		ResourceLayout(Stages, SetIndex)
-		{
-			
-		}
-
+		GLResourceDescription(const Ry::ArrayList<ShaderStage>& Stages, int32 SetIndex = 0) : ResourceLayout(Stages, SetIndex){}
 		virtual ~GLResourceDescription() = default;
 		
-		void CreateDescription() override
-		{
-			
-		}
-		
-		void DeleteDescription() override
-		{
-			
-		}
-		
-	};
-
-	struct UniformRef
-	{
-		bool bIsPrimitive;
-		int32 Offset;
-		int32 SlotSize = 0;
+		void CreateDescription() override {}
+		void DeleteDescription() override {}
 	};
 
 	struct MappedUniformBuffer
 	{
 		ConstantBuffer* ConstBuffer = nullptr;
-		Ry::Map<Ry::String, UniformRef> UniformRefs;
+		Ry::OAHashMap<Ry::String, BufferRef> UniformRefs;
 		uint8* HostDataBuffer;
 		uint32 HostBufferSize;
 		GLuint Ubo;
@@ -87,10 +60,6 @@ namespace Ry
 	private:
 
 		void BindTexture(Ry::String TextureName, GLuint Handle, GLuint Target);
-
-		void MapData(MappedUniformBuffer* Dst, const ConstantBuffer* Src);
-		void MapData_Helper(MappedUniformBuffer* Dst, const BufferMember* Member, Ry::String ParentId, int32& Marker);
-
 
 		Map<Ry::String, MappedUniformBuffer*> MappedUniformBuffers;
 

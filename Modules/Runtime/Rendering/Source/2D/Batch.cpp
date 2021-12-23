@@ -1088,12 +1088,6 @@ namespace Ry
 
 				for (const BatchGroup* Group : PipelineItr.GetValue())
 				{
-					if(RenderTargetWidth < 600)
-					{
-						std::cout << "test" << std::endl;
-					}
-					if (Group->BatchMesh->GetVertexArray()->GetIndexCount() <= 0)
-						continue;
 
 					RectScissor Scissor = Group->State.Scissor;
 					if(Scissor.IsEnabled())
@@ -1111,8 +1105,6 @@ namespace Ry
 							RenderTargetWidth,
 							RenderTargetHeight
 						);
-						//AtLayer->CommandBuffer->SetScissorSize(0, 0, RenderTargetWidth, RenderTargetHeight);
-
 					}
 					else
 					{
