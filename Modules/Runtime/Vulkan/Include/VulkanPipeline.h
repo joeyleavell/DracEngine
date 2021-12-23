@@ -2,7 +2,7 @@
 
 #include "Core/Core.h"
 #include "VulkanCommon.h"
-#include "Interface/Pipeline.h"
+#include "Pipeline.h"
 #include "VulkanGen.h"
 
 namespace Ry

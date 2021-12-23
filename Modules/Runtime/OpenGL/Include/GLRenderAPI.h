@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Interface/RenderAPI.h"
+#include "RenderAPI.h"
 #include "OpenGLGen.h"
-#include "Interface/RenderPass.h"
+#include "RenderPass.h"
 
 namespace Ry
 {

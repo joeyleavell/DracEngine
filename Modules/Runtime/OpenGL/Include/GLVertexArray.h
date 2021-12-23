@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/VertexArray.h"
+#include "VertexArray.h"
 #include "Vertex.h"
 #include "glew.h"
 #include "OpenGLGen.h"

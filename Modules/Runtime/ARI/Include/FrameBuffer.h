@@ -2,14 +2,14 @@
 
 #include "Core/Core.h"
 #include "RenderPass.h"
-#include "RenderingGen.h"
+#include "FrameBuffer.gen.h"
 
 namespace Ry
 {
 
 	class Texture;
 
-	class RENDERING_MODULE FrameBuffer
+	class ARI_MODULE FrameBuffer
 	{
 
 	public:

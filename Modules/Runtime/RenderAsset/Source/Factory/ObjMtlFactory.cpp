@@ -4,8 +4,7 @@
 #include "TextureAsset.h"
 #include "Manager/IAssetManager.h"
 #include "File/File.h"
-#include "Core/Globals.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
 
 namespace Ry
 {

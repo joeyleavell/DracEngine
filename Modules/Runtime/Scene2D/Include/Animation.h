@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
 #include "Animation.gen.h"
 
 namespace Ry

@@ -1,4 +1,4 @@
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
 
 namespace Ry
 {

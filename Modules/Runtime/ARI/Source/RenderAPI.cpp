@@ -1,6 +1,6 @@
-#include "Interface/RenderAPI.h"
-#include "Interface/Pipeline.h"
-#include "Interface/Shader.h"
+#include "RenderAPI.h"
+#include "Pipeline.h"
+#include "Shader.h"
 #include "Core/Globals.h"
 
 namespace Ry

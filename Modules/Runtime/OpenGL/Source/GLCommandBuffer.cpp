@@ -1,7 +1,7 @@
 #include "GLCommandBuffer.h"
 #include "glew.h"
 #include "GLShader.h"
-#include "Interface/Pipeline.h"
+#include "Pipeline.h"
 #include "GLVertexArray.h"
 #include "GLResources.h"
 #include "GLRenderingState.h"

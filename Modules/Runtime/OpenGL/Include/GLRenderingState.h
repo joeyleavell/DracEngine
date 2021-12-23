@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/Pipeline.h"
+#include "Pipeline.h"
 #include "OpenGLGen.h"
 
 namespace Ry

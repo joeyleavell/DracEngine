@@ -4,11 +4,11 @@
 #include "Algorithm/Algorithm.h"
 #include "Data/ArrayList.h"
 #include "Core/Memory/SharedPtr.h"
-#include "Scene2D.gen.h"
 #include "2D/Batch/Batch.h"
 #include "Animation.h"
 #include "Transform.h"
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
+#include "Scene2D.gen.h"
 
 namespace Ry
 {

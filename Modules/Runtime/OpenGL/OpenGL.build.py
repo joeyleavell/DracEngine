@@ -4,7 +4,7 @@ MacroDefs = ["GLEW_STATIC", "GLEW_NO_GLU"]
 
 Extern = ["Glew", "Glfw"]
 
-Modules = ["Core", "Math", "AssetCore", "Rendering"]
+Modules = ["Core", "Math", "AssetCore", "Rendering", "ARI"]
 
 if TargetArch == "x64":
 	if TargetOS == "Windows":

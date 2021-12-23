@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/Texture.h"
+#include "Texture.h"
 #include "RyMath.h"
 #include "RenderingGen.h"
 
@@ -33,6 +33,16 @@ namespace Ry
 		Ry::Texture* MetallicMap  = nullptr;
 		Ry::Texture* AOMap        = nullptr;
 		Ry::Texture* EmissiveMap  = nullptr;
+
+		Material()
+		{
+			
+		}
+
+		~Material()
+		{
+			
+		}
 
 	};
 }

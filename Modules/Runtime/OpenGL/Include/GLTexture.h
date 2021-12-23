@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/Texture.h"
+#include "Texture.h"
 #include "Core/Core.h"
 #include "glew.h"
 #include "OpenGLGen.h"

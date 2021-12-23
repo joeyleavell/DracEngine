@@ -1,4 +1,4 @@
-#include "Interface/RenderPass.h"
+#include "RenderPass.h"
 
 namespace Ry
 {

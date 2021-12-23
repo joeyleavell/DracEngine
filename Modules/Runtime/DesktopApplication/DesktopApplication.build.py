@@ -12,7 +12,9 @@ Modules = ["Core",
 "OpenGL", 
 "Vulkan",
 "Windowing",
-"Scene2D"]
+"Scene2D",
+"ARI"
+]
 
 # Declare module type
 Type = "Runtime"

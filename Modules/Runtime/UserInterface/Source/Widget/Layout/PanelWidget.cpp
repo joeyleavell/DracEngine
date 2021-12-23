@@ -1,4 +1,5 @@
 #include "Widget/Layout/PanelWidget.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

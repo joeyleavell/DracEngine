@@ -9,7 +9,7 @@
 #include "GLResources.h"
 #include "GLTexture.h"
 #include "GLFrameBuffer.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
 
 namespace Ry
 {

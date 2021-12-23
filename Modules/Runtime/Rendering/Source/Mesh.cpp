@@ -1,12 +1,11 @@
 #include "Mesh.h"
 #include "MeshData.h"
-#include "Material.h"
-#include "Interface/Shader.h"
-#include "Interface/VertexArray.h"
+#include "Shader.h"
+#include "VertexArray.h"
 #include "Core/Globals.h"
 #include "File/File.h"
 #include "Physics.h"
-#include "Interface/RenderAPI.h"
+#include "RenderAPI.h"
 
 namespace Ry
 {

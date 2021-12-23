@@ -1,4 +1,5 @@
 #include "Widget/Layout/SlotWidget.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

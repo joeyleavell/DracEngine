@@ -2,15 +2,17 @@
 #include "VulkanCommandBuffer.h"
 #include "VulkanRenderAPI.h"
 #include "Core/Globals.h"
-#include "Interface/VertexArray.h"
 #include "VulkanVertexArray.h"
-#include "Interface/Shader.h"
 #include "VulkanShader.h"
 #include "VulkanPipeline.h"
 #include "VulkanResources.h"
 #include "VulkanTexture.h"
 #include "VulkanContext.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
+#include "Shader.h"
+#include "VertexArray.h"
+#include "VulkanFramebuffer.h"
+#include "VulkanRenderPass.h"
 
 namespace Ry
 {

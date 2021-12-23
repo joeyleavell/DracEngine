@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Interface/RenderingResource.h"
+#include "RenderingResource.h"
 #include "glew.h"
 #include "Data/Map.h"
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
 #include "OpenGLGen.h"
 
 namespace Ry

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Vertex.h"
+#include "VertexFormat.h"
+#include "VertexArray.gen.h"
 
 namespace Ry
 {
@@ -26,7 +27,7 @@ namespace Ry
 	 * An abstract representation of an array of vertices stored on the graphics card.
 	 * A vertex array can optionally have an internal index buffer, which stores an array of indices that indexes into the vertex array.
 	 */
-	class RENDERING_MODULE VertexArray
+	class ARI_MODULE VertexArray
 	{
 	public:
 

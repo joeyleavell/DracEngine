@@ -1,4 +1,4 @@
-#include "Interface/Shader.h"
+#include "Shader.h"
 #include "Language/ShaderReflector.h"
 #include "Core/Globals.h"
 

@@ -1,5 +1,6 @@
 #include "VulkanFramebuffer.h"
 #include "VulkanContext.h"
+#include "VulkanRenderPass.h"
 #include "Core/Globals.h"
 
 namespace Ry

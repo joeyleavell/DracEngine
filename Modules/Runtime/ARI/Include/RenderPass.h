@@ -2,7 +2,7 @@
 
 #include "Core/Core.h"
 #include "Core/Globals.h"
-#include "RenderingGen.h"
+#include "RenderPass.gen.h"
 
 namespace Ry
 {
@@ -18,12 +18,12 @@ namespace Ry
 		Stencil
 	};
 
-	struct RENDERING_MODULE ColorAttachment
+	struct ARI_MODULE ColorAttachment
 	{
 		virtual ~ColorAttachment() = default;
 	};
 
-	class AttachmentDescription
+	class ARI_MODULE AttachmentDescription
 	{
 	public:
 
@@ -35,7 +35,7 @@ namespace Ry
 		const ColorAttachment* ExistingAttachment = nullptr;
 	};
 
-	class FrameBufferDescription
+	class ARI_MODULE FrameBufferDescription
 	{
 	public:
 
@@ -128,7 +128,7 @@ namespace Ry
 		}
 	};
 
-	class RENDERING_MODULE Subpass
+	class ARI_MODULE Subpass
 	{
 	public:
 		Ry::ArrayList<int32> UsedAttachments;
@@ -139,7 +139,7 @@ namespace Ry
 	};
 
 	// todo: rename render pass "render graph" and subpass "render node" -- i like that naming scheme better for a generic system
-	class RENDERING_MODULE RenderPass
+	class ARI_MODULE RenderPass
 	{
 	public:
 

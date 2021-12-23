@@ -1,7 +1,6 @@
 #include "VulkanVertexArray.h"
 #include "VulkanContext.h"
 #include "VulkanBuffer.h"
-#include "Core/Globals.h"
 
 namespace Ry
 {

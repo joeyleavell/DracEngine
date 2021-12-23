@@ -1,9 +1,9 @@
 #include "Language/ShaderReflector.h"
 #include "Language/spirv_reflect.h"
 #include "Language/ShaderCompiler.h"
-#include "2D/Batch/Batch.h"
-#include "Interface/RenderAPI.h"
-#include "Interface/RenderingResource.h"
+#include "RenderAPI.h"
+#include "RenderingResource.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

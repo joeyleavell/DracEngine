@@ -1,6 +1,6 @@
 #include "VectorFontAsset.h"
 #include "Font.h"
-#include <iostream>
+#include "Bitmap.h"
 #include "stb_truetype.h"
 
 constexpr uint32 START_CODEPOINT = 32;

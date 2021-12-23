@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "RenderingGen.h"
+#include "Texture.gen.h"
 
 namespace Ry
 {
@@ -19,7 +19,7 @@ namespace Ry
 		Nearest, Linear
 	};
 	
-	class RENDERING_MODULE Texture
+	class ARI_MODULE Texture
 	{
 	
 	public:

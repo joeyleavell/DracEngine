@@ -15,7 +15,6 @@ namespace Ry
 		this->Handle = 0;
 
 		glGenTextures(1, &Handle);
-		Ry::Log->Log("OpenGL texture generated: " + Ry::to_string(Handle));
 
 		GLint GLFilter = GL_LINEAR;
 		if (Filter == TextureFiltering::Nearest)

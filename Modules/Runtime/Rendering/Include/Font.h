@@ -2,8 +2,6 @@
 
 #include "Core/Core.h"
 #include "Data/Map.h"
-#include "Bitmap.h"
-#include "Text.h"
 #include "RenderingGen.h"
 
 namespace Ry
@@ -12,6 +10,7 @@ namespace Ry
 	class TextureBatch;
 	class String;
 	class Texture;
+	class Bitmap;
 
 	constexpr uint32 FONT_BITMAP_SIZE = 1024;
 

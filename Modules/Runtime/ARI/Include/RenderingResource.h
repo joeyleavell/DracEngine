@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface/Shader.h"
-#include "RenderingGen.h"
+#include "Shader.h"
+#include "RenderingResource.gen.h"
 
 #define DeclPrimitive(DataType, Name) new Ry::PrimitiveBufferMember(Name, Ry::ShaderPrimitiveDataType::DataType, 1)
 #define DeclStruct(Name, InitializerList) new Ry::StructBufferMember(Name, 1, InitializerList)
@@ -17,7 +17,7 @@ namespace Ry
 	class FrameBuffer;
 	struct ColorAttachment;
 
-	class BufferMember
+	class ARI_MODULE BufferMember
 	{
 	public:		
 		Ry::String Id = "";
@@ -28,14 +28,14 @@ namespace Ry
 
 	};
 
-	struct BufferRef
+	struct ARI_MODULE BufferRef
 	{
 		bool bIsPrimitive = false;
 		int32 Offset = 0;
 		int32 SlotSize = 0;
 	};
 
-	class PrimitiveBufferMember : public BufferMember
+	class ARI_MODULE PrimitiveBufferMember : public BufferMember
 	{
 	public:
 		ShaderPrimitiveDataType DataType;
@@ -54,7 +54,7 @@ namespace Ry
 
 	};
 
-	class StructBufferMember : public BufferMember
+	class ARI_MODULE StructBufferMember : public BufferMember
 	{
 	public:
 		Ry::ArrayList<BufferMember*> StructMembers;
@@ -94,7 +94,7 @@ namespace Ry
 		
 	};
 
-	class ConstantBuffer
+	class ARI_MODULE ConstantBuffer
 	{
 	public:
 		int32 Index;
@@ -125,7 +125,7 @@ namespace Ry
 
 	};
 
-	class TextureBinding
+	class ARI_MODULE TextureBinding
 	{
 	public:
 		int32 Index = 0;
@@ -138,7 +138,7 @@ namespace Ry
 		}
 	};
 
-	class RENDERING_MODULE ResourceLayout
+	class ARI_MODULE ResourceLayout
 	{
 	public:
 
@@ -180,7 +180,7 @@ namespace Ry
 
 	};
 
-	class RENDERING_MODULE ResourceSet
+	class ARI_MODULE ResourceSet
 	{
 	public:
 
@@ -223,16 +223,16 @@ namespace Ry
 
 	namespace Std140Helpers
 	{
-		RENDERING_MODULE int32 CalcAlignmentRequirement(const BufferMember* Root);
-		RENDERING_MODULE int32 CalcAlignmentRequirement(ShaderPrimitiveDataType Primitive);
-		RENDERING_MODULE int32 CalcBufferSize(const ConstantBuffer* Buffer);
-		RENDERING_MODULE void CalcMemberSize(const BufferMember* Layout, int32& Offset);
-		RENDERING_MODULE int32 SizeOf(const ShaderPrimitiveDataType& PrimData);
+		ARI_MODULE int32 CalcAlignmentRequirement(const BufferMember* Root);
+		ARI_MODULE int32 CalcAlignmentRequirement(ShaderPrimitiveDataType Primitive);
+		ARI_MODULE int32 CalcBufferSize(const ConstantBuffer* Buffer);
+		ARI_MODULE void CalcMemberSize(const BufferMember* Layout, int32& Offset);
+		ARI_MODULE int32 SizeOf(const ShaderPrimitiveDataType& PrimData);
 
-		RENDERING_MODULE void MapData_Helper(OAHashMap<Ry::String, BufferRef>& OutRefs, const BufferMember* Member, Ry::String ParentId, int32& Marker);
-		RENDERING_MODULE void MapData(OAHashMap<Ry::String, BufferRef>& OutRefs, const ConstantBuffer* Src);
+		ARI_MODULE void MapData_Helper(OAHashMap<Ry::String, BufferRef>& OutRefs, const BufferMember* Member, Ry::String ParentId, int32& Marker);
+		ARI_MODULE void MapData(OAHashMap<Ry::String, BufferRef>& OutRefs, const ConstantBuffer* Src);
 
-		RENDERING_MODULE void PrintData(const Ry::ArrayList<ConstantBuffer*> ConstantBuffers);
+		ARI_MODULE void PrintData(const Ry::ArrayList<ConstantBuffer*> ConstantBuffers);
 	}
 	
 }

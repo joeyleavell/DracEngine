@@ -5,6 +5,7 @@
 #include "Data/ArrayList.h"
 #include "RenderingGen.h"
 #include "Vertex.h"
+#include "VertexFormat.h"
 #include "Core/Globals.h"
 
 namespace Ry

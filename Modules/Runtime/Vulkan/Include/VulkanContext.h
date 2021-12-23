@@ -4,10 +4,10 @@
 
 #include "Core/Core.h"
 #include "VulkanGen.h"
-#include <vector>
 #include "Context.h"
 #include "vulkan/vulkan.h"
 #include "VulkanCommandBuffer.h"
+#include "VulkanCommon.h"
 
 struct GLFWwindow;
 

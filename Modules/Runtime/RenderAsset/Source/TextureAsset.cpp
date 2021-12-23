@@ -1,8 +1,8 @@
 #include "TextureAsset.h"
 #include "Core/Globals.h"
 #include "Bitmap.h"
-#include "Interface/RenderAPI.h"
-#include "Interface/Texture.h"
+#include "RenderAPI.h"
+#include "Texture.h"
 
 namespace Ry
 {

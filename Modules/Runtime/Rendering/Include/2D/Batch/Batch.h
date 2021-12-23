@@ -1,15 +1,11 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Core/Globals.h"
 #include "Data/ArrayList.h"
 #include "RyMath.h"
 #include "RenderingEngine.h"
 #include "Color.h"
-#include "Data/ArrayList.h"
-#include <cstdarg>
-#include "Mesh.h"
-#include "Interface/Pipeline.h"
+#include "Pipeline.h"
 #include "Data/Set.h"
 
 #define TEXT_VERT "/Engine/Shaders/Vertex/font.glv"
@@ -90,6 +86,9 @@ namespace Ry
 	class ResourceSet;
 	class ResourceLayout;
 	class CommandBuffer;
+	class Mesh;
+	class Vertex;
+	class VertexFormat;
 
 	struct RENDERING_MODULE TextLine
 	{
@@ -127,18 +126,7 @@ namespace Ry
 			this->IndexCount = 0;
 		}
 
-		void AddVertex(Ry::VertexFormat& Format, Ry::Vertex* Vert)
-		{
-			float VertData[30];
-			Vert->Pack(VertData);
-
-			for(int32 Element = 0; Element < Format.GetElementCount(); Element++)
-			{
-				Data.Add(VertData[Element]);
-			}
-
-			VertexCount++;
-		}
+		void AddVertex(Ry::VertexFormat& Format, Ry::Vertex* Vert);
 
 		void AddVertex1P1C(float X, float Y, float Z, float R, float G, float B, float A)
 		{
@@ -248,10 +236,7 @@ namespace Ry
 
 		int LastIndexCount = -1;
 
-		~BatchGroup()
-		{
-			delete BatchMesh;
-		}
+		~BatchGroup();
 
 	};
 

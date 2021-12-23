@@ -4,11 +4,11 @@
 #include "Vertex.h"
 #include "VulkanContext.h"
 #include "VulkanShader.h"
-#include "VulkanVertexArray.h"
-#include "VulkanBuffer.h"
 #include "VulkanSwapChain.h"
 #include "VulkanResources.h"
 #include <cassert>
+
+#include "VulkanRenderPass.h"
 
 namespace Ry
 {

@@ -1,5 +1,6 @@
 #include "Widget/Widget.h"
 #include "Buttons.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

@@ -1,5 +1,5 @@
 # Declare module dependencies
-Modules = ["Core", "Math", "AssetCore", "Rendering", "Profiling"]
+Modules = ["Core", "Math", "AssetCore", "Rendering", "Profiling", "ARI"]
 
 Extern = ["Stb"]
 

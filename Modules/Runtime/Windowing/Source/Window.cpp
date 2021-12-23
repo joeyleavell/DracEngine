@@ -7,7 +7,7 @@
 #include "GLSwapChain.h"
 #include "VulkanContext.h"
 #include "VulkanSwapChain.h"
-#include "Interface/SwapChain.h"
+#include "SwapChain.h"
 #include "Input.h"
 #include "Event.h"
 #include "Keys.h"

@@ -3,8 +3,9 @@
 #include "2D/Batch/Batch.h"
 #include "Core/Globals.h"
 #include <iostream>
-#include "Interface/RenderAPI.h"
-#include "Interface/Texture.h"
+#include "RenderAPI.h"
+#include "Texture.h"
+#include "Bitmap.h"
 
 namespace Ry
 {

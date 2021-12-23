@@ -5,6 +5,7 @@
 #include "VulkanPipeline.h"
 #include "VulkanCommandBuffer.h"
 #include "VulkanFramebuffer.h"
+#include "VulkanRenderPass.h"
 #include "VulkanResources.h"
 
 namespace Ry

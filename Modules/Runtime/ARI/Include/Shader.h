@@ -1,9 +1,7 @@
 #pragma once
 
-#include "Asset.h"
-#include "RenderingGen.h"
-#include "Data/Map.h"
-#include "Vertex.h"
+#include "VertexFormat.h"
+#include "Shader.gen.h"
 
 namespace Ry
 {
@@ -65,7 +63,7 @@ namespace Ry
 		Float4x4
 	};
 
-	Ry::String RENDERING_MODULE ToString(ShaderPrimitiveDataType DT);
+	Ry::String ARI_MODULE ToString(ShaderPrimitiveDataType DT);
 
 	struct ShaderVariable
 	{
@@ -107,46 +105,7 @@ namespace Ry
 
 	};
 
-	// struct ShaderInputVariable
-	// {
-	// 	Ry::String Name;
-	// 	ShaderPrimitiveDataType Type;
-	//
-	// 	/**
-	// 	 * Includes float type.
-	// 	 */
-	// 	bool IsVectorType() const
-	// 	{
-	// 		if (Type == ShaderPrimitiveDataType::Float)
-	// 			return true;
-	// 		if (Type == ShaderPrimitiveDataType::Float2)
-	// 			return true;
-	// 		if (Type == ShaderPrimitiveDataType::Float3)
-	// 			return true;
-	// 		if (Type == ShaderPrimitiveDataType::Float4)
-	// 			return true;
-	//
-	// 		return false;
-	// 	}
-	//
-	// 	int32 GetVectorElementCount() const
-	// 	{
-	// 		if (Type == ShaderPrimitiveDataType::Float)
-	// 			return 1;
-	// 		if (Type == ShaderPrimitiveDataType::Float2)
-	// 			return 2;
-	// 		if (Type == ShaderPrimitiveDataType::Float3)
-	// 			return 3;
-	// 		if (Type == ShaderPrimitiveDataType::Float4)
-	// 			return 4;
-	//
-	// 		return -1;
-	// 	}
-	//
-	// 	
-	// };
-
-	class RENDERING_MODULE ShaderReflection
+	class ARI_MODULE ShaderReflection
 	{
 	public:
 
@@ -166,7 +125,7 @@ namespace Ry
 		
 	};
 
-	class RENDERING_MODULE Shader
+	class ARI_MODULE Shader
 	{
 	public:
 
@@ -192,9 +151,6 @@ namespace Ry
 		Ry::VertexFormat VertFormat;
 		ShaderReflection VertReflectionData;
 		ShaderReflection FragReflectionData;
-
-		// Ry::ArrayList<ResourceLayout*> VertexReflectionData;
-		// Ry::ArrayList<ResourceLayout*> FragmentReflectionData;
 
 	};
 

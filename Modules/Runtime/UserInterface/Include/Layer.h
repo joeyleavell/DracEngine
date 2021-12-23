@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Event.h"
-#include "Interface/SwapChain.h"
+#include "SwapChain.h"
 #include "UserInterfaceGen.h"
 
 namespace Ry

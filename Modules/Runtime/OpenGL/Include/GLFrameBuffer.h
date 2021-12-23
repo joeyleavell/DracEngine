@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
 #include "Core/Core.h"
 #include "glew.h"
 

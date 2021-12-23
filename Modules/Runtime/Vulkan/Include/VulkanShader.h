@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Interface/Shader.h"
+#include "Shader.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
-#include "Language/ShaderCompiler.h"
 
 namespace Ry
 {

@@ -1,9 +1,9 @@
 #include "RenderingEngine.h"
-#include "2D/Batch/Batch.h"
 #include "Asset.h"
-#include "Interface/RenderAPI.h"
+#include "RenderAPI.h"
 #include "Bitmap.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

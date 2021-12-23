@@ -2,4 +2,4 @@ Type = "Runtime"
 
 Extern = ["RapidXML"]
 
-Modules = ["Core", "Math", "AssetCore", "Rendering", "Input"]
+Modules = ["Core", "Math", "AssetCore", "Rendering", "Input", "ARI"]

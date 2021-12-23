@@ -3,8 +3,8 @@
 #include "File/AssetRef.h"
 #include "File/File.h"
 #include "Widget/BorderWidget.h"
-#include "Widget/Label.h"
 #include "Widget/Layout/PanelWidget.h"
+#include "Core/Globals.h"
 
 using namespace rapidxml;
 

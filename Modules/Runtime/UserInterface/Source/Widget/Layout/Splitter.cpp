@@ -1,5 +1,6 @@
 #include "Widget/Layout/Splitter.h"
 #include "Buttons.h"
+#include "Core/Globals.h"
 #include <cmath>
 
 namespace Ry

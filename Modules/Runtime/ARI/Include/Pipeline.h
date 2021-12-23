@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Vertex.h"
-#include "RenderingGen.h"
+#include "VertexFormat.h"
+#include "Pipeline.gen.h"
 
 namespace Ry
 {
@@ -13,7 +13,7 @@ namespace Ry
 	class UniformBuffer;
 	class ResourceLayout;
 
-	struct PipelineDepth
+	struct ARI_MODULE PipelineDepth
 	{
 		bool bEnableDepthTest;
 	};
@@ -33,7 +33,7 @@ namespace Ry
 		Add
 	};
 
-	struct PipelineBlendInfo
+	struct ARI_MODULE PipelineBlendInfo
 	{
 		// Whether blending should be enabled
 		bool bEnabled = false;
@@ -47,7 +47,7 @@ namespace Ry
 
 	};
 
-	struct RENDERING_MODULE RectScissor
+	struct ARI_MODULE RectScissor
 	{
 		int32 X = -1;
 		int32 Y = -1;
@@ -118,7 +118,7 @@ namespace Ry
 		}
 	};
 
-	struct PipelineCreateInfo
+	struct ARI_MODULE PipelineCreateInfo
 	{
 		Ry::ArrayList<Ry::ResourceLayout*> ResourceDescriptions;
 		Ry::Shader* PipelineShader = nullptr;
@@ -136,7 +136,7 @@ namespace Ry
 
 	};
 
-	class RENDERING_MODULE Pipeline
+	class ARI_MODULE Pipeline
 	{
 	public:
 		

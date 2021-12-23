@@ -1,14 +1,14 @@
 #include "Forward/ForwardSceneRenderer.h"
 #include "Application.h"
-#include "Interface/RenderAPI.h"
-#include "Interface/SwapChain.h"
-#include "Interface/RenderingResource.h"
+#include "RenderAPI.h"
+#include "SwapChain.h"
+#include "RenderingResource.h"
 #include "RenderingEngine.h"
-#include "Interface/Pipeline.h"
-#include "Interface/RenderCommand.h"
+#include "Pipeline.h"
+#include "RenderCommand.h"
 #include "SceneGraph.h"
 #include "ScenePrimitive.h"
-#include "Interface/Shader.h"
+#include "Shader.h"
 
 namespace Ry
 {

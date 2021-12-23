@@ -1,4 +1,4 @@
-#include "Interface/RenderingResource.h"
+#include "RenderingResource.h"
 #include "Core/Globals.h"
 
 namespace Ry

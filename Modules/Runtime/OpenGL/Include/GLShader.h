@@ -3,7 +3,7 @@
 #include "Core/Core.h"
 #include "Core/String.h"
 #include "Data/Map.h"
-#include "Interface/Shader.h"
+#include "Shader.h"
 #include "glew.h"
 #include "OpenGLGen.h"
 

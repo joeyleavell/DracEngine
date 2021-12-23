@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/RenderCommand.h"
+#include "RenderCommand.h"
 #include "OpenGLGen.h"
 
 namespace Ry

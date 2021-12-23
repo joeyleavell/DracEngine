@@ -2,8 +2,8 @@
 
 #include "Core/Core.h"
 #include "Core/Globals.h"
-#include "RenderingGen.h"
 #include "SwapChain.h"
+#include "RenderCommand.gen.h"
 
 namespace Ry
 {
@@ -29,7 +29,7 @@ namespace Ry
 	class FrameBuffer;
 	class ResourceSet;
 
-	struct RENDERING_MODULE SetViewportSizeCmd
+	struct ARI_MODULE SetViewportSizeCmd
 	{
 		int32 ViewportX;
 		int32 ViewportY;
@@ -39,7 +39,7 @@ namespace Ry
 		int32 TargetHeight;
 	};
 
-	struct RENDERING_MODULE SetViewportScissorCmd
+	struct ARI_MODULE SetViewportScissorCmd
 	{
 		int32 ScissorX;
 		int32 ScissorY;
@@ -49,45 +49,44 @@ namespace Ry
 		int32 TargetHeight;
 	};
 	
-	struct RENDERING_MODULE BindPipelineCommand
+	struct ARI_MODULE BindPipelineCommand
 	{
 		Ry::Pipeline* Pipeline;
 	};
 
-	struct RENDERING_MODULE BindResourcesCommand
+	struct ARI_MODULE BindResourcesCommand
 	{
 		int32 SetCount = 0;
 		ResourceSet** SetPtrs = nullptr;
 	};
 
-	struct RENDERING_MODULE DrawVertexArrayCommand
+	struct ARI_MODULE DrawVertexArrayCommand
 	{
 		Ry::VertexArray* VertexArray;
 		int32 FirstVertex = 0;
 		int32 VertexCount = 0;
 	};
 
-	struct RENDERING_MODULE DrawVertexArrayIndexedCommand
+	struct ARI_MODULE DrawVertexArrayIndexedCommand
 	{
 		Ry::VertexArray* VertexArray;
 		int32 FirstIndex = 0;
 		int32 IndexCount = 0;
 	};
 
-	struct RENDERING_MODULE CommandBufferCommand
+	struct ARI_MODULE CommandBufferCommand
 	{
 		Ry::CommandBuffer* CmdBuffer = nullptr;
 	};
 
-
-	struct RENDERING_MODULE BeginRenderPassCommand
+	struct ARI_MODULE BeginRenderPassCommand
 	{
 		Ry::RenderPass* RenderPass;
 		FrameBuffer* SourceBuffer;
 		bool bUseSecondary;
 	};
 
-	class RENDERING_MODULE RenderCommand
+	class ARI_MODULE RenderCommand
 	{
 	public:
 		RenderCommand();
@@ -97,13 +96,13 @@ namespace Ry
 		
 	};
 
-	struct SecondaryCommandBufferInfo
+	struct ARI_MODULE SecondaryCommandBufferInfo
 	{
 		bool bSecondary = false;
 		RenderPass* ParentRenderPass = nullptr;
 	};
 
-	class RENDERING_MODULE CommandBuffer
+	class ARI_MODULE CommandBuffer
 	{
 	public:
 
@@ -298,23 +297,6 @@ namespace Ry
 		bool bImmediate;
 
 
-	};
-
-	class RENDERING_MODULE RenderingCommandBuffer
-	{
-	public:
-
-		virtual void BeginRecording(bool bImmediate) = 0;
-		virtual void EndRecording() = 0;
-
-		virtual void BeginRenderPass(Ry::RenderPass* Pipeline) = 0;
-		virtual void EndRenderPass(Ry::RenderPass* Pipeline) = 0;
-
-		virtual void BindPipeline(Ry::Pipeline* Pipeline) = 0;
-
-		virtual void DrawVertexArray(Ry::VertexArray* VertexArray) = 0;
-
-		
 	};
 	
 }

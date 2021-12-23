@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RenderingGen.h"
 #include "Core/Core.h"
+#include "RenderAPI.gen.h"
 
 namespace Ry
 {
@@ -23,7 +23,7 @@ namespace Ry
 	enum class ShaderStage;
 	enum class TextureFiltering;
 
-	class RENDERING_MODULE RenderAPI
+	class ARI_MODULE RenderAPI
 	{
 	public:
 

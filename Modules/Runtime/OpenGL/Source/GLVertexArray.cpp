@@ -1,5 +1,4 @@
 #include "GLVertexArray.h"
-#include <iostream>
 
 namespace Ry
 {

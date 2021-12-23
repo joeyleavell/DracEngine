@@ -5,11 +5,6 @@
 #include "VulkanVertexArray.h"
 #include "VulkanShader.h"
 #include "VulkanCommon.h"
-#include "VulkanSwapChain.h"
-#include "VulkanPipeline.h"
-#include "VulkanCommandBuffer.h"
-#include "VulkanRenderPass.h"
-#include "VulkanFramebuffer.h"
 
 namespace Ry
 {

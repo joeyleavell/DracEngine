@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "RenderingGen.h"
+#include "Bitmap.gen.h"
 
 namespace Ry
 {
@@ -121,7 +121,7 @@ namespace Ry
 		void SetPixel(int32 X, int32 Y, uint32 Value) override;
 	};
 	
-	class RENDERING_MODULE Bitmap
+	class ARI_MODULE Bitmap
 	{
 	public:
 

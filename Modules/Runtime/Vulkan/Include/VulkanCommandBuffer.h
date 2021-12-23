@@ -1,12 +1,9 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "VulkanCommon.h"
-#include "Interface/RenderCommand.h"
+#include "RenderCommand.h"
 #include "VulkanGen.h"
 #include "VulkanSwapChain.h"
-#include "VulkanRenderPass.h"
-#include "VulkanFramebuffer.h"
 
 namespace Ry
 {

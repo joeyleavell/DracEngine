@@ -10,6 +10,7 @@
 #include "Widget/Input/Button.h"
 #include "WidgetManager.h"
 #include "Buttons.h"
+#include "Core/Globals.h"
 
 namespace Ry
 {

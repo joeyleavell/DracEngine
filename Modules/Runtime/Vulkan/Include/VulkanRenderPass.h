@@ -1,9 +1,8 @@
 #pragma once
 
 #include "VulkanCommon.h"
-#include "Interface/RenderPass.h"
+#include "RenderPass.h"
 #include "VulkanGen.h"
-#include "Data/Map.h"
 
 namespace Ry
 {

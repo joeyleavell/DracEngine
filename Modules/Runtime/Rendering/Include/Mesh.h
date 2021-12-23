@@ -4,7 +4,7 @@
 #include "MeshData.h"
 #include "Light.h"
 #include "Vertex.h"
-#include "Interface/VertexArray.h"
+#include "VertexArray.h"
 
 namespace Ry
 {

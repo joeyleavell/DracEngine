@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/SwapChain.h"
+#include "SwapChain.h"
 #include "OpenGLGen.h"
 
 namespace Ry

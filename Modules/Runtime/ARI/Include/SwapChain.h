@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "RenderingGen.h"
+#include "SwapChain.gen.h"
 
 struct GLFWwindow;
 
@@ -12,7 +12,7 @@ namespace Ry
 	class FrameBuffer;
 	class CommandBuffer;
 
-	class RENDERING_MODULE SwapChain
+	class ARI_MODULE SwapChain
 	{
 	public:
 		Ry::MulticastDelegate<> OnSwapChainDirty;

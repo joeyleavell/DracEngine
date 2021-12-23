@@ -1,7 +1,7 @@
 #pragma once
 
 #include "VulkanGen.h"
-#include "Interface/Texture.h"
+#include "Texture.h"
 #include "vulkan/vulkan.h"
 
 namespace Ry

@@ -5,10 +5,10 @@
 #include "Widget/UserInterface.h"
 #include "Widget/Layout/GridPanel.h"
 #include "ContentBrowser/ContentBrowser.h"
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
 #include "Widget/Label.h"
-#include "MainEditorLayer.gen.h"
 #include "World2D.h"
+#include "MainEditorLayer.gen.h"
 
 namespace Ry
 {

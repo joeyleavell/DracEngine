@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Interface/FrameBuffer.h"
+#include "FrameBuffer.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
 #include "VulkanSwapChain.h"

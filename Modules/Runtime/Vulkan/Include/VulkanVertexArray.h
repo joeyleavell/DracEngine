@@ -3,7 +3,7 @@
 #include "Core/Core.h"
 #include "vulkan/vulkan.h"
 #include "VulkanGen.h"
-#include "Interface/VertexArray.h"
+#include "VertexArray.h"
 
 namespace Ry
 {

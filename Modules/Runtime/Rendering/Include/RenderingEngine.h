@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Asset.h"
-#include "Core/Core.h"
 #include "Core/String.h"
-#include "Vertex.h"
 #include "Data/Map.h"
 #include "RenderingGen.h"
 

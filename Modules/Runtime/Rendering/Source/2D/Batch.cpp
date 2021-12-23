@@ -4,20 +4,21 @@
 #include "Font.h"
 #include "RenderingEngine.h"
 #include "Color.h"
-#include "Camera.h"
 #include "RyMath.h"
 #include "Core/Globals.h"
-#include <iostream>
 #include <cmath>
 #include <algorithm>
-#include "Interface/Pipeline.h"
-#include "Interface/SwapChain.h"
-#include "Interface/RenderAPI.h"
-#include "Interface/RenderingResource.h"
-#include "Interface/RenderCommand.h"
-#include "Interface/RenderPass.h"
-#include "Interface/VertexArray.h"
-#include "Interface/Texture.h"
+
+#include "Bitmap.h"
+#include "Mesh.h"
+#include "Pipeline.h"
+#include "SwapChain.h"
+#include "RenderAPI.h"
+#include "RenderingResource.h"
+#include "RenderCommand.h"
+#include "RenderPass.h"
+#include "VertexArray.h"
+#include "Texture.h"
 
 namespace Ry
 {
@@ -45,6 +46,19 @@ namespace Ry
 		}
 		delete[] Lines;
 
+	}
+
+	void BatchItem::AddVertex(Ry::VertexFormat& Format, Ry::Vertex* Vert)
+	{
+		float VertData[30];
+		Vert->Pack(VertData);
+
+		for (int32 Element = 0; Element < Format.GetElementCount(); Element++)
+		{
+			Data.Add(VertData[Element]);
+		}
+
+		VertexCount++;
 	}
 
 	Ry::SharedPtr<BatchItem> MakeItem()
@@ -500,6 +514,11 @@ namespace Ry
 		}
 
 		Init();		
+	}
+
+	BatchGroup::~BatchGroup()
+	{
+		delete BatchMesh;
 	}
 
 	Batch::Batch(RenderPass* RP, int32 RTWidth, int32 RTHeight)

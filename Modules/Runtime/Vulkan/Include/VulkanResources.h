@@ -2,11 +2,10 @@
 
 #include "Core/Core.h"
 #include "VulkanGen.h"
-#include "Interface/Shader.h"
+#include "Shader.h"
 #include "Data/Map.h"
-#include <cassert>
 #include "vulkan/vulkan.h"
-#include "Interface/RenderingResource.h"
+#include "RenderingResource.h"
 
 // Create offsets for Vulkan to be compatible with HLSL register locations
 #define C_BUFFER_OFFSET 0
