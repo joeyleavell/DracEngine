@@ -359,7 +359,7 @@ namespace Ry
 		}
 
 		// Send the rendered glyph sheet to the rendering hardware
-		AtlasTexture->Data(FontAtlas);
+		AtlasTexture->Data(reinterpret_cast<uint8*>(FontAtlas->GetPixelBuffer()->GetAsRGBA()), FontAtlas->GetWidth(), FontAtlas->GetHeight(), PixelFormat::R8G8B8A8);
 
 		// Delete the intermediate bitmap atlas
 		delete FontAtlas;

@@ -13,13 +13,13 @@ namespace Ry
 		this->OutFile = OutFile;
 
 		// Open file output stream
-		this->Output.open(*OutFile, std::fstream::out | std::fstream::binary);
+		this->Output->open(*OutFile, std::fstream::out | std::fstream::binary);
 	}
 
 	void Serializer::Close()
 	{
 		// Close file output stream
-		this->Output.close();
+		this->Output->close();
 	}
 
 	void Serializer::WriteUByte(uint8 Byte)

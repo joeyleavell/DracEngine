@@ -32,20 +32,15 @@ namespace Ry
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	void GLTexture::Data(const Bitmap* Bitmap)
+	void GLTexture::Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format)
 	{
-		Texture::Data(Bitmap);
-		//this->InternalFormat = PixelFormatToGL(Bitmap->GetPixelBuffer()->GetPixelFormat());
-	
-		uint32 Width = Bitmap->GetWidth();
-		uint32 Height = Bitmap->GetHeight();
-		uint8* RawData = Bitmap->GetData<uint8>();
+		Texture::Data(Data, Width, Height, Format);
 
-		int32 GLFormat = PixelFormatToGL(Bitmap->GetPixelBuffer()->GetPixelFormat());
-		int32 GLStorage = PixelStorageToGL(Bitmap->GetPixelBuffer()->GetPixelStorage());
+		int32 GLFormat = PixelFormatToGLFormat(Format);
+		int32 GLStorage = PixelFormatToGLStorage(Format);
 
 		glBindTexture(Target, Handle);
-		glTexImage2D(Target, 0, InternalFormat, Width, Height, 0, GLFormat, GLStorage, RawData);
+		glTexImage2D(Target, 0, InternalFormat, Width, Height, 0, GLFormat, GLStorage, Data);
 		glBindTexture(Target, 0);
 
 	}
@@ -70,24 +65,17 @@ namespace Ry
 		return InternalFormat;
 	}
 
-	int32 GLTexture::PixelFormatToGL(PixelFormat Format)
+	int32 GLTexture::PixelFormatToGLFormat(PixelFormat Format)
 	{
 		int32 GLFormat = GL_RGB;
 
 		switch (Format)
 		{
-		case PixelFormat::NONE:
-		case PixelFormat::RGB:
+		case PixelFormat::R8G8B8A8:
 			GLFormat = GL_RGB;
 			break;
-		case PixelFormat::RGBA:
+		case PixelFormat::R8G8B8:
 			GLFormat = GL_RGBA;
-			break;
-		case PixelFormat::GRAYSCALE:
-			GLFormat = GL_RED;
-			break;
-		case PixelFormat::DEPTH:
-			GLFormat = GL_DEPTH_COMPONENT;
 			break;
 		default:
 			Ry::Log->LogError("NON SUPPORTED FORMAT RETURNING GL_RGB " + Ry::to_string((int32)Format));
@@ -96,34 +84,21 @@ namespace Ry
 		return GLFormat;
 	}
 
-	int32 GLTexture::PixelStorageToGL(PixelStorage Storage)
+	int32 GLTexture::PixelFormatToGLStorage(PixelFormat Format)
 	{
 		int32 GLStorage = GL_UNSIGNED_BYTE;
 
-		switch (Storage)
+		switch (Format)
 		{
-		case PixelStorage::NONE:
-		case PixelStorage::RED8:
-		case PixelStorage::THREE_BYTE_RGB:
-		case PixelStorage::FOUR_BYTE_RGBA:
+		case PixelFormat::R8G8B8A8:
+		case PixelFormat::R8G8B8:
 			GLStorage = GL_UNSIGNED_BYTE;
 			break;
-		case PixelStorage::FLOAT:
-			GLStorage = GL_FLOAT;
-			break;
 		default:
-			Ry::Log->LogError("NON SUPPORTED FORMAT RETURNING GL_RGB " + Ry::to_string((int32)Storage));
+			Ry::Log->LogError("Non supported GL format for textures: " + Ry::to_string((int32)Format));
 		}
 
 		return GLStorage;
 	}
-
-	// Todo: move this concept to gl resources/command buffer
-// void GLTexture::Bind(uint32 Unit)
-// {
-// 	glActiveTexture(GL_TEXTURE0 + Unit);
-// 	glBindTexture(Target, Handle);		
-// 	glActiveTexture(GL_TEXTURE0); // Switch back to default texture unit
-// }
 	
 }

@@ -12,7 +12,7 @@ namespace Ry
 	/**
 	 * Specifies a pixel format for textures.
 	 */
-	enum class PixelFormat
+	enum class PixelFormat2
 	{
 		NONE, RGB, RGBA, GRAYSCALE, DEPTH
 	};
@@ -25,7 +25,7 @@ namespace Ry
 	class PixelBuffer
 	{
 	public:
-		PixelBuffer(int32 InWidth, int32 InHeight, PixelFormat InFormat, PixelStorage Storage): Format(InFormat), Storage(Storage), Width(InWidth), Height(InHeight), Data(nullptr) {};
+		PixelBuffer(int32 InWidth, int32 InHeight, PixelFormat2 InFormat, PixelStorage Storage): Format(InFormat), Storage(Storage), Width(InWidth), Height(InHeight), Data(nullptr) {};
 		virtual ~PixelBuffer() {};
 
 		int32 GetWidth() const { return Width; }
@@ -43,7 +43,7 @@ namespace Ry
 		 */
 		virtual void SetPixel(int32 X, int32 Y, uint32 Value) = 0;
 
-		PixelFormat GetPixelFormat()
+		PixelFormat2 GetPixelFormat()
 		{
 			return Format;
 		}
@@ -84,7 +84,7 @@ namespace Ry
 		}
 		
 	protected:
-		PixelFormat Format;
+		PixelFormat2 Format;
 		PixelStorage Storage;
 		int32 Width;
 		int32 Height;
@@ -121,7 +121,7 @@ namespace Ry
 		void SetPixel(int32 X, int32 Y, uint32 Value) override;
 	};
 	
-	class ARI_MODULE Bitmap
+	class RENDERING_MODULE Bitmap
 	{
 	public:
 

@@ -36,32 +36,24 @@ namespace Ry
 		vkFreeMemory(GVulkanContext->GetLogicalDevice(), TextureMemory, nullptr);
 	}
 
-	void VulkanTexture::Data(const Bitmap* Bitmap)
+	void VulkanTexture::Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format)
 	{
-		Texture::Data(Bitmap);
+		Texture::Data(Data, Width, Height, Format);
 
-		/*if(Bitmap->GetPixelBuffer()->GetPixelStorage() != PixelStorage::THREE_BYTE_RGB)
-		{
-			Ry::Log->LogError("Vulkan textures only support three byte RGB bitmaps");
-			return;
-		}*/
-
-		// Todo: support more vulkan formats
-
-		VkDeviceSize ImageSizeBytes = Bitmap->GetWidth() * Bitmap->GetHeight() * 4;
+		VkDeviceSize ImageSizeBytes = Width * Height * 4;
 
 		// todo: utilize texture usage
 		StagingMemory = new VulkanBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ImageSizeBytes);
 
-		uint32* RGBAData = Bitmap->GetPixelBuffer()->GetAsRGBA();
-		StagingMemory->UploadData(RGBAData, Bitmap->GetWidth() * Bitmap->GetHeight());
-		delete RGBAData; // Don't need data anymore
+		//uint32* RGBAData = Bitmap->GetPixelBuffer()->GetAsRGBA();
+		StagingMemory->UploadData(Data, (uint32) ImageSizeBytes); // TODO: Don't downcast here
+		//delete RGBAData; // Don't need data anymore
 
 		VkImageCreateInfo ImageInfo{};
 		ImageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		ImageInfo.imageType = VK_IMAGE_TYPE_2D;
-		ImageInfo.extent.width = static_cast<uint32_t>(Bitmap->GetWidth());
-		ImageInfo.extent.height = static_cast<uint32_t>(Bitmap->GetHeight());
+		ImageInfo.extent.width = Width;
+		ImageInfo.extent.height = Height;
 		ImageInfo.extent.depth = 1;
 		ImageInfo.mipLevels = 1;
 		ImageInfo.arrayLayers = 1;
@@ -95,9 +87,14 @@ namespace Ry
 
 		vkBindImageMemory(GVulkanContext->GetLogicalDevice(), TextureResource, TextureMemory, 0);
 
+		// Transition to optimal transfer dst for copying data to
 		TransitionImageLayout(TextureResource, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL); 	// Transition to optimal layout for transferring image
-		CopyBufferToImage(Bitmap->GetWidth(), Bitmap->GetHeight(), StagingMemory->GetBufferObject(), TextureResource);
-		TransitionImageLayout(TextureResource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL); // Transition to being shader read only
+
+		// Copy data buffer into image memory
+		CopyBufferToImage(Width, Height, StagingMemory->GetBufferObject(), TextureResource);
+
+		// Transition to being shader read only for use in shaders
+		TransitionImageLayout(TextureResource, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL); 
 
 		// Now create an image view
 		VkImageViewCreateInfo ViewInfo{};

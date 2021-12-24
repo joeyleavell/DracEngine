@@ -44,7 +44,7 @@ namespace Ry
 			}
 			else
 			{
-				return Output;
+				return *Output;
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace Ry
 		}
 
 		Ry::String OutFile;
-		std::ofstream Output;
+		std::ofstream* Output;
 
 		int32 StreamStackSize = 0;
 		std::ostringstream* StreamStack = nullptr;

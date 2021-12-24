@@ -5,7 +5,7 @@ namespace Ry
 {
 
 	PixelBufferFourByteRGBA::PixelBufferFourByteRGBA(int32 Width, int32 Height):
-	PixelBuffer(Width, Height, PixelFormat::RGBA, PixelStorage::FOUR_BYTE_RGBA)
+	PixelBuffer(Width, Height, PixelFormat2::RGBA, PixelStorage::FOUR_BYTE_RGBA)
 	{
 		Data = new uint8[Width * Height * 4];
 		memset(Data, 0, Width * Height * 4);
@@ -30,7 +30,7 @@ namespace Ry
 	}
 
 	PixelBufferThreeByteRGB::PixelBufferThreeByteRGB(int32 Width, int32 Height) :
-		PixelBuffer(Width, Height, PixelFormat::RGB, PixelStorage::THREE_BYTE_RGB)
+		PixelBuffer(Width, Height, PixelFormat2::RGB, PixelStorage::THREE_BYTE_RGB)
 	{
 		Data = new uint8[Width * Height * 3];
 		memset(Data, 0, Width * Height * 3);
@@ -53,7 +53,7 @@ namespace Ry
 	}
 
 	PixelBufferRed8::PixelBufferRed8(int32 Width, int32 Height) :
-		PixelBuffer(Width, Height, PixelFormat::GRAYSCALE, PixelStorage::RED8)
+		PixelBuffer(Width, Height, PixelFormat2::GRAYSCALE, PixelStorage::RED8)
 	{
 		Data = new uint8[Width * Height];
 		memset(Data, 0, Width * Height);

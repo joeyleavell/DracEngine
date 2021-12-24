@@ -19,7 +19,7 @@ namespace Ry
 
 		virtual void DeleteTexture();
 
-		void Data(const Bitmap* Bitmap);
+		void Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format);
 		virtual void Bind(uint32 Unit) {};
 		virtual int32 GetSamples() const { return 0; };
 

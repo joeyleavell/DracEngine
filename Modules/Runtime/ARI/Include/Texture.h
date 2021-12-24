@@ -5,10 +5,6 @@
 
 namespace Ry
 {
-	class Bitmap;
-	enum class PixelFormat;
-	enum class PixelStorage;
-
 	enum class TextureUsage
 	{
 		STATIC, DYNAMIC	
@@ -17,6 +13,11 @@ namespace Ry
 	enum class TextureFiltering
 	{
 		Nearest, Linear
+	};
+
+	enum class PixelFormat
+	{
+		R8G8B8A8, R8G8B8
 	};
 	
 	class ARI_MODULE Texture
@@ -30,19 +31,16 @@ namespace Ry
 		TextureUsage GetUsage() const;
 		TextureFiltering GetFilter() const;
 		
-		/************************************************************************/
-		/* Interface functions                                                  */
-		/************************************************************************/
-		virtual void Data(const Bitmap* Bitmap) { this->CachedBitmap = Bitmap; }
+		virtual void Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format);
 		virtual void DeleteTexture() = 0;
 
 		int32 GetWidth() const;
 		int32 GetHeight() const;
 
-
 	private:
 
-		const Bitmap* CachedBitmap;		
+		uint32 Width;
+		uint32 Height;
 		TextureUsage Usage;
 		TextureFiltering Filter;
 	

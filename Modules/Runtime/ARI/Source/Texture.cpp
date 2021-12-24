@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "Bitmap.h"
 
 namespace Ry
 {
@@ -8,7 +7,6 @@ namespace Ry
 	{
 		this->Usage = InUsage;
 		this->Filter = Filter;
-		this->CachedBitmap = nullptr;
 	}
 	
 	TextureUsage Texture::GetUsage() const
@@ -21,14 +19,20 @@ namespace Ry
 		return Filter;
 	}
 
+	void Texture::Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format)
+	{
+		this->Width = Width;
+		this->Height = Height;
+	}
+
 	int32 Texture::GetWidth() const
 	{
-		return CachedBitmap->GetWidth();
+		return Width;
 	}
 
 	int32 Texture::GetHeight() const
 	{
-		return CachedBitmap->GetHeight();
+		return Height;
 	}
 	
 }

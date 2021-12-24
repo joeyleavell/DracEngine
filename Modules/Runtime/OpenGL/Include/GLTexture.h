@@ -14,7 +14,7 @@ namespace Ry
 		GLTexture(TextureUsage InUsage, TextureFiltering Filter);
 		virtual ~GLTexture() = default;
 		
-		void Data(const Bitmap* Bitmap) override;
+		void Data(uint8* Data, uint32 Width, uint32 Height, PixelFormat Format) override;
 		void DeleteTexture() override;
 
 		GLuint GetHandle() const;
@@ -23,8 +23,8 @@ namespace Ry
 
 	protected:
 
-		int32 PixelFormatToGL(PixelFormat Format);
-		int32 PixelStorageToGL(PixelStorage Storage);
+		int32 PixelFormatToGLFormat(PixelFormat Format);
+		int32 PixelFormatToGLStorage(PixelFormat Storage);
 		
 		GLuint Handle;
 		GLenum Target;
