@@ -27,7 +27,7 @@ namespace Ry
 		HorizontalBarItem = MakeItemSet();
 		VerticalBarItem = MakeItemSet();
 
-		ScrollMethod = SCROLL_METHOD_TOP_TO_BOTTOM;
+		VerticalPlacement = SCROLL_METHOD_TOP_TO_BOTTOM;
 	}
 
 	float ScrollPane::GetVerticalScrollAmount()
