@@ -127,22 +127,21 @@ namespace Ry
 	{
 		SlotWidget::OnHovered(MouseEv);
 
-		MarkDirty(this);
+		RearrangeAndRepaint();
 	}
 
 	void BorderWidget::OnUnhovered(const MouseEvent& MouseEv)
 	{
 		SlotWidget::OnUnhovered(MouseEv);
 
-		MarkDirty(this);
-
+		RearrangeAndRepaint();
 	}
 
 	bool BorderWidget::OnPressed(const MouseButtonEvent& MouseEv)
 	{
 		SlotWidget::OnPressed(MouseEv);
 
-		MarkDirty(this);
+		RearrangeAndRepaint();
 
 		return true;
 	}
@@ -151,7 +150,7 @@ namespace Ry
 	{
 		SlotWidget::OnReleased(MouseEv);
 
-		MarkDirty(this);
+		RearrangeAndRepaint();
 
 		return true;
 	}

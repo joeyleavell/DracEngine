@@ -56,7 +56,7 @@ namespace Ry
 			Offset.Y = (int32) MouseEv.MouseY - Icon->GetAbsolutePosition().Y;
 
 			this->bIsPressed = true;
-			MarkDirty(this, true);
+			RearrangeAndRepaint();
 			return true;
 		}
 
@@ -65,7 +65,7 @@ namespace Ry
 			this->bIsPressed = false;
 			this->bIsDragging = false;
 
-			MarkDirty(this, true);
+			RearrangeAndRepaint();
 			return true;
 		}
 
@@ -93,7 +93,7 @@ namespace Ry
 			LastMouseY = MouseEv.MouseY;
 
 			// MarkDirty; this widget needs a re-draw as the widget matches the x,y position of the mouse
-			MarkDirty(this);
+			RearrangeAndRepaint();
 
 			return true;
 		}

@@ -51,7 +51,12 @@ namespace Ry
 	{
 		RootWidgets.Add(Widget);
 
-		Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
+		//Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
+
+		// Register delegates
+		Widget->OnFullRefresh.AddMemberFunction(this, &UserInterface::OnFullRefresh);
+		Widget->OnReArrange.AddMemberFunction(this, &UserInterface::OnReArrange);
+		Widget->OnRePaint.AddMemberFunction(this, &UserInterface::OnRePaint);
 
 		Widget->SetStyle(Style);
 		Widget->SetVisible(true, true);
@@ -97,6 +102,8 @@ namespace Ry
 		}
 
 		Bat->Update();
+
+		OnFullRefresh();
 	}
 
 	void UserInterface::Draw()
@@ -113,7 +120,130 @@ namespace Ry
 		Bat->Update();
 	}
 
-	void UserInterface::RenderStateDirty(Widget* Wid, bool bFullRefresh)
+	void UserInterface::Update()
+	{
+		// Fast clear lists for this frame
+		UpdateValues.AllChildren.SoftClear();
+		UpdateValues.PipelineStates.SoftClear();
+		UpdateValues.WidgetChildren.SoftClear();
+
+		if(bNeedsFullRefresh)
+		{
+			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
+			{
+
+				RootWidget->GetAllChildren(UpdateValues.AllChildren);
+
+				for (Widget* Child : UpdateValues.AllChildren)
+				{
+					Child->GetPipelineStates(UpdateValues.PipelineStates);
+
+					// Child->OnHide(Bat);
+					// if (Child->IsVisible())
+					// 	Child->OnShow(Bat);
+
+					if (Child->IsVisible())
+					{
+						Child->OnShow(Bat);
+					}
+					else
+					{
+						Child->OnHide(Bat);
+					}
+					if(Child->bHasBeenShown && !Child->IsVisible())
+					{
+					//	Child->OnHide(Bat);
+					}
+					else if(!Child->bHasBeenShown && Child->IsVisible())
+					{
+					//	Child->OnShow(Bat);
+					}
+
+				}
+
+				for (const PipelineState& State : UpdateValues.PipelineStates)
+				{
+					Bat->UpdatePipelineState(State);
+				}
+
+			}
+
+			Draw();
+		}
+
+		bool bUpdateBatch = false;
+
+		if (NeedsRePaint.GetSize() > 0)
+		{
+			Ry::OASetIterator<Widget*> WidItr = NeedsRePaint.CreatePairIterator();
+			while (WidItr)
+			{
+				UpdateValues.WidgetChildren.SoftClear();
+
+				(*WidItr)->GetAllChildren(UpdateValues.WidgetChildren);
+				UpdateValues.WidgetChildren.Add(*WidItr);
+
+				for(Widget* Wid : UpdateValues.WidgetChildren)
+				{
+					Wid->OnHide(Bat);
+					if (Wid->IsVisible())
+						Wid->OnShow(Bat);
+				}
+
+				++WidItr;
+			}
+			bUpdateBatch = true;
+		}
+
+		if (NeedsReArrange.GetSize() > 0)
+		{
+			Ry::OASetIterator<Widget*> WidItr = NeedsReArrange.CreatePairIterator();
+			while (WidItr)
+			{
+				(*WidItr)->Arrange();
+				(*WidItr)->Draw();
+
+				// Update pipeline states too
+				(*WidItr)->GetPipelineStates(UpdateValues.PipelineStates);
+				for (const PipelineState& State : UpdateValues.PipelineStates)
+				{
+					Bat->UpdatePipelineState(State);
+				}
+
+				++WidItr;
+			}
+
+			bUpdateBatch = true;
+		}
+
+
+		if (bUpdateBatch)
+		{
+			Bat->Update();
+		}
+
+		// TODO: Will clearing these each frame be a significant performance hit?
+		bNeedsFullRefresh = false;
+		NeedsRePaint.Clear();
+		NeedsReArrange.Clear();
+	}
+
+	void UserInterface::OnFullRefresh()
+	{
+		bNeedsFullRefresh = true;
+	}
+
+	void UserInterface::OnReArrange(Widget* Wid)
+	{
+		NeedsReArrange.Insert(Wid);
+	}
+
+	void UserInterface::OnRePaint(Widget* Wid)
+	{
+		NeedsRePaint.Insert(Wid);
+	}
+
+	void UserInterface::RenderStateDirty(Widget* Wid, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh)
 	{
 		static Ry::ArrayList<PipelineState> PipelineStates;
 		static Ry::ArrayList<Widget*> AllChildren;
@@ -193,7 +323,6 @@ namespace Ry
 				Bat->UpdatePipelineState(State);
 			}
 		}
-
 
 		if (bFullRefresh)
 			Draw(); // Re-arrange everything, will also update batch

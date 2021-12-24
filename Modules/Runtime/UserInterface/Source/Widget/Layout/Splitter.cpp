@@ -156,7 +156,7 @@ namespace Ry
 			BarPosition = std::max(MinBarPosition, BarPosition);
 			BarPosition = std::min(MaxBarPosition, BarPosition);
 
-			MarkDirty(this, true);
+			FullRefresh();
 			
 			return true;
 		}

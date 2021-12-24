@@ -185,6 +185,22 @@ namespace Ry
 		return *this;
 	}
 
+	void Widget::FullRefresh()
+	{
+		FindTopParent()->OnFullRefresh.Broadcast();
+	}
+
+	void Widget::RearrangeAndRepaint()
+	{
+		Widget* Top = FindTopParent();
+		Top->OnRePaint.Broadcast(this);
+		Top->OnReArrange.Broadcast(this);
+	}
+
+	void Widget::Remove()
+	{
+	}
+
 	void Widget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
 	{
 
@@ -203,7 +219,7 @@ namespace Ry
 			Temp = Temp->Parent;
 		}
 
-		MarkDirty(this);
+		RearrangeAndRepaint();
 	}
 
 	PipelineState Widget::GetPipelineState(const Widget* ForWidget) const
@@ -323,7 +339,7 @@ namespace Ry
 		SetVisibleInternal(bVisibility, bPropagate);
 
 		// Actually marks the widget as dirty. Saves having to do this for each child widget.
-		MarkDirty(this);
+		RearrangeAndRepaint();
 	}
 
 	void Widget::SetVisibleInternal(bool bVisibility, bool bPropagate)
@@ -331,16 +347,16 @@ namespace Ry
 		this->bVisible = bVisibility;
 	}
 
-	void Widget::MarkDirty(Widget* Self, bool bFullRefresh)
-	{
-		Widget* CurrentParent = Self;
-		while(CurrentParent && CurrentParent->Parent)
-		{
-			CurrentParent = CurrentParent->Parent;
-		}
-
-		CurrentParent->RenderStateDirty.Broadcast(Self, bFullRefresh);
-	}
+	// void Widget::MarkDirty(Widget* Self, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh)
+	// {
+	// 	Widget* CurrentParent = Self;
+	// 	while(CurrentParent && CurrentParent->Parent)
+	// 	{
+	// 		CurrentParent = CurrentParent->Parent;
+	// 	}
+	//
+	// 	GetT->RenderStateDirty.Broadcast(Self, bRePaint, bNeedsReArrange, bFullRefresh);
+	// }
 
 	void Widget::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
 	{
@@ -399,6 +415,16 @@ namespace Ry
 		}
 	}
 
+
+	Widget* Widget::FindTopParent()
+	{
+		Widget* CurrentParent = this;
+		while (CurrentParent && CurrentParent->Parent)
+		{
+			CurrentParent = CurrentParent->Parent;
+		}
+		return CurrentParent;
+	}
 
 	int32 Widget::GetWidgetID() const
 	{

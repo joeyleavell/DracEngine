@@ -31,7 +31,7 @@ namespace Ry
 		// Pre compute text data
 		ComputeTextData();
 
-		MarkDirty(this);
+		FullRefresh();
 
 		return *this;
 	}
@@ -43,7 +43,7 @@ namespace Ry
 		
 		bTextSizeDirty = true;
 
-		MarkDirty(this, true);
+		FullRefresh();
 
 		return *this;
 	}

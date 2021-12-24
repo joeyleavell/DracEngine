@@ -70,7 +70,7 @@ namespace Ry
 
 		PanelWidget::AppendSlot(Widget);
 
-		MarkDirty(this);
+		FullRefresh();
 
 		return PanelSlot;
 	}

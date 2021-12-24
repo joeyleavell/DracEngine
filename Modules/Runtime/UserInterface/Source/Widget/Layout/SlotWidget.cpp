@@ -273,7 +273,7 @@ namespace Ry
 		Arrange();
 
 		// Recompute cached size
-		MarkDirty(this);
+		FullRefresh();
 	}
 
 	bool SlotWidget::OnMouseEvent(const MouseEvent& MouseEv)

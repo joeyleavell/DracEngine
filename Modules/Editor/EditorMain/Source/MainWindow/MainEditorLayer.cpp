@@ -122,6 +122,7 @@ namespace Ry
 	{
 		TestWorld->Update(Delta);
 
+		UI->Update();
 	}
 
 	void MainEditorLayer::Render()

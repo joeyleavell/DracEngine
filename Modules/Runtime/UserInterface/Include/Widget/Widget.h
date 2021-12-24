@@ -160,6 +160,8 @@ namespace Ry
 	{
 	public:
 
+		friend class UserInterface;
+
 		GeneratedBody()
 
 		/**
@@ -180,7 +182,9 @@ namespace Ry
 		 *
 		 * @param Ry::Widget* The widget whose render state is dirty
 		 */
-		MulticastDelegate<Ry::Widget*, bool> RenderStateDirty;
+		MulticastDelegate<> OnFullRefresh;
+		MulticastDelegate<Widget*> OnRePaint;
+		MulticastDelegate<Widget*> OnReArrange;
 
 		Widget();
 		
@@ -197,7 +201,10 @@ namespace Ry
 		Point GetAbsolutePosition() const;
 		Widget& SetRelativePosition(float X, float Y);
 		Widget& SetMaxSize(int32 MaxWidth, int32 MaxHeight);
-		void MarkDirty(Widget* Self, bool bFullRefresh = false);
+		void FullRefresh();
+		void RearrangeAndRepaint(); \
+		void Remove();
+		//void MarkDirty(Widget* Self, bool bRePaint = true, bool bNeedsReArrange = true, bool bFullRefresh = false);
 		void SetVisible(bool bVisibility, bool bPropagate);
 
 		virtual void SetVisibleInternal(bool bVisibility, bool bPropagate);
@@ -210,7 +217,9 @@ namespace Ry
 		virtual PipelineState GetPipelineState(const Widget* ForWidget) const;
 		virtual RectScissor GetClipSpace(const Widget* ForWidget) const;
 		virtual Widget& operator[](SharedPtr<Ry::Widget> Child);
+		virtual void Draw() {}
 		virtual void Arrange();
+		virtual void OnRemove() {};
 		virtual void OnHovered(const MouseEvent& MouseEv);
 		virtual void OnUnhovered(const MouseEvent& MouseEv);
 		virtual bool OnPressed(const MouseButtonEvent& MouseEv);
@@ -236,10 +245,9 @@ namespace Ry
 		// Space that this widget actually ends up accupying after being scaled to account for overflow
 		virtual SizeType GetScaledOccupiedSize(const Widget* ForWidget) const;
 
-		virtual void Draw() {};
-		virtual SizeType ComputeSize() const { return SizeType{}; };
+		virtual SizeType ComputeSize() const { return SizeType{}; }
 		virtual void OnShow(Ry::Batch* Batch) {}
-		virtual void OnHide(Ry::Batch* Batch) {};
+		virtual void OnHide(Ry::Batch* Batch) {}
 
 		template <typename WidgetClass>
 		SharedPtr<WidgetClass> FindChildWidget(Ry::String ChildWidgetId) const
@@ -248,6 +256,8 @@ namespace Ry
 		}
 
 	protected:
+
+		Widget* FindTopParent();
 
 		const StyleSet* Style;
 
@@ -267,6 +277,7 @@ namespace Ry
 
 	private:
 
+		bool bHasBeenShown = false;
 		uint32 WidgetID;
 
 	} RefClass();

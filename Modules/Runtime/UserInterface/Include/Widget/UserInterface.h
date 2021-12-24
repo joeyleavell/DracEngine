@@ -26,9 +26,26 @@ namespace Ry
 		void Redraw();
 		void Draw();
 
+		void Update();
+
 	private:
 
-		void RenderStateDirty(Widget* Wid, bool bFullRefresh);
+		struct UpdateStruct
+		{
+			Ry::ArrayList<PipelineState> PipelineStates;
+			Ry::ArrayList<Widget*> AllChildren;
+			Ry::ArrayList<Widget*> WidgetChildren;
+		} UpdateValues;
+
+		void OnFullRefresh();
+		void OnReArrange(Widget* Wid);
+		void OnRePaint(Widget* Wid);
+
+		bool bNeedsFullRefresh;
+		Ry::OASet<Widget*> NeedsReArrange;
+		Ry::OASet<Widget*> NeedsRePaint;
+
+		void RenderStateDirty(Widget* Wid, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh);
 
 		Ry::Batch* Bat;
 		Ry::ArrayList<Ry::SharedPtr<Ry::Widget>> RootWidgets;

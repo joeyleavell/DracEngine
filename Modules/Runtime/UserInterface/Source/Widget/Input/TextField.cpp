@@ -40,7 +40,7 @@ namespace Ry
 
 		// Pre compute text data
 		ComputeTextData(ComputedTextData, Text);
-		MarkDirty(this);
+		FullRefresh();
 
 		return *this;
 	}
@@ -50,7 +50,7 @@ namespace Ry
 		this->TextStyleName = TextStyleName;
 		bTextSizeDirty = true;
 
-		MarkDirty(this);
+		FullRefresh();
 
 		return *this;
 	}
@@ -150,7 +150,7 @@ namespace Ry
 			CursorPos = CursorAdvanceRight(Initial);
 			SelectionPos = CursorAdvanceLeft(Initial);
 
-			MarkDirty(this, true);
+			RearrangeAndRepaint();
 
 			return true;
 		}
@@ -166,7 +166,8 @@ namespace Ry
 			int32 MouseXOffset = (int32)(MouseEv.MouseX - Abs.X);
 			CursorPos = FindClosestCursorIndex(MouseXOffset);
 
-			MarkDirty(this);
+			RearrangeAndRepaint();
+
 		}
 
 		return true;
@@ -194,7 +195,7 @@ namespace Ry
 					SelectionPos = -1;
 				}
 
-				MarkDirty(this);
+				RearrangeAndRepaint();
 			}
 			else
 			{
@@ -202,7 +203,7 @@ namespace Ry
 			}
 		}
 
-		MarkDirty(this);
+		RearrangeAndRepaint();
 
 		return true;
 	}
@@ -249,7 +250,7 @@ namespace Ry
 			int32 Start = CursorPos < SelectionPos ? CursorPos : SelectionPos;
 			int32 End = CursorPos < SelectionPos ? SelectionPos : CursorPos;
 
-			MarkDirty(this, true);
+			FullRefresh();
 			RemoveSubstring(Start, End);
 		}
 	}
@@ -279,13 +280,13 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					MarkDirty(this);
+					RearrangeAndRepaint();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					MarkDirty(this);
+					RearrangeAndRepaint();
 				}
 			}
 
@@ -296,7 +297,7 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				MarkDirty(this);
+				RearrangeAndRepaint();
 			}
 
 			// Simply decrement cursor pos
@@ -316,7 +317,7 @@ namespace Ry
 				SelectionPos = -1;
 			}
 
-			MarkDirty(this);
+			RearrangeAndRepaint();
 		}
 
 		if (CursorPos < 0)
@@ -375,13 +376,13 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					MarkDirty(this);
+					RearrangeAndRepaint();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					MarkDirty(this);
+					RearrangeAndRepaint();
 				}
 			}
 		}
@@ -390,7 +391,7 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				MarkDirty(this);
+				RearrangeAndRepaint();
 			}
 
 			// Simply increment cursor pos
@@ -409,7 +410,7 @@ namespace Ry
 				SelectionPos = -1;
 			}
 
-			MarkDirty(this);
+			RearrangeAndRepaint();
 		}
 
 
@@ -440,7 +441,7 @@ namespace Ry
 
 		CursorPos += Insert.getSize();
 		SelectionPos = -1; // Selection immediately goes away on type
-		MarkDirty(this, true);
+		FullRefresh();
 	}
 
 	bool TextField::OnKey(const KeyEvent& KeyEv)
@@ -464,7 +465,7 @@ namespace Ry
 					SelectionPos = 0;
 					CursorPos = Text.getSize();
 
-					MarkDirty(this, true);
+					FullRefresh();
 				}
 
 				// Pasting text
@@ -489,7 +490,7 @@ namespace Ry
 				HandleRightArrow(KeyEv);
 			}
 
-			MarkDirty(this, true);
+			FullRefresh();
 		}
 
 		return true;
@@ -500,7 +501,7 @@ namespace Ry
 		// Modify the text
 		InsertText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
 
-		MarkDirty(this, true);
+		FullRefresh();
 
 		return true;
 	}

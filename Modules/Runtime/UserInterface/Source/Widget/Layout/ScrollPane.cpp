@@ -73,7 +73,7 @@ namespace Ry
 		if (std::abs(Prev - Scroll) >= 0.000001f)
 		{
 			// Scroll amount has changed, mark widget as dirty	
-			MarkDirty(this);
+			RearrangeAndRepaint();
 		}
 	}
 
@@ -90,7 +90,7 @@ namespace Ry
 		if (std::abs(Prev - Scroll) >= 0.000001f)
 		{
 			// Scroll amount has changed, mark widget as dirty	
-			MarkDirty(this);
+			RearrangeAndRepaint();
 		}
 	}
 
@@ -153,6 +153,8 @@ namespace Ry
 				//break;
 			}
 		}
+
+		//MarkDirty(this, true, false);
 
 		// The physical size the children occupy
 		SizeType ChildrenSize = ComputeChildrenSize();

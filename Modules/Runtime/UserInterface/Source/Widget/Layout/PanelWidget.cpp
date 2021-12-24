@@ -251,6 +251,7 @@ namespace Ry
 		for (SharedPtr<Widget> Child : Children)
 		{
 			Child->SetVisible(false, true);
+			Child->RearrangeAndRepaint();
 		}
 
 		Children.Clear();

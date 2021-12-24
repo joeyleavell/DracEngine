@@ -76,7 +76,7 @@ namespace Ry
 
 		}
 
-		Browser->MarkDirty(Browser.Get());
+		Browser->FullRefresh();
 		
 	}
 
