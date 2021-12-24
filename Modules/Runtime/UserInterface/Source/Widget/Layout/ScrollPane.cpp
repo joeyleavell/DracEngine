@@ -26,6 +26,8 @@ namespace Ry
 
 		HorizontalBarItem = MakeItemSet();
 		VerticalBarItem = MakeItemSet();
+
+		ScrollMethod = SCROLL_METHOD_TOP_TO_BOTTOM;
 	}
 
 	float ScrollPane::GetVerticalScrollAmount()
@@ -152,14 +154,21 @@ namespace Ry
 			}
 		}
 
-		// Calculate scroll amount
+		// The physical size the children occupy
 		SizeType ChildrenSize = ComputeChildrenSize();
+
+		// The max space available to us that will fit on the screen
 		SizeType ThisSize = Widget::GetScaledSlotSize(this);
 
 		float HiddenAmountX = (float)(ChildrenSize.Width - ThisSize.Width);
 		float HiddenAmountY = (float)(ChildrenSize.Height - ThisSize.Height);
 		int32 OffsetX = (int32)(HiddenAmountX * HorizontalScrollAmount);
 		int32 OffsetY = (int32)(HiddenAmountY * VerticalScrollAmount);
+		if (VerticalPlacement == SCROLL_METHOD_TOP_TO_BOTTOM)
+		{
+			OffsetY = (int32)(HiddenAmountY * (1.0f - VerticalScrollAmount));
+		}
+
 		if (OffsetX < 0)
 			OffsetX = 0;
 		if (OffsetY < 0)
@@ -167,22 +176,46 @@ namespace Ry
 
 		int32 CurrentY = static_cast<int32>(0);
 
+		if(VerticalPlacement == SCROLL_METHOD_TOP_TO_BOTTOM)
+		{
+			CurrentY = ThisSize.Height;
+		}
+
 		for (SharedPtr<Slot> ChildSlot : ChildrenSlots)
 		{
 			SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 			SizeType ContentSize = Widget->ComputeSize();
 
 			// Add top padding prior to setting relative position
-			CurrentY += static_cast<int32>(ChildSlot->PaddingTop);
+			if(VerticalPlacement == SCROLL_METHOD_BOTTOM_TO_TOP)
+			{
+				CurrentY += static_cast<int32>(ChildSlot->PaddingBottom);
+			}
+			else if(VerticalPlacement == SCROLL_METHOD_TOP_TO_BOTTOM)
+			{
+				CurrentY -= static_cast<int32>(ChildSlot->PaddingTop) + ContentSize.Height;
+			}
 
 			float WidgetX = static_cast<float>(ChildSlot->PaddingLeft - OffsetX);
 			float WidgetY = static_cast<float>(CurrentY - OffsetY);
+			if (VerticalPlacement == SCROLL_METHOD_TOP_TO_BOTTOM)
+			{
+				WidgetY = static_cast<float>(CurrentY + OffsetY);
+			}
 
 			// Set the widget's relative position
 			Widget->SetRelativePosition(WidgetX, WidgetY);
 			Widget->Arrange();
 
-			CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->PaddingBottom);
+			if (VerticalPlacement == SCROLL_METHOD_BOTTOM_TO_TOP)
+			{
+				CurrentY += static_cast<int32>(ContentSize.Height + ChildSlot->PaddingTop);
+			}
+			else if (VerticalPlacement == SCROLL_METHOD_TOP_TO_BOTTOM)
+			{
+				CurrentY -= static_cast<int32>(ChildSlot->PaddingBottom);
+			}
+
 		}
 
 	}

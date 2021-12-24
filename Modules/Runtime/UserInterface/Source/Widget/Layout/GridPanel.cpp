@@ -92,7 +92,7 @@ namespace Ry
 
 		SizeType ThisSize = Widget::GetScaledSlotSize(this);
 
-		float CurrentY = static_cast<int32>(0.0f);
+		float CurrentY = ThisSize.Height - MaxRows * CellHeight;
 
 		// See how many columns will fit
 
@@ -128,6 +128,7 @@ namespace Ry
 
 				float WidgetX = Col * CellWidth;
 				float WidgetY = Row * CellHeight;
+				
 
 				// Place the widget in the middle of the cell
 
@@ -172,12 +173,13 @@ namespace Ry
 		// Default margin: 5px
 
 		int32 MaxCols = CalcMaxCols();
+		int32 MaxRows = CalcMaxRows();
 
 		int32 SizeX = static_cast<int32>(MaxCols * CellWidth);
-		int32 SizeY = static_cast<int32>(0.0f);
+		int32 SizeY = static_cast<int32>(MaxRows * CellHeight);
 
 		// Find max row/col
-		int32 MaxRow = 0;
+		/*int32 MaxRow = 0;
 		bool bRowExists = true;
 
 		while (bRowExists)
@@ -200,7 +202,7 @@ namespace Ry
 			}
 
 			MaxRow++;
-		}
+		}*/
 
 		return SizeType{ SizeX, SizeY };
 	}
@@ -265,7 +267,7 @@ namespace Ry
 		int32 MaxCols = CalcMaxCols();
 		
 		// Find max row/col
-		int32 MaxRow = 0;
+		/*int32 MaxRow = 0;
 		bool bRowExists = true;
 
 		while (bRowExists)
@@ -282,9 +284,9 @@ namespace Ry
 				}
 			}
 
-		}
+		}*/
 
-		return MaxRow;
+		return static_cast<int32>(std::ceil(ChildrenSlots.GetSize() / static_cast<float>(MaxCols)));
 
 	}
 

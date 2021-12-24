@@ -7,11 +7,17 @@
 namespace Ry
 {
 
+	constexpr uint8 SCROLL_METHOD_TOP_TO_BOTTOM = 0x0000;
+	constexpr uint8 SCROLL_METHOD_BOTTOM_TO_TOP = 0x0001;
+
 	class USERINTERFACE_MODULE ScrollPane : public PanelWidget
 	{
 	public:
 
 		GeneratedBody()
+
+		RefField()
+		uint8 VerticalPlacement;
 
 		struct Slot : public PanelWidgetSlot
 		{

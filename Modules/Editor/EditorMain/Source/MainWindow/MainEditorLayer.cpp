@@ -120,9 +120,6 @@ namespace Ry
 
 	void MainEditorLayer::Update(float Delta)
 	{
-		TestWorld->GetCamera()->Transform.Position.y -= 10.0f * Delta;
-		TestWorld->GetCamera()->Update();
-
 		TestWorld->Update(Delta);
 
 	}

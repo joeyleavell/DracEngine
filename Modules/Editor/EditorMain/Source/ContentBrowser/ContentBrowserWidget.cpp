@@ -93,7 +93,7 @@ namespace Ry
 			LastMouseY = MouseEv.MouseY;
 
 			// MarkDirty; this widget needs a re-draw as the widget matches the x,y position of the mouse
-			MarkDirty(this, true);
+			MarkDirty(this);
 
 			return true;
 		}

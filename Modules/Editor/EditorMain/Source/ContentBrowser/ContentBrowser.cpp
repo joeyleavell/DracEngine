@@ -51,8 +51,8 @@ namespace Ry
 			bool bIsRAsset = Path.path().extension() == ".rasset";
 
 			// Only show files of type .rasset
-			if (!bIsDirectory && !bIsRAsset)
-				continue;
+			//if (!bIsDirectory && !bIsRAsset)
+				//continue;
 
 			// Create a browser node for this
 			BrowserNode Node;
