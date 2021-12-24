@@ -1,6 +1,5 @@
 #include "Json/Json.h"
 #include "nlohmann/json.hpp"
-#include <complex.h>
 
 namespace Ry
 {

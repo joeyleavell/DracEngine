@@ -39,7 +39,7 @@ namespace Ry
 
 				// Setup the format of this attribute.
 				//glVertexAttribFormat(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, offset);
-				glVertexAttribPointer(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, Stride, reinterpret_cast<void*>(offset));
+				glVertexAttribPointer(attrib_index, attribute.Size, GL_FLOAT, GL_FALSE, Stride, reinterpret_cast<void*>(static_cast<uint64>(offset)));
 
 				// Enable this attribute.
 				glEnableVertexAttribArray(attrib_index);

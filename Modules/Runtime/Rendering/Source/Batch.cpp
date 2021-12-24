@@ -1119,10 +1119,10 @@ namespace Ry
 						float Ph = Scissor.Height / ((float) Ry::GetViewportHeight());
 
 						AtLayer->CommandBuffer->SetScissorSize(
-							Px * RenderTargetWidth, 
-							Py * RenderTargetHeight, 
-							Pw * RenderTargetWidth, 
-							Ph * RenderTargetHeight,
+							static_cast<int32>(Px * RenderTargetWidth), 
+							static_cast<int32>(Py * RenderTargetHeight),
+							static_cast<int32>(Pw * RenderTargetWidth),
+							static_cast<int32>(Ph * RenderTargetHeight),
 							RenderTargetWidth,
 							RenderTargetHeight
 						);

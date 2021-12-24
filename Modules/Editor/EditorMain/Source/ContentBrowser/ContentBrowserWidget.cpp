@@ -145,7 +145,7 @@ namespace Ry
 		{
 			SizeType Size = Icon->ComputeSize();
 			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
-			IconStyle.Default->Draw(GhostIconItemSet, LastMouseX - Offset.X, LastMouseY - Offset.Y, Size.Width, Size.Height);
+			IconStyle.Default->Draw(GhostIconItemSet, LastMouseX - static_cast<float>(Offset.X), LastMouseY - static_cast<float>(Offset.Y), static_cast<float>(Size.Width), static_cast<float>(Size.Height));
 		}
 	}
 

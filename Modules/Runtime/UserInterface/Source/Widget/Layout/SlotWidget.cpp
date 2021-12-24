@@ -395,8 +395,8 @@ namespace Ry
 	{
 		// Padding is guaranteed
 		SizeType SlotSize = GetScaledSlotSize(ForWidget);
-		SlotSize.Width += (PaddingLeft + PaddingRight);
-		SlotSize.Height += (PaddingTop + PaddingBottom);
+		SlotSize.Width += static_cast<int32>(PaddingLeft + PaddingRight);
+		SlotSize.Height += static_cast<int32>(PaddingTop + PaddingBottom);
 
 		return SlotSize;
 	}
@@ -407,9 +407,9 @@ namespace Ry
 		SizeType Ours = Widget::GetScaledSlotSize(this);
 		
 		if (Unscaled.Width > Ours.Width)
-			Unscaled.Width = Ours.Width - PaddingLeft - PaddingRight;
+			Unscaled.Width = static_cast<int32>(static_cast<float>(Ours.Width) - PaddingLeft - PaddingRight);
 		if (Unscaled.Height > Ours.Height)
-			Unscaled.Height = Ours.Height - PaddingTop - PaddingBottom;
+			Unscaled.Height = static_cast<int32>(static_cast<float>(Ours.Height) - PaddingTop - PaddingBottom);
 
 		return Unscaled;
 	}
@@ -456,13 +456,14 @@ namespace Ry
 		}
 
 		Ry::Log->LogError("Tried calling SlotWidget::GetSlotSize() with widget that is not this SlotWidget's child!");
+		return SizeType{};
 	}
 
 	SizeType SlotWidget::GetUnscaledOccupiedSize(const Widget* ForWidget) const
 	{
 		SizeType SlotSize = GetUnscaledSlotSize(ForWidget);
-		SlotSize.Width += (PaddingLeft + PaddingRight);
-		SlotSize.Height += (PaddingTop + PaddingBottom);
+		SlotSize.Width += static_cast<int32>(PaddingLeft + PaddingRight);
+		SlotSize.Height += static_cast<int32>(PaddingTop + PaddingBottom);
 
 		return SlotSize;
 	}

@@ -89,6 +89,8 @@ namespace Ry
 
 		// Return the command buffer to the command pool
 		vkFreeCommandBuffers(GVulkanContext->GetLogicalDevice(), GVulkanContext->GetCommandPool(), 1, &CmdBuffer);
+
+		return true;
 	}
 
 	uint32 FindMemoryType(uint32 TypeFilter, VkMemoryPropertyFlags Props)

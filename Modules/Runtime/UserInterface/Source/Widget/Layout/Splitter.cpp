@@ -13,8 +13,8 @@ namespace Ry
 		this->Type = SPLITTER_TYPE_HOR;
 		this->BarThickness = 20.0f;
 		this->BarPosition = 0.5f;
-		this->MinBarPosition = 0.1;
-		this->MaxBarPosition = 0.9;
+		this->MinBarPosition = 0.1f;
+		this->MaxBarPosition = 0.9f;
 	};
 
 	Splitter::Slot Splitter::MakeSlot()
@@ -34,7 +34,7 @@ namespace Ry
 
 		if (Type == SPLITTER_TYPE_HOR)
 		{
-			int32 SplitterWidth = std::round(OurSize.Width * BarPosition);
+			int32 SplitterWidth = static_cast<int32>(std::round(static_cast<float>(OurSize.Width) * BarPosition));
 
 			if (ForWidget == Children[0].Get())
 			{
@@ -254,13 +254,13 @@ namespace Ry
 
 			if(ForWidget == Children[0].Get())
 			{
-				Result.Width  -= SlotA->PaddingLeft + SlotA->PaddingRight;
-				Result.Height -= SlotA->PaddingTop + SlotA->PaddingBottom;
+				Result.Width  -= static_cast<int32>(SlotA->PaddingLeft + SlotA->PaddingRight);
+				Result.Height -= static_cast<int32>(SlotA->PaddingTop + SlotA->PaddingBottom);
 			}
 			else
 			{
-				Result.Width -= SlotB->PaddingLeft + SlotB->PaddingRight;
-				Result.Height -= SlotB->PaddingTop + SlotB->PaddingBottom;
+				Result.Width -= static_cast<int32>(SlotB->PaddingLeft + SlotB->PaddingRight);
+				Result.Height -= static_cast<int32>(SlotB->PaddingTop + SlotB->PaddingBottom);
 			}
 
 			return Result;
@@ -310,13 +310,25 @@ namespace Ry
 		// Draw splitter bar
 		if(Type == SPLITTER_TYPE_HOR)
 		{
-			float PosX = OurPos.X + std::round(  OurSize.Width * BarPosition);
-			Ry::BatchRectangle(SplitterItem, WHITE, PosX, OurPos.Y, BarThickness, OurSize.Height, 1.0f);
+			float PosX = static_cast<float>(OurPos.X) + std::round(  static_cast<float>(OurSize.Width) * BarPosition);
+			Ry::BatchRectangle(
+				SplitterItem, 
+				WHITE, 
+				PosX, static_cast<float>(OurPos.Y), 
+				BarThickness, static_cast<float>(OurSize.Height), 
+				1.0f
+			);
 		}
 		else // Vertical
 		{
-			int32 PosY = OurPos.Y + std::round(OurSize.Height * BarPosition);
-			Ry::BatchRectangle(SplitterItem, WHITE, OurPos.X, PosY, OurSize.Width, BarThickness, 1.0f);
+			float PosY = static_cast<float>(OurPos.Y) + std::round(static_cast<float>(OurSize.Height) * BarPosition);
+			Ry::BatchRectangle(
+				SplitterItem, 
+				WHITE,
+				static_cast<float>(OurPos.X), PosY, 
+				static_cast<float>(OurSize.Width), BarThickness, 
+				1.0f
+			);
 		}
 
 		PanelWidget::Draw();

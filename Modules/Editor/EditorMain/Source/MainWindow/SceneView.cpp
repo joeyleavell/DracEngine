@@ -30,7 +30,7 @@ namespace Ry
 				0.0, 1.0f,
 				1.0f, -1.0f,
 				0.0f, 0.0f,
-				Size.Width, Size.Height,
+				static_cast<float>(Size.Width), static_cast<float>(Size.Height),
 				0.0f
 			);
 		}

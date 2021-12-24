@@ -320,12 +320,12 @@ namespace Ry
 					if (Slot->HorizontalAlignMode == HOR_ALIGN_FILL)
 						Width = ThisSize.Width;
 					else
-						Width = Slot->SlotWidth;
+						Width = static_cast<int32>(Slot->SlotWidth);
 
 					if (Slot->VerticalAlignMode == VERT_ALIGN_FILL)
 						Height = ThisSize.Height;
 					else
-						Height = Slot->SlotHeight;
+						Height = static_cast<int32>(Slot->SlotHeight);
 
 					Size = SizeType{ (int32)Width, (int32)Height };
 				}
@@ -345,8 +345,8 @@ namespace Ry
 	{
 		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
 		SizeType UnscaledSlotSize = GetUnscaledSlotSize(ForWidget);
-		UnscaledSlotSize.Width += Slot->PaddingLeft + Slot->PaddingRight;
-		UnscaledSlotSize.Height += Slot->PaddingBottom + Slot->PaddingTop;
+		UnscaledSlotSize.Width += static_cast<int32>(Slot->PaddingLeft + Slot->PaddingRight);
+		UnscaledSlotSize.Height += static_cast<int32>(Slot->PaddingBottom + Slot->PaddingTop);
 
 		return UnscaledSlotSize;
 	}
@@ -356,8 +356,8 @@ namespace Ry
 		// Padding is guaranteed
 		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
 		SizeType ScaledSlotSize = GetScaledSlotSize(ForWidget);
-		ScaledSlotSize.Width += Slot->PaddingLeft + Slot->PaddingRight;
-		ScaledSlotSize.Height += Slot->PaddingBottom + Slot->PaddingTop;
+		ScaledSlotSize.Width += static_cast<int32>(Slot->PaddingLeft + Slot->PaddingRight);
+		ScaledSlotSize.Height += static_cast<int32>(Slot->PaddingBottom + Slot->PaddingTop);
 
 		return ScaledSlotSize;
 	}

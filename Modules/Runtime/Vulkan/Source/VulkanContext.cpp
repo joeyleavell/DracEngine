@@ -319,7 +319,7 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredDeviceExtensions.GetSize());
 		CreateInfo.ppEnabledExtensionNames = DeviceExtensionsAsCString;
 
-#if !defined(RYBUILD_DISTRIBUTE) and defined(VULKAN_VALIDATION)
+#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
 		CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
 		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else

@@ -78,7 +78,6 @@ namespace Ry
 	class Camera;
 	class Shader;
 	class Texture;
-	class ColorAttachment;
 	class BitmapFont;
 	class Pipeline;
 	class SwapChain;
@@ -87,8 +86,9 @@ namespace Ry
 	class ResourceLayout;
 	class CommandBuffer;
 	class Mesh;
-	class Vertex;
 	class VertexFormat;
+	struct ColorAttachment;
+	struct Vertex;
 
 	struct RENDERING_MODULE TextLine
 	{
