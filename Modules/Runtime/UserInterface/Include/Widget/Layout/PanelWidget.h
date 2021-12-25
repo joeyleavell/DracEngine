@@ -11,8 +11,7 @@ namespace Ry
 	class USERINTERFACE_MODULE PanelWidget : public Widget
 	{
 	public:
-
-		PanelWidget();
+		PanelWidget() = default;
 
 		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
@@ -22,6 +21,7 @@ namespace Ry
 		void SetParent(Widget* Parent) override;
 		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		void Draw() override;
+		void Update() override;
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget);
 		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;
@@ -44,10 +44,16 @@ namespace Ry
 		// int32 NormalizeWidth(int32 InWidth);
 		// int32 NormalizeHeight(int32 InHeight);
 
-
 	protected:
 		Ry::ArrayList<SharedPtr<Widget>> Children;
+
+		void RegisterSlot(SharedPtr<PanelWidgetSlot> Slot);
+		bool Contains(Widget* const& Widget) const;
+		SharedPtr<PanelWidgetSlot> GetSlotForWidget(Widget* const& Widget) const;
+
+	private:
 		Ry::OAHashMap<Widget*, SharedPtr<PanelWidgetSlot>> WidgetSlots;
+		Ry::OAHashMap<Widget*, bool> CullData;
 
 	} RefClass();
 

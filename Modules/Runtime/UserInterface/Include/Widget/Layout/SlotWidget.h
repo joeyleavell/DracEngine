@@ -68,6 +68,7 @@ namespace Ry
 		SizeType ComputeSize() const override;
 		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
 		void Draw() override;
+		void Update() override;
 		void Arrange() override;
 		void SetChild(Ry::SharedPtr<Ry::Widget> Child);
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;

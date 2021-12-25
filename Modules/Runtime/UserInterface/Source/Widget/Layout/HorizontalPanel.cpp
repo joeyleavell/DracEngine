@@ -77,14 +77,14 @@ namespace Ry
 		SharedPtr<HorizontalPanelSlot> PanelSlot = MakeShared(new HorizontalPanelSlot(Widget));
 		ChildrenSlots.Add(PanelSlot);
 
-		WidgetSlots.Insert(Widget.Get(), PanelSlot);
+		RegisterSlot(PanelSlot);
 		
 		return PanelSlot;
 	}
 
 	SizeType HorizontalPanel::GetScaledSlotSize(const Widget* ForWidget) const
 	{
-		SharedPtr<PanelWidgetSlot> Slot = WidgetSlots.Get(const_cast<Widget* const>(ForWidget));
+		SharedPtr<PanelWidgetSlot> Slot = GetSlotForWidget(const_cast<Widget* const>(ForWidget));
 		SizeType UnscaledOccupied = GetUnscaledOccupiedSize(ForWidget);
 		SizeType ThisSize = Widget::GetScaledSlotSize(this);
 

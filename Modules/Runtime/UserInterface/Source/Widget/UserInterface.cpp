@@ -127,6 +127,12 @@ namespace Ry
 		UpdateValues.PipelineStates.SoftClear();
 		UpdateValues.WidgetChildren.SoftClear();
 
+		// Update all widgets
+		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
+		{
+			RootWidget->Update();
+		}
+
 		if(bNeedsFullRefresh)
 		{
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)

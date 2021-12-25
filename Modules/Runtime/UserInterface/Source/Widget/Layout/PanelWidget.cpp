@@ -3,11 +3,6 @@
 
 namespace Ry
 {
-	
-	PanelWidget::PanelWidget()
-	{
-
-	}
 
 	SharedPtr<Widget> PanelWidget::FindChildWidgetById(const Ry::String& Id) const
 	{
@@ -93,6 +88,23 @@ namespace Ry
 
 		for (SharedPtr<Widget> Child : Children)
 		{
+			// Don't draw widget if it's been culled
+			if (!CullData.Get(Child.Get()))
+			{
+				Child->Draw();
+			}
+		}
+
+	}
+
+	void PanelWidget::Update()
+	{
+		Widget::Update();
+
+		RectScissor ClipSpace = GetClipSpace(nullptr);
+
+		for (SharedPtr<Widget> Child : Children)
+		{
 			Point Pos = Child->GetAbsolutePosition();
 			SizeType ContentSize = Child->ComputeSize();
 
@@ -104,26 +116,20 @@ namespace Ry
 				if (!Child->IsVisible())
 				{
 					Child->SetVisible(true, true);
-					bUpdateBatch = true;
+					CullData.Insert(Child.Get(), false);
 				}
-
-				Child->Draw();
 			}
 			else
 			{
-				
+
 				if (Child->IsVisible())
 				{
 					Child->SetVisible(false, true);
-					bUpdateBatch = true;
+					CullData.Insert(Child.Get(), true);
 				}
 			}
 
-		}
-
-		if (bUpdateBatch)
-		{
-			//MarkDirty(this);
+			Child->Update();
 		}
 
 	}
@@ -361,6 +367,22 @@ namespace Ry
 		ScaledSlotSize.Height += static_cast<int32>(Slot->PaddingBottom + Slot->PaddingTop);
 
 		return ScaledSlotSize;
+	}
+
+	void PanelWidget::RegisterSlot(SharedPtr<PanelWidgetSlot> Slot)
+	{
+		WidgetSlots.Insert(Slot->GetWidget().Get(), Slot);
+		CullData.Insert(Slot->GetWidget().Get(), false);
+	}
+
+	bool PanelWidget::Contains(Widget* const& Widget) const
+	{
+		return WidgetSlots.Contains(Widget);
+	}
+
+	SharedPtr<PanelWidgetSlot> PanelWidget::GetSlotForWidget(Widget* const& Widget) const
+	{
+		return WidgetSlots.Get(Widget);
 	}
 
 	/*int32 PanelWidget::NormalizeWidth(int32 InWidth)

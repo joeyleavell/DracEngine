@@ -110,8 +110,8 @@ namespace Ry
 
 		SharedPtr<Widget> WidgetA = Children[0];
 		SharedPtr<Widget> WidgetB = Children[1];
-		SharedPtr<PanelWidgetSlot> SlotA = WidgetSlots.Get(WidgetA.Get());
-		SharedPtr<PanelWidgetSlot> SlotB = WidgetSlots.Get(WidgetB.Get());
+		SharedPtr<PanelWidgetSlot> SlotA = GetSlotForWidget(WidgetA.Get());
+		SharedPtr<PanelWidgetSlot> SlotB = GetSlotForWidget(WidgetB.Get());
 
 		RectScissor OurSize = Widget::GetClipSpace(this);
 
@@ -217,12 +217,12 @@ namespace Ry
 	SizeType Splitter::GetScaledSlotSize(const Widget* ForWidget) const
 	{
 		// Result is the same padding or no padding due to clipping
-		if (WidgetSlots.Contains(const_cast<Widget* const>(ForWidget)))
+		if (Contains(const_cast<Widget* const>(ForWidget)))
 		{
 			SizeType Size = ComputeSize();
 
-			SharedPtr<PanelWidgetSlot> SlotA = WidgetSlots.Get(Children[0].Get());
-			SharedPtr<PanelWidgetSlot> SlotB = WidgetSlots.Get(Children[1].Get());
+			SharedPtr<PanelWidgetSlot> SlotA = GetSlotForWidget(Children[0].Get());
+			SharedPtr<PanelWidgetSlot> SlotB = GetSlotForWidget(Children[1].Get());
 
 			SizeType Result;
 
@@ -283,7 +283,7 @@ namespace Ry
 		// Create widget
 		SharedPtr<Slot> SplitterSlot = MakeShared(new Slot(Widget));
 
-		WidgetSlots.Insert(Widget.Get(), SplitterSlot);
+		RegisterSlot(SplitterSlot);
 
 		return SplitterSlot;
 	}

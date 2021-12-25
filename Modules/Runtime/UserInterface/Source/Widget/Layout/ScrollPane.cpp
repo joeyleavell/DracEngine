@@ -108,7 +108,7 @@ namespace Ry
 		SharedPtr<Slot> ScrollSlot = MakeShared(new Slot(Widget));
 		ChildrenSlots.Add(ScrollSlot);
 
-		WidgetSlots.Insert(Widget.Get(), ScrollSlot);
+		RegisterSlot(ScrollSlot);
 
 		return ScrollSlot;
 	}

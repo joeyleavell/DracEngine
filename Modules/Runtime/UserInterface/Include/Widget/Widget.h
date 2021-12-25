@@ -218,6 +218,7 @@ namespace Ry
 		virtual RectScissor GetClipSpace(const Widget* ForWidget) const;
 		virtual Widget& operator[](SharedPtr<Ry::Widget> Child);
 		virtual void Draw() {}
+		virtual void Update() {}
 		virtual void Arrange();
 		virtual void OnRemove() {};
 		virtual void OnHovered(const MouseEvent& MouseEv);

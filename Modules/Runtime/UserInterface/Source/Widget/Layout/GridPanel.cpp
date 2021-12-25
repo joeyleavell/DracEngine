@@ -66,7 +66,7 @@ namespace Ry
 		Occupied.Insert(Next);
 		ChildrenSlots.Add(PanelSlot);
 
-		WidgetSlots.Insert(Widget.Get(), PanelSlot);
+		RegisterSlot(PanelSlot);
 
 		PanelWidget::AppendSlot(Widget);
 
@@ -225,7 +225,7 @@ namespace Ry
 	{
 		// Result is the same including padding or not (for now)
 
-		if (WidgetSlots.Contains(const_cast<Widget* const>(ForWidget)))
+		if (Contains(const_cast<Widget* const&>(ForWidget)))
 		{
 			return SizeType{ (int32)CellWidth, (int32)CellHeight };
 		}

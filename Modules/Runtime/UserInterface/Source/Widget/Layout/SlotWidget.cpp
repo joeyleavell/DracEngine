@@ -206,6 +206,15 @@ namespace Ry
 		}
 	}
 
+	void SlotWidget::Update()
+	{
+		Widget::Update();
+		if(Child)
+		{
+			Child->Update();
+		}
+	}
+
 	void SlotWidget::Arrange()
 	{
 		if (Child)
