@@ -17,7 +17,7 @@ namespace Ry
 		return this;
 	}
 
-	bool UserInterface::OnEvent(const Event & Ev)
+	bool UserInterface::OnEvent(const Event& Ev)
 	{
 		for (Ry::SharedPtr<Widget>& Root : RootWidgets)
 		{
@@ -28,11 +28,6 @@ namespace Ry
 		}
 
 		return false;
-	}
-
-	void UserInterface::SetBatch(Batch * Bat)
-	{
-		this->Bat = Bat;
 	}
 
 	void UserInterface::SetStyle(const StyleSet* Style)
@@ -51,81 +46,72 @@ namespace Ry
 	{
 		RootWidgets.Add(Widget);
 
-		//Widget->RenderStateDirty.AddMemberFunction(this, &UserInterface::RenderStateDirty);
-
-		// Register delegates
-		Widget->OnFullRefresh.AddMemberFunction(this, &UserInterface::OnFullRefresh);
-		Widget->OnReArrange.AddMemberFunction(this, &UserInterface::OnReArrange);
-		Widget->OnRePaint.AddMemberFunction(this, &UserInterface::OnRePaint);
-
-		Widget->SetStyle(Style);
+		Widget->SetParent(this);
 		Widget->SetVisible(true, true);
+		Widget->SetStyle(Style);
+		Widget->OnShow(Bat);
 
-		Draw();
+		bNeedsFullRefresh = true;
 	}
 
 	void UserInterface::Redraw()
 	{
-		static Ry::ArrayList<Widget*> Children;
+		// Free pipeline states
 		static Ry::ArrayList<PipelineState> PipelineStates;
+		PipelineStates.SoftClear();
 
+		// Clear everything from batch
 		Bat->Clear();
 
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 		{
+			// Re-arrange and place widget
 			RootWidget->Arrange();
 			RootWidget->Draw();
 
-			RootWidget->SetVisible(false, true);
-			RootWidget->SetVisible(true, true);
+			// Re-add all widgets to batch
+			RootWidget->OnShow(Bat);
+
+			// Gather pipeline states
+			RootWidget->GetPipelineStates(PipelineStates, true);
 		}
 
-		// Update the dynamic pipeline states of all children
+		// Update all pipeline states
+		for (const PipelineState& State : PipelineStates)
+		{
+			Bat->UpdatePipelineState(State);
+		}
 
-		//PipelineStates.SoftClear();
-		//AllChildren.SoftClear();
+		// Update batch
+		Bat->Update();
+	}
+
+	void UserInterface::Arrange()
+	{
+		Widget::Arrange();
 
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 		{
-			Children.SoftClear();
-			PipelineStates.SoftClear();
-
-			RootWidget->GetAllChildren(Children);
-			for (Widget* Child : Children)
-			{
-				Child->GetPipelineStates(PipelineStates);
-			}
-			for (const PipelineState& State : PipelineStates)
-			{
-				Bat->UpdatePipelineState(State);
-			}
+			// Create the geometry for the elements
+			RootWidget->Arrange();
 		}
-
-		Bat->Update();
-
-		OnFullRefresh();
 	}
 
 	void UserInterface::Draw()
 	{
+		Widget::Draw();
+
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 		{
-			// Arrange the root widget so it is correctly placed
-			RootWidget->Arrange();
-
 			// Create the geometry for the elements
 			RootWidget->Draw();
 		}
-
-		Bat->Update();
 	}
 
 	void UserInterface::Update()
 	{
 		// Fast clear lists for this frame
-		UpdateValues.AllChildren.SoftClear();
-		UpdateValues.PipelineStates.SoftClear();
-		UpdateValues.WidgetChildren.SoftClear();
+		PipelineStates.SoftClear();
 
 		// Update all widgets
 		for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
@@ -135,70 +121,22 @@ namespace Ry
 
 		if(bNeedsFullRefresh)
 		{
+			// Update all pipeline states, arrange and draw widgets, update batch
 			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
 			{
-
-				RootWidget->GetAllChildren(UpdateValues.AllChildren);
-
-				for (Widget* Child : UpdateValues.AllChildren)
-				{
-					Child->GetPipelineStates(UpdateValues.PipelineStates);
-
-					// Child->OnHide(Bat);
-					// if (Child->IsVisible())
-					// 	Child->OnShow(Bat);
-
-					if (Child->IsVisible())
-					{
-						Child->OnShow(Bat);
-					}
-					else
-					{
-						Child->OnHide(Bat);
-					}
-					if(Child->bHasBeenShown && !Child->IsVisible())
-					{
-					//	Child->OnHide(Bat);
-					}
-					else if(!Child->bHasBeenShown && Child->IsVisible())
-					{
-					//	Child->OnShow(Bat);
-					}
-
-				}
-
-				for (const PipelineState& State : UpdateValues.PipelineStates)
-				{
-					Bat->UpdatePipelineState(State);
-				}
-
+				RootWidget->GetPipelineStates(PipelineStates);
 			}
 
-			Draw();
-		}
-
-		bool bUpdateBatch = false;
-
-		if (NeedsRePaint.GetSize() > 0)
-		{
-			Ry::OASetIterator<Widget*> WidItr = NeedsRePaint.CreatePairIterator();
-			while (WidItr)
+			for (const PipelineState& State : PipelineStates)
 			{
-				UpdateValues.WidgetChildren.SoftClear();
-
-				(*WidItr)->GetAllChildren(UpdateValues.WidgetChildren);
-				UpdateValues.WidgetChildren.Add(*WidItr);
-
-				for(Widget* Wid : UpdateValues.WidgetChildren)
-				{
-					Wid->OnHide(Bat);
-					if (Wid->IsVisible())
-						Wid->OnShow(Bat);
-				}
-
-				++WidItr;
+				Bat->UpdatePipelineState(State);
 			}
+
+			Arrange();
+			Draw();
+
 			bUpdateBatch = true;
+			bNeedsFullRefresh = false;
 		}
 
 		if (NeedsReArrange.GetSize() > 0)
@@ -210,8 +148,8 @@ namespace Ry
 				(*WidItr)->Draw();
 
 				// Update pipeline states too
-				(*WidItr)->GetPipelineStates(UpdateValues.PipelineStates);
-				for (const PipelineState& State : UpdateValues.PipelineStates)
+				(*WidItr)->GetPipelineStates(PipelineStates);
+				for (const PipelineState& State : PipelineStates)
 				{
 					Bat->UpdatePipelineState(State);
 				}
@@ -219,6 +157,7 @@ namespace Ry
 				++WidItr;
 			}
 
+			// Re-arranging widgets performs an implicit batch update
 			bUpdateBatch = true;
 		}
 
@@ -226,115 +165,25 @@ namespace Ry
 		if (bUpdateBatch)
 		{
 			Bat->Update();
+			bUpdateBatch = false;
 		}
 
-		// TODO: Will clearing these each frame be a significant performance hit?
-		bNeedsFullRefresh = false;
-		NeedsRePaint.Clear();
 		NeedsReArrange.Clear();
 	}
 
-	void UserInterface::OnFullRefresh()
+	void UserInterface::Rearrange(Widget* Widget)
+	{
+		NeedsReArrange.Insert(Widget);
+	}
+
+	void UserInterface::FullRefresh()
 	{
 		bNeedsFullRefresh = true;
 	}
 
-	void UserInterface::OnReArrange(Widget* Wid)
+	void UserInterface::UpdateBatch()
 	{
-		NeedsReArrange.Insert(Wid);
-	}
-
-	void UserInterface::OnRePaint(Widget* Wid)
-	{
-		NeedsRePaint.Insert(Wid);
-	}
-
-	void UserInterface::RenderStateDirty(Widget* Wid, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh)
-	{
-		static Ry::ArrayList<PipelineState> PipelineStates;
-		static Ry::ArrayList<Widget*> AllChildren;
-		static Ry::ArrayList<Widget*> WidgetChildren;
-		AllChildren.SoftClear();
-		PipelineStates.SoftClear();
-
-		// Takes care of widget visibility changes and widget swapping elements
-		{
-			WidgetChildren.SoftClear();
-
-			// Add the widget and its children
-			Wid->GetAllChildren(WidgetChildren);
-			WidgetChildren.Add(Wid);
-
-			for (Widget* Child : WidgetChildren)
-			{
-				if (Child == Wid)
-				{
-					Child->OnHide(Bat);
-					if (Child->IsVisible())
-						Child->OnShow(Bat);
-				}
-				else
-				{
-					if (Child->IsVisible())
-					{
-						Child->OnShow(Bat);
-					}
-					else
-					{
-						Child->OnHide(Bat);
-					}
-				}
-			}
-		}
-
-
-		// Takes care of position changes, element changes, etc.
-		if (!bFullRefresh)
-		{
-			// Correctly places widget
-			Wid->Arrange();
-			Wid->Draw();
-		}
-
-		//PipelineStates.SoftClear();
-		//AllChildren.SoftClear();
-
-		// Takes care of scissor changes
-		if (bFullRefresh)
-		{
-			for (Ry::SharedPtr<Widget>& RootWidget : RootWidgets)
-			{
-				AllChildren.SoftClear();
-				PipelineStates.SoftClear();
-
-				RootWidget->GetAllChildren(AllChildren);
-
-				for (Widget* Child : AllChildren)
-				{
-					Child->GetPipelineStates(PipelineStates);
-				}
-
-				for (const PipelineState& State : PipelineStates)
-				{
-					Bat->UpdatePipelineState(State);
-				}
-
-			}
-		}
-		else
-		{
-			Wid->GetPipelineStates(PipelineStates);
-			for (const PipelineState& State : PipelineStates)
-			{
-				Bat->UpdatePipelineState(State);
-			}
-		}
-
-		if (bFullRefresh)
-			Draw(); // Re-arrange everything, will also update batch
-		else
-			Bat->Update(); // Just update batch, this assumes the dirty-ness doesn't affect the positioning of other widgets
-
+		bUpdateBatch = true;
 	}
 
 }

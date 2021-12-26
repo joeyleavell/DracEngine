@@ -175,7 +175,9 @@ namespace Ry
 
 		//TestWorld->Resize(Width, Height);
 
+		//UI->FullRefresh();
 		UI->Redraw();
+		
 	}
 
 	void MainEditorLayer::SceneResized(uint32 Width, uint32 Height)

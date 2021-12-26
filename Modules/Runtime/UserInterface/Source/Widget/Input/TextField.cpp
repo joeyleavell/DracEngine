@@ -20,7 +20,7 @@ namespace Ry
 		{
 			const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
 			
-			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : ResolvedStyle.Font->MeasureWidth(Text));
+			CachedSize.Width = static_cast<int32>(ResolvedStyle.Font->MeasureWidth(Text));
 			CachedSize.Height = static_cast<int32>(ResolvedStyle.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
 			bTextSizeDirty = false;
 		}
@@ -62,6 +62,8 @@ namespace Ry
 
 	void TextField::OnShow(Ry::Batch* Batch)
 	{
+		Widget::OnShow(Batch);
+
 		const TextStyle& ResolvedStyle = Style->GetTextStyle(TextStyleName);
 
 		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), ResolvedStyle.Font->GetAtlasTexture(), WidgetLayer + 1);
@@ -150,7 +152,7 @@ namespace Ry
 			CursorPos = CursorAdvanceRight(Initial);
 			SelectionPos = CursorAdvanceLeft(Initial);
 
-			RearrangeAndRepaint();
+			Rearrange();
 
 			return true;
 		}
@@ -166,7 +168,7 @@ namespace Ry
 			int32 MouseXOffset = (int32)(MouseEv.MouseX - Abs.X);
 			CursorPos = FindClosestCursorIndex(MouseXOffset);
 
-			RearrangeAndRepaint();
+			Rearrange();
 
 		}
 
@@ -195,7 +197,7 @@ namespace Ry
 					SelectionPos = -1;
 				}
 
-				RearrangeAndRepaint();
+				Rearrange();
 			}
 			else
 			{
@@ -203,7 +205,7 @@ namespace Ry
 			}
 		}
 
-		RearrangeAndRepaint();
+		Rearrange();
 
 		return true;
 	}
@@ -280,13 +282,13 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					RearrangeAndRepaint();
+					Rearrange();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					RearrangeAndRepaint();
+					Rearrange();
 				}
 			}
 
@@ -297,7 +299,7 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				RearrangeAndRepaint();
+				Rearrange();
 			}
 
 			// Simply decrement cursor pos
@@ -317,7 +319,7 @@ namespace Ry
 				SelectionPos = -1;
 			}
 
-			RearrangeAndRepaint();
+			Rearrange();
 		}
 
 		if (CursorPos < 0)
@@ -376,13 +378,13 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					RearrangeAndRepaint();
+					Rearrange();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					RearrangeAndRepaint();
+					Rearrange();
 				}
 			}
 		}
@@ -391,7 +393,7 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				RearrangeAndRepaint();
+				Rearrange();
 			}
 
 			// Simply increment cursor pos
@@ -410,7 +412,7 @@ namespace Ry
 				SelectionPos = -1;
 			}
 
-			RearrangeAndRepaint();
+			Rearrange();
 		}
 
 

@@ -15,7 +15,7 @@ namespace Ry
 		{
 			const TextStyle& ResolvedTextStyle = Style->GetTextStyle(TextStyleName);
 
-			CachedSize.Width = static_cast<int32>(MaxSize.Width > 0 ? MaxSize.Width : ResolvedTextStyle.Font->MeasureWidth(Text));
+			CachedSize.Width = static_cast<int32>(ResolvedTextStyle.Font->MeasureWidth(Text));
 			CachedSize.Height = static_cast<int32>(ResolvedTextStyle.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
 			bTextSizeDirty = false;
 		}
@@ -39,7 +39,6 @@ namespace Ry
 	Label& Label::SetTextStyle(const Ry::String& StyleName)
 	{
 		this->TextStyleName = StyleName;
-	//	Style.SetFont(Font).SetColor(Color);
 		
 		bTextSizeDirty = true;
 
@@ -47,15 +46,6 @@ namespace Ry
 
 		return *this;
 	}
-
-	/*Label& Label::SetFont(BitmapFont* Font)
-	{
-		Style.SetFont(Font);
-		bTextSizeDirty = true;
-
-		MarkDirty(this);
-		return *this;
-	}*/
 
 	const Ry::String& Label::GetText() const
 	{
@@ -93,9 +83,11 @@ namespace Ry
 		}
 	}
 
-	void Label::SetStyle(const Ry::StyleSet* Style)
+	void Label::SetVisibleFlag(bool bVisibility, bool bPropagate)
 	{
-		Widget::SetStyle(Style);
+		Widget::SetVisibleFlag(bVisibility, bPropagate);
+
+		ItemSet->bVisible = bVisibility;
 	}
 
 	void Label::ComputeTextData()

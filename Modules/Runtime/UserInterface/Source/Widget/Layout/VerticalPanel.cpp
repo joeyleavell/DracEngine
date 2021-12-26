@@ -35,14 +35,6 @@ namespace Ry
 			SharedPtr<VerticalPanelSlot > ChildSlot = ChildrenSlots[ChildrenSlots.GetSize() - VBoxIndex - 1];
 			SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
 			SizeType ContentSize = GetScaledSlotSize(Widget.Get());
-			// if(ChildSlot->bSizeToContent)
-			// {
-			// 	ContentSize = Widget->ComputeSize();
-			// }
-			// else
-			// {
-			// 	ContentSize = SizeType{ (int32) ChildSlot->SlotWidth, (int32)ChildSlot->SlotHeight };
-			// }
 
 			CurrentY += static_cast<int32>(ChildSlot->PaddingBottom);
 
@@ -125,7 +117,6 @@ namespace Ry
 		}
 
 		// Squeeze down width if necessary
-		//float Width = GetSlotSizeUnnormalized(const_cast<Widget* const>(ForWidget), true).Width;
 		if (UnscaledOccupied.Width > ThisSize.Width)
 		{
 			UnscaledOccupied.Width = ThisSize.Width;

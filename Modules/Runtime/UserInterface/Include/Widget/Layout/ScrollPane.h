@@ -54,11 +54,12 @@ namespace Ry
 		 */
 		void Arrange() override;
 		PipelineState GetPipelineState(const Widget* ForWidget) const override;
-		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates) override;
+		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse) override;
 
 		RectScissor GetClipSpace(const Widget* ForWidget) const override;
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
+		void Update() override;
 		SizeType ComputeSize() const override;
 		void ClearChildren() override;
 		bool OnMouseScroll(const MouseScrollEvent& MouseEv) override;
@@ -66,6 +67,8 @@ namespace Ry
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;
 
 	private:
+
+		mutable SizeType SizeCache;
 
 		bool ShouldShowVertScrollbar();
 		bool ShouldShowHorizontalScrollbar();

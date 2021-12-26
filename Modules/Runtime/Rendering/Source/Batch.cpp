@@ -731,11 +731,14 @@ namespace Ry
 	{
 		auto AddItem = [](Ry::SharedPtr<BatchItem> Item, Mesh* BatchMesh)
 		{
-			uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
+			if(Item->bVisible)
+			{
+				uint32 BaseIndex = BatchMesh->GetMeshData()->GetVertexCount();
 
-			// Add all vertices and indices
-			BatchMesh->GetMeshData()->AddVertexRaw(Item->Data.GetData(), (int32)Item->Data.GetSize(), Item->VertexCount);
-			BatchMesh->GetMeshData()->AddIndexRaw(Item->Indices.GetData(), (int32)Item->Indices.GetSize(), BaseIndex);
+				// Add all vertices and indices
+				BatchMesh->GetMeshData()->AddVertexRaw(Item->Data.GetData(), (int32)Item->Data.GetSize(), Item->VertexCount);
+				BatchMesh->GetMeshData()->AddIndexRaw(Item->Indices.GetData(), (int32)Item->Indices.GetSize(), BaseIndex);
+			}
 		};
 
 		int32 Items = 0;
@@ -759,15 +762,21 @@ namespace Ry
 					OASetIterator<SharedPtr<BatchItem>> ItemItr = Group->Items.CreatePairIterator();
 					while(ItemItr)
 					{
-						AddItem(*ItemItr, Group->BatchMesh);
-						++ItemItr;
+						if((*ItemItr)->bVisible)
+						{
+							AddItem(*ItemItr, Group->BatchMesh);
+							++ItemItr;
+						}
 					}
 
 					for (SharedPtr<BatchItemSet> ItemSet : Group->ItemSets)
 					{
-						for (SharedPtr<BatchItem> Item : ItemSet->Items)
+						if(ItemSet->bVisible)
 						{
-							AddItem(Item, Group->BatchMesh);
+							for (SharedPtr<BatchItem> Item : ItemSet->Items)
+							{
+								AddItem(Item, Group->BatchMesh);
+							}
 						}
 					}
 

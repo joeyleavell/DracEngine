@@ -63,14 +63,11 @@ namespace Ry
 		
 		static Slot MakeSlot(int32 Row, int32 Column);
 
-	//	GridPanel& SetMaxCols(int32 Max);
 		GridPanel& SetCellWidth(float Size);
 		GridPanel& SetCellHeight(float Size);
 
 		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;
 		SizeType GetUnscaledSlotSize(const Widget* ForWidget) const override;
-
-		RectScissor GetClipSpace(const Widget* ForWidget) const override;
 
 	private:
 
@@ -79,8 +76,6 @@ namespace Ry
 
 		bool IsSlotOccupied(int32 Row, int32 Col) const;
 		SlotPosition FindFree();
-
-	//	int32 MaxCols = 5;
 
 		Ry::ArrayList<SharedPtr<Slot>> ChildrenSlots;
 

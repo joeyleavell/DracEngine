@@ -47,7 +47,7 @@ namespace Ry
 		Splitter();
 
     	RectScissor GetClipSpace(const Widget* ForWidget) const override;
-		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates) override;
+		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse) override;
 		PipelineState GetPipelineState(const Widget* ForWidget) const override;
     	SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget) override;
 

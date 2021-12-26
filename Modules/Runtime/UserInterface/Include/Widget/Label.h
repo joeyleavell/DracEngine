@@ -28,7 +28,7 @@ namespace Ry
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
 		void Draw() override;
-		void SetStyle(const Ry::StyleSet* Style) override;
+		void SetVisibleFlag(bool bVisibility, bool bPropagate) override;
 
 	private:
 

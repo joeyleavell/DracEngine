@@ -238,30 +238,6 @@ namespace Ry
 		return GetScaledSlotSize(ForWidget);
 	}
 
-	RectScissor GridPanel::GetClipSpace(const Widget* ForWidget) const
-	{
-		/*int32 Index = 0;
-		for(SharedPtr<Slot> Slot : ChildrenSlots)
-		{
-			if(ForWidget == Slot->GetWidget().Get())
-			{
-				int32 MaxRows = CalcMaxRows();
-				int32 MaxCols = CalcMaxCols();
-
-				int32 Row = Index / MaxRows;
-				int32 Col = Index % MaxCols;
-
-				Point Abs = GetAbsolutePosition();
-				int32 X = Abs.X + Col * CellWidth;
-				int32 Y = Abs.Y + Row * CellHeight;
-				return RectScissor{ X, Y, (int32) CellWidth, (int32)CellHeight };
-			}
-			Index++;
-		}*/
-
-		return Widget::GetClipSpace(this);
-	}
-
 	int32 GridPanel::CalcMaxRows() const
 	{
 		int32 MaxCols = CalcMaxCols();

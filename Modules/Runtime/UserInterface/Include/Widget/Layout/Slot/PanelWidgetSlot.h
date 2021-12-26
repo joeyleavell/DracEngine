@@ -160,7 +160,7 @@ namespace Ry
 		{
 			if (Widget.IsValid())
 			{
-				Widget->RearrangeAndRepaint();
+				Widget->Rearrange();
 			}
 		}
 

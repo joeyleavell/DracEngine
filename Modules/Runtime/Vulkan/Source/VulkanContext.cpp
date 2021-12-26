@@ -42,11 +42,13 @@ namespace Ry
 			Ry::Log->Log("Created Vulkan instance");
 		}
 
+#if VULKAN_VALIDATION
 		if(!SetupVulkanDebug())
 		{
 			Ry::Log->LogError("Failed to setup Vulkan debug");
 			return false;
 		}
+#endif
 
 		if (!CreateDummySurface())
 		{
@@ -205,7 +207,7 @@ namespace Ry
 		}
 	}
 
-#if !defined(RYBUILD_CONFIG_SHIPPING) && defined(VULKAN_VALIDATION)
+#if !defined(RYBUILD_CONFIG_SHIPPING) && VULKAN_VALIDATION
 	bool VulkanContext::SetupVulkanDebug()
 	{
 		VkDebugUtilsMessengerCreateInfoEXT CreateInfo{};
@@ -319,7 +321,7 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = static_cast<uint32>(RequiredDeviceExtensions.GetSize());
 		CreateInfo.ppEnabledExtensionNames = DeviceExtensionsAsCString;
 
-#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
+#if !defined(RYBUILD_DISTRIBUTE) && VULKAN_VALIDATION
 		CreateInfo.enabledLayerCount = static_cast<uint32_t>(NumValidationLayers);
 		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else
@@ -367,7 +369,7 @@ namespace Ry
 	{
 		Ry::ArrayList<Ry::String> SupportedExtensions;
 
-#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
+#if !defined(RYBUILD_DISTRIBUTE) && VULKAN_VALIDATION
 		if (!CheckValidationLayerSupport(RequiredValidationLayers))
 		{
 			Ry::Log->LogError("Requested validation layers not available");
@@ -439,30 +441,22 @@ namespace Ry
 		CreateInfo.enabledExtensionCount = RequiredInstanceExtensions.GetSize();
 		CreateInfo.ppEnabledExtensionNames = InstanceExtCString;
 
-#if !defined(RYBUILD_DISTRIBUTE) && defined(VULKAN_VALIDATION)
-		if(true)
+#if !defined(RYBUILD_DISTRIBUTE) && VULKAN_VALIDATION
+		// Create the c string array of validation layers as these will also be used later in device creation
+		ValidationLayers = new char* [RequiredValidationLayers.GetSize()];
+		NumValidationLayers = RequiredValidationLayers.GetSize();
+		for (int32 ValLayerIndex = 0; ValLayerIndex < RequiredValidationLayers.GetSize(); ValLayerIndex++)
 		{
-			// Create the c string array of validation layers as these will also be used later in device creation
-			ValidationLayers = new char* [RequiredValidationLayers.GetSize()];
-			NumValidationLayers = RequiredValidationLayers.GetSize();
-			for (int32 ValLayerIndex = 0; ValLayerIndex < RequiredValidationLayers.GetSize(); ValLayerIndex++)
-			{
-				Ry::String ValLayer = RequiredValidationLayers[ValLayerIndex];
-				ValidationLayers[ValLayerIndex] = new char[ValLayer.getSize() + 1];
-				MemCpy(ValidationLayers[ValLayerIndex], ValLayer.getSize() + 1, *ValLayer, ValLayer.getSize() + 1);
-			}
-
-			CreateInfo.enabledLayerCount = RequiredValidationLayers.GetSize();
-			CreateInfo.ppEnabledLayerNames = ValidationLayers;
-		}
-		else
-		{
-			CreateInfo.enabledLayerCount = 0;
-			CreateInfo.ppEnabledLayerNames = nullptr;
+			Ry::String ValLayer = RequiredValidationLayers[ValLayerIndex];
+			ValidationLayers[ValLayerIndex] = new char[ValLayer.getSize() + 1];
+			MemCpy(ValidationLayers[ValLayerIndex], ValLayer.getSize() + 1, *ValLayer, ValLayer.getSize() + 1);
 		}
 
+		CreateInfo.enabledLayerCount = RequiredValidationLayers.GetSize();
+		CreateInfo.ppEnabledLayerNames = ValidationLayers;
 #else
 		CreateInfo.enabledLayerCount = 0;
+		CreateInfo.ppEnabledLayerNames = nullptr;
 #endif
 
 		bool bSuccess = vkCreateInstance(&CreateInfo, nullptr, &VulkanInstance) == VK_SUCCESS;

@@ -71,7 +71,7 @@ namespace Ry
 			return;
 
 		// TODO: This is horribly slow! Don't do this! The below vkMapMemory needs to be correctly synchronized
-		vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
+		//vkDeviceWaitIdle(GVulkanContext->GetLogicalDevice());
 
 		int32 BufferSize = sizeof(T) * Count;
 

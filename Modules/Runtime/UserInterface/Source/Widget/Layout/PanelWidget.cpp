@@ -40,19 +40,34 @@ namespace Ry
 		Children.Add(Widget);
 
 		// Set the widget's parent
-		Widget->SetStyle(Style);
 		Widget->SetParent(this);
 		Widget->SetVisible(IsVisible(), true); // Child matches our visibility
-		
+		Widget->SetStyle(Style);
+
+		if(Style)
+		{
+			Widget->OnShow(GetBatch());
+		}
+
 		return SharedPtr<PanelWidgetSlot>();
 	}
 
 	void PanelWidget::OnShow(Ry::Batch* Batch)
 	{
+		Widget::OnShow(Batch);
+		for (SharedPtr<Widget> Child : Children)
+		{
+			Child->OnShow(Batch);
+		}
 	}
 
 	void PanelWidget::OnHide(Ry::Batch* Batch)
 	{
+		Widget::OnHide(Batch);
+		for (SharedPtr<Widget> Child : Children)
+		{
+			Child->OnHide(Batch);
+		}
 	}
 
 	void PanelWidget::SetParent(Widget* Parent)
@@ -66,18 +81,18 @@ namespace Ry
 		}
 	}
 
-	void PanelWidget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
-	{
-		for (SharedPtr<Widget> Child : Children)
-		{
-			if (Child.IsValid())
-			{
-				OutChildren.Add(Child.Get());
-				Child->GetAllChildren(OutChildren);
-			}
-		}
-
-	}
+	// void PanelWidget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
+	// {
+	// 	for (SharedPtr<Widget> Child : Children)
+	// 	{
+	// 		if (Child.IsValid())
+	// 		{
+	// 			OutChildren.Add(Child.Get());
+	// 			Child->GetAllChildren(OutChildren);
+	// 		}
+	// 	}
+	//
+	// }
 
 	void PanelWidget::Draw()
 	{
@@ -117,6 +132,7 @@ namespace Ry
 				{
 					Child->SetVisible(true, true);
 					CullData.Insert(Child.Get(), false);
+					Child->Rearrange();
 				}
 			}
 			else
@@ -124,8 +140,8 @@ namespace Ry
 
 				if (Child->IsVisible())
 				{
-					Child->SetVisible(false, true);
 					CullData.Insert(Child.Get(), true);
+					Child->SetVisible(false, true);
 				}
 			}
 
@@ -141,16 +157,16 @@ namespace Ry
 		return *this;
 	}
 
-	void PanelWidget::SetVisibleInternal(bool bVisibility, bool bPropagate)
+	void PanelWidget::SetVisibleFlag(bool bVisibility, bool bPropagate)
 	{
-		Widget::SetVisibleInternal(bVisibility, bPropagate);
+		Widget::SetVisibleFlag(bVisibility, bPropagate);
 
 		if (bPropagate)
 		{
 			for (SharedPtr<Widget> Child : Children)
 			{
 				// Set child to its own visibility, needs to refresh
-				Child->SetVisibleInternal(bVisibility, true);
+				Child->SetVisibleFlag(bVisibility, true);
 			}
 		}
 	}
@@ -254,13 +270,31 @@ namespace Ry
 
 	void PanelWidget::ClearChildren()
 	{
-		for (SharedPtr<Widget> Child : Children)
-		{
-			Child->SetVisible(false, true);
-			Child->RearrangeAndRepaint();
-		}
+		// Ry::ArrayList<Ry::Widget*> AllChildren;
+		// GetAllChildren(AllChildren);
+		// for (Widget* Child : AllChildren)
+		// {
+		// 	Child->OnHide(GetBatch());
+		// }
+
+		OnHide(GetBatch());
+
+		FullRefresh();
 
 		Children.Clear();
+	}
+
+	void PanelWidget::GetPipelineStates(Ry::ArrayList<PipelineState>& PipelineStates, bool bRecurse)
+	{
+		Widget::GetPipelineStates(PipelineStates, bRecurse);
+
+		if(bRecurse)
+		{
+			for (SharedPtr<Widget> Child : Children)
+			{
+				Child->GetPipelineStates(PipelineStates, true);
+			}
+		}
 	}
 
 	// SizeType PanelWidget::GetSlotSize(const Widget* ForWidget, bool bIncludePadding) const

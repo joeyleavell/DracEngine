@@ -31,6 +31,9 @@ namespace Ry
 
 	private:
 
+		void ShowGhost(Batch* Bat);
+		void HideGhost(Batch* Bat);
+
 		Point Offset;
 		bool bIsPressed;
 		bool bIsDragging;

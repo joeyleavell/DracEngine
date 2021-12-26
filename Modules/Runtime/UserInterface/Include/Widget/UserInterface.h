@@ -8,46 +8,39 @@
 namespace Ry
 {
 
-	class USERINTERFACE_MODULE UserInterface
+	class USERINTERFACE_MODULE UserInterface : public Widget
 	{
 	public:
 
 		UserInterface(Batch* Bat = nullptr, const StyleSet* Style = nullptr);
 		~UserInterface() = default;
 		UserInterface* operator[](Ry::SharedPtr<Widget>& Root);
-		bool OnEvent(const Event& Ev);
-		void SetBatch(Batch* Bat);
-		void SetStyle(const StyleSet* Style);
-		
+
 		/**
 		 * Adds a widget to the root-level of this user interface.
 		 */
 		void AddRoot(Ry::SharedPtr<Ry::Widget> Widget);
 		void Redraw();
-		void Draw();
 
-		void Update();
+		// Override functions
+		bool OnEvent(const Event& Ev) override;
+		void SetStyle(const Ry::StyleSet* Style) override;
+		void Arrange() override;
+		void Draw() override;
+		void Update() override;
+
+		void Rearrange(Widget* Widget) override;
+		void FullRefresh() override;
+		void UpdateBatch() override;
 
 	private:
 
-		struct UpdateStruct
-		{
-			Ry::ArrayList<PipelineState> PipelineStates;
-			Ry::ArrayList<Widget*> AllChildren;
-			Ry::ArrayList<Widget*> WidgetChildren;
-		} UpdateValues;
-
-		void OnFullRefresh();
-		void OnReArrange(Widget* Wid);
-		void OnRePaint(Widget* Wid);
+		Ry::ArrayList<PipelineState> PipelineStates;
 
 		bool bNeedsFullRefresh;
+		bool bUpdateBatch;
 		Ry::OASet<Widget*> NeedsReArrange;
-		Ry::OASet<Widget*> NeedsRePaint;
 
-		void RenderStateDirty(Widget* Wid, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh);
-
-		Ry::Batch* Bat;
 		Ry::ArrayList<Ry::SharedPtr<Ry::Widget>> RootWidgets;
 		Ry::Widget* KeyboardFocus;
 		const Ry::StyleSet* Style;

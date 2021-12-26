@@ -1,6 +1,6 @@
 #pragma once
 
-#define VULKAN_VALIDATION 1
+#define VULKAN_VALIDATION 0
 
 #include "Core/Core.h"
 #include "VulkanGen.h"

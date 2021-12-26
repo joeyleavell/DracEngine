@@ -109,11 +109,13 @@ namespace Ry
 		Ry::ArrayList<uint32> Indices;
 		int32 VertexCount;
 		int32 IndexCount;
+		bool bVisible;
 
 		BatchItem()
 		{
 			this->VertexCount = 0;
 			this->IndexCount = 0;
+			this->bVisible = true;
 		}
 
 		void Clear()
@@ -177,6 +179,7 @@ namespace Ry
 	struct RENDERING_MODULE BatchItemSet
 	{
 		Ry::ArrayList<Ry::SharedPtr<BatchItem>> Items;
+		bool bVisible = true;
 
 		void AddItem(Ry::SharedPtr<BatchItem> Item)
 		{

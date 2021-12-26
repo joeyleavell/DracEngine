@@ -70,20 +70,6 @@ namespace Ry
 		return *this;
 	}
 
-	// SlotWidget& SlotWidget::SetVerticalAlignment(uint8 Alignment)
-	// {
-	// 	this->ContentVAlign = Alignment;
-	//
-	// 	return *this;
-	// }
-	//
-	// SlotWidget& SlotWidget::SetHorizontalAlignment(HAlign Alignment)
-	// {
-	// 	this->ContentHAlign = Alignment;
-	//
-	// 	return *this;
-	// }
-
 	SlotWidget& SlotWidget::AutoWidth()
 	{
 		this->WidthMode = SIZE_MODE_AUTO;
@@ -96,50 +82,6 @@ namespace Ry
 		this->WidthMode = SIZE_MODE_AUTO;
 
 		return *this;
-	}
-
-	/*SlotWidget& SlotWidget::FillX(float FillX)
-	{ 
-		this->Fill = FillX;
-		this->WidthMode = SizeMode::PERCENTAGE;
-
-		return *this;
-	}
-
-	SlotWidget& SlotWidget::FillY(float FillY)
-	{
-		this->FillYPercent = FillY;
-		this->HeightMode = SizeMode::PERCENTAGE;
-
-		return *this;
-	}*/
-
-	/*SlotWidget& SlotWidget::FillParent()
-	{
-		return FillX(1.0).FillY(1.0);
-	}*/
-
-	// SlotWidget& SlotWidget::SetVAlign(VAlign VerticalAlign)
-	// {
-	// 	this->VerticalAlign = VerticalAlign;
-	//
-	// 	return *this;
-	// }
-	//
-	// SlotWidget& SlotWidget::SetHAlign(HAlign HorizontalAlign)
-	// {
-	// 	this->HorizontalAlign = HorizontalAlign;
-	//
-	// 	return *this;
-	// }
-
-	void SlotWidget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
-	{
-		if (Child.IsValid())
-		{
-			OutChildren.Add(Child.Get());
-			Child->GetAllChildren(OutChildren);
-		}
 	}
 
 	SizeType SlotWidget::ComputeSize() const
@@ -187,13 +129,13 @@ namespace Ry
 		return Result;
 	}
 
-	void SlotWidget::SetVisibleInternal(bool bVisibility, bool bPropagate)
+	void SlotWidget::SetVisibleFlag(bool bVisibility, bool bPropagate)
 	{
-		Widget::SetVisibleInternal(bVisibility, bPropagate);
+		Widget::SetVisibleFlag(bVisibility, bPropagate);
 		
 		if (Child && bPropagate)
 		{
-			Child->SetVisibleInternal(bVisibility, true);
+			Child->SetVisibleFlag(bVisibility, true);
 		}
 	}
 
@@ -274,9 +216,13 @@ namespace Ry
 
 		// Setup the parent/child relationship
 		this->Child = Child;
-		Child->SetStyle(Style);
 		Child->SetParent(this);
 		Child->SetVisible(IsVisible(), true); // Child matches our visibility
+		Child->SetStyle(Style);
+		if(Style)
+		{
+			Child->OnShow(GetBatch());
+		}
 
 		// Automatically rearrange
 		Arrange();
@@ -369,13 +315,6 @@ namespace Ry
 		return false;
 	}
 
-	Widget& SlotWidget::operator[](SharedPtr<Ry::Widget> Child)
-	{
-		SetChild(Child);
-
-		return *this;
-	}
-
 	void SlotWidget::OnHovered(const MouseEvent& MouseEv)
 	{
 		Widget::OnHovered(MouseEv);
@@ -398,6 +337,34 @@ namespace Ry
 		Widget::OnReleased(MouseEv);
 
 		return true;
+	}
+
+	void SlotWidget::OnShow(Ry::Batch* Batch)
+	{
+		Widget::OnShow(Batch);
+		if(Child)
+		{
+			Child->OnShow(Batch);
+		}
+	}
+
+	void SlotWidget::OnHide(Ry::Batch* Batch)
+	{
+		Widget::OnHide(Batch);
+		if (Child)
+		{
+			Child->OnHide(Batch);
+		}
+	}
+
+	void SlotWidget::GetPipelineStates(Ry::ArrayList<PipelineState>& PipelineStates, bool bRecurse)
+	{
+		Widget::GetPipelineStates(PipelineStates, bRecurse);
+
+		if(Child && bRecurse)
+		{
+			Child->GetPipelineStates(PipelineStates, true);
+		}
 	}
 
 	SizeType SlotWidget::GetScaledOccupiedSize(const Widget* ForWidget) const
@@ -437,10 +404,7 @@ namespace Ry
 
 			if (WidthMode == SIZE_MODE_PERCENTAGE || HeightMode == SIZE_MODE_PERCENTAGE)
 			{
-				if (Parent)
-					ParentSize = Widget::GetScaledSlotSize(this); // Occupy a percentage of the size fully available to us
-				else
-					ParentSize = SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
+				ParentSize = Widget::GetScaledSlotSize(this); // Occupy a percentage of the size fully available to us
 			}
 
 			if (WidthMode == SIZE_MODE_AUTO)

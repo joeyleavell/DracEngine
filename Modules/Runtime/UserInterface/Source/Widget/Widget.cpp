@@ -8,7 +8,6 @@ namespace Ry
 
 	Widget::Widget() :
 		Parent(nullptr),
-		MaxSize{ -1, -1 },
 		WidgetLayer(0),
 		RelativePosition{ 0, 0 },
 		bHovered(false),
@@ -147,7 +146,7 @@ namespace Ry
 		return bPressed;
 	}
 
-	bool Widget::IsVisible()
+	bool Widget::IsVisible() const
 	{
 		return bVisible;
 	}
@@ -170,40 +169,42 @@ namespace Ry
 		return AbsolutePosition;
 	}
 
-	Widget& Widget::SetRelativePosition(float X, float Y)
+	void Widget::SetRelativePosition(float X, float Y)
 	{
 		RelativePosition.X = (int32)X;
 		RelativePosition.Y = (int32)Y;
-
-		return *this;
-	}
-
-	Widget& Widget::SetMaxSize(int32 MaxWidth, int32 MaxHeight)
-	{
-		this->MaxSize = SizeType{ MaxWidth, MaxHeight };
-
-		return *this;
 	}
 
 	void Widget::FullRefresh()
 	{
-		FindTopParent()->OnFullRefresh.Broadcast();
+		Ry::Widget* TopParent = FindTopParent();
+		if (TopParent != this)
+		{
+			FindTopParent()->FullRefresh();
+		}
 	}
 
-	void Widget::RearrangeAndRepaint()
+	void Widget::Rearrange(Widget* Widget)
 	{
-		Widget* Top = FindTopParent();
-		Top->OnRePaint.Broadcast(this);
-		Top->OnReArrange.Broadcast(this);
+		// By default, arrange this widget
+		if (!Widget)
+			Widget = this;
+
+		Ry::Widget* TopParent = FindTopParent();
+		if(TopParent != this)
+		{
+			FindTopParent()->Rearrange(Widget);
+		}
+
 	}
 
-	void Widget::Remove()
+	void Widget::UpdateBatch()
 	{
-	}
-
-	void Widget::GetAllChildren(Ry::ArrayList<Widget*>& OutChildren)
-	{
-
+		Ry::Widget* TopParent = FindTopParent();
+		if (TopParent != this)
+		{
+			FindTopParent()->UpdateBatch();
+		}
 	}
 
 	void Widget::SetParent(Widget* Parent)
@@ -219,7 +220,7 @@ namespace Ry
 			Temp = Temp->Parent;
 		}
 
-		RearrangeAndRepaint();
+		Rearrange();
 	}
 
 	PipelineState Widget::GetPipelineState(const Widget* ForWidget) const
@@ -255,14 +256,8 @@ namespace Ry
 		}
 	}
 
-	Widget& Widget::operator[](SharedPtr<Ry::Widget> Child)
-	{
-		return *this;
-	}
-
 	void Widget::Arrange()
 	{
-
 	}
 
 	void Widget::OnHovered(const MouseEvent& MouseEv)
@@ -336,35 +331,40 @@ namespace Ry
 	void Widget::SetVisible(bool bVisibility, bool bPropagate)
 	{
 		// Sets the actual value of visibility and ensures propagation
-		SetVisibleInternal(bVisibility, bPropagate);
+		SetVisibleFlag(bVisibility, bPropagate);
 
-		// Actually marks the widget as dirty. Saves having to do this for each child widget.
-		RearrangeAndRepaint();
+		// Tells the batch to update since we likely added/removed geometry during this visibility change.
+		UpdateBatch();
 	}
 
-	void Widget::SetVisibleInternal(bool bVisibility, bool bPropagate)
+	void Widget::SetVisibleFlag(bool bVisibility, bool bPropagate)
 	{
 		this->bVisible = bVisibility;
 	}
 
-	// void Widget::MarkDirty(Widget* Self, bool bRePaint, bool bNeedsReArrange, bool bFullRefresh)
-	// {
-	// 	Widget* CurrentParent = Self;
-	// 	while(CurrentParent && CurrentParent->Parent)
-	// 	{
-	// 		CurrentParent = CurrentParent->Parent;
-	// 	}
-	//
-	// 	GetT->RenderStateDirty.Broadcast(Self, bRePaint, bNeedsReArrange, bFullRefresh);
-	// }
-
-	void Widget::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	void Widget::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse)
 	{
 		// By default, add the pipeline state associated with the entire widget.
 		// Children widgets can have their own dynamic pipeline states, but most widgets don't implement this.
 		// One widget that does implement this is the splitter widget.
 
 		//OutStates.Add(GetPipelineState(nullptr));
+	}
+
+	void Widget::SetBatch(Batch* Bat)
+	{
+		this->Bat = Bat;
+	}
+
+	Batch* Widget::GetBatch()
+	{
+		Widget* TopMostParent = this;
+		while(TopMostParent && TopMostParent->Parent)
+		{
+			TopMostParent = TopMostParent->Parent;
+		}
+
+		return TopMostParent->Bat;
 	}
 
 	SizeType Widget::GetScaledSlotSize(const Widget* ForWidget) const

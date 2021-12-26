@@ -55,18 +55,11 @@ namespace Ry
 		SlotWidget& Padding(float Pad);
 		SlotWidget& Padding(float Vertical, float Horizontal);
 		SlotWidget& Padding(float Left, float Right, float Top, float Bottom);
-		//SlotWidget& SetVerticalAlignment(VAlign Alignment);
-		//SlotWidget& SetHorizontalAlignment(HAlign Alignment);
 		SlotWidget& AutoWidth();
 		SlotWidget& AutoHeight();
-		//SlotWidget& FillX(float FillX);
-		//SlotWidget& FillY(float FillY);
 		SlotWidget& FillParent();
-		//SlotWidget& SetVAlign(VAlign VerticalAlign);
-		//SlotWidget& SetHAlign(HAlign HorizontalAlign);
-		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		SizeType ComputeSize() const override;
-		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
+		void SetVisibleFlag(bool bVisibility, bool bPropagate) override;
 		void Draw() override;
 		void Update() override;
 		void Arrange() override;
@@ -79,11 +72,13 @@ namespace Ry
 		bool OnChar(const CharEvent& CharEv) override;
 		bool OnKey(const KeyEvent& KeyEv) override;
 		bool OnPathDrop(const PathDropEvent& PathDropEv) override;
-		Widget& operator[](SharedPtr<Ry::Widget> Child) override;
 		void OnHovered(const MouseEvent& MouseEv) override;
 		void OnUnhovered(const MouseEvent& MouseEv) override;
 		bool OnPressed(const MouseButtonEvent& MouseEv) override;
 		bool OnReleased(const MouseButtonEvent& MouseEv) override;
+		void OnShow(Ry::Batch* Batch) override;
+		void OnHide(Ry::Batch* Batch) override;
+		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse) override;
 		
 		SizeType GetScaledOccupiedSize(const Widget* ForWidget) const override;
 		SizeType GetScaledSlotSize(const Widget* ForWidget) const override;

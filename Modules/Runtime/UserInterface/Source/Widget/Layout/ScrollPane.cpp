@@ -73,7 +73,7 @@ namespace Ry
 		if (std::abs(Prev - Scroll) >= 0.000001f)
 		{
 			// Scroll amount has changed, mark widget as dirty	
-			RearrangeAndRepaint();
+			Rearrange();
 		}
 	}
 
@@ -90,7 +90,7 @@ namespace Ry
 		if (std::abs(Prev - Scroll) >= 0.000001f)
 		{
 			// Scroll amount has changed, mark widget as dirty	
-			RearrangeAndRepaint();
+			Rearrange();
 		}
 	}
 
@@ -232,8 +232,10 @@ namespace Ry
 		return State;
 	}
 
-	void ScrollPane::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	void ScrollPane::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse)
 	{
+		PanelWidget::GetPipelineStates(OutStates, bRecurse);
+
 		OutStates.Add(GetPipelineState(nullptr));
 	}
 
@@ -272,45 +274,50 @@ namespace Ry
 
 	void ScrollPane::OnShow(Ry::Batch* Batch)
 	{
-		Widget::OnShow(Batch);
+		PanelWidget::OnShow(Batch);
 
 		//Batch->AddItem(DebugRect, "Shape", GetPipelineState(this));
 
 		// Push scroll bar to last layer
 		// todo: come up with better way than this
 		RectScissor Scissor;
-		if(ShouldShowHorizontalScrollbar())
-		{
-			HorizontalScrollBar->Show(HorizontalBarItem, Batch, -1, GetPipelineState(this));
-		}
 
-		if(ShouldShowVertScrollbar())
-		{
-			VerticalScrollBar->Show(VerticalBarItem, Batch, -1, GetPipelineState(this));
-		}
 	}
 
 	void ScrollPane::OnHide(Ry::Batch* Batch)
 	{
-		Widget::OnHide(Batch);
+		PanelWidget::OnHide(Batch);
 
 		//Batch->RemoveItem(DebugRect);
 
-		VerticalScrollBar->Hide(VerticalBarItem, Batch);
-		HorizontalScrollBar->Hide(HorizontalBarItem, Batch);
+	}
+
+	void ScrollPane::Update()
+	{
+		PanelWidget::Update();
+
+		if (ShouldShowHorizontalScrollbar())
+		{
+			HorizontalScrollBar->Show(HorizontalBarItem, GetBatch(), -1, GetPipelineState(this));
+		}
+		else
+		{
+			HorizontalScrollBar->Hide(HorizontalBarItem, GetBatch());
+		}
+
+		if (ShouldShowVertScrollbar())
+		{
+			VerticalScrollBar->Show(VerticalBarItem, GetBatch(), -1, GetPipelineState(this));
+		}
+		else
+		{
+			VerticalScrollBar->Hide(VerticalBarItem, GetBatch());
+		}
 	}
 
 	SizeType ScrollPane::ComputeSize() const
 	{
 		return Widget::GetScaledSlotSize(this);
-		/*		if(Parent)
-				{
-					return Parent->ComputeSize();
-				}
-				else
-				{
-					return SizeType{ Ry::GetViewportWidth(), Ry::GetViewportHeight() };
-				}*/
 	}
 
 	void ScrollPane::ClearChildren()

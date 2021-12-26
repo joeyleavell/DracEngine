@@ -13,17 +13,19 @@ namespace Ry
 	public:
 		PanelWidget() = default;
 
+		virtual void ClearChildren();
+
 		SharedPtr<Widget> FindChildWidgetById(const Ry::String& Id) const override;
 		void SetStyle(const Ry::StyleSet* Style) override;
 		virtual SharedPtr<PanelWidgetSlot> AppendSlot(SharedPtr<Widget> Widget);
 		void OnShow(Ry::Batch* Batch) override;
 		void OnHide(Ry::Batch* Batch) override;
 		void SetParent(Widget* Parent) override;
-		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
+//		void GetAllChildren(Ry::ArrayList<Widget*>& OutChildren) override;
 		void Draw() override;
 		void Update() override;
 		PanelWidget& operator+(Ry::SharedPtr<Widget>& Widget);
-		void SetVisibleInternal(bool bVisibility, bool bPropagate) override;
+		void SetVisibleFlag(bool bVisibility, bool bPropagate) override;
 		bool OnMouseEvent(const MouseEvent& MouseEv) override;
 		bool OnMouseButtonEvent(const MouseButtonEvent& MouseEv) override;
 		bool OnMouseClicked(const MouseClickEvent& MouseEv) override;
@@ -32,7 +34,7 @@ namespace Ry
 		bool OnKey(const KeyEvent& KeyEv) override;
 		bool OnChar(const CharEvent& CharEv) override;
 		bool OnPathDrop(const PathDropEvent& PathDropEv) override;
-		virtual void ClearChildren();
+		void GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse) override;
 		//RectScissor GetClipSpace(const Widget* ForWidget) const override;
 
 		//SizeType GetSlotSize(const Widget* ForWidget, bool bIncludePadding = false) const override;

@@ -10,6 +10,8 @@ namespace Ry
 
 	void BorderWidget::OnShow(Ry::Batch* Batch)
 	{
+		SlotWidget::OnShow(Batch);
+
 		if(!BoxStyleName.IsEmpty())
 		{
 			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
@@ -57,6 +59,7 @@ namespace Ry
 
 	void BorderWidget::OnHide(Ry::Batch* Batch)
 	{
+		SlotWidget::OnHide(Batch);
 		if(!BoxStyleName.IsEmpty())
 		{
 			const BoxStyle& BoxStyle = Style->GetBoxStyle(BoxStyleName);
@@ -127,21 +130,21 @@ namespace Ry
 	{
 		SlotWidget::OnHovered(MouseEv);
 
-		RearrangeAndRepaint();
+		Rearrange();
 	}
 
 	void BorderWidget::OnUnhovered(const MouseEvent& MouseEv)
 	{
 		SlotWidget::OnUnhovered(MouseEv);
 
-		RearrangeAndRepaint();
+		Rearrange();
 	}
 
 	bool BorderWidget::OnPressed(const MouseButtonEvent& MouseEv)
 	{
 		SlotWidget::OnPressed(MouseEv);
 
-		RearrangeAndRepaint();
+		Rearrange();
 
 		return true;
 	}
@@ -150,9 +153,16 @@ namespace Ry
 	{
 		SlotWidget::OnReleased(MouseEv);
 
-		RearrangeAndRepaint();
+		Rearrange();
 
 		return true;
+	}
+
+	void BorderWidget::SetVisibleFlag(bool bVisibility, bool bPropagate)
+	{
+		SlotWidget::SetVisibleFlag(bVisibility, bPropagate);
+
+		ItemSet->bVisible = bVisibility;
 	}
 
 }

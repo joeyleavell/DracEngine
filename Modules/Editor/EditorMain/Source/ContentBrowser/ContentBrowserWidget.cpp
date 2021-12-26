@@ -56,7 +56,8 @@ namespace Ry
 			Offset.Y = (int32) MouseEv.MouseY - Icon->GetAbsolutePosition().Y;
 
 			this->bIsPressed = true;
-			RearrangeAndRepaint();
+			//RearrangeAndRepaint();
+
 			return true;
 		}
 
@@ -65,7 +66,17 @@ namespace Ry
 			this->bIsPressed = false;
 			this->bIsDragging = false;
 
-			RearrangeAndRepaint();
+			if (Batch* Batch = GetBatch())
+			{
+				if (IsVisible())
+				{
+					HideGhost(Batch);
+					Rearrange();
+				}
+			}
+
+			//RearrangeAndRepaint();
+
 			return true;
 		}
 
@@ -92,8 +103,20 @@ namespace Ry
 			LastMouseX = MouseEv.MouseX;
 			LastMouseY = MouseEv.MouseY;
 
+			if(!bGhostShown)
+			{
+				if (Batch* Batch = GetBatch())
+				{
+					if (IsVisible())
+					{
+						ShowGhost(Batch);
+					}
+				}
+			}
+
+			Rearrange();
 			// MarkDirty; this widget needs a re-draw as the widget matches the x,y position of the mouse
-			RearrangeAndRepaint();
+			//RearrangeAndRepaint();
 
 			return true;
 		}
@@ -107,21 +130,7 @@ namespace Ry
 
 		if(bIsDragging && !bGhostShown)
 		{
-			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
-
-			// Set state of "ghost" icon
-			{
-				PipelineState State = GetPipelineState(this);
-				State.StateID += "_Drag";
-				State.Scissor.X = 0;
-				State.Scissor.Y = 0;
-				State.Scissor.Width = Ry::GetViewportWidth();
-				State.Scissor.Height = Ry::GetViewportHeight();
-
-				IconStyle.Default->Show(GhostIconItemSet, Batch, GetWidgetID(), State);
-
-				bGhostShown = true;
-			}
+			ShowGhost(Batch);
 		}
 	}
 
@@ -131,9 +140,7 @@ namespace Ry
 
 		if(bGhostShown)
 		{
-			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
-			IconStyle.Default->Hide(GhostIconItemSet, Batch);
-			bGhostShown = false;
+			HideGhost(Batch);
 		}
 	}
 
@@ -147,6 +154,32 @@ namespace Ry
 			const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
 			IconStyle.Default->Draw(GhostIconItemSet, LastMouseX - static_cast<float>(Offset.X), LastMouseY - static_cast<float>(Offset.Y), static_cast<float>(Size.Width), static_cast<float>(Size.Height));
 		}
+	}
+
+	void ContentBrowserItem::ShowGhost(Batch* Bat)
+	{
+		const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
+
+		// Set state of "ghost" icon
+		{
+			PipelineState State = GetPipelineState(this);
+			State.StateID += "_Drag";
+			State.Scissor.X = 0;
+			State.Scissor.Y = 0;
+			State.Scissor.Width = Ry::GetViewportWidth();
+			State.Scissor.Height = Ry::GetViewportHeight();
+
+			IconStyle.Default->Show(GhostIconItemSet, Bat, GetWidgetID(), State);
+
+			bGhostShown = true;
+		}
+	}
+
+	void ContentBrowserItem::HideGhost(Batch* Bat)
+	{
+		const BoxStyle& IconStyle = Style->GetBoxStyle(Icon->BoxStyleName);
+		IconStyle.Default->Hide(GhostIconItemSet, Bat);
+		bGhostShown = false;
 	}
 
 	ContentBrowserWidget::ContentBrowserWidget()

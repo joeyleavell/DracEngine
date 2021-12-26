@@ -27,6 +27,7 @@ namespace Ry
 		void OnUnhovered(const MouseEvent& MouseEv) override;
 		bool OnPressed(const MouseButtonEvent& MouseEv) override;
 		bool OnReleased(const MouseButtonEvent& MouseEv) override;
+		void SetVisibleFlag(bool bVisibility, bool bPropagate) override;
 
 	private:
 

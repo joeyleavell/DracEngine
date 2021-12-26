@@ -72,10 +72,10 @@ namespace Ry
 		switch (Format)
 		{
 		case PixelFormat::R8G8B8A8:
-			GLFormat = GL_RGB;
+			GLFormat = GL_RGBA;
 			break;
 		case PixelFormat::R8G8B8:
-			GLFormat = GL_RGBA;
+			GLFormat = GL_RGB;
 			break;
 		default:
 			Ry::Log->LogError("NON SUPPORTED FORMAT RETURNING GL_RGB " + Ry::to_string((int32)Format));

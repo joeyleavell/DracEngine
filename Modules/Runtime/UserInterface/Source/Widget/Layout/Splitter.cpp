@@ -66,8 +66,10 @@ namespace Ry
 
 	}
 
-	void Splitter::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates)
+	void Splitter::GetPipelineStates(Ry::ArrayList<PipelineState>& OutStates, bool bRecurse)
 	{
+		PanelWidget::GetPipelineStates(OutStates, bRecurse);
+
 		OutStates.Add(GetPipelineState(Children[0].Get()));
 		OutStates.Add(GetPipelineState(Children[1].Get()));
 		OutStates.Add(GetPipelineState(nullptr));
