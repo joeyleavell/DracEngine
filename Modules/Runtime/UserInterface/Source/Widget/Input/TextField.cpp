@@ -69,9 +69,6 @@ namespace Ry
 		Batch->AddItemSet(ItemSet, "Font", GetPipelineState(this), ResolvedStyle.Font->GetAtlasTexture(), WidgetLayer + 1);
 		Batch->AddItem(CursorItem, "Shape", GetPipelineState(this), (Texture*) nullptr, WidgetLayer + 1);
 
-		if (CursorPos != SelectionPos && SelectionPos >= 0)
-			Batch->AddItem(SelectionItem, "Shape", GetPipelineState(this), (Texture*) nullptr, WidgetLayer);
-
 	}
 
 	void TextField::OnHide(Ry::Batch* Batch)
@@ -152,7 +149,7 @@ namespace Ry
 			CursorPos = CursorAdvanceRight(Initial);
 			SelectionPos = CursorAdvanceLeft(Initial);
 
-			Rearrange();
+			UpdateSelectionBox();
 
 			return true;
 		}
@@ -168,6 +165,7 @@ namespace Ry
 			int32 MouseXOffset = (int32)(MouseEv.MouseX - Abs.X);
 			CursorPos = FindClosestCursorIndex(MouseXOffset);
 
+			UpdateSelectionBox();
 			Rearrange();
 
 		}
@@ -196,8 +194,6 @@ namespace Ry
 				{
 					SelectionPos = -1;
 				}
-
-				Rearrange();
 			}
 			else
 			{
@@ -205,6 +201,7 @@ namespace Ry
 			}
 		}
 
+		UpdateSelectionBox();
 		Rearrange();
 
 		return true;
@@ -282,13 +279,11 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					Rearrange();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					Rearrange();
 				}
 			}
 
@@ -299,7 +294,6 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				Rearrange();
 			}
 
 			// Simply decrement cursor pos
@@ -318,12 +312,13 @@ namespace Ry
 				CursorPos = CursorPos < SelectionPos ? CursorPos : SelectionPos;
 				SelectionPos = -1;
 			}
-
-			Rearrange();
 		}
 
 		if (CursorPos < 0)
 			CursorPos = 0;
+
+		Rearrange();
+		UpdateSelectionBox();
 	}
 
 	int32 TextField::CursorAdvanceLeft(int32 Initial)
@@ -378,13 +373,11 @@ namespace Ry
 				{
 					// We had a selection but it was broken
 					SelectionPos = -1;
-					Rearrange();
 				}
 				else if (SelectionPos == -1 || InitialCursor == SelectionPos)
 				{
 					// We didn't have a selection, create one
 					SelectionPos = InitialCursor;
-					Rearrange();
 				}
 			}
 		}
@@ -393,7 +386,6 @@ namespace Ry
 			if (SelectionPos < 0 || SelectionPos == CursorPos)
 			{
 				SelectionPos = CursorPos;
-				Rearrange();
 			}
 
 			// Simply increment cursor pos
@@ -411,13 +403,14 @@ namespace Ry
 				CursorPos = CursorPos < SelectionPos ? SelectionPos : CursorPos;
 				SelectionPos = -1;
 			}
-
-			Rearrange();
 		}
 
 
 		if (CursorPos > Text.getSize())
 			CursorPos = Text.getSize();
+
+		UpdateSelectionBox();
+		Rearrange();
 	}
 
 	void TextField::InsertText(const Ry::String Insert)
@@ -444,6 +437,16 @@ namespace Ry
 		CursorPos += Insert.getSize();
 		SelectionPos = -1; // Selection immediately goes away on type
 		FullRefresh();
+	}
+
+	void TextField::UpdateSelectionBox()
+	{
+		if (CursorPos != SelectionPos && SelectionPos >= 0)
+			GetBatch()->AddItem(SelectionItem, "Shape", GetPipelineState(this), (Texture*) nullptr, WidgetLayer);
+		else
+			GetBatch()->RemoveItem(SelectionItem);
+
+		UpdateBatch();
 	}
 
 	bool TextField::OnKey(const KeyEvent& KeyEv)

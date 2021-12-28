@@ -224,7 +224,7 @@ namespace Ry
 
 	PipelineState ScrollPane::GetPipelineState(const Widget* ForWidget) const
 	{
-		static Ry::String StateId = Ry::to_string(GetWidgetID());
+		Ry::String StateId = Ry::to_string(GetWidgetID());
 		PipelineState State;
 		State.Scissor = GetClipSpace(ForWidget); // Scroll pane doesn't 
 		State.StateID = StateId;

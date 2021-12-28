@@ -14,7 +14,19 @@
                 </Slot>
 
                 <Slot>
-                    <Ry::SceneView Id="SceneView"/>
+                    <Ry::Splitter BarThickness="10.0" Type="1">
+                        <Slot>
+                            <Ry::SceneView Id="SceneView"/>
+                        </Slot>
+
+                        <Slot>
+                            <Ry::BorderWidget BoxStyleName="ContentBrowserBackground" FillX="1.0" FillY="1.0" WidthMode="1" HeightMode="1">
+                                <Ry::ScrollPane Id="DetailsPanel"/>
+                            </Ry::BorderWidget>
+                        </Slot>
+
+                    </Ry::Splitter>
+
                 </Slot>
             </Ry::Splitter>
         </Slot>

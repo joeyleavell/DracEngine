@@ -1,4 +1,6 @@
 #include "MainWindow/MainEditorLayer.h"
+
+#include "DetailsView.h"
 #include "RenderAPI.h"
 #include "Widget/UserInterface.h"
 #include "Widget/BorderWidget.h"
@@ -79,6 +81,7 @@ namespace Ry
 
 		Ry::SharedPtr<Ry::BorderWidget> Root;
 		Ry::SharedPtr<Ry::ContentBrowserWidget> BrowserWidget;
+		Ry::SharedPtr<Ry::ScrollPane> DetailsPanel;
 		SharedPtr<Ry::SceneView> SceneView;
 
 		// Build editor UI
@@ -92,6 +95,8 @@ namespace Ry
 				SceneView->SetSceneRenderer(SceneRenderer);
 				SceneView->OnSceneResized.AddMemberFunction(this, &MainEditorLayer::SceneResized);
 			}
+
+			DetailsPanel = Root->FindChildWidget<Ry::ScrollPane>("DetailsPanel");
 		}
 		
 		// Create the content browser utility
@@ -108,6 +113,15 @@ namespace Ry
 		if(SceneView)
 		{
 			SizeType SceneViewSize = SceneView->ComputeSize();
+		}
+
+		if(DetailsPanel)
+		{
+			TestObj Obj;
+			Obj.TestString = "hello";
+			Ry::SharedPtr<DetailsView> Details = MakeShared(new DetailsView);
+			Details->SetObject(&Obj);
+			DetailsPanel->AppendSlot(Details);
 		}
 
 		// Initialize the directory now that the content browser is added to the root

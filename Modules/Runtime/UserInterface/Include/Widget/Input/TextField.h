@@ -60,6 +60,8 @@ namespace Ry
 
 	private:
 
+		void UpdateSelectionBox();
+
 		bool bDragging = false;
 		int32 CursorPos;
 		int32 SelectionPos;
