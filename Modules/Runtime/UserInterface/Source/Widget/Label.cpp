@@ -7,6 +7,7 @@ namespace Ry
 		Widget()
 	{
 		ItemSet = MakeItemSet();
+		MinimumWidth = 200.0f;
 	}
 
 	SizeType Label::ComputeSize() const
@@ -17,6 +18,12 @@ namespace Ry
 
 			CachedSize.Width = static_cast<int32>(ResolvedTextStyle.Font->MeasureWidth(Text));
 			CachedSize.Height = static_cast<int32>(ResolvedTextStyle.Font->MeasureHeight(Text, static_cast<float>(CachedSize.Width)));
+
+			if(MinimumWidth >= 0 && CachedSize.Width < MinimumWidth)
+			{
+				CachedSize.Width = MinimumWidth;
+			}
+
 			bTextSizeDirty = false;
 		}
 

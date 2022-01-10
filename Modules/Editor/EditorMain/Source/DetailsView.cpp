@@ -48,6 +48,8 @@ namespace Ry
 
 		LabelSlot->SetPadding(5.0f);
 		ValueSlot->SetPadding(5.0f);
+		LabelSlot->HorizontalAlignMode = HOR_ALIGN_FILL;
+		ValueSlot->HorizontalAlignMode = VERT_ALIGN_FILL;
 
 		SharedPtr<PanelWidgetSlot> Row = DetailsPanel->AppendSlot(FieldRow);
 		Row->SetPadding(10.0f);

@@ -21,7 +21,7 @@ namespace Ry
 		for (SharedPtr<HorizontalPanelSlot> ChildSlot : ChildrenSlots)
 		{
 			SharedPtr<Ry::Widget> Widget = ChildSlot->GetWidget();
-			SizeType ContentSize = Widget->ComputeSize();
+			SizeType ContentSize = Widget->ComputeSize();// GetScaledSlotSize(Widget.Get());
 
 			CurrentX += static_cast<int32>(ChildSlot->PaddingLeft);
 

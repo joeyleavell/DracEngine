@@ -20,6 +20,9 @@ namespace Ry
 		RefField()
 		Ry::String TextStyleName;
 
+		RefField()
+		int32 MinimumWidth;
+
 		Label();
 		SizeType ComputeSize() const override;
 		Label& SetText(const Ry::String& Text);
