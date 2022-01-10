@@ -7,7 +7,7 @@ namespace Ry
 		Widget()
 	{
 		ItemSet = MakeItemSet();
-		MinimumWidth = 200.0f;
+		MinimumWidth = 125.0f;
 	}
 
 	SizeType Label::ComputeSize() const

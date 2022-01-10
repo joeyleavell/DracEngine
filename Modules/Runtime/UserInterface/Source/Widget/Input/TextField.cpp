@@ -469,8 +469,6 @@ namespace Ry
 				{
 					SelectionPos = 0;
 					CursorPos = Text.getSize();
-
-					FullRefresh();
 				}
 
 				// Pasting text
@@ -495,6 +493,7 @@ namespace Ry
 				HandleRightArrow(KeyEv);
 			}
 
+			UpdateSelectionBox();
 			FullRefresh();
 		}
 
@@ -506,6 +505,7 @@ namespace Ry
 		// Modify the text
 		InsertText(Ry::String("") + static_cast<char>(CharEv.Codepoint));
 
+		UpdateSelectionBox();
 		FullRefresh();
 
 		return true;

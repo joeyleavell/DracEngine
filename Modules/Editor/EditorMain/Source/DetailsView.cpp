@@ -1,6 +1,7 @@
 #include "DetailsView.h"
 
 #include "Widget/Label.h"
+#include "Widget/Input/TextBox.h"
 #include "Widget/Input/TextField.h"
 
 namespace Ry
@@ -35,12 +36,12 @@ namespace Ry
 	{
 		SharedPtr<Ry::HorizontalPanel> FieldRow = MakeShared(new Ry::HorizontalPanel);
 		SharedPtr<Ry::Label> RowLabel = MakeShared(new Ry::Label);
-		SharedPtr<Ry::TextField> StringField = MakeShared(new Ry::TextField);
+		SharedPtr<Ry::TextBox> StringField = MakeShared(new Ry::TextBox);
 
 		RowLabel->TextStyleName = "Normal";
 		RowLabel->SetText(Field.Name);
 
-		StringField->TextStyleName = "Normal";
+		StringField->GetTextField()->SetStyle("Normal");
 		StringField->SetText(*Field.GetConstPtrToField<Ry::String>(Object)); // Set the initial text
 
 		SharedPtr<PanelWidgetSlot> LabelSlot = FieldRow->AppendSlot(RowLabel);

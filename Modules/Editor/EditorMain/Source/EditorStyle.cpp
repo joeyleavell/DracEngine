@@ -79,6 +79,14 @@ namespace Ry
 			EditorStyle.AddBoxStyle("ContentBrowserBackground", ContentBrowserBackground);
 		}
 
+		// Background for text boxes
+		{
+			BoxStyle TextBoxBackground;
+			TextBoxBackground.DefaultBox().SetBackgroundColor(WHITE.ScaleRGB(0.2f));
+			TextBoxBackground.DefaultBox().SetBorderRadius(5.0f);
+			EditorStyle.AddBoxStyle("TextBox", TextBoxBackground);
+		}
+
 		// Register the style globally
 		RegisterStyle("Editor", &EditorStyle);
 	}
